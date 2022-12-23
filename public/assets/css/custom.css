@@ -1,0 +1,98 @@
+.font-weight-bold {
+    font-weight: bold;
+    color:#46a795;
+}
+
+.font-weight-bold:hover {
+    color: #24695d;
+}
+
+.form-label-black {
+    color: black !important;
+    font-size: 15px;
+}
+
+.error {
+    color: red !important;
+    margin: 0px 0px 5px 0px !important;
+}
+
+.width-80 {
+    width: 80% !important;
+}
+
+.width-10 {
+    width: 10% !important;
+}
+
+.width-5 {
+    width: 5% !important;
+}
+
+.width-6 {
+    width: 6% !important;
+}
+
+.width-9 {
+    width: 9% !important;
+}
+
+.text-sm-custom {
+    font-size: 14px !important;
+}
+
+.table th {
+    font-size: 12px;
+    vertical-align: top;
+}
+
+.card .card-header-custom {
+    padding: 15px 0px 0px 25px !important;
+    border-bottom: solid 2px #f5f7fb;
+    font-family: Montserrat, sans-serif;
+    font-weight: 600;
+}
+
+.font-weight-600-height-7 {
+    font-weight: 500 !important;
+    line-height:0.7 !important;
+}
+
+.linebreak {
+    height: 15px;
+}
+
+.height-auto {
+    width: auto;
+}
+
+.text-12 {
+    font-size: 12px;
+}
+
+.text-10 {
+    font-size: 10px;
+}
+
+.text-20 {
+    font-size: 20px;
+}
+
+.centering {
+    margin: auto;
+}
+
+.cursor-pointer {
+    cursor:pointer;
+}
+
+.cursor-pointer:hover {
+    color: #24695c;
+}
+
+
+@media only screen and (max-width: 1337px) {
+    .mb-1-responsive {
+        margin-bottom: -12px !important;
+    }
+}
