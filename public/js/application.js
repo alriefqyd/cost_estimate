@@ -1,4 +1,7 @@
 $(function(){
+
+    $('.select2').select2();
+
     /**
      * Project Form
      */

@@ -1,12 +1,12 @@
-insert into users 
-	(`name`,`email`,`password`,`created_at`,`updated_at`,`role`,`profile_id`)
-values 
-	('system','system@mail.system','$2y$10$UK19PtQqzN.OAZS07fKF6eXlN/E/jREKQYdscmoKe1mdefqh0fziO',now(),now(),'admin','1');
+insert into users
+	(`name`,`email`,`password`,`created_at`,`updated_at`)
+values
+	('system','system@mail.system','$2y$10$UK19PtQqzN.OAZS07fKF6eXlN/E/jREKQYdscmoKe1mdefqh0fziO',now(),now());
 
 
 INSERT INTO man_powers
     (`code`,`skill_level`,`title`,`basic_rate_month`,`basic_rate_hour`,`general_allowance`,`bpjs`,`bpjs_kesehatan`,`thr`,`public_holiday`,`leave`,`pesangon`,`asuransi`,`safety`,`total_benefit_hourly`,`overall_rate_hourly`,`factor_hourly`)
-    values 
+    values
     ('SUPV','Skilled','Supervisor',4420244.43,25550.545838150287,0,1977.612247872832,1022.0218335260115,2128.3604683179187,0,0,4683.4150521329475,0,590.8798972382788,10402.28949908799,35952.83533723828,62917.46184016699),
     ('SFTOF','Skilled','Safety Officer',3788780.94,21900.467861271674,0,1695.0962124624275,876.018714450867,1824.3089728439304,0,0,4014.3557589710977,0,590.8798972382788,9000.659555966602,30901.127417238276,54076.97298016698),
     ('TECH1','Skilled','Technician ? 1',3788553.6131435996,21899.1538332,0,1694.9945066896798,875.9661533279999,1824.19951430556,0,0,4014.1148976255595,0,590.8798972382788,9000.154969187079,30899.308802387077,54073.79040417739),
@@ -64,7 +64,9 @@ INSERT INTO man_powers
     ('PRJCONT','Skilled','Project Controller',12856129.97,74312.89,0,5751.817685999999,2972.5156,6190.263737,0,0,13621.552737,0,590.8798972382788,29127.02965723828,103439.91965723828,181019.85940016698),
     ('PLCPRGR','Skilled','PLC Programmer',22500000,130057.80346820809,0,10066.473988439306,5202.312138728324,10833.815028901734,0,0,23839.595375722543,0,590.8798972382788,50533.07642903019,180590.87989723828,316034.039820167);
 
-INSERT INTO `equipment_tools_categoryss` VALUES (1,'EQ010','Passenger Vehicle','2022-07-26 05:31:48','2022-07-26 05:31:48'),(2,'EQ021','Surveying Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(3,'EQ030',' Lifting and supporting Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(4,'EQ040',' Material Handling and conveying Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(5,'EQ050',' Ground excavation and Grading Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(6,'EQ060 ','Ground compaction Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(7,'EQ070 ','Pumps and compressor','2022-07-26 05:31:48','2022-07-26 05:31:48'),(8,'EQ080',' Steel Fabrication Tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(9,'EQ090',' Generator','2022-07-26 05:31:48','2022-07-26 05:31:48'),(10,'EQ100',' Concrete Work Tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(11,'EQ110','Cable wiring Installation tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(12,'EQ120 ','Piping and Plumbing Work tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(13,'EQ130','Painting Tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(14,'EQ140 ','Inspection Tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(15,'EQ150 ','Construction Aid','2022-07-26 05:31:48','2022-07-26 05:31:48'),(16,'EQ160','Special Vehicle or tools','2022-07-26 05:31:48','2022-07-26 05:31:48');
+INSERT INTO `equipment_tools_categoryss`
+    (`id`,`code`,`description`,`created_at`,`updated_at`)
+VALUES (1,'EQ010','Passenger Vehicle','2022-07-26 05:31:48','2022-07-26 05:31:48'),(2,'EQ021','Surveying Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(3,'EQ030',' Lifting and supporting Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(4,'EQ040',' Material Handling and conveying Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(5,'EQ050',' Ground excavation and Grading Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(6,'EQ060 ','Ground compaction Equipment','2022-07-26 05:31:48','2022-07-26 05:31:48'),(7,'EQ070 ','Pumps and compressor','2022-07-26 05:31:48','2022-07-26 05:31:48'),(8,'EQ080',' Steel Fabrication Tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(9,'EQ090',' Generator','2022-07-26 05:31:48','2022-07-26 05:31:48'),(10,'EQ100',' Concrete Work Tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(11,'EQ110','Cable wiring Installation tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(12,'EQ120 ','Piping and Plumbing Work tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(13,'EQ130','Painting Tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(14,'EQ140 ','Inspection Tools','2022-07-26 05:31:48','2022-07-26 05:31:48'),(15,'EQ150 ','Construction Aid','2022-07-26 05:31:48','2022-07-26 05:31:48'),(16,'EQ160','Special Vehicle or tools','2022-07-26 05:31:48','2022-07-26 05:31:48');
 
 
 insert into materials_categorys (`code`,`description`)
@@ -242,10 +244,10 @@ VALUES
     ((select id from equipment_tools_categorys where code = 'EQ160'),'4018102','Cadweld Mould Horizontal Tee "TA" 95 to 95 mm2',1,'set',1653000,NULL,NULL,NULL),
     ((select id from equipment_tools_categorys where code = 'EQ160'),'4018103','Cadweld Mould Vertical Steel Surface "VS" 95 mm2',NULL,NULL,1653000,NULL,NULL,NULL),
     ((select id from equipment_tools_categorys where code = 'EQ160'),'4018104','Cadweld Mould Vertical Cable to Ground Rod  "GT" 5/8" to 95 mm2',NULL,NULL,1653000,NULL,NULL,NULL);
-    
 
-    
-INSERT INTO materials 
+
+
+INSERT INTO materials
 (`category_id`,`code`,`tool_equipment_description`,`quantity`,`unit`,`rate`,`ref_material_number`,`updated_at`,`remark`,`stock_code`,`description`)
 VALUES
     ((select id from materials_categorys where code = 'M010'),'M010.001','Concrete mix 15 Mpa, from CS Batching plant',1,'m3','2204160',NULL,'2017-06-13 00:00:00',NULL,15102686,NULL),
@@ -347,7 +349,7 @@ VALUES
     ((select id from materials_categorys where code = 'M070'),'15117571','ANGLE:STRUCT;EQUAL;65X65X8MM;6M;7.66KG/M ',1,'Kg','14307.658833768493','SAP','2018-07-17 00:00:00','dahlan ',NULL,NULL),
     ((select id from materials_categorys where code = 'M070'),'15117544','BEAM, STRUCTURAL;WIDE; 152MM DEPTH;6M',1,'Kg','17000',NULL,NULL,NULL,NULL,NULL),
     ((select id from materials_categorys where code = 'M080'),'M080.001','Pasir Pasang',1,'M3','170400',NULL,NULL,NULL,NULL,NULL),
-    ((select id from materials_categorys where code = 'M080'),'M080.002','Pasir Urug',1,'m3','115800',NULL,NULL,NULL,NULL,NULL),  
+    ((select id from materials_categorys where code = 'M080'),'M080.002','Pasir Urug',1,'m3','115800',NULL,NULL,NULL,NULL,NULL),
     ((select id from materials_categorys where code = 'M080'),'M080.003','Backfill material - AP 20 or AP 28',1,'m3','300000',NULL,NULL,NULL,NULL,NULL),
     ((select id from materials_categorys where code = 'M080'),'M080.004','Pasir Beton',1,'m3','115800',NULL,NULL,NULL,NULL,NULL),
     ((select id from materials_categorys where code = 'M080'),'M080.005','Pasir kwarsa',1,'m3','400000',NULL,NULL,NULL,NULL,NULL),
@@ -416,7 +418,7 @@ VALUES
     ((select id from materials_categorys where code = 'M130'),'M130.009','Jotun Thinner no. 17; 5L',1,'can','189259',NULL,'2017-12-16 00:00:00','Shafwan ',NULL,NULL),
     ((select id from materials_categorys where code = 'M130'),'M130.010','Jotun Thinner no. 10; 5L',1,'can','167979',NULL,'2017-12-16 00:00:00','Shafwan ',NULL,NULL),
     ((select id from materials_categorys where code = 'M130'),'M130.011','Cat dinding, weathershield',1,'ltr','100000',NULL,'2017-09-19 09:34:42','stefen',NULL,NULL),
-    ((select id from materials_categorys where code = 'M130'),'M130.012','Wire brust',1,'EA','589000',NULL,'2017-08-14 09:34:42','Herly',NULL,NULL), 
+    ((select id from materials_categorys where code = 'M130'),'M130.012','Wire brust',1,'EA','589000',NULL,'2017-08-14 09:34:42','Herly',NULL,NULL),
     ((select id from materials_categorys where code = 'M130'),'M130.013','Painting Finishing',1,'m2','54912',NULL,'2017-08-14 09:34:42','Herly',NULL,NULL),
     ((select id from materials_categorys where code = 'M130'),'M130.014','Thinner',1,'m2','3665.025',NULL,'2017-08-14 09:34:42','Herly',NULL,NULL),
     ((select id from materials_categorys where code = 'M130'),'M130.015','Painting Priming',1,'m2','90349.974',NULL,'2017-08-14 09:34:42','Herly',NULL,NULL),
@@ -948,10 +950,10 @@ VALUES
 	1,'Pkg','78905918.56060606',NULL,NULL,'Rani-26/04/19',NULL,NULL),
 	((select id from materials_categorys where code = 'M430'),'M430.015','WS-C3650-48FD-S  Cisco Catalyst 3650 48 Port Full PoE 2x10G Uplink IP Base;
 	CON-SNT-WSC365FD  SNTC-8X5XNBD Cisco Catalyst 3650 48 Port Full PoE 2x1 ;
-	S3650UK9-37E  CAT3650 Universal k9 image 
-	PWR-C2-1025WAC  1025W AC Config 2 Power Supply 
+	S3650UK9-37E  CAT3650 Universal k9 image
+	PWR-C2-1025WAC  1025W AC Config 2 Power Supply
 
-	CAB-TA-EU  Europe AC Type A Power Cable 
+	CAB-TA-EU  Europe AC Type A Power Cable
 	STACK-T2-BLANK  Type 2 Stacking Blank;
 	1. Provide supporting letter from PT Cisco Systems Indonesia (registered partner and not end of sale device(s))
 	2. Included Smartnet / Partner Share Support services
@@ -1249,16 +1251,16 @@ VALUES
     ((select id from materials_categorys where code = 'MTE'),'MTE218','ANCHOR, MASONRY;3/8IN; 1-3/16IN LG;',1,'EA','4791.6429',NULL,NULL,'Arifai',15098784,NULL),
     ((select id from materials_categorys where code = 'MTE'),'MTE219','NUT, PLAIN, GANG CHANNEL;M8; STEEL',1,'EA','18585.7664',NULL,NULL,'Arifai',15092721,NULL),
     ((select id from materials_categorys where code = 'M130'),'MTM101','PAINT, FINISHING;HARDTOP XP;  C/O 18.2L COMP A; 1.8L COMP B; ',1,'CAN',NULL,NULL,NULL,'Satria',NULL,NULL),
-    ((select id from materials_categoryss where code = 'M130'),'MTM102','PAINT:PRIMING; JOTAMASTIC 87 ; C/O 14.7L COMP A; 2.7L COMP B; ',1,'CAN',NULL,NULL,NULL,'Satria',NULL,NULL),
+    ((select id from materials_categorys where code = 'M130'),'MTM102','PAINT:PRIMING; JOTAMASTIC 87 ; C/O 14.7L COMP A; 2.7L COMP B; ',1,'CAN',NULL,NULL,NULL,'Satria',NULL,NULL),
     ((select id from materials_categorys where code = 'M130'),'MTM103','THINNER:PAINT PRODUCTS; CAN/5L; FOR POLYUR ETHANE PRODUCTS',1,'CAN',NULL,NULL,NULL,'Satria',NULL,NULL),
     ((select id from materials_categorys where code = 'M130'),'MTM104','SANDBLASTING;STONE, CRUSHED;AGGREGATE SILICA FLUX;',1,'M3',NULL,NULL,NULL,'Satria',NULL,NULL),
     ((select id from materials_categorys where code = 'M070'),'MTM091','PLATE:MILD STEEL ASTM A36;10X1524X3048MM;G3101-SS400; ',1,'SHT',NULL,NULL,NULL,'Satria',NULL,NULL),
     ((select id from materials_categorys where code = 'M070'),'MTM092','PLATE:  MILD STEEL;  ASTM A36; SIZE: 16X1524X3048MM; ',1,'SHT',NULL,NULL,NULL,'Satria',NULL,NULL),
     ((select id from materials_categorys where code = 'M070'),'MTM093','BEAM:STRUCTURAL; WIDE; 203MM DEPTH; 133MM W; 6M LG;A36',1,'LGH',NULL,NULL,NULL,'Satria',NULL,NULL);
- 
-   
-   
-   
+
+
+
+
    INSERT INTO work_item_types
 	(`code`,`title`)
 	VALUES
@@ -1301,9 +1303,9 @@ VALUES
     ('4.7','Pemasangan kamera CCTV dan monitor'),
     ('4.8','Pemasangan FO dan LAN (Network services)'),
     ('4.9','Support manpower untuk test dan commissioning');
-   
-   
-	INSERT INTO work_items 
+
+
+	INSERT INTO work_items
     	(`work_item_type_id`,`code`,`description`,`volume`,`unit`,`total`,`amount_material`)
 	VALUES
 	    ((select id from work_item_types where code = '1.1') ,'1.1.1','Penggalian manual tanah biasa, berpasir, untuk struktural kedalaman sampai 2m, tidak termasuk membuang galian.',1,'m3',199100,NULL),
@@ -1661,4 +1663,3 @@ VALUES
 
 
     update work_items set created_by = (select id from users where name = 'system');
-   

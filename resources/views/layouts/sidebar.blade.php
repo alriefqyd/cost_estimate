@@ -15,9 +15,8 @@
                         <div class="mobile-back text-end"><span>Back</span><i class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                     </li>
                     <li class="sidebar-main-title">
-
+                        
                     </li>
-                    <li><a class="nav-link menu-title" href="/dashboard"><i data-feather="home"></i><span>Dashboard</span></a></li>
                     <li><a class="nav-link menu-title" href="/project"><i data-feather=""></i><span>Cost Estimate</span></a></li> {{--list of summary in excel template--}}
                     <li><a class="nav-link menu-title" href="/work-item"><i data-feather=""></i><span>Work Item</span></a></li>
                     <li><a class="nav-link menu-title" href="/man-power"><i data-feather=""></i><span>Man Power List</span></a></li>

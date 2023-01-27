@@ -109,7 +109,7 @@
 <script src="{{'/assets/js/vector-map/map/jquery-jvectormap-in-mill.js'}}"></script>
 <script src="{{'/assets/js/vector-map/map/jquery-jvectormap-asia-mill.js'}}"></script>
 <script src="{{'/assets/js/dashboard/default.js'}}"></script>
-<script src="{{'/assets/js/notify/index.js'}}"></script>
+{{--<script src="{{'/assets/js/notify/index.js'}}"></script>--}}
 <script src="{{'/assets/js/datepicker/date-picker/datepicker.js'}}"></script>
 <script src="{{'/assets/js/datepicker/date-picker/datepicker.en.js'}}"></script>
 <script src="{{'/assets/js/datepicker/date-picker/datepicker.custom.js'}}"></script>
@@ -130,6 +130,7 @@
 <script src="{{'/assets/js/form-wizard/jquery.backstretch.min.js'}}"></script>
 
 <script src="{{'/js/config.js'}}"></script>
+<script src="{{'/assets/select2/dist/js/select2.min.js'}}"></script>
 <script src="{{'/js/application.js'}}"></script>
 <!-- login js-->
 <!-- Plugin used-->

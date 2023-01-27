@@ -445,11 +445,16 @@ else will be select and update the data --}}
                             <tbody>
                                 <tr class="js-work-element-input-column">
                                     <td>
-                                        <input class="form-control typeahead form-control tt-input js-input-work-element-idx-0
-                                                       js-work-element-input" type="text"
-                                               name="work_element[]"
-                                               placeholder="Work Element" autocomplete="off"
-                                               spellcheck="false" dir="auto" style="position: relative; vertical-align: top;">
+                                        <select class="form-control select2">
+                                            @foreach($workItem as $wi)
+                                                <option>{{$wi->description}}</option>
+                                            @endforeach
+                                        </select>
+{{--                                        <input class="form-control typeahead form-control tt-input js-input-work-element-idx-0--}}
+{{--                                                       js-work-element-input" type="text"--}}
+{{--                                               name="work_element[]"--}}
+{{--                                               placeholder="Work Element" autocomplete="off"--}}
+{{--                                               spellcheck="false" dir="auto" style="position: relative; vertical-align: top;">--}}
                                     </td>
                                     <td class="text-center"><i class="fa fa-trash-o js-delete-work-element text-danger text-20" data-idx="0"></i></td>
                                 </tr>
