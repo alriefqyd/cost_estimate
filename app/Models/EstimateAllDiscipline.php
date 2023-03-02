@@ -14,7 +14,7 @@ class EstimateAllDiscipline extends Model
     ];
 
     public function projects(){
-        return $this->belongsToMany(Project::class,'estimate_all_discipline_project');
+        return $this->belongsTo(Project::class,'project_id');
     }
 
     public function disciplineWorkTypes(){
@@ -22,11 +22,10 @@ class EstimateAllDiscipline extends Model
     }
 
     public function workItems(){
-        return $this->hasMany(WorkItem::class,'work_item_id');
+        return $this->belongsTo(WorkItem::class,'work_item_id');
     }
 
     public function workElements(){
-        return $this->hasMany(WorkElement::class,'id');
+        return $this->belongsTo(WorkElement::class,'work_element_id');
     }
-
 }

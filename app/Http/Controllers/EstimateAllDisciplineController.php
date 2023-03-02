@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
+use App\Models\Setting;
 use App\Models\WorkElement;
 use App\Models\WorkItem;
 use App\Models\WorkItemType;
@@ -11,32 +12,58 @@ use Illuminate\Http\Request;
 
 class EstimateAllDisciplineController extends Controller
 {
-    public function create(Project $project){
+    public function getWorkItems(Request $request, Project $project){
+        $data = EstimateAllDiscipline::with(['workItems.manPowers','workItems.equipmentTools','workItems.materials'])->where('project_id', $project->id)
+            ->where('work_scope',$request->discipline)->get();
+        return $data;
+    }
+
+    public function create(Request $request, Project $project){
         //select data by project, if estimate discipline with the user discipline exist, open it and update, else will be create new one
-        $workItem = WorkItem::all();
+        /*$data = EstimateAllDiscipline::with(['projects','workElements'])->whereHas('projects',function ($q) use ($request) {
+            return $q->where('id',$request->project_id);
+        });*/
+
+        $workItem = new WorkItemController();
+        $workElement = WorkElement::where('project_id',$project->id)->where('work_scope',$request->discipline)->get();
+        if(isset($request->discipline)
+            && !array_key_exists($request->discipline,Setting::DISCIPLINE)){
+            abort(404);
+        }
+
         return view('estimate_discipline.create',[
             'project' => $project,
-            'workItem' => $workItem
+            'isEmptyWorkElement' => sizeof($workElement) < 1,
+            'workElement' => $workElement,
+            'workItem' => $this->getWorkItems($request, $project)
         ]);
     }
 
-    /**
-     * Save Work Element
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
-     */
-    public function storeWorkElement(Request $request, Project $project){
-        $workElements = $request->work_element;
-        $workElementsSize = sizeof($workElements);
-//        EstimateAllDiscipline::create([
-//            'project_id' => $project->id
-//        ]);
+    public function store(Request $request){
+        $workItemController = new WorkItemController();
+//        $workItemRelated = $workItemController->getWorkItems($request);
 
-        for($i=1;$i<=$workElementsSize;$i++){
-            $workElement = new WorkElement();
-            $workElement->name = $request->work_element[$i];
-            $workElement->save();
+        try {
+            foreach ($request->work_items as $item){
+//                return response()->json($item['workElement']);
+                $estimateAllDiscipline = new EstimateAllDiscipline();
+                $estimateAllDiscipline->title = '';
+                $estimateAllDiscipline->work_scope = $request->discipline;
+                $estimateAllDiscipline->work_item_id = $item['workItem'];
+                $estimateAllDiscipline->work_element_id =$item['workElement'];
+                $estimateAllDiscipline->volume = $item['vol'];
+                $estimateAllDiscipline->project_id = $request->project_id;
+                $estimateAllDiscipline->save();
+            }
+            $response = [
+                'status' => 200,
+                'message' => 'Success, Your data was saved successfully'
+            ];
+
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json($e->getMessage());
         }
-
-        return $workElements;
     }
+
 }

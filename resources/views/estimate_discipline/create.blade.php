@@ -21,7 +21,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body p-3">
-                        <h6>Project : Mine_Overhead Cable at Watu Labu Tower Area -</h6>
+                        <h6>Project :  {{$project->project_title}}</h6>
                     </div>
                 </div>
             </div>

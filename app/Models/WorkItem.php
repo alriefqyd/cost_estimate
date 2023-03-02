@@ -10,15 +10,20 @@ class WorkItem extends Model
     use HasFactory;
 
     public function estimateAllDisciplines(){
-        return $this->belongsTo(EstimateAllDiscipline::class,'work_item_id');
+        return $this->hasMany(EstimateAllDiscipline::class,'work_item_id');
     }
 
+    /**
+     * Relation to labor/Man Powers
+     * Once Amount total work hourly update in manpower amount labor is updated to
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function manPowers(){
-        return $this->belongsToMany(ManPower::class,'labor_id');
+        return $this->belongsToMany(ManPower::class,'man_powers_work_items')->withPivot('labor_unit', 'labor_coefisient','amount');
     }
 
     public function materials(){
-        return $this->hasMany(Material::class,'material_id');
+        return $this->belongsToMany(Material::class,'work_items_materials','work_item_id','materials_id')->withPivot('unit', 'quantity','amount','unit_price');
     }
 
     public function tools(){
@@ -30,6 +35,6 @@ class WorkItem extends Model
     }
 
     public function equipmentTools(){
-        return $this->belongsToMany(EquipmentTools::class,'equipment_tool_id');
+        return $this->belongsToMany(EquipmentTools::class,'work_items_equipment_tools')->withPivot('quantity', 'amount','unit_price','unit');
     }
 }

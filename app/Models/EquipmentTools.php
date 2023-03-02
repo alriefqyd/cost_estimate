@@ -10,6 +10,6 @@ class EquipmentTools extends Model
     use HasFactory;
 
     public function workItems(){
-        return $this->belongsToMany(WorkItem::class,'tools_equipment_id');
+        return $this->belongsToMany(WorkItem::class,'work_items_equipment_tools')->withPivot('unit', 'amount','unit_price','unit');;
     }
 }

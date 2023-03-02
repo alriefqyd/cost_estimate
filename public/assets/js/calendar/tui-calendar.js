@@ -21434,7 +21434,7 @@ module.exports = ScheduleDetailPopup;
 "use strict";
 /* eslint complexity: 0 */
 /**
- * @fileoverview Helpers for handlebar templates.
+ * @fileoverview helpers for handlebar templates.
  * @author NHN FE Development Lab <dl_javascript@nhn.com>
  */
 

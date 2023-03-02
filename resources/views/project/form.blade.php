@@ -41,7 +41,7 @@
                 <label class="form-label form-label-black">Design Engineer Civil</label>
                 <div class="row js-parent-input">
                     <div class="col-md-12">
-                        <select class="select2-ajax form-control js-design-engineer js-project_engineer_civil"
+                        <select class="select2 form-control js-design-engineer js-project_engineer_civil"
                                 data-allowClear="true"
                                 data-url="/getUserEmployee"
                                 data-subject="{{$setting::DESIGN_ENGINEER_LIST['civil']}}"

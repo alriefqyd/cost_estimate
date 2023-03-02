@@ -90,6 +90,50 @@
     color: #24695c;
 }
 
+.width-50 {
+    max-width: 50% !important;
+}
+
+.table-fixed {
+    table-layout: fixed;
+    width: 100px;
+}
+
+.min-w-50 {
+    min-width: 50px !important;
+}
+
+.min-w-100 {
+    min-width: 100px !important;
+}
+
+.min-w-200 {
+    min-width: 200px !important;
+}
+
+.min-w-300 {
+    min-width: 300px !important;
+}
+
+.min-w-400 {
+    min-width: 400px !important;
+}
+.min-w-420 {
+    min-width: 420px !important;
+}
+.min-w-450 {
+    min-width: 450px !important;
+}
+
+.min-w-500 {
+    min-width: 500px !important;
+}
+
+.min-w-550 {
+    min-width: 550px !important;
+}
+
+
 
 @media only screen and (max-width: 1337px) {
     .mb-1-responsive {

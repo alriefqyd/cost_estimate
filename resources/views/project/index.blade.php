@@ -4,10 +4,9 @@
     <div class="page-header">
         <div class="row">
             <div class="col-sm-6">
-                <h3>project list</h3>
+                <h3>project Management</h3>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item">dashboard</li>
                     <li class="breadcrumb-item active">project list</li>
                 </ol>
             </div>

@@ -12,7 +12,7 @@ class Project extends Model
 
 
     public function estimateAllDisciplines(){
-        return $this->belongsToMany(EstimateAllDiscipline::class,'estimate_all_discipline_project');
+        return $this->hasMany(EstimateAllDiscipline::class,'project_id');
     }
 
     public function designEngineerMechanical(){
@@ -29,6 +29,10 @@ class Project extends Model
 
     public function designEngineerInstrument(){
         return $this->belongsTo(User::class,'design_engineer_instrument');
+    }
+
+    public function workElements(){
+        return $this->hasMany(WorkElement::class,'project_id');
     }
 
 }

@@ -15,4 +15,12 @@ class Setting extends Model
         'electrical' => 'Electrical',
         'instrument' => 'Instrument'
     ];
+
+    public const DISCIPLINE = [
+        'general' => 'GENERAL',
+        'mechanical' => 'MECHANICAL',
+        'electrical' => 'ELECTRICAL',
+        'instrument' => 'INSTRUMENT',
+        'civil' => 'CIVIL'
+    ];
 }

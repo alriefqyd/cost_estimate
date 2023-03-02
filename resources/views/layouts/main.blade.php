@@ -68,10 +68,10 @@
 <!-- Page Body Start-->
     <div class="page-body-wrapper sidebar-icon">
         @include('layouts.sidebar')
-        <div class="page-body" style="overflow-y: hidden">
+        <div class="page-body">
             @yield('main')
         </div>
-{{--        @include('layouts.footer')--}}
+        @include('layouts.footer')
         @include('mustache')
     </div>
 </div>
@@ -131,7 +131,9 @@
 
 <script src="{{'/js/config.js'}}"></script>
 <script src="{{'/assets/select2/dist/js/select2.min.js'}}"></script>
+<script src="{{'/js/notification.js'}}"></script>
 <script src="{{'/js/application.js'}}"></script>
+<script src="{{'/js/estimate_discipline.js'}}"></script>
 <!-- login js-->
 <!-- Plugin used-->
 </body>

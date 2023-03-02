@@ -10,7 +10,7 @@ class ManPower extends Model
     use HasFactory;
 
     public function workItems(){
-        return $this->belongsToMany(WorkItem::class,'labor_id');
+        return $this->belongsToMany(WorkItem::class,'man_powers_work_items')->withPivot('labor_unit', 'labor_coefisient','amount');
     }
 
 }

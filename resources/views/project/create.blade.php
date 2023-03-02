@@ -4,10 +4,9 @@
     <div class="page-header">
         <div class="row">
             <div class="col-sm-6">
-                <h3>project Info</h3>
+                <h3>Project Management</h3>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                    <li class="breadcrumb-item">dashboard</li>
                     <li class="breadcrumb-item">Cost Estimate list</li>
                     <li class="breadcrumb-item active">Add Project Info</li>
                 </ol>
@@ -21,7 +20,7 @@
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
-                    <div class="row mb-5">
+                    <div class="row">
                         @if($errors->any())
                             <div class="col-md-12 alert alert-danger">
                                 @foreach ($errors->all() as $error)
@@ -34,7 +33,8 @@
                         <form class="needs-validation js-add-project-form" method="post" action="/project" novalidate="">
                             @csrf
                             @include('project.form')
-                            <button type="submit" class="btn btn-success">Save Data</button>
+                            <button type="submit" class="btn btn-success float-end">Save Data</button>
+                            <button type="" class="btn btn-light float-end m-r-5">Cancel</button>
                         </form>
                     </div>
                 </div>
