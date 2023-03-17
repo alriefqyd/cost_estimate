@@ -1,21 +1,3 @@
-{{--
-!!!!!!!!
-add work element and discipline first
-input work item based work element and discipline
-like canon site behaviour
-
-discipline is max two in condition cost-estimate just one disciplene (general and own discipline)
-discipline possible just only one data
-
-work element created based on discipline
-work element is not mandatory
-
-work item created based on work element (if exist) or discipline
-
-top of page is create discipline and work element
-
---}}
-
 @inject('workItemController','App\Http\Controllers\WorkItemController')
 <div class="card js-select-discipline-card" data-id="{{$project->id}}">
     <div class="card-body">
@@ -68,6 +50,7 @@ top of page is create discipline and work element
                                                        placeholder="Work Element" autocomplete="off"
                                                        spellcheck="false" dir="auto"
                                                        style="position: relative; vertical-align: top;">
+                                                <input type="hidden" name="element_id[]"/>
                                             </td>
                                             <td class="text-center"><i
                                                     class="fa fa-trash-o js-delete-work-element text-danger text-20"
@@ -84,6 +67,7 @@ top of page is create discipline and work element
                                                            placeholder="Work Element" autocomplete="off"
                                                            spellcheck="false" dir="auto"
                                                            style="position: relative; vertical-align: top;">
+                                                    <input type="hidden" name="element_id[]" value="{{$item->id}}"/>
                                                 </td>
                                                 <td class="text-center"><i
                                                         class="fa fa-trash-o js-delete-work-element text-danger text-20"
@@ -104,7 +88,6 @@ top of page is create discipline and work element
                 </div>
                 <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                     <div class="row">
-
                         <div class="col-md-12 mt-5">
                             <div class="table-responsive js-table-input-work-item mb-2">
                                 <table class="table table-fixed" style="width: 100%">
@@ -153,13 +136,13 @@ top of page is create discipline and work element
                                         <th class="text-center min-w-200" style="">Work Element</th>
                                         <th class="text-center min-w-300">Work Item</th>
                                         <th class="text-center min-w-100">Vol</th>
-                                        <th class="text-center min-w-550" style="">
+                                        <th class="text-center min-w-200" style="">
                                             Labour
                                         </th>
-                                        <th class="text-center min-w-500" style="">
+                                        <th class="text-center min-w-200" style="">
                                             Tool And Equipment
                                         </th>
-                                        <th class="text-center min-w-500" style="">
+                                        <th class="text-center min-w-200" style="">
                                             Material
                                         </th>
                                         <th class="text-center" style="width: 15%">Action</th>
@@ -167,75 +150,59 @@ top of page is create discipline and work element
                                     </thead>
                                     <tbody class="js-body-work-item-table">
                                     @foreach($workItem as $item)
-                                        <tr class="js-work-item-input-column">
+
+                                        @php($arrTotManPower = $item?->workItems?->manPowers?->map(function ($el)
+                                                    use ($workItemController){
+                                                    $rate = $el->overall_rate_hourly;
+                                                    $coef = $el->pivot->labor_coefisient;
+                                                    $tot = $rate * $workItemController->toDecimalRound($coef);
+                                                    return $tot;
+                                                })->all())
+                                        @php($arrTotTool = $item?->workItems?->equipmentTools->map(function ($el){
+                                                  $rate = $el->local_rate;
+                                                  $qty = $el->pivot->quantity;
+                                                  $tot = $rate * (float) $qty;
+                                                  return $tot;
+                                              })->all())
+                                        @php($arrTotMaterials = $item?->workItems?->materials->map(function ($el){
+                                                 $rate = $el->rate;
+                                                 $qty = $el->pivot->quantity;
+                                                 $tot = $rate * (float) $qty;
+                                                 return $tot;
+                                             })->all())
+                                        @php($totalRateManPower = $workItemController->toCurrency(array_sum($arrTotManPower)))
+                                        @php($totalRateEquipments = $workItemController->toCurrency(array_sum($arrTotTool)))
+                                        @php($totalRateMaterials = $workItemController->toCurrency(array_sum($arrTotMaterials)))
+
+                                        <input type="hidden" class="js-existing-work-items" name="element_id[]"
+                                               data-volume="{{$item->volume}}"
+                                               data-work-element="{{$item->work_element_id}}"
+                                               data-work-item="{{$item->work_item_id}}"
+                                               value="{{$item->id}}">
+                                        <tr class="js-work-item-input-column" data-id-item="{{$item->id}}">
                                             <td class="text-center">{{$item->workElements?->name}}</td>
                                             <td>{{$item->workItems->description  }}</td>
                                             <td>{{$item->volume }} {{$item->workItems->unit}}</td>
                                             <td>
-                                                <table class="table table-striped">
-                                                    <thead>
-                                                    <th>Title</th>
-                                                    <th>Unit</th>
-                                                    <th>Coef</th>
-                                                    <th>Rate (Rp)</th>
-                                                    <th>Amount (Rp)</th>
-                                                    </thead>
-                                                    <tbody>
-                                                    @foreach($item?->workItems?->manPowers as $manPower)
-                                                        <tr>
-                                                            <td>{{$manPower->title}}</td>
-                                                            <td>{{$manPower?->pivot?->labor_unit}}</td>
-                                                            <td>{{$workItemController->toDecimalRound($manPower?->pivot?->labor_coefisient)}}</td>
-                                                            <td>{{$workItemController->toCurrency($manPower?->overall_rate_hourly)}}</td>
-                                                            <td>{{$workItemController->toCurrency($manPower?->pivot?->amountPivot)}}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                    </tbody>
-                                                </table>
+                                                {{$totalRateManPower}}
+                                                @if($arrTotManPower)
+                                                    <i class="fa fa-exclamation-circle cursor-pointer"
+                                                       data-bs-toggle="modal" data-original-title="test" data-bs-target="#manPowersModal_{{$item->work_item_id}}"></i>
+                                                @endif
                                             </td>
                                             <td>
-                                                <table class="table table-striped">
-                                                    <thead>
-                                                        <th>Description</th>
-                                                        <th>Unit</th>
-                                                        <th>Quantity</th>
-                                                        <th>Unit Price (Rp)</th>
-                                                        <th>Amount (Rp)</th>
-                                                    </thead>
-                                                    <tbody>
-                                                    @foreach($item?->workItems?->equipmentTools as $tools)
-                                                        <tr>
-                                                            <td>{{ $tools->description }}</td>
-                                                            <td>{{ $tools?->pivot?->unit }}</td>
-                                                            <td>{{ $tools?->pivot?->quantity }}</td>
-                                                            <td>{{ $workItemController->toCurrency($tools?->pivot?->unit_price) }}</td>
-                                                            <td>{{ $workItemController->toCurrency($tools?->pivot?->amount) }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                    </tbody>
-                                                </table>
+                                                {{$totalRateEquipments}}
+                                                @if($arrTotTool)
+                                                    <i class="fa fa-exclamation-circle cursor-pointer"
+                                                       data-bs-toggle="modal" data-original-title="test" data-bs-target="#toolsEquipmentsModal_{{$item->work_item_id}}"></i>
+                                                @endif
                                             </td>
                                             <td>
-                                                <table class="table table-striped">
-                                                    <thead>
-                                                    <th>Description</th>
-                                                    <th>Unit</th>
-                                                    <th>Quantity</th>
-                                                    <th>Unit Price (Rp)</th>
-                                                    <th>Amount (Rp)</th>
-                                                    </thead>
-                                                    <tbody>
-                                                    @foreach($item?->workItems?->materials as $tools)
-                                                        <tr>
-                                                            <td>{{ $tools?->tool_equipment_description }}</td>
-                                                            <td>{{ $tools?->pivot?->unit }}</td>
-                                                            <td>{{ $tools?->pivot?->quantity }}</td>
-                                                            <td>{{ $workItemController->toCurrency($tools?->pivot?->unit_price) }}</td>
-                                                            <td>{{ $workItemController->toCurrency($tools?->pivot?->amount) }}</td>
-                                                        </tr>
-                                                    @endforeach
-                                                    </tbody>
-                                                </table>
+                                                {{$totalRateMaterials}}
+                                                @if($arrTotMaterials)
+                                                    <i class="fa fa-exclamation-circle cursor-pointer"
+                                                       data-bs-toggle="modal" data-original-title="test" data-bs-target="#materialsModal_{{$item->work_item_id}}"></i>
+                                                @endif
                                             </td>
                                             <td class="text-center"><i
                                                     class="fa fa-trash-o js-delete-work-item text-danger text-20"
@@ -247,14 +214,15 @@ top of page is create discipline and work element
                             </div>
                         </div>
                         <div class="mt-5 float-end">
-                            <button class="btn btn-primary js-save-estimate-discipline">Save As Draft</button>
-                            <button class="btn btn-primary js-save-estimate-discipline">Publish</button>
+                            <button class="btn btn-primary js-save-estimate-discipline" {{sizeof($workItem) > 0 ? "data-update=true" : ''}} >Save As Draft</button>
+                            <button class="btn btn-primary js-save-estimate-discipline" {{sizeof($workItem) > 0 ? "data-update=true" : ''}}>Publish</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    @include('estimate_discipline.modal_detail')
 @endif
 
 

@@ -1,19 +1,22 @@
+@inject('workItemController','App\Http\Controllers\WorkItemController')
 <div class="col-sm-12 col-lg-12 col-xl-12">
     <div class="col">
         <span class="float-end">
             <a href="/project/{{$project->id}}/estimate-discipline/create">
-                <button class="btn btn-outline-primary" type="button">Add New Data</button>
+                <button class="btn btn-outline-primary" type="button">
+                    {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
+                </button>
             </a>
         </span>
     </div>
     <div class="clearfix"></div>
     <div class="col">
         <ul class="nav nav-tabs mb-4" id="icon-tab" role="tablist">
-            <li class="nav-item"><a class="nav-link active" id="icon-home-tab" data-bs-toggle="tab" href="#icon-home" role="tab" aria-controls="icon-home" aria-selected="true"><i class="icofont icofont-ui-home"></i>All</a></li>
-            <li class="nav-item"><a class="nav-link" id="icon-home-tab" data-bs-toggle="tab" href="#icon-home" role="tab" aria-controls="icon-home" aria-selected="false"><i class="icofont icofont-ui-home"></i>Civil</a></li>
-            <li class="nav-item"><a class="nav-link" id="profile-icon-tab" data-bs-toggle="tab" href="#profile-icon" role="tab" aria-controls="profile-icon" aria-selected="false"><i class="icofont icofont-man-in-glasses"></i>Mechanical</a></li>
-            <li class="nav-item"><a class="nav-link" id="contact-icon-tab" data-bs-toggle="tab" href="#contact-icon" role="tab" aria-controls="contact-icon" aria-selected="false"><i class="icofont icofont-contacts"></i>Electrical</a></li>
-            <li class="nav-item"><a class="nav-link" id="contact-icon-tab" data-bs-toggle="tab" href="#contact-icon" role="tab" aria-controls="contact-icon" aria-selected="false"><i class="icofont icofont-contacts"></i>Instrument</a></li>
+            <li class="nav-item"><a class="nav-link {{request()->segment(4) == 'All' || !request()->discipline ? 'active' : ''}}" id="icon-home-tab" href="/project/{{$project->id}}/discipline/all" aria-selected="true"><i class="icofont icofont-ui-home"></i>All</a></li>
+            <li class="nav-item"><a class="nav-link {{request()->segment(4) == 'civil' ? 'active' : ''}}" id="icon-home-tab" href="/project/{{$project->id}}/discipline/civil" role="tab" aria-controls="icon-home" aria-selected="false"><i class="icofont icofont-ui-home"></i>Civil</a></li>
+            <li class="nav-item"><a class="nav-link {{request()->segment(4) == 'mechanical' ? 'active' : ''}}" id="profile-icon-tab" href="/project/{{$project->id}}/discipline/mechanical" role="tab" aria-controls="profile-icon" aria-selected="false"><i class="icofont icofont-man-in-glasses"></i>Mechanical</a></li>
+            <li class="nav-item"><a class="nav-link {{request()->segment(4) == 'electrical' ? 'active' : ''}}" id="contact-icon-tab" href="/project/{{$project->id}}/discipline/electrical" role="tab" aria-controls="contact-icon" aria-selected="false"><i class="icofont icofont-contacts"></i>Electrical</a></li>
+            <li class="nav-item"><a class="nav-link {{request()->segment(4) == 'instrument' ? 'active' : ''}}" id="contact-icon-tab" href="/project/{{$project->id}}/discipline/instrument" role="tab" aria-controls="contact-icon" aria-selected="false"><i class="icofont icofont-contacts"></i>Instrument</a></li>
         </ul>
     </div>
     <div class="table-responsive table-striped">
@@ -22,7 +25,6 @@
                 <tr>
                     <th style="vertical-align : middle;" rowspan="2" class="text-center th-lg">Work Element</th>
                     <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center">Work Item</th>
-                    <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center">Work Description</th>
                     <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center">Vol</th>
                     <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center">Unit</th>
                     <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Labour Cost</th>
@@ -52,61 +54,50 @@
                 </tr>
             </thead>
             <tbody>
-            <tr>
-                <td style="width: 9rem">General</td>
-                <td>10002</td>
-                <td>Pekerjaan pembuatan lubang untuk pemancangan tiang listrik, 1/6 dar total panjang tiang</td>
-                <td>2</td>
-                <td>Lgh</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-            </tr>
-            <tr>
-                <td>General</td>
-                <td>10002</td>
-                <td>Pekerjaan pembuatan lubang untuk pemancangan tiang listrik, 1/6 dar total panjang tiang</td>
-                <td>2</td>
-                <td>Lgh</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-            </tr>
-            <tr>
-                <td>General</td>
-                <td>10002</td>
-                <td>Pekerjaan pembuatan lubang untuk pemancangan tiang listrik, 1/6 dar total panjang tiang</td>
-                <td>2</td>
-                <td>Lgh</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-            </tr>
-            <tr>
-                <td>General</td>
-                <td>10002</td>
-                <td>Pekerjaan pembuatan lubang untuk pemancangan tiang listrik, 1/6 dar total panjang tiang</td>
-                <td>2</td>
-                <td>Lgh</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
-                <td>1.234.567,89</td>
+            @php ($totalCost = array())
+            @foreach($estimateAllDisciplines as $key => $value)
+                @php ($total = $workItemController->getTotalCost($value,'man_power',false) +
+                        $workItemController->getTotalCost($value,'tool_equipments',false) +
+                        $workItemController->getTotalCost($value,'materials',false))
+                @php($totalCost[] = $total)
+                <tr>
+                    <td colspan="1">{{$key}}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>{{$workItemController->getTotalCost($value,'man_power',true)}}</td>
+                    <td></td>
+                    <td>{{$workItemController->getTotalCost($value,'tool_equipments',true)}}</td>
+                    <td></td>
+                    <td>{{$workItemController->getTotalCost($value,'materials',true)}}</td>
+                    <td>
+                        {{$workItemController->toCurrency($total)}}
+                    </td>
+                </tr>
+                @foreach($value as $item)
+                    <tr>
+                        <td>{{$item?->workItems?->code}}</td>
+                        <td>{{$item?->workItems?->description}}</td>
+                        <td>{{$item?->volume}}</td>
+                        <td>{{$item?->workItems?->unit}}</td>
+                        <td>{{$workItemController->toCurrency($item?->workItems?->manPowers()->sum('amount'))}}</td>
+                        <td>{{$workItemController->toCurrency($item?->volume * $item?->workItems?->manPowers()->sum('amount'))}}</td>
+                        <td>{{$workItemController->toCurrency($workItemController->getTotalAmountToolsEquipment($item?->workItems?->equipmentTools))}}</td>
+                        <td>{{$workItemController->toCurrency($workItemController->getTotalAmountToolsEquipment($item?->workItems?->equipmentTools) * $item?->volume) }}</td>
+                        <td>{{$workItemController->toCurrency($workItemController->getTotalAmountMaterials($item?->workItems?->materials)) }}</td>
+                        <td>{{$workItemController->toCurrency($workItemController->getTotalAmountMaterials($item?->workItems?->materials) * $item?->volume)}}</td>
+                        <td></td>
+                    </tr>
+                @endforeach
+            @endforeach
+            <tr class="font-weight-bold" style="background-color: #c4bd97">
+                <td colspan="10">
+                    Total
+                </td>
+                <td>
+                    {{$workItemController->toCurrency(array_sum($totalCost))}}
+                </td>
             </tr>
             </tbody>
         </table>

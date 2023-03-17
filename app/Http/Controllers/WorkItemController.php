@@ -54,7 +54,7 @@ class WorkItemController extends Controller
 //        dd($items);
     }
     /**
-     * Get Work Element List Based on Project and Discipline
+     * Set Work Item to Show iin List Estimate Discipline
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -84,7 +84,7 @@ class WorkItemController extends Controller
                     foreach ($equipmentTools as $equipment){
                         $equipmentToolsArr[] = array(
                             "description" => $equipment->description,
-                            "quantity" => $equipment?->pivot?->quantity,
+                            "quantity" => number_format($equipment?->pivot?->quantity,2),
                             "unit" => $equipment?->pivot?->unit,
                             "unitPrice" => $this->toCurrency($equipment?->pivot?->unit_price),
                             "amount" => $this->toCurrency($equipment?->pivot?->amount),
@@ -97,19 +97,28 @@ class WorkItemController extends Controller
                         $materialsArr[] = array(
                             "description" => $material->tool_equipment_description,
                             "unit" => $material?->pivot?->unit,
-                            "quantity" => $material?->pivot?->quantity,
+                            "quantity" => number_format($material?->pivot?->quantity,2),
                             "rate" => $this->toCurrency($material?->pivot?->unit_price),
                             "amount" => $this->toCurrency($material?->pivot?->amount),
                         );
                     }
                 }
+
+                $totalRateManPowers = $this->getTotalRateManPowers($manPowers);
+                $totalRateEquipments = $this->getTotalRateEquipments($equipmentTools);
+                $totalRateMaterials = $this->getTotalRateMaterials($materials);
+
                 $children[] = array(
                     "id" => $subItems->id,
                     "text" => $subItems->description,
                     "vol" => $subItems->unit,
                     "manPowers" => $manPowersArr,
+                    "manPowersTotalRate" => $totalRateManPowers,
                     "equipmentTools" => $equipmentToolsArr,
-                    'materials' => $materialsArr,
+                    "equipmentToolsRate" => $totalRateEquipments,
+                    "materials" => $materialsArr,
+                    "materialsRate" => $totalRateMaterials,
+
                 );
             }
 
@@ -134,5 +143,90 @@ class WorkItemController extends Controller
         if(!$val) return '';
         $val = str_replace(',','.',$val);
         return round($val, 2);
+    }
+
+    public function getTotalAmountToolsEquipment($equipment){
+        $quantity = $equipment;
+        $detailAmount = array();
+        foreach($quantity as $item){
+            $sum = $item->pivot->quantity * $item->local_rate;
+            $detailAmount[] = $sum;
+        }
+
+        if(sizeof($detailAmount) < 1) return 0;
+        return array_sum($detailAmount);
+    }
+
+    public function getTotalAmountMaterials($materials){
+        $detailAmount = array();
+        foreach ($materials as $material){
+            $sum = $material->pivot->quantity * $material->rate;
+            $detailAmount[] = $sum;
+        }
+        if(sizeof($detailAmount) < 1) return 0;
+        return array_sum($detailAmount);
+    }
+
+    public function getTotalCost($costs,$type, $toCurrency){
+        $cost = array();
+        $costCategory = '';
+
+        foreach ($costs as $item){
+            switch ($type){
+                case 'man_power':
+                    $cost[] = $item->workItems?->manPowers()->sum('amount') * $item?->volume;
+                break;
+                case 'tool_equipments':
+                    $cost[] = $this->getTotalAmountToolsEquipment($item?->workItems?->equipmentTools) * $item?->volume;
+                    break;
+                case 'materials':
+                    $cost[] = $this->getTotalAmountMaterials($item?->workItems?->materials) * $item?->volume;
+                    break;
+                default:
+                    $cost = null;
+            }
+
+        }
+
+        if($toCurrency) return $this->toCurrency(array_sum($cost));
+        else return array_sum($cost);
+    }
+
+    public function removeCurrencyFormat($value){
+        if(!$value) return '';
+        return number_format($value, 0);
+    }
+
+    public function getTotalRateManPowers($value){
+        $data = $value->map(function($el){
+            $rate = $el->overall_rate_hourly ?: 0;
+            $coef = $el?->pivot?->labor_coefisient ?: 1;
+            $tot = $rate * $this->toDecimalRound($coef);
+            return $tot;
+        })->all();
+
+        return $this->toCurrency(array_sum($data));
+    }
+
+    public function getTotalRateEquipments($value){
+        $data = $value->map(function($el){
+            $rate = $el->local_rate;
+            $qty = $el->pivot->quantity;
+            $tot = $rate * (float) $qty;
+            return $tot;
+        })->all();
+
+        return $this->toCurrency(array_sum($data));
+    }
+
+    public function getTotalRateMaterials($value){
+        $data = $value->map(function($el){
+            $rate = $el->rate;
+            $qty = $el->pivot->quantity;
+            $tot = $rate * (float) $qty;
+            return $tot;
+        })->all();
+
+        return $this->toCurrency(array_sum($data));
     }
 }

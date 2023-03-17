@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -7565,9 +7566,21 @@ class ProjectController extends Controller
 
     }
 
-    public function detail(Project $project){
+    public function detail(Project $project, Request $request){
+        $estimateDisciplines = EstimateAllDiscipline::with(['workElements','workItems.manPowers','workItems.equipmentTools','workItems.materials'])
+            ->when($request->discipline == 'civil', function($q){
+                return $q->where('work_scope','=','civil');
+            })->when($request->discipline == 'mechanical', function($q){
+                return $q->where('work_scope','=','mechanical');
+            })->when($request->discipline == 'electrical', function($q){
+                return $q->where('work_scope','=','electrical');
+            })->when($request->discipline == 'instrument', function($q){
+                return $q->where('work_scope','=','instrument');
+            })->where('project_id',$project->id)
+            ->get()->groupBy('workElements.name');
         return view('project.detail',[
             'project' => $project,
+            'estimateAllDisciplines' => $estimateDisciplines,
             'project_date' => Carbon::parse($project->created_at)->format('d-M-Y'),
         ]);
     }

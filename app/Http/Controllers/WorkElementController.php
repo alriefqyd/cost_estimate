@@ -13,19 +13,38 @@ class WorkElementController extends Controller
     }
 
     public function store(Request $request, Project $project){
+        // check existing id
+        // if id exist update
+        // if id not exist add new
+
+        $existingIdElement = $project->workElements->map(function ($element){
+            return $element->id;
+        })->all();
+
         $workElements = $request->work_element;
         $workElementsSize = sizeof($workElements);
         try {
             for($i=0;$i<$workElementsSize;$i++){
-                $workElement = new WorkElement();
-                $workElement->name = $request->work_element[$i];
-                $workElement->work_scope = $request->discipline;
-                $workElement->projects()->associate($project->id);
-                $workElement->save();
+                if($request->element_id[$i] != null){
+                    $existingWorkElement = WorkElement::where('id',$request->element_id[$i])->first();
+                    $existingWorkElement->name = $request->work_element[$i];
+                    $existingWorkElement->save();
+                } else {
+                    $workElement = new WorkElement();
+                    $workElement->name = $request->work_element[$i];
+                    $workElement->work_scope = $request->discipline;
+                    $workElement->projects()->associate($project->id);
+                    $workElement->save();
+                }
             }
-            return redirect('/project/'.$project->id.'/estimate-discipline/create?discipline='. $request->discipline);
+            $diff = array_diff($existingIdElement,$request->element_id);
+            foreach ($diff as $idDiff){
+                WorkElement::where('id',$idDiff)->delete();
+            }
+
+            return redirect('/project/'.$project->id.'/estimate-discipline/create/'. $request->discipline);
         } catch (\Exception $e){
-            return redirect('/project/'.$project->id.'/estimate-discipline/create?discipline='. $request->discipline)->withErrors($e->getMessage());
+            return redirect('/project/'.$project->id.'/estimate-discipline/create/'. $request->discipline)->withErrors($e->getMessage());
         }
     }
 
