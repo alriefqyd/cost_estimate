@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DisciplineProjects;
 use App\Models\EstimateAllDiscipline;
+use App\Models\LocationEquipments;
+use App\Models\ManPower;
 use App\Models\Project;
 use App\Models\Setting;
 use App\Models\WorkElement;
 use App\Models\WorkItem;
 use App\Models\WorkItemType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class EstimateAllDisciplineController extends Controller
 {
@@ -29,6 +33,10 @@ class EstimateAllDisciplineController extends Controller
             response(404);
         }
         $workItem = new WorkItemController();
+        $disciplines = Setting::DISCIPLINE;
+        $existingLocationEquipment = LocationEquipments::with(['disciplineProjects'])->where('project_id',$project->id)->get();
+//        dd($existingLocationEquipment);
+//        $existingDisciplineProject = DisciplineProjects::with(['disciplineProjects'])->where('project_id',$project->id)->get();
         $workElement = WorkElement::where('project_id',$project->id)->where('work_scope',$request->discipline)->get();
         if(isset($request->discipline)
             && !array_key_exists($request->discipline,Setting::DISCIPLINE)){
@@ -39,7 +47,10 @@ class EstimateAllDisciplineController extends Controller
             'project' => $project,
             'isEmptyWorkElement' => sizeof($workElement) < 1,
             'workElement' => $workElement,
-            'workItem' => $this->getWorkItems($request, $project)
+            'workItem' => $this->getWorkItems($request, $project),
+            'disciplines' => $disciplines,
+            'locationEquipments' => $existingLocationEquipment,
+//            'disciplineProjects' => $existingDisciplineProject
         ]);
     }
 
@@ -102,4 +113,27 @@ class EstimateAllDisciplineController extends Controller
         }
     }
 
+    public function getItemAdditional(Request $request){
+        $arrayResult = array();
+        $manPowerController = new ManPowerController();
+        $materialController = new MaterialController();
+
+        switch ($request->type) {
+            case('manPower') :
+                $data = $manPowerController->getAllManPower($request);
+                foreach ($data as $item){
+                    $arrayResult[] = array(
+                        'text' => $item?->title,
+                        'id' => $item?->id,
+                        'rate' => $item?->overall_rate_hourly,
+                    );
+                }
+                break;
+            case('material') :
+                $data = $materialController->getAllMaterial($request);
+                break;
+        }
+
+        return $arrayResult;
+    }
 }

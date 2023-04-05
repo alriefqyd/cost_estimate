@@ -1,23 +1,188 @@
 @inject('workItemController','App\Http\Controllers\WorkItemController')
-<div class="card js-select-discipline-card" data-id="{{$project->id}}">
-    <div class="card-body">
-        <div class="mb-2">
-            <label class="col-form-label">Discipline</label>
-            <select name="work_scope" class="select2 js-select-discipline col-sm-12">
-                <option disabled {{!request()->discipline ? 'selected' : ''}} value> Select Discipline</option>
-                <option {{request()->discipline == 'general' ? 'selected' : ''}} value="general">General</option>
-                <option {{request()->discipline == 'electrical' ? 'selected' : ''}} value="electrical">Electrical
-                </option>
-                <option {{request()->discipline == 'instrument' ? 'selected' : ''}} value="instrument">Instrument
-                </option>
-                <option {{request()->discipline == 'mechanical' ? 'selected' : ''}} value="mechanical">Mechanical
-                </option>
-                <option {{request()->discipline == 'civil' ? 'selected' : ''}} value="civil">Civil</option>
-            </select>
+        <div class="card">
+            <div class="card-body">
+                <form action="/workElement/{{$project->id}}" class="f1" method="post">
+                    @csrf
+                    <div class="f1-steps">
+                        <div class="f1-progress">
+                            <div class="f1-progress-line" data-now-value="16.66" data-number-of-steps="3"></div>
+                        </div>
+                        <div class="f1-step active">
+                            <div class="f1-step-icon">1</div>
+                            <p>WBS Level 1 </p>
+                        </div>
+                        <div class="f1-step">
+                            <div class="f1-step-icon">2</div>
+                            <p>WBS Level 2</p>
+                        </div>
+                        <div class="f1-step">
+                            <div class="f1-step-icon">3</div>
+                            <p>WBS Level 3</p>
+                        </div>
+                    </div>
+                    <fieldset>
+                        <div class="col-md-12 mt-5 js-form-save-location">
+                            <label class="col-form-label">Location/Equipment</label>
+                            <div class="table-responsive mb-5">
+                                <table class="table js-work-element-table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <td style="width: 90%">Title</td>
+                                            <td class="text-center">Action</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @if($locationEquipments)
+                                            @foreach($locationEquipments as $item)
+                                                <tr class="js-item-parent">
+                                                    <td>
+                                                        <input type="text" value="{{$item->title}}" name="location_equipment[]" class="form-control js-form-location-equipment"/>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <i class="fa fa-trash-o js-delete-item text-danger text-20 cursor-pointer"
+                                                           data-idx="0"></i>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr class="js-item-parent">
+                                                <td>
+                                                    <input type="text" name="location_equipment[]" class="form-control js-form-location-equipment"/>
+                                                </td>
+                                                <td class="text-center">
+                                                    <i class="fa fa-trash-o js-delete-item text-danger text-20 cursor-pointer"
+                                                       data-idx="0"></i>
+                                                </td>
+                                            </tr>
+                                        @endif
+
+                                    </tbody>
+                                </table>
+                                <div class="float-end text-12 cursor-pointer js-add-location_equipment"><i
+                                    class="fa fa-plus-circle"></i> Add new location/equipment
+                                </div>
+                            </div>
+
+                            <div class="f1-buttons">
+                                <button class="btn btn-primary btn-next js-btn-next-save-wbs-location" type="button">Next</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <div class="col-sm-12 js-loader-wbs-level-2">
+                            <div class="loader-box">
+                                <div class="loader-3"></div>
+                            </div>
+                        </div>
+                        <div class="table-responsive js-table-wbs-level-2 mb-5 d-none js-form-save-discipline">
+                            <table class="table js-work-element-table table-striped">
+                                <thead>
+                                    <tr>
+                                        <td>Location/Equipment</td>
+                                        <td class="text-center">Disciplines</td>
+                                    </tr>
+                                </thead>
+                                <tbody class="js-render-location-discipline">
+                                    @if($locationEquipments)
+                                        @foreach($locationEquipments as $item)
+                                            <tr class="js-item-parent">
+                                                <td>{{$item->title}} 99</td>
+                                                <td style="width: 80%">
+                                                    <table class="table-striped" style="width: 100%">
+                                                        <tr>
+                                                            <td>
+                                                                <select name="work_scope[]" data-location="" multiple="multiple" class="js-select-2 js-form-discipline">
+                                                                    @foreach($disciplines as $key => $value)
+                                                                        <option value="{{$key}}">{{$value}}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="f1-buttons">
+                            <button class="btn btn-primary btn-previous js-btn-previous-wbs-discipline" type="button">Previous</button>
+                            <button class="btn btn-primary btn-next js-btn-next-save-wbs-discipline" type="button">Next</button>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <div class="table-responsive mb-5">
+                            <table class="table js-work-element-table table-striped">
+                                <thead>
+                                <tr>
+                                    <td>Discipline</td>
+                                    <td class="text-center">Work Element</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>GENERAL</td>
+                                    <td style="width: 80%">
+                                        <table class="table-striped" style="width: 100%">
+                                            <tr>
+                                                <td>
+                                                    <select name="work_scope[]" multiple="multiple" class="select2">
+                                                        @foreach($disciplines as $key => $value)
+                                                            <option value="{{$key}}">{{$value}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>3.3KV OVERHEAD LINE INSTALLATION</td>
+                                    <td style="width: 80%">
+                                        <table class="table-striped" style="width: 100%">
+                                            <tr>
+                                                <td>
+                                                    <select name="work_scope[]" multiple="multiple" class="select2">
+                                                        @foreach($disciplines as $key => $value)
+                                                            <option value="{{$key}}">{{$value}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>FIRE PROTECTION</td>
+                                    <td style="width: 80%">
+                                        <table class="table-striped" style="width: 100%">
+                                            <tr>
+                                                <td>
+                                                    <select name="work_scope[]" multiple="multiple" class="select2">
+                                                        @foreach($disciplines as $key => $value)
+                                                            <option value="{{$key}}">{{$value}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="f1-buttons">
+                            <button class="btn btn-primary btn-previous" type="button">Previous</button>
+                            <button class="btn btn-primary btn-submit" type="submit">Submit</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
         </div>
-    </div>
-</div>
-@if(request()->discipline)
+
+
+{{--@if(request()->discipline)--}}
     <div class="card js-works-detail-form">
         <div class="card-body">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -115,9 +280,12 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <select class="select2 js-select-work-element col-sm-12"
+                                            <select class="select2 js-select-work-element-item col-sm-12"
                                                     data-discipline="{{request()->discipline}}"
                                                     data-id="{{$project->id}}">
+                                                @foreach($workElement as $element)
+                                                    <option value="{{$element->id}}">{{$element->name}}</option>
+                                                @endforeach
                                             </select>
                                         </td>
                                     </tr>
@@ -150,12 +318,11 @@
                                     </thead>
                                     <tbody class="js-body-work-item-table">
                                     @foreach($workItem as $item)
-
                                         @php($arrTotManPower = $item?->workItems?->manPowers?->map(function ($el)
                                                     use ($workItemController){
                                                     $rate = $el->overall_rate_hourly;
                                                     $coef = $el->pivot->labor_coefisient;
-                                                    $tot = $rate * $workItemController->toDecimalRound($coef);
+                                                    $tot = (float) $rate * (float) $workItemController->toDecimalRound($coef);
                                                     return $tot;
                                                 })->all())
                                         @php($arrTotTool = $item?->workItems?->equipmentTools->map(function ($el){
@@ -223,7 +390,7 @@
         </div>
     </div>
     @include('estimate_discipline.modal_detail')
-@endif
+{{--@endif--}}
 
 
 

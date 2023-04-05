@@ -35,12 +35,10 @@
                 </div>
             @endif
 
-            <form action="/workElement/{{$project->id}}" method="post">
-                @csrf
-                <div class="col-sm-12">
-                    @include('estimate_discipline.form')
-                </div>
-            </form>
+            <div class="col-sm-12">
+                @include('estimate_discipline.form')
+            </div>
+
         </div>
     </div>
 @endsection

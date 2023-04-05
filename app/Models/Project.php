@@ -35,4 +35,8 @@ class Project extends Model
         return $this->hasMany(WorkElement::class,'project_id');
     }
 
+    public function locationEquipments(){
+        return $this->hasMany(LocationEquipments::class);
+    }
+
 }

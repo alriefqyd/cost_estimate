@@ -43,7 +43,7 @@
 </script>
 
 <script id="js-template-modal-work-item" type="x-tmpl-mustache">
-    <div class="modal fade js-modal-detail-work-item-@{{workItemId}}" id="materialsModal_@{{workItemId}}" tabindex="-1" role="dialog" aria-labelledby="materialsModal_@{{workItemId}}Label" aria-hidden="true">
+    <div class="modal fade js-modal-detail-work-item-@{{workItemId}}" id="materialsModal_@{{workItemId}}" role="dialog" aria-labelledby="materialsModal_@{{workItemId}}Label" aria-hidden="true">
             <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -79,14 +79,14 @@
             </div>
         </div>
     </div>
-    <div class="modal fade js-modal-detail-work-item-@{{workItemId}}" id="manPowersModal_@{{workItemId}}" tabindex="-1" role="dialog" aria-labelledby="manPowersModal_@{{workItemId}}Label" aria-hidden="true">
+    <div class="modal fade js-modal-detail-work-item-@{{workItemId}}" id="manPowersModal_@{{workItemId}}" role="dialog" aria-labelledby="manPowersModal_@{{workItemId}}Label" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Man Power</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body js-modal-work-item">
                     <table class="table table-striped">
                         <thead>
                         <th>Title</th>
@@ -107,6 +107,9 @@
                         @{{ /manPowers }}
                         </tbody>
                     </table>
+                    <div class="float-end m-t-5 cursor-pointer js-add-new-detail-man-power js-add-work-item-additional">
+                        <i class="fa fa-plus-circle"></i> Add new man power
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Close</button>
@@ -116,7 +119,7 @@
         </div>
     </div>
     </div>
-    <div class="modal fade js-modal-detail-work-item-@{{workItemId}}" id="toolsEquipmentsModal_@{{workItemId}}" tabindex="-1" role="dialog" aria-labelledby="materialsModal_@{{workItemId}}Label" aria-hidden="true">
+    <div class="modal fade js-modal-detail-work-item-@{{workItemId}}" id="toolsEquipmentsModal_@{{workItemId}}" role="dialog" aria-labelledby="materialsModal_@{{workItemId}}Label" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -152,4 +155,58 @@
             </div>
         </div>
     </div>
+</script>
+
+<script id="js-template-table-work-item-additional-man-power" type="x-tmpl-mustache">
+    <tr>
+        <td>
+            <select class="form-control js-select-item-additional"
+            data-url="/getItemAdditional/manPower">
+            </select>
+        </td>
+        <td>
+            <input type="text" name="unit_man_power[]" class="form-control"/>
+        </td>
+        <td>
+            <input type="text" name="coef_man_power[]" class="form-control js-additional-man-power-coef"/>
+        </td>
+        <td class="js-additional-man-power-rate">
+
+        </td>
+        <td class="js-additional-man-power-amount">
+
+        <td>
+
+    </tr>
+</script>
+
+<script id="js-template-table-location_equipment" type="x-tmpl-mustache">
+    <tr class="js-item-parent">
+        <td>
+            <input type="text" name="location_equipment[]" class="form-control js-form-location-equipment"/>
+        </td>
+        <td class="text-center">
+            <i class="fa fa-trash-o js-delete-item text-danger text-20 cursor-pointer"
+                data-idx="0"></i>
+        </td>
+    </tr>
+</script>
+
+<script id="js-template-table-wbs-level2" type="x-tmpl-mustache">
+     <tr class="js-item-parent">
+        <td>@{{ value }}</td>
+        <td style="width: 80%">
+            <table class="table-striped" style="width: 100%">
+                <tr>
+                    <td>
+                        <select name="work_scope[]" data-location=@{{ id }} multiple="multiple" class="js-select-2 js-form-discipline">
+                            @foreach($disciplines as $key => $value)
+                                <option value="{{$key}}">{{$value}}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 </script>

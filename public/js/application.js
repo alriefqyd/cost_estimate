@@ -28,7 +28,7 @@ $(function(){
                 remote:"Project no already taken"
             }
         }
-    })
+    });
 
     var designEngineerInit = function (e){
         var _this = $(e);

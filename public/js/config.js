@@ -15,7 +15,6 @@ $(function (){
     });
 
 
-
     $('.select2-ajax').select2({
         allowClear:$(this).data('allowClear'),
         placeholder:$(this).data('placeholder'),

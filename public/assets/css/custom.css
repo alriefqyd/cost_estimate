@@ -133,6 +133,13 @@
     min-width: 550px !important;
 }
 
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+    padding: 5px 5px 0 !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    margin-top: 2px !important;
+}
 
 
 @media only screen and (max-width: 1337px) {
