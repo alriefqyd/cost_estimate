@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\WorkElement;
+use App\Models\WorkBreakdownStructure;
 use Illuminate\Http\Request;
 
 class WorkElementController extends Controller
@@ -54,11 +55,7 @@ class WorkElementController extends Controller
      * @return \Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
     public function getDataWorkElements(Request $request){
-        $data = WorkElement::where('project_id',$request->project_id)
-            ->where('work_scope',$request->discipline)
-            ->when(isset($request->q),function ($q) use ($request){
-                return $q->where('name','like','%'.$request->q.'%');
-            })->get();
+        $data = WorkBreakdownStructure::where('parent_id',$request?->discipline)->get();
         return $data;
     }
     /**
@@ -71,7 +68,7 @@ class WorkElementController extends Controller
         $response = array();
         foreach ($data as $item){
             $response[] = array(
-                "text" => $item->name,
+                "text" => $item->title,
                 "id" => $item->id
             );
         }

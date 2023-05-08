@@ -8,4 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class WorkBreakdownStructure extends Model
 {
     use HasFactory;
+    public function wbsLevel3s(){
+        return $this->hasOne(WbsLevel3::class,'discipline');
+    }
+
+    public function wbsDiscipline(){
+        return $this->hasMany(WorkBreakdownStructure::class,'parent_id');
+    }
+
+    public function wbsLevel3WorkElements(){
+        return $this->hasOne(WbsLevel3::class,'work_element');
+    }
 }

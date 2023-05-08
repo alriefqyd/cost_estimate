@@ -1,14 +1,5 @@
 @inject('workItemController','App\Http\Controllers\WorkItemController')
 <div class="col-sm-12 col-lg-12 col-xl-12">
-    <div class="col">
-        <span class="float-end">
-            <a href="/project/{{$project->id}}/estimate-discipline/create">
-                <button class="btn btn-outline-primary" type="button">
-                    {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
-                </button>
-            </a>
-        </span>
-    </div>
     <div class="clearfix"></div>
     <div class="col">
         <ul class="nav nav-tabs mb-4" id="icon-tab" role="tablist">
@@ -77,7 +68,7 @@
                 </tr>
                 @foreach($value as $item)
                     <tr>
-                        <td>{{$item?->workItems?->code}}</td>
+                        <td>{{$item->wbsLevels3?->workElements?->title}}</td>
                         <td>{{$item?->workItems?->description}}</td>
                         <td>{{$item?->volume}}</td>
                         <td>{{$item?->workItems?->unit}}</td>

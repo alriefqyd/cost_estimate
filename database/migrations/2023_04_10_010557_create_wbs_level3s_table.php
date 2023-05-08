@@ -13,10 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('discipline_projects', function (Blueprint $table) {
+        Schema::create('wbs_level3s', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('location_id');
-            $table->foreignId('discipline_id');
+            $table->string('type');
+            $table->string('title');
+            $table->string('discipline');
+            $table->text('work_element')->nullable();
+            $table->foreignId('project_id');
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('discipline_projects');
+        Schema::dropIfExists('wbs_level3s');
     }
 };

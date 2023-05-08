@@ -10,7 +10,6 @@ $(function (){
         _this.select2({
             allowClear:true,
             placeholder:_this.data('placeholder'),
-            minimumInputLength:_this.data('minimumInputLength')
         });
     });
 

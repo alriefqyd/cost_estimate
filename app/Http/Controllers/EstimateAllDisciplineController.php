@@ -5,14 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\DisciplineProjects;
 use App\Models\EstimateAllDiscipline;
 use App\Models\LocationEquipments;
-use App\Models\ManPower;
 use App\Models\Project;
-use App\Models\Setting;
-use App\Models\WorkElement;
-use App\Models\WorkItem;
-use App\Models\WorkItemType;
+use App\Models\WbsLevel3;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class EstimateAllDisciplineController extends Controller
 {
@@ -22,81 +17,36 @@ class EstimateAllDisciplineController extends Controller
         return $data;
     }
 
-    public function create(Request $request, Project $project){
-        //select data by project, if estimate discipline with the user discipline exist, open it and update, else will be create new one
-        /*$data = EstimateAllDiscipline::with(['projects','workElements'])->whereHas('projects',function ($q) use ($request) {
-            return $q->where('id',$request->project_id);
-        });*/
-
-        if(isset($request->discipline) &&
-            !array_key_exists($request->discipline,Setting::DISCIPLINE)){
-            response(404);
-        }
-        $workItem = new WorkItemController();
-        $disciplines = Setting::DISCIPLINE;
-        $existingLocationEquipment = LocationEquipments::with(['disciplineProjects'])->where('project_id',$project->id)->get();
-//        dd($existingLocationEquipment);
-//        $existingDisciplineProject = DisciplineProjects::with(['disciplineProjects'])->where('project_id',$project->id)->get();
-        $workElement = WorkElement::where('project_id',$project->id)->where('work_scope',$request->discipline)->get();
-        if(isset($request->discipline)
-            && !array_key_exists($request->discipline,Setting::DISCIPLINE)){
-            abort(404);
-        }
-
-        return view('estimate_discipline.create',[
-            'project' => $project,
-            'isEmptyWorkElement' => sizeof($workElement) < 1,
-            'workElement' => $workElement,
-            'workItem' => $this->getWorkItems($request, $project),
-            'disciplines' => $disciplines,
-            'locationEquipments' => $existingLocationEquipment,
-//            'disciplineProjects' => $existingDisciplineProject
-        ]);
-    }
-
-    public function store(Request $request){
-        $workItemController = new WorkItemController();
-        try {
-            foreach ($request->work_items as $item){
-                $estimateAllDiscipline = new EstimateAllDiscipline();
-                $estimateAllDiscipline->title = '';
-                $estimateAllDiscipline->work_scope = $request->discipline;
-                $estimateAllDiscipline->work_item_id = $item['workItem'];
-                $estimateAllDiscipline->work_element_id = $item['workElement'];
-                $estimateAllDiscipline->volume = $item['vol'];
-                $estimateAllDiscipline->project_id = $request->project_id;
-                $estimateAllDiscipline->save();
-            }
-            $response = [
-                'status' => 200,
-                'message' => 'Success, Your data was saved successfully'
-            ];
-
-            return response()->json($response);
-        } catch (\Exception $e) {
-            return response()->json($e->getMessage());
-        }
-    }
-
     public function update(Request $request){
-        $workItemController = new WorkItemController();
         if(sizeof($request->work_items) > 0){
-            $existingEstimateDiscipline = EstimateAllDiscipline::where('project_id',$request->project_id)
-                ->where('work_scope',$request->discipline)->get();
-            foreach ($existingEstimateDiscipline as $item){
-                $item->delete();
+            $existingEstimateDiscipline = $this->getExistingWorkItemByWbs($request);
+            if($existingEstimateDiscipline){
+                foreach ($existingEstimateDiscipline as $item){
+                    $item->delete();
+                }
             }
         }
+
+        $workItemController = new WorkItemController();
 
         try {
             foreach ($request->work_items as $idx => $item){
                 $estimateAllDiscipline = new EstimateAllDiscipline();
                 $estimateAllDiscipline->title = '';
-                $estimateAllDiscipline->work_scope = $request->discipline;
                 $estimateAllDiscipline->work_item_id = $item['workItem'];
-                $estimateAllDiscipline->work_element_id =$item['workElement'];
                 $estimateAllDiscipline->volume = $item['vol'];
                 $estimateAllDiscipline->project_id = $request->project_id;
+                $estimateAllDiscipline->labour_factorial = $item['labourFactorial'];
+                $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'];
+                $estimateAllDiscipline->material_factorial = $item['materialFactorial'];
+                $estimateAllDiscipline->labor_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['labourUnitRate']);
+                $estimateAllDiscipline->labor_cost_total_rate =  $workItemController->removeCommaCurrencyFormat($item['totalRateManPowers']);
+                $estimateAllDiscipline->tool_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['equipmentUnitRate']);
+                $estimateAllDiscipline->tool_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateEquipments']);
+                $estimateAllDiscipline->material_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['materialUnitRate']);
+                $estimateAllDiscipline->material_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateMaterials']);
+
+                $estimateAllDiscipline->equipment_location_id = $request->work_element;
                 $estimateAllDiscipline->save();
             }
             $response = [
@@ -135,5 +85,40 @@ class EstimateAllDisciplineController extends Controller
         }
 
         return $arrayResult;
+    }
+
+    public function create(Project $project){
+        $wbsLevel3 = WbsLevel3::where('project_id',$project->id)->get()->groupby('title');
+        return view('work_item.create',[
+            'project' => $project,
+            'wbsLevel3' => $wbsLevel3,
+        ]);
+    }
+
+    public function getExistingWorkItemByWbs($request){
+        $data = EstimateAllDiscipline::with(['wbsLevels3.workElements.wbsDiscipline','workItems.materials',
+            'workItems.manPowers','workItems.equipmentTools'])
+            ->whereHas('wbsLevels3',function($q) use ($request){
+                return $q->where('work_element',$request->level3);
+            })->where('project_id',$request->project_id)->get();
+
+        return $data;
+    }
+
+    public function setExistingWorkItemByWbs(Request $request){
+        $data = $this->getExistingWorkItemByWbs($request);
+        $dataEstimateDisciplineSummary = array();
+
+        return response()->json([
+            'status' => 200,
+            'data' => $data
+        ]);
+    }
+
+    public function removeEstimatedDisciplineByEquipmentLocationId($ids,$project_id){
+        $data = EstimateAllDiscipline::where('project_id',$project_id)->whereNotIn('equipment_location_id',$ids)->get();
+        foreach($data as $item){
+            $item->delete();
+        }
     }
 }

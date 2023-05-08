@@ -1,3 +1,4 @@
+@inject('witemCont','App\Http\Controllers\WorkItemController')
 <script id="js-template-work-element" type="x-tmpl-mustache">
      <tr class="js-work-element-input-column">
         <td>
@@ -10,11 +11,11 @@
         </td>
         <td class="text-center"><i class="fa fa-trash-o js-delete-work-element text-danger text-20" data-idx="@{{ no }}"></i></td>
     </tr>
+
 </script>
 
 <script id="js-template-work-item" type="x-tmpl-mustache">
-    <tr class="js-work-item-input-column">
-        <td class="text-center">@{{ workElementText }}</td>
+    <tr class="js-work-item-input-column text-center">
         <td>@{{ workItemText }}</td>
         <td>@{{ vol }} @{{ unit }}</td>
         <td>
@@ -23,13 +24,13 @@
                 <i class="fa fa-exclamation-circle cursor-pointer"
                    data-bs-toggle="modal" data-original-title="test" data-bs-target="#manPowersModal_@{{ workItemId }}"></i>
              @{{/totalRateManPowers}}
-         </td>
+        </td>
         <td>
-        @{{ totalRateEquipments }}
-        @{{#totalRateEquipments}}
-            <i class="fa fa-exclamation-circle cursor-pointer"
-               data-bs-toggle="modal" data-original-title="test" data-bs-target="#toolsEquipmentsModal_@{{ workItemId }}"></i>
-        @{{/totalRateEquipments}}
+            @{{ totalRateEquipments }}
+            @{{#totalRateEquipments}}
+                <i class="fa fa-exclamation-circle cursor-pointer"
+                   data-bs-toggle="modal" data-original-title="test" data-bs-target="#toolsEquipmentsModal_@{{ workItemId }}"></i>
+            @{{/totalRateEquipments}}
         </td>
         <td>
             @{{ totalRateMaterials }}
@@ -38,8 +39,18 @@
                    data-bs-toggle="modal" data-original-title="test" data-bs-target="#materialsModal_@{{ workItemId }}"></i>
             @{{/totalRateMaterials}}
         </td>
+        <td>
+            @{{ labourFactorial }}
+        </td>
+        <td>
+            @{{ equipmentFactorial }}
+        </td>
+        <td>
+            @{{ materialFactorial }}
+        </td>
          <td class="text-center"><i class="fa fa-trash-o js-delete-work-item text-danger text-20" data-idx="@{{ idx }}"></i></td>
     </tr>
+
 </script>
 
 <script id="js-template-modal-work-item" type="x-tmpl-mustache">
@@ -62,11 +73,11 @@
                             <tbody>
                             @{{ #materials }}
                             <tr>
-                                <td>@{{ description }}</td>
+                                <td>@{{ tool_equipment_description }}</td>
                                 <td>@{{ unit }}</td>
-                                <td>@{{ quantity }}</td>
+                                <td>@{{ pivot.quantity }}</td>
                                 <td>@{{ rate }}</td>
-                                <td>@{{ amount }}</td>
+                                <td>@{{ pivot.amount }}</td>
                             </tr>
                             @{{ /materials }}
                             </tbody>
@@ -98,18 +109,15 @@
                         <tbody>
                         @{{ #manPowers }}
                         <tr>
-                            <td>@{{ manPowerTitle }}</td>
-                            <td>@{{ unitPivot }}</td>
-                            <td>@{{ laborCoefisient }}</td>
-                            <td>@{{ rateHourly }}</td>
-                            <td>@{{ amountPivot }}</td>
+                            <td>@{{ title }}</td>
+                            <td>@{{ pivot.labor_unit }}</td>
+                            <td>@{{ pivot.labor_coefisient }}</td>
+                            <td>@{{ overall_rate_hourly }}</td>
+                            <td>@{{ pivot.amount }}</td>
                         </tr>
                         @{{ /manPowers }}
                         </tbody>
                     </table>
-                    <div class="float-end m-t-5 cursor-pointer js-add-new-detail-man-power js-add-work-item-additional">
-                        <i class="fa fa-plus-circle"></i> Add new man power
-                    </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Close</button>
@@ -181,32 +189,32 @@
 </script>
 
 <script id="js-template-table-location_equipment" type="x-tmpl-mustache">
-    <tr class="js-item-parent">
-        <td>
-            <input type="text" name="location_equipment[]" class="form-control js-form-location-equipment"/>
-        </td>
-        <td class="text-center">
-            <i class="fa fa-trash-o js-delete-item text-danger text-20 cursor-pointer"
-                data-idx="0"></i>
-        </td>
-    </tr>
+    @include('work_item.location_mustache')
 </script>
 
-<script id="js-template-table-wbs-level2" type="x-tmpl-mustache">
-     <tr class="js-item-parent">
-        <td>@{{ value }}</td>
-        <td style="width: 80%">
-            <table class="table-striped" style="width: 100%">
-                <tr>
-                    <td>
-                        <select name="work_scope[]" data-location=@{{ id }} multiple="multiple" class="js-select-2 js-form-discipline">
-                            @foreach($disciplines as $key => $value)
-                                <option value="{{$key}}">{{$value}}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
+<script id="js-template-table-discipline_work-element" type="x-tmpl-mustache">
+    @include('work_item.discipline_work_element')
 </script>
+
+{{--<script id="js-template-level2-form" type="x-tmpl-mustache">--}}
+{{--@{{ #data }}--}}
+{{--    <div class="checkbox checkbox-primary">--}}
+{{--        <input class="js-checkbox-wbs-level2" data-id="{{isset($project->id) ? $project?->id : ''}}" id="checkbox-@{{ title }}" type="checkbox" value="@{{ value }}">--}}
+{{--        <label class="label-checkbox-work-item" for="checkbox-@{{ title }}">@{{ title }}</label>--}}
+{{--    </div>--}}
+{{--@{{ /data }}--}}
+{{--</script>--}}
+
+{{--<script id="js-template-level3-form" type="x-tmpl-mustache">--}}
+{{--@{{ #data }}--}}
+{{--    @{{#value}}--}}
+{{--        <div class="checkbox checkbox-primary">--}}
+{{--            <input class="js-checkbox-wbs-level3" id="checkbox-@{{ key }}" type="checkbox" value="@{{ value }}">--}}
+{{--            <label class="label-checkbox-work-item" for="checkbox-@{{ key }}">@{{ value }}</label>--}}
+{{--        </div>--}}
+{{--    @{{/value}}--}}
+{{--    @{{^value}}--}}
+{{--        <span class="checkbox">Empty List</span>--}}
+{{--    @{{/value}}--}}
+{{--@{{ /data }}--}}
+{{--</script>--}}

@@ -35,8 +35,9 @@ class Project extends Model
         return $this->hasMany(WorkElement::class,'project_id');
     }
 
-    public function locationEquipments(){
-        return $this->hasMany(LocationEquipments::class);
+    public function wbsLevel3s(){
+        return $this->hasMany(WbsLevel3::class,'project_id');
     }
+
 
 }

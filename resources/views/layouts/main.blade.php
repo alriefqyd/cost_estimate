@@ -134,6 +134,7 @@
 <script src="{{'/js/notification.js'}}"></script>
 <script src="{{'/js/application.js'}}"></script>
 <script src="{{'/js/estimate_discipline.js'}}"></script>
+<script src="{{'/js/work_breakdown_structure.js'}}"></script>
 <!-- login js-->
 <!-- Plugin used-->
 </body>

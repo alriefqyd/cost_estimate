@@ -54,7 +54,7 @@ class WorkItemController extends Controller
 //        dd($items);
     }
     /**
-     * Set Work Item to Show iin List Estimate Discipline
+     * Set Work Item to Show in List Estimate Discipline
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -72,11 +72,9 @@ class WorkItemController extends Controller
                 if($manPowers){
                     foreach ($manPowers as $manPower){
                         $manPowersArr[] = array(
-                            "manPowerTitle" => $manPower->title,
-                            "amountPivot" => $this->toCurrency($manPower->pivot->amount),
-                            "coefisient" => $manPower?->pivot?->coefisient,
-                            "laborCoefisient" =>$this->toDecimalRound($manPower?->pivot?->labor_coefisient),
-                            "rateHourly" => $this->toCurrency($manPower?->overall_rate_hourly)
+                            "title" => $manPower->title,
+                            "pivot" => $manPower?->pivot,
+                            "overall_rate_hourly" => $manPower?->overall_rate_hourly
                         );
                     }
                 }
@@ -95,11 +93,10 @@ class WorkItemController extends Controller
                 if($materials){
                     foreach ($materials as $material){
                         $materialsArr[] = array(
-                            "description" => $material->tool_equipment_description,
+                            "tool_equipment_description" => $material->tool_equipment_description,
                             "unit" => $material?->pivot?->unit,
-                            "quantity" => number_format($material?->pivot?->quantity,2),
-                            "rate" => $this->toCurrency($material?->pivot?->unit_price),
-                            "amount" => $this->toCurrency($material?->pivot?->amount),
+                            "pivot" => $material?->pivot,
+                            "rate" => $material?->pivot?->rate,
                         );
                     }
                 }
@@ -147,6 +144,7 @@ class WorkItemController extends Controller
 
     public function getTotalAmountToolsEquipment($equipment){
         $quantity = $equipment;
+        if(!$quantity) return null;
         $detailAmount = array();
         foreach($quantity as $item){
             $sum = $item->pivot->quantity * $item->local_rate;
@@ -158,6 +156,7 @@ class WorkItemController extends Controller
     }
 
     public function getTotalAmountMaterials($materials){
+        if(!$materials) return null;
         $detailAmount = array();
         foreach ($materials as $material){
             $sum = $material->pivot->quantity * $material->rate;
@@ -167,7 +166,7 @@ class WorkItemController extends Controller
         return array_sum($detailAmount);
     }
 
-    public function getTotalCost($costs,$type, $toCurrency){
+    public function getTotalCost($costs,$type,$toCurrency){
         $cost = array();
         $costCategory = '';
 
@@ -228,5 +227,10 @@ class WorkItemController extends Controller
         })->all();
 
         return $this->toCurrency(array_sum($data));
+    }
+
+    public function removeCommaCurrencyFormat($val){
+        if(!$val) return "";
+        return str_replace(',','',$val);
     }
 }

@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('work_elements', function (Blueprint $table) {
-            $table->foreignId('work_breakdown_structures_discipline_id');
+        Schema::table('estimate_all_disciplines', function (Blueprint $table) {
+            $table->string('work_scope')->nullable()->change();
+            $table->string('work_element_id')->nullable()->change();
         });
     }
 
@@ -25,8 +26,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('work_elements', function (Blueprint $table) {
-            $table->removeColumn('work_breakdown_structures_discipline_id');
+        Schema::table('estimate_all_disciplines', function (Blueprint $table) {
+            $table->string('work_scope')->change();
+            $table->string('work_element_id')->change();
         });
     }
 };

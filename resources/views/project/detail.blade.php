@@ -1,5 +1,6 @@
 @extends('layouts.main')
 @section('main')
+@inject('wbsLevel3Controller','App\Http\Controllers\WbsLevel3Controller')
     <div class="container-fluid">
         <div class="page-header">
             <div class="row">
@@ -21,7 +22,10 @@
                     <div class="card-header pb-0 card-header-custom">
                         <div class="row">
                             <div class="col-md-6">
-                                <p class="float start">Project Info</p>
+                                <p class="float start">Project Info
+                                <i class="fa fa-chevron-circle-up cursor-pointer js-chev-hide-content"></i>
+                                <i class="fa fa-chevron-circle-down cursor-pointer js-chev-show-content d-none"></i>
+                                </p>
                             </div>
                             <div class="col-md-6">
                                 <button class="btn btn-outline-success float-end m-r-10">Edit Project Info</button>
@@ -51,8 +55,86 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
+                    <div class="card-header card-header-custom pb-0">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="float start">Work Breakdown Structure
+                                    <i class="fa fa-chevron-circle-up cursor-pointer js-chev-hide-content"></i>
+                                    <i class="fa fa-chevron-circle-down cursor-pointer js-chev-show-content d-none"></i>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="/project/{{$project->id}}/wbs/{{sizeof($wbs) > 0 ? 'edit' : 'create'}}">
+                                    <button class="btn btn-outline-primary float-end m-r-10" type="button">
+                                        {{sizeof($wbs) > 0 ? 'Edit WBS' : 'Create WBS'}}
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if(sizeof($wbs) < 1)
+                            <div class="col-lg-12 text-center">
+                                <p >There is no data to display</p>
+                            </div>
+                        @else
+                        <div class="col-lg-12 text-center">
+                            <div class="table-responsive table-striped">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <td style="width:25%">Location/Equipment</td>
+                                        <td style="width:25%">Discipline</td>
+                                        <td style="width:50%">Work Element</td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($wbs as $key=>$value)
+                                        <tr>
+                                            <td>{{$key}}</td>
+                                            <td></td>
+                                            <td></td>
+                                        </tr>
+                                        @foreach($value as $wbs)
+                                            <tr>
+                                                <td>
+                                                </td>
+                                                <td>
+                                                    {{$wbs->wbsDiscipline?->title}}
+                                                </td>
+                                                <td>{{$wbs->workElements?->title}}</td>
+                                            </tr>
+                                        @endforeach
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
                     <div class="card-header card-header-custom pb-0" >
-                        <p>Estimate All Discipline</p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="float start">Estimate All Discipline
+                                    <i class="fa fa-chevron-circle-up cursor-pointer js-chev-hide-content"></i>
+                                    <i class="fa fa-chevron-circle-down cursor-pointer js-chev-show-content d-none"></i>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="/project/{{$project->id}}/work-item/create">
+                                    <button class="btn btn-outline-primary float-end m-r-10" type="button">
+                                        {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-body">
                         @include('project.detail_table')
@@ -75,77 +157,7 @@
                                     <div class="col-md-12 mb-4">
                                         <button class="btn btn-success float-end"><i class="fa fa-download"></i> Download as xlsx</button>
                                     </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered" style="font-size: 12px">
-                                            <thead>
-                                            <tr>
-                                                <th class="col-1" rowspan="2">LOC / EQUIP.</th>
-                                                <th class="col-1">DISCIPLINE</th>
-                                                <th class="col-6">WORK DESCRIPTION</th>
-                                                <th class="col-1">LABOUR COST</th>
-                                                <th class="col-1">TOOL AND EQUIPMENT COST</th>
-                                                <th class="col-1">MATERIAL COST</th>
-                                                <th class="col-1">TOTAL WORK COST</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            <tr>
-                                                <th scope="row">A</th>
-                                                <th></th>
-                                                <td>General</td>
-                                                <td>9.000</td>
-                                                <td>10.000.231</td>
-                                                <td>18.900.231</td>
-                                                <td>44.531.231</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row"></th>
-                                                <th>A.1</th>
-                                                <td>Electrical Work</td>
-                                                <td>9.000</td>
-                                                <td>10.000.231</td>
-                                                <td>18.900.231</td>
-                                                <td>44.531.231</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row"></th>
-                                                <th>A.2</th>
-                                                <td>LOCATION / EQUIPMENT - A </td>
-                                                <td>9.000</td>
-                                                <td>10.000.231</td>
-                                                <td>18.900.231</td>
-                                                <td>44.531.231</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">B</th>
-                                                <th></th>
-                                                <td>CONTIGENCY </td>
-                                                <td>9.000</td>
-                                                <td>10.000.231</td>
-                                                <td>18.900.231</td>
-                                                <td>44.531.231</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row"></th>
-                                                <th>B.1</th>
-                                                <td>CONTIGENCY 15%</td>
-                                                <td>9.000</td>
-                                                <td>10.000.231</td>
-                                                <td>18.900.231</td>
-                                                <td>44.531.231</td>
-                                            </tr>
-                                            <tr>
-                                                <th scope="row">C</th>
-                                                <th></th>
-                                                <td>TOTAL PROJECT COST</td>
-                                                <td>9.000</td>
-                                                <td>10.000.231</td>
-                                                <td>18.900.231</td>
-                                                <td>44.531.231</td>
-                                            </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                    @include('project.summary_table_cost_estimate')
                                 </div>
                             </div>
                         </div>

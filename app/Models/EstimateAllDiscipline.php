@@ -28,4 +28,9 @@ class EstimateAllDiscipline extends Model
     public function workElements(){
         return $this->belongsTo(WorkElement::class,'work_element_id');
     }
+
+    public function wbsLevels3(){
+        return $this->belongsTo(WbsLevel3::class,'equipment_location_id','work_element');
+    }
+
 }
