@@ -39,5 +39,16 @@ class Project extends Model
         return $this->hasMany(WbsLevel3::class,'project_id');
     }
 
+    public function scopeFilter($query, array $filters){
+        $query->when($filters['q'] ?? false, fn($query, $q) =>
+        $query->where('project_title','like','%'.$q.'%')
+            ->orWhere('project_no','like','%'.$q.'%')
+        );
+    }
+
+    public function projectWbsLevel3(){
+        return $this->hasMany(WbsLevel3::class,'project_id');
+    }
+
 
 }

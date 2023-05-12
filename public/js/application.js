@@ -53,4 +53,13 @@ $(function(){
     $('.js-design-engineer').each(function (){
         designEngineerInit(this)
     })
+
+    /**
+     * Project List
+     */
+
+    $('.btn-search-project').on('click',function(e){
+        e.preventDefault();
+        $('.js-form-project-search').submit();
+    });
 })

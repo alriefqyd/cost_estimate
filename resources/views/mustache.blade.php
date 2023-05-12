@@ -196,25 +196,3 @@
     @include('work_item.discipline_work_element')
 </script>
 
-{{--<script id="js-template-level2-form" type="x-tmpl-mustache">--}}
-{{--@{{ #data }}--}}
-{{--    <div class="checkbox checkbox-primary">--}}
-{{--        <input class="js-checkbox-wbs-level2" data-id="{{isset($project->id) ? $project?->id : ''}}" id="checkbox-@{{ title }}" type="checkbox" value="@{{ value }}">--}}
-{{--        <label class="label-checkbox-work-item" for="checkbox-@{{ title }}">@{{ title }}</label>--}}
-{{--    </div>--}}
-{{--@{{ /data }}--}}
-{{--</script>--}}
-
-{{--<script id="js-template-level3-form" type="x-tmpl-mustache">--}}
-{{--@{{ #data }}--}}
-{{--    @{{#value}}--}}
-{{--        <div class="checkbox checkbox-primary">--}}
-{{--            <input class="js-checkbox-wbs-level3" id="checkbox-@{{ key }}" type="checkbox" value="@{{ value }}">--}}
-{{--            <label class="label-checkbox-work-item" for="checkbox-@{{ key }}">@{{ value }}</label>--}}
-{{--        </div>--}}
-{{--    @{{/value}}--}}
-{{--    @{{^value}}--}}
-{{--        <span class="checkbox">Empty List</span>--}}
-{{--    @{{/value}}--}}
-{{--@{{ /data }}--}}
-{{--</script>--}}

@@ -17,9 +17,18 @@ class EstimateAllDisciplineController extends Controller
         return $data;
     }
 
+    public function getExistingWbsLevel3Id(Request $request){
+        $wbsLevel3 = WbsLevel3::where('identifier',$request->level1)->where('discipline',$request->level2)
+            ->where('work_element',$request->level3)->first('id');
+
+        return $wbsLevel3->id;
+    }
     public function update(Request $request){
+
+        $workItemController = new WorkItemController();
+        $existingWbsLevel3Id = $this->getExistingWbsLevel3Id($request);
         if(sizeof($request->work_items) > 0){
-            $existingEstimateDiscipline = $this->getExistingWorkItemByWbs($request);
+            $existingEstimateDiscipline = $this->getExistingWorkItemByWbs($request, $existingWbsLevel3Id);
             if($existingEstimateDiscipline){
                 foreach ($existingEstimateDiscipline as $item){
                     $item->delete();
@@ -27,7 +36,6 @@ class EstimateAllDisciplineController extends Controller
             }
         }
 
-        $workItemController = new WorkItemController();
 
         try {
             foreach ($request->work_items as $idx => $item){
@@ -45,7 +53,7 @@ class EstimateAllDisciplineController extends Controller
                 $estimateAllDiscipline->tool_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateEquipments']);
                 $estimateAllDiscipline->material_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['materialUnitRate']);
                 $estimateAllDiscipline->material_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateMaterials']);
-
+                $estimateAllDiscipline->wbs_level3_id = $existingWbsLevel3Id;
                 $estimateAllDiscipline->equipment_location_id = $request->work_element;
                 $estimateAllDiscipline->save();
             }
@@ -95,18 +103,18 @@ class EstimateAllDisciplineController extends Controller
         ]);
     }
 
-    public function getExistingWorkItemByWbs($request){
-        $data = EstimateAllDiscipline::with(['wbsLevels3.workElements.wbsDiscipline','workItems.materials',
+    public function getExistingWorkItemByWbs($request, $existingWbsLevel3Id){
+        $data = EstimateAllDiscipline::with(['wbss','wbsLevels3.workElements.wbsDiscipline','workItems.materials',
             'workItems.manPowers','workItems.equipmentTools'])
-            ->whereHas('wbsLevels3',function($q) use ($request){
-                return $q->where('work_element',$request->level3);
-            })->where('project_id',$request->project_id)->get();
+            ->where('wbs_level3_id',$existingWbsLevel3Id )
+            ->where('project_id',$request->project_id)->get();
 
         return $data;
     }
 
     public function setExistingWorkItemByWbs(Request $request){
-        $data = $this->getExistingWorkItemByWbs($request);
+        $existingWbsLevel3Id = $this->getExistingWbsLevel3Id($request);
+        $data = $this->getExistingWorkItemByWbs($request,$existingWbsLevel3Id);
         $dataEstimateDisciplineSummary = array();
 
         return response()->json([
@@ -115,10 +123,18 @@ class EstimateAllDisciplineController extends Controller
         ]);
     }
 
+    /**
+     * Hapus Estimate Discipline Yang Worlk Element nya tidak dari id terdaftar
+     * @param $ids
+     * @param $project_id
+     * @return void
+     */
     public function removeEstimatedDisciplineByEquipmentLocationId($ids,$project_id){
-        $data = EstimateAllDiscipline::where('project_id',$project_id)->whereNotIn('equipment_location_id',$ids)->get();
-        foreach($data as $item){
-            $item->delete();
+        if($ids) {
+            $data = EstimateAllDiscipline::where('project_id',$project_id)->whereNotIn('wbs_level3_id',$ids)->get();
+            foreach($data as $item){
+                $item->delete();
+            }
         }
     }
 }

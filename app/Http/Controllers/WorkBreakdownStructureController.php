@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
 use App\Models\Setting;
 use App\Models\WbsLevel3;
@@ -68,37 +69,92 @@ class WorkBreakdownStructureController extends Controller
         }
     }
 
+    public function update(Project $project, Request $request){
+        try {
+            $this->deleteWbs($project,$request);
+            $this->storeWbs($project,$request);
+            $this->updateEstimateWbs($project,$request);
+
+            $response = [
+                'status' => 200,
+                'message' => 'Success, Your data was update successfully'
+            ];
+            return response()->json($response);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+
     public function storeWbs(Project $project, Request $request){
-       $this->processStoreWbs($project,$request,true);
+       $data = $this->processData($request);
+       foreach($data as $item){
+           $wbsLevel3 = new WbsLevel3();
+           $wbsLevel3->type = $item->type;
+           $wbsLevel3->title = $item->title;
+           $wbsLevel3->discipline = $item->discipline;
+           $wbsLevel3->work_element = $item->work_element;
+           $wbsLevel3->project_id = $project->id;
+           $wbsLevel3->identifier = $item->identifier;
+           $wbsLevel3->save();
+       }
     }
-
-    public function getIdWbsRemoved(Project $project, Request $request){
-        $idTobeRemove = $this->processStoreWbs($project, $request,false);
-        return $idTobeRemove;
-    }
-
-    public function processStoreWbs(Project $project, Request $request, $isSave){
-        $arrIdRemoved = array();
+//cari semua estimate discipline yang wbs_level3_id nya tidak ada di daftar wbsLevel3 by project
+    public function processData(Request $request){
+        $arrData = array();
         foreach ($request->wbs as $item){
+            $identifier = $item['identifier'];
             foreach ($item['discipline'] as $discipline){
-                $arrWorkElement = array();
+                if(!$identifier) $identifier = uniqId();
                 if(isset($discipline['work_element'])){
                     foreach ($discipline['work_element'] as $key => $value){
-                        $wbsLevel3 = new WbsLevel3();
-                        $wbsLevel3->type = $item['type'];
-                        $wbsLevel3->title = $item['title'];
-                        $wbsLevel3->discipline = $discipline['id'];
-                        $wbsLevel3->work_element = $value;
-                        $wbsLevel3->project_id = $project->id;
-                        $wbsLevel3->save();
-                        if(!$isSave) {
-                            if($wbsLevel3->work_element != 'null') array_push($arrIdRemoved,$wbsLevel3->work_element);
+                        $workElement = $value;
+                        $oldWbsId = '';
+                        $jsonArray = json_decode($workElement);
+                        if (isset($jsonArray?->value) && isset($jsonArray?->oldWbsId) && (json_last_error() == JSON_ERROR_NONE)) {
+                            $workElement = $jsonArray?->value;
+                            $oldWbsId = $jsonArray?->oldWbsId;
                         }
+
+                        $data = [
+                            'type' => $item['type'],
+                            'title' => $item['title'],
+                            'discipline' => $discipline['id'],
+                            'work_element' => $workElement,
+                            'identifier' => $identifier,
+                            'oldWbsId' => $oldWbsId
+                        ];
+                        $obj = json_decode(json_encode($data), false);
+                        array_push($arrData,$obj);
                     }
                 }
             }
         }
-        if(!$isSave) return $arrIdRemoved;
+        return $arrData;
+    }
+
+    public function updateEstimateWbs(Project $project, Request $request){
+        $data = $this->processData($request);
+        $arrayIdEstimate = array();
+        foreach($data as $item){
+            $newWbs = WbsLevel3::where('project_id',$project->id)->where('discipline',$item->discipline)
+                ->where('work_element',$item->work_element)->where('identifier',$item->identifier)
+                ->first();
+            $estimateDiscipline = EstimateAllDiscipline::where('wbs_level3_id',$item?->oldWbsId)->where('project_id',$project->id)->first();
+            if($newWbs && $estimateDiscipline){
+                $estimateDiscipline->wbs_level3_id = $newWbs->id;
+                array_push($arrayIdEstimate,  $estimateDiscipline->wbs_level3_id);
+                $estimateDiscipline->save();
+            }
+        }
+
+        $toDelete = EstimateAllDIscipline::where('project_id',$project->id)->whereNotIn('wbs_level3_id',$arrayIdEstimate)->get();
+        foreach($toDelete as $v){
+            $v->delete();
+        }
     }
 
     public function generateWorkBreakdown(Project $project){
@@ -140,26 +196,6 @@ class WorkBreakdownStructureController extends Controller
         return $data;
     }
 
-    public function update(Project $project, Request $request){
-        try {
-            $estimateAllDisciplineController = new EstimateAllDisciplineController();
-            $equipmentLocationIdToRemove = $this->getIdWbsRemoved($project,$request);
-            $this->deleteWbs($project,$request);
-            $this->storeWbs($project,$request);
-            $estimateAllDisciplineController->removeEstimatedDisciplineByEquipmentLocationId($equipmentLocationIdToRemove,$project->id);
-            $response = [
-                'status' => 200,
-                'message' => 'Success, Your data was update successfully'
-            ];
-            return response()->json($response);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 500,
-                'message' => $e->getMessage()
-            ]);
-        }
-    }
-
     public function deleteWbs(Project $project, Request $request){
         $data = WbsLevel3::where('project_id', $project->id)->get();
         foreach($data as $item){
@@ -171,7 +207,7 @@ class WorkBreakdownStructureController extends Controller
     public function getWbsLevel2(Request $request){
         try{
             $data = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$request->project_id)
-                ->where('title', $request->level1)
+                ->where('identifier', $request->level1)
                 ->get()->groupBy('wbsDiscipline.title');
             $arrayObj = array();
 
@@ -198,7 +234,8 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function getWbsLevel3(Request $request){
-        $data = WbsLevel3::with('workElements')->where('project_id',$request->project_id)->where('discipline',$request->level2)->get();
+        $data = WbsLevel3::with('workElements')->where('project_id',$request->project_id)->where('discipline',$request->level2)
+            ->where('identifier',$request->level1)->get();
 
         $arrayObj = array();
         foreach($data as $key => $value){

@@ -15,7 +15,8 @@
             @if(isset($exDiscipline))
                 @foreach($exDiscipline as $workElement)
                     @if(($workElement->work_element) != 'null')
-                        <option value="{{$workElement->workElements?->id}}" selected>{{$workElement->workElements?->title}}</option>
+                        <option value="{{json_encode(['value' => $workElement->workElements?->id,'oldWbsId'=> $workElement->id])}}"
+                                selected>{{$workElement->workElements?->title}}</option>
                     @endif
                 @endforeach
             @endif

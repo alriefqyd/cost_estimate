@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class WorkItemController extends Controller
 {
+    public function index(){
+
+    }
     public function getWorkItems(Request $request){
 //        $workItem = WorkItem::with(['workItemTypes','manPowers'])->
 //            when(isset($request->q),function ($query) use ($request){
@@ -54,7 +57,7 @@ class WorkItemController extends Controller
 //        dd($items);
     }
     /**
-     * Set Work Item to Show in List Estimate Discipline
+     * Set Work Item to Show in List Estimate Discipline Select2
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -191,6 +194,17 @@ class WorkItemController extends Controller
         else return array_sum($cost);
     }
 
+    public function getTotalCostFromEstimateDiscipline(){
+
+    }
+
+    public function getResultCount($value,$factorial){
+        if(!$value) return '';
+        if(!$factorial) $factorial = 1;
+        $newValue = $value * $factorial;
+        return $this->toCurrency($newValue);
+    }
+
     public function removeCurrencyFormat($value){
         if(!$value) return '';
         return number_format($value, 0);
@@ -232,5 +246,38 @@ class WorkItemController extends Controller
     public function removeCommaCurrencyFormat($val){
         if(!$val) return "";
         return str_replace(',','',$val);
+    }
+
+    /**
+     * Sum total price category by work element in project detail page estimate discipline
+     * @return array
+     */
+    public function sumTotalByWorkElement($estimateDiscipline){
+        $totalPriceLabor = 0;
+        $totalPriceEquipment = 0;
+        $totalPriceMaterial = 0;
+
+        if($estimateDiscipline){
+            foreach($estimateDiscipline as $v){
+                $totalPriceLabor += $v->labor_cost_total_rate * $v->volume;
+                $totalPriceEquipment += $v->tool_unit_rate_total * $v->volume;
+                $totalPriceMaterial += $v->material_unit_rate_total * $v->volume;
+            }
+        }
+
+        $totalWorkCostByElement = $totalPriceLabor + $totalPriceEquipment + $totalPriceMaterial;
+
+        $data = [
+            'totalLaborByWorkElement' => $this->toCurrency($totalPriceLabor),
+            'totalEquipmentByWorkElement' => $this->toCurrency($totalPriceEquipment),
+            'totalMaterialByWorkElement' => $this->toCurrency($totalPriceMaterial),
+            'totalWorkCostByElement' => $totalWorkCostByElement
+        ];
+
+        return $data;
+    }
+
+    public function sumTotalEstimateDiscipline($value){
+
     }
 }

@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class EstimateAllDiscipline extends Model
 {
+    /**
+     * equipment_location_id tidak bisa jadi patokan karena kalau dia dobel di discipline berbeda tidak bisa di tahu
+     */
     use HasFactory;
 
     protected $fillable = [
@@ -31,6 +34,10 @@ class EstimateAllDiscipline extends Model
 
     public function wbsLevels3(){
         return $this->belongsTo(WbsLevel3::class,'equipment_location_id','work_element');
+    }
+
+    public function wbss(){
+        return $this->belongsTo(WbsLevel3::class,'wbs_level3_id','id');
     }
 
 }

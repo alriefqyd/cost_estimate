@@ -20,50 +20,47 @@
 </div>
 <div class="container-fluid product-wrapper">
     <div class="row project-cards">
-
         <div class="col-sm-12">
             <div class="card">
                 <div class="card-body m-0 p-3">
                     <div class="mb-5 mt-2">
+                        <form class="js-form-project-search" method="get" action="/project">
                         <div class="row">
                             <div class="col-md-1">
                                 <label>Filter By</label>
                             </div>
+
                             <div class="col-md-3 mb-1 mb-1-responsive">
                                 <select class="select2 col-sm-12"
                                         data-placeholder="Project Sponsor">
                                     <option></option>
-                                    <option value="WY">Peter</option>
-                                    <option value="WY">Hanry Die</option>
-                                    <option value="WY">John Doe</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-1">
-                                <input type="text" placeholder="Project No/Project Name" class="form-control" style="height: 40px">
+                                <input type="text" name="q" placeholder="Project No/Project Name" class="form-control" style="height: 40px">
                             </div>
                             <div class="col-md-2 mb-1" >
-                                <button class="btn btn-outline-success" style="height: 40px">Search</button>
+                                <button class="btn btn-outline-success btn btn-search-project" style="height: 40px">Search</button>
                             </div>
                         </div>
-                    </div>
+                    </form>
+                </div>
                     @include('project.table')
                 </div>
             </div>
         </div>
-        @if(sizeof($projects) > 10)
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="row">
-                        <div class="col-md-6 p-0">
-                        </div>
-                        <div class="col-md-6 p-0">
-                            {{$projects->onEachSide(1)->links()}}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
     </div>
+    @if($projects->total() > 1)
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <nav aria-label="Page navigation example float-end">
+                    <ul class="pagination">
+                        {{$projects->onEachSide(1)->links('project.pagination')}}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    @endif
 </div>
 <!-- Container-fluid Ends-->
 @endsection

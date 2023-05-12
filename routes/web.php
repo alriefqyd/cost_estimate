@@ -51,6 +51,12 @@ Route::get('/getItemAdditional/{type}',[\App\Http\Controllers\EstimateAllDiscipl
 Route::get('/getWbsLevel2',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel2'])->middleware('auth');
 Route::get('/getWbsLevel3',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel3'])->middleware('auth');
 
+Route::get('/work-item/',[\App\Http\Controllers\WorkItemController::class,'index'])->middleware('auth');
+
+
+Route::get('/man-power/',[\App\Http\Controllers\ManPowerController::class,'index'])->middleware('auth');
+
+
 //Route::post('/saveLocation',[\App\Http\Controllers\LocationEquipmentsController::class,'saveLocation'])->name('saveLocation')->middleware('auth');
 //Route::post('/saveDiscipline',[\App\Http\Controllers\DisciplineProjectsController::class,'saveDiscipline'])->name('saveLocation')->middleware('auth');
 

@@ -14,10 +14,6 @@ class WorkElementController extends Controller
     }
 
     public function store(Request $request, Project $project){
-        // check existing id
-        // if id exist update
-        // if id not exist add new
-
         $existingIdElement = $project->workElements->map(function ($element){
             return $element->id;
         })->all();

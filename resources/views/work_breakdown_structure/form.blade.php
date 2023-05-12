@@ -20,8 +20,13 @@
     <div class="row">
         <div class="card">
             <div class="col-md-12 m-10">
-                <button class="btn btn-success js-form-list-location-submit">Save</button>
+                <button class="btn btn-success js-form-list-location-submit">
+                    <div class="loader-box" style="height: auto">
+                        Save <div style="margin-left:3px" class="loader-34 d-none"></div>
+                    </div>
+                </button>
                 <button class="btn btn-success">Cancel</button>
+
             </div>
         </div>
     </div>

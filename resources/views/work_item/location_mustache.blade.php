@@ -7,6 +7,7 @@
     <div class="card-body">
         <fieldset>
             <div class="row mb-2">
+                <input type="hidden" class="js-wbs-l3-identifier"  value="{{isset($uniqueId) ? $uniqueId : (isset($wbs?->first()?->identifier) ? $wbs->first()->identifier : '')}}">
                 <div class="col-md-12 mb-3">
                     <label>Type</label>
                     <select name="type[]" class="select2 form-control js-wbs-l3-type">

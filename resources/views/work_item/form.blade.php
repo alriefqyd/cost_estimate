@@ -10,7 +10,7 @@
                     <select class="select2 form-control js-select-level1" data-id="{{$project?->id}}" data-placeholder="Select WBS Level 1">
                         <option></option>
                         @foreach($wbsLevel3 as $key => $wbs)
-                            <option value="{{$key}}">{{$key}}</option>
+                            <option value="{{$wbs->first()->identifier}}">{{$key}}</option>
                         @endforeach
                     </select>
 {{--                    @foreach($wbsLevel3 as $key => $wbs)--}}

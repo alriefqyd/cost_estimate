@@ -89,6 +89,15 @@ $(function(){
         $(this).closest('.js-form-row-discipline').remove();
     })
 
+    function isJson(str){
+        try {
+            JSON.parse(str);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     $(document).on('click','.js-form-list-location-submit',function (e){
         e.preventDefault()
         var _this = $(this)
@@ -97,12 +106,16 @@ $(function(){
         var url = $('.js-form-wbs-estimate-discipline').data('url')
         var id = $('.js-form-wbs-estimate-discipline').data('id')
 
+        _this.find('.loader-34').removeClass('d-none');
+        _this.attr('disabled','disabled')
         $.each(_item_parent,function (index,value){
             var __this = $(this);
             var __type = __this.find('.js-wbs-l3-type')
             var __title = __this.find('.js-wbs-l3-location_equipment-title')
+            var __identifier = __this.find('.js-wbs-l3-identifier')
             var __discipline = __this.find('.js-wbs-l3-discipline')
             var arrDiscipline = []
+            var arrWorkElement = []
 
             $.each(__discipline,function (index,value){
                 var ___this = $(this)
@@ -115,10 +128,12 @@ $(function(){
 
             var item = {}
             item['title'] = __title.val();
+            item['identifier'] = __identifier.val();
             item['type'] = __type.val();
             item['discipline'] = arrDiscipline
 
             jsonObj.push(item)
+            console.log(jsonObj)
 
         })
 
@@ -127,12 +142,15 @@ $(function(){
             url: url,
             data : {wbs:jsonObj},
             success:function(result){
+                console.log(result)
                 if(result.status === 200){
                     notification('success',result.message)
+                    // return false
                     setTimeout(function (){
                         window.location.href = '/project/' + id
                     },2000)
                 } else {
+                    console.log(result.message);
                     notification('danger',result.message,'fa fa-cross','Error')
                 }
             }
@@ -150,126 +168,6 @@ $(function(){
         $(this).siblings('.js-chev-hide-content').removeClass('d-none');
         $(this).closest('.card').find('.card-body').removeClass('d-none');
     })
-
-    // var _checkbox_level2 = $('.js-level2-checkbox');
-    // $(document).on('click','.js-checkbox-wbs-level1',function(){
-    //     var _this = $(this);
-    //
-    //     if(_this.is(':checked')){
-    //         $('.js-checkbox-wbs-level1').each(function(){
-    //             if(_this.attr('id') != $(this).attr('id')){
-    //                 $(this).attr('disabled','disabled')
-    //             }
-    //         })
-    //         getLevel2(_this);
-    //     } else {
-    //         _checkbox_level2.find('.js-loader').removeClass('d-none');
-    //         $('.js-card-section-work-item').addClass('d-none');
-    //         $('.js-level2-checkbox').addClass('d-none');
-    //         $('.js-level3-checkbox').addClass('d-none');
-    //         $('.js-level2-checkbox').find('.checkbox').remove();
-    //         $('.js-level3-checkbox').find('.checkbox').remove();
-    //         $('.js-btn-next-work-item').attr('disabled','disabled');
-    //         _checkbox_level3.find('.js-loader').removeClass('d-none');
-    //         $('.js-checkbox-wbs-level1').each(function(){
-    //             $(this).removeAttr('disabled','disabled')
-    //         })
-    //     }
-    //
-    // });
-
-    // var _checkbox_level3 = $('.js-level3-checkbox');
-    // $(document).on('click','.js-checkbox-wbs-level2', function(){
-    //     var _this = $(this);
-    //     if(_this.is(':checked')){
-    //         $('.js-checkbox-wbs-level2').each(function(){
-    //             if(_this.attr('id') != $(this).attr('id')){
-    //                 $(this).attr('disabled','disabled')
-    //             }
-    //         })
-    //         getLevel3(_this);
-    //     } else {
-    //         $('.js-btn-next-work-item').attr('disabled','disabled');
-    //         $('.js-card-section-work-item').addClass('d-none');
-    //         _checkbox_level3.find('.js-loader').removeClass('d-none');
-    //         _checkbox_level3.addClass('d-none');
-    //         _checkbox_level3.find('.checkbox').remove();
-    //         $('.js-checkbox-wbs-level2').each(function(){
-    //             $(this).removeAttr('disabled','disabled')
-    //         })
-    //     }
-    // });
-
-    // $(document).on('click','.js-checkbox-wbs-level3', function(){
-    //     var _this = $(this);
-    //
-    //     if(_this.is(':checked')){
-    //         $('.js-btn-next-work-item').removeAttr('disabled','disabled');
-    //         $('.js-checkbox-wbs-level3').each(function(){
-    //             if(_this.attr('id') != $(this).attr('id')){
-    //                 $(this).attr('disabled','disabled')
-    //             }
-    //         })
-    //     } else {
-    //         $('.js-btn-next-work-item').attr('disabled','disabled');
-    //         $('.js-card-section-work-item').addClass('d-none');
-    //         $('.js-checkbox-wbs-level3').each(function(){
-    //             $(this).removeAttr('disabled','disabled')
-    //         })
-    //     }
-    // });
-    //
-    // function getLevel2($this){
-    //     $.ajax({
-    //         url:'/getWbsLevel2',
-    //         data:{'level1':$this.val(),'project_id':$this.data('id')},
-    //         success:function(result){
-    //             if(result.status === 200){
-    //                 _checkbox_level2.removeClass('d-none');
-    //                 var template = $('#js-template-level2-form').html();
-    //                 Mustache.parse(template)
-    //                 var data = {
-    //                     data : result.data
-    //                 }
-    //
-    //                 var renderTemplate = Mustache.render(template,data)
-    //                 setTimeout(function(){
-    //                     _checkbox_level2.find('.js-loader').addClass('d-none');
-    //                     _checkbox_level2.find('.form-group').append(renderTemplate);
-    //                 },500)
-    //             }
-    //         }
-    //     })
-    // }
-    //
-    // function getLevel3($this){
-    //     $.ajax({
-    //         url:'/getWbsLevel3',
-    //         data:{'level2':$this.val(),'project_id':$this.data('id')},
-    //         success:function(result){
-    //             if(result.status === 200){
-    //                 _checkbox_level3.removeClass('d-none');
-    //                 var template = $('#js-template-level3-form').html();
-    //                 Mustache.parse(template)
-    //                 var data = {
-    //                     data : result.data
-    //                 }
-    //
-    //                 if(data.data[0].value == null){
-    //                     $('.js-btn-next-work-item').removeAttr('disabled')
-    //                 } else {
-    //                     $('.js-btn-next-work-item').attr('disabled','disabled')
-    //                 }
-    //
-    //                 var renderTemplate = Mustache.render(template,data)
-    //                 setTimeout(function(){
-    //                     _checkbox_level3.find('.js-loader').addClass('d-none');
-    //                     _checkbox_level3.find('.form-group').append(renderTemplate);
-    //                 },500)
-    //             }
-    //         }
-    //     })
-    // }
 
     var level2DisciplineByProject = function (el) {
         var _this = $(el);
@@ -299,6 +197,7 @@ $(function(){
     var level3DisciplineByProject = function (el) {
         var _this = $(el);
         var _level2 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level2');
+        var _level1 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level1');
         if (_this.data("select2")) _this.select2("destroy");
 
         _this.select2({
@@ -308,7 +207,7 @@ $(function(){
                 url:'/getWbsLevel3',
                 dataType: 'json',
                 data:function(params){
-                    return {'project_id':_level2.data('id'),'level2':_level2.val()}
+                    return {'project_id':_level2.data('id'),'level2':_level2.val(),'level1':_level1.val()}
                 },
                 processResults:function (resp) {
                     if(resp.status === 200){
@@ -343,10 +242,18 @@ $(function(){
 
     $(document).on('change','.js-select-level3',function(){
         var _this = $(this)
+        var _level2 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level2');
+        var _level1 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level1');
+        var _identifier = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level1');
+
         if(_this.val() !== null){
             $.ajax({
                 url:'/getExistingWorkItemByWbs',
-                data:{'project_id':_this.data('id'),'level3':_this.val()},
+                data:{
+                    'project_id':_this.data('id'),
+                    'level3':_this.val(),
+                    'level2':_level2.val(),
+                    'level1':_level1.val()},
                 success:function(resp){
                     if(resp.status === 200){
                         $('.js-card-section-work-item').removeClass('d-none')
@@ -372,7 +279,6 @@ $(function(){
 
         _array_estimate_discipline = [];
         $.each(value,function(){
-            console.log(this)
             var _data = {
                 "idx": generateId(),
                 "workItem":this.work_item_id,
@@ -405,16 +311,6 @@ $(function(){
 
     }
 
-    // $(document).on('click','.js-btn-next-work-item',function(){
-    //     $.ajax({
-    //         type:"GET",
-    //         url:"/getWorkItemsByWorkBreakdownStructure",
-    //         data:{
-    //             '':''
-    //         }
-    //     })
-    //     $('.js-card-section-work-item').removeClass('d-none')
-    // })
 
     //add work item
     var _table_item = 0;
@@ -431,25 +327,6 @@ $(function(){
     function generateId(){
         return Math.random().toString(36).substring(2,9);
     }
-
-    // if(_existingWorkItems.length > 0){
-    //     $.each(_existingWorkItems,function(index,value){
-    //         var data = {
-    //             "idx" : index,
-    //             "workItem" : $(this).data('work-item'),
-    //             "workElement": $(this).data('work-element'),
-    //             "vol" : $(this).data('volume'),
-    //             "estimate_discipline_id" : $(this).val(),
-    //         }
-    //         _array_estimate_discipline.push(data);
-    //     });
-    // }
-
-    // $(document).on('change','.js-select-discipline',function (){
-    //     var _parent = $('.js-select-discipline-card');
-    //     var _id = _parent.data('id');
-    //     window.location.href = '/project/' + _id + '/estimate-discipline/create/' + $(this).val();
-    // });
 
     var _table_no = 0;
     $(document).on('click', '.js-add-work-element', function () {
@@ -651,11 +528,16 @@ $(function(){
             _url = '/project/'+_id+'/estimate-discipline/update'
         }
 
+        var _level2 = $('.js-select-level2').val();
+        var _level1 = $('.js-select-level1').val();
+
         var _data = {
             'work_items' : _array_estimate_discipline,
             'project_id' : _id,
             'work_element' : _work_element,
-            'level3' : _work_element
+            'level3' : _work_element,
+            'level2' : _level2,
+            'level1' : _level1
         }
 
         $.ajax({

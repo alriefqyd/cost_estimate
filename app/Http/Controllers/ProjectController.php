@@ -19,7 +19,8 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])->paginate(10);
+        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
+            ->filter(request(['q']))->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
         return view('project.index',[
             'projects' => $projects
         ]);
@@ -120,8 +121,8 @@ class ProjectController extends Controller
     }
 
     public function detail(Project $project, Request $request){
-        $estimateDisciplines = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('workElements.title');
-
+        $workItemController = new workItemController();
+        $estimateDisciplines = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.title');
         $wbs = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$project->id)->get()->groupBy('title');
         $summary = $this->getSummaryCostEstimate($project, $request);
         return view('project.detail',[
@@ -134,7 +135,7 @@ class ProjectController extends Controller
     }
 
     public function getEstimateDisciplineByProject(Project $project, Request $request){
-        $data = EstimateAllDiscipline::with(['wbsLevels3.workElements','workItems.manPowers','workItems.equipmentTools','workItems.materials'])
+        $data = EstimateAllDiscipline::with(['wbss','wbsLevels3.workElements','workItems.manPowers','workItems.equipmentTools','workItems.materials'])
             ->when($request->discipline == 'civil', function($q){
                 return $q->where('work_scope','=','civil');
             })->when($request->discipline == 'mechanical', function($q){

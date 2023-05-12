@@ -128,6 +128,10 @@
     min-width: 200px !important;
 }
 
+.min-w-250 {
+    min-width: 250px !important;
+}
+
 .min-w-300 {
     min-width: 300px !important;
 }
@@ -148,6 +152,14 @@
 
 .min-w-550 {
     min-width: 550px !important;
+}
+
+.bg-brown {
+    background-color: #A39B72FF !important;
+}
+
+.loader-34:after,.loader-34:before {
+    background-color: #FFFFFF !important;
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
