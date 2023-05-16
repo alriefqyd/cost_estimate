@@ -17,10 +17,16 @@
                     <li class="sidebar-main-title">
 
                     </li>
-                    <li><a class="nav-link menu-title" href="/project"><i data-feather=""></i><span>Cost Estimate</span></a></li> {{--list of summary in excel template--}}
+                    <li><a class="nav-link menu-title" href="/project"><i data-feather=""></i><span>Cost Estimate</span></a></li>
                     <li><a class="nav-link menu-title" href="/work-item"><i data-feather=""></i><span>Work Item</span></a></li>
                     <li><a class="nav-link menu-title" href="/man-power"><i data-feather=""></i><span>Man Power List</span></a></li>
-                    <li><a class="nav-link menu-title" href="/tool-equipment"><i data-feather=""></i><span>Tool Equipment List</span></a></li>
+                    <li class="dropdown">
+                        <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather=""></i><span>Tool Equipment </span></a>
+                        <ul class="nav-submenu menu-content">
+                            <li><a href="/tool-equipment">Tool Equipment List</a></li>
+                            <li><a href="/tool-equipment-category">Tool Equipment Category </a></li>
+                        </ul>
+                    </li>
                     <li><a class="nav-link menu-title" href="/material"><i data-feather=""></i><span>Material List</span></a></li>
                 </ul>
             </div>

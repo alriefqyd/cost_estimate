@@ -138,6 +138,8 @@
 <script src="{{'/js/estimate_discipline.js'}}"></script>
 <script src="{{'/js/work_breakdown_structure.js'}}"></script>
 <script src="{{'/js/man_power.js'}}"></script>
+<script src="{{'/js/tool_equipment.js'}}"></script>
+<script src="{{'/js/tool_equipment_category.js'}}"></script>
 <!-- login js-->
 <!-- Plugin used-->
 </body>

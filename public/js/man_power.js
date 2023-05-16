@@ -134,7 +134,7 @@ $(function() {
     })
 
     /**
-     * Delete Work Element
+     * Delete Man Power
      */
     var _idDelete = '';
     $('.js-delete-man-power').on('click', function(){
@@ -163,5 +163,4 @@ $(function() {
             }
         })
     })
-
 })

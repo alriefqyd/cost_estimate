@@ -53,7 +53,6 @@ Route::get('/getWbsLevel3',[\App\Http\Controllers\WorkBreakdownStructureControll
 
 Route::get('/work-item/',[\App\Http\Controllers\WorkItemController::class,'index'])->middleware('auth');
 
-
 Route::get('/man-power/',[\App\Http\Controllers\ManPowerController::class,'index'])->middleware('auth');
 Route::get('/man-power/create',[\App\Http\Controllers\ManPowerController::class,'create'])->middleware('auth');
 Route::post('/man-power/',[\App\Http\Controllers\ManPowerController::class,'store'])->middleware('auth');
@@ -61,6 +60,19 @@ Route::put('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController:
 Route::get('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController::class,'detail'])->middleware('auth');
 Route::delete('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController::class,'delete'])->middleware('auth');
 
+Route::get('/tool-equipment',[\App\Http\Controllers\EquipmentToolsController::class,'index'])->middleware('auth');
+Route::get('/tool-equipment/create',[\App\Http\Controllers\EquipmentToolsController::class,'create'])->middleware('auth');
+Route::post('/tool-equipment/',[\App\Http\Controllers\EquipmentToolsController::class,'store'])->middleware('auth');
+Route::put('/tool-equipment/{equipmentTools:id}',[\App\Http\Controllers\EquipmentToolsController::class,'update'])->middleware('auth');
+Route::get('/tool-equipment/{equipmentTools:id}',[\App\Http\Controllers\EquipmentToolsController::class,'show'])->middleware('auth');
+Route::delete('/tool-equipment/{equipmentTools:id}',[\App\Http\Controllers\EquipmentToolsController::class,'destroy'])->middleware('auth');
+
+Route::get('/tool-equipment-category',[\App\Http\Controllers\EquipmentToolsCategoryController::class,'index'])->middleware('auth');
+Route::get('/tool-equipment-category/create',[\App\Http\Controllers\EquipmentToolsCategoryController::class,'create'])->middleware('auth');
+Route::post('/tool-equipment-category/',[\App\Http\Controllers\EquipmentToolsCategoryController::class,'store'])->middleware('auth');
+Route::put('/tool-equipment-category/{equipmentToolsCategory:id}',[\App\Http\Controllers\EquipmentToolsCategoryController::class,'update'])->middleware('auth');
+Route::get('/tool-equipment-category/{equipmentToolsCategory:id}',[\App\Http\Controllers\EquipmentToolsCategoryController::class,'show'])->middleware('auth');
+Route::delete('/tool-equipment-category/{equipmentToolsCategory:id}',[\App\Http\Controllers\EquipmentToolsCategoryController::class,'destroy'])->middleware('auth');
 
 //Route::post('/saveLocation',[\App\Http\Controllers\LocationEquipmentsController::class,'saveLocation'])->name('saveLocation')->middleware('auth');
 //Route::post('/saveDiscipline',[\App\Http\Controllers\DisciplineProjectsController::class,'saveDiscipline'])->name('saveLocation')->middleware('auth');

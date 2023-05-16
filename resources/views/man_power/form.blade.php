@@ -110,7 +110,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-2 mt-5 float-right">
+    <div class="col-md-12 mt-5 text-end">
         <button class="btn js-btn-save-man-power btn-outline-success">Save</button>
     </div>
 </div>

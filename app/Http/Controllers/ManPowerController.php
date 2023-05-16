@@ -46,7 +46,20 @@ class ManPowerController extends Controller
             'code' => 'required|unique:man_powers',
             'skill_level' => 'required',
             'title' => 'required',
-            'basic_rate_month' => 'required'
+            'basic_rate_month' => 'required',
+            'basic_rate_hour' => 'required',
+            'general_allowance' => 'required',
+            'bpjs' => 'required',
+            'bpjs_kesehatan' => 'required',
+            'thr' => 'required',
+            'public_holiday' => 'required',
+            'leave' => 'required',
+            'pesangon' => 'required',
+            'asuransi' => 'required',
+            'safety' => 'required',
+            'total_benefit_hourly' => 'required',
+            'overall_rate_hourly' => 'required',
+            'factor_hourly' => 'required',
         ]);
         try{
             DB::beginTransaction();
@@ -126,7 +139,7 @@ class ManPowerController extends Controller
                 'message' => 'Item Successfully Deleted'
             ]);
         } catch (Exception $e){
-            return response([
+            return response()->json([
                 'status' => 500,
                 'message' => $e->getMessage()
             ]);
