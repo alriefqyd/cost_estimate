@@ -118,6 +118,8 @@
 <script src="{{'/assets/js/uikit/components/sortable.js'}}"></script>
 <script src="{{'/assets/js/uikit/components/nestable.js'}}"></script>
 <script src="{{'/assets/js/mustache.min.js'}}"></script>
+<script src="{{'/js/jquery.formatCurrency-1.4.0.min.js'}}"></script>
+<script src="{{'/js/jquery.formatCurrency-1.4.0.js'}}"></script>
 <!-- Plugins JS Ends-->
 <!-- Theme js-->
 <script src="{{'/assets/js/script.js'}}"></script>
@@ -135,6 +137,7 @@
 <script src="{{'/js/application.js'}}"></script>
 <script src="{{'/js/estimate_discipline.js'}}"></script>
 <script src="{{'/js/work_breakdown_structure.js'}}"></script>
+<script src="{{'/js/man_power.js'}}"></script>
 <!-- login js-->
 <!-- Plugin used-->
 </body>

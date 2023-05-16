@@ -8,8 +8,9 @@
 }
 
 .form-label-black {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: black !important;
-    font-size: 15px;
+    font-size: 14px;
 }
 
 .error {
@@ -195,6 +196,14 @@
 
 .m-t-40 {
     margin-top: 40px;
+}
+
+.height-40 {
+    height: 40px;
+}
+
+.mb-1 {
+    margin-bottom: 15px !important;
 }
 
 @media only screen and (max-width: 1337px) {

@@ -48,4 +48,14 @@ class Setting extends Model
         'site_accommodation_vehicles_air_travel' => 'SITE ACCOMMODATION,VEHICLES,AIR TRAVEL',
         'off_site_accommodation_and_air_travel' => 'OFF SITE ACCOMMODATION AND AIR TRAVEL'
     ];
+
+    public const SKILL_LEVEL = [
+      'skilled' => 'Skilled',
+      'semi_skilled' => 'Semi Skilled',
+      'unskilled' => 'Un Skilled'
+    ];
+
+    public const MAN_POWER_SAFETY_RATE = 'MAN_POWER_SAFETY_RATE';
+    public const MAN_POWER = 'MAN_POWER';
+    public const MPSAFETY = 'MPSAFETY';
 }

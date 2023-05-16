@@ -37,7 +37,7 @@
                                 </select>
                             </div>
                             <div class="col-md-6 mb-1">
-                                <input type="text" name="q" placeholder="Project No/Project Name" class="form-control" style="height: 40px">
+                                <input type="text" name="q" value="{{request()->q}}" placeholder="Project No/Project Name" class="form-control" style="height: 40px">
                             </div>
                             <div class="col-md-2 mb-1" >
                                 <button class="btn btn-outline-success btn btn-search-project" style="height: 40px">Search</button>
