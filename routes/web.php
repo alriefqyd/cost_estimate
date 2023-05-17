@@ -74,6 +74,20 @@ Route::put('/tool-equipment-category/{equipmentToolsCategory:id}',[\App\Http\Con
 Route::get('/tool-equipment-category/{equipmentToolsCategory:id}',[\App\Http\Controllers\EquipmentToolsCategoryController::class,'show'])->middleware('auth');
 Route::delete('/tool-equipment-category/{equipmentToolsCategory:id}',[\App\Http\Controllers\EquipmentToolsCategoryController::class,'destroy'])->middleware('auth');
 
+Route::get('/material',[\App\Http\Controllers\MaterialController::class,'index'])->middleware('auth');
+Route::get('/material/create',[\App\Http\Controllers\MaterialController::class,'create'])->middleware('auth');
+Route::post('/material/',[\App\Http\Controllers\MaterialController::class,'store'])->middleware('auth');
+Route::put('/material/{material:id}',[\App\Http\Controllers\MaterialController::class,'update'])->middleware('auth');
+Route::get('/material/{material:id}',[\App\Http\Controllers\MaterialController::class,'show'])->middleware('auth');
+Route::delete('/material/{material:id}',[\App\Http\Controllers\MaterialController::class,'destroy'])->middleware('auth');
+
+Route::get('/material-category',[\App\Http\Controllers\MaterialCategoryController::class,'index'])->middleware('auth');
+Route::get('/material-category/create',[\App\Http\Controllers\MaterialCategoryController::class,'create'])->middleware('auth');
+Route::post('/material-category/',[\App\Http\Controllers\MaterialCategoryController::class,'store'])->middleware('auth');
+Route::put('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'update'])->middleware('auth');
+Route::get('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'show'])->middleware('auth');
+Route::delete('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'destroy'])->middleware('auth');
+
 //Route::post('/saveLocation',[\App\Http\Controllers\LocationEquipmentsController::class,'saveLocation'])->name('saveLocation')->middleware('auth');
 //Route::post('/saveDiscipline',[\App\Http\Controllers\DisciplineProjectsController::class,'saveDiscipline'])->name('saveLocation')->middleware('auth');
 
