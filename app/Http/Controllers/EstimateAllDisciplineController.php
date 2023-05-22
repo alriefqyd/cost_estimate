@@ -97,7 +97,7 @@ class EstimateAllDisciplineController extends Controller
 
     public function create(Project $project){
         $wbsLevel3 = WbsLevel3::where('project_id',$project->id)->get()->groupby('title');
-        return view('work_item.create',[
+        return view('estimate_all_discipline.create',[
             'project' => $project,
             'wbsLevel3' => $wbsLevel3,
         ]);

@@ -142,6 +142,7 @@
 <script src="{{'/js/tool_equipment_category.js'}}"></script>
 <script src="{{'/js/material.js'}}"></script>
 <script src="{{'/js/material_category.js'}}"></script>
+<script src="{{'/js/work_item.js'}}"></script>
 <!-- login js-->
 <!-- Plugin used-->
 </body>

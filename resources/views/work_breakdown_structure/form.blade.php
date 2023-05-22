@@ -6,10 +6,10 @@
         @csrf
         @if(isset($existingWbs))
             @foreach($existingWbs as $wbs)
-                @include('work_item.location_mustache', ['wbs' => $wbs])
+                @include('estimate_all_discipline.location_mustache', ['wbs' => $wbs])
             @endforeach
         @else
-            @include('work_item.location_mustache')
+            @include('estimate_all_discipline.location_mustache')
         @endif
 
     </div>

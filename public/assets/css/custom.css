@@ -107,26 +107,32 @@
 
 .min-w-30 {
     min-width: 30px !important;
+    max-width: 30px !important;
 }
 
 .min-w-50 {
     min-width: 50px !important;
+    max-width: 50px !important;
 }
 
 .min-w-100 {
     min-width: 100px !important;
+    max-width: 100px !important;
 }
 
 .min-w-150 {
     min-width: 150px !important;
+    max-width: 150px !important;
 }
 
 .min-w-160 {
     min-width: 160px !important;
+    max-width: 160px !important;
 }
 
 .min-w-200 {
     min-width: 200px !important;
+    max-width: 200px !important;
 }
 
 .min-w-250 {
@@ -204,6 +210,31 @@
 
 .mb-1 {
     margin-bottom: 15px !important;
+}
+
+.card-header-costume {
+    padding-top: 15px;
+    padding-bottom: 5px;
+    padding-left:10px;
+    border-bottom: solid 1px black;
+}
+
+.max_width10_td {
+    max-width: 10px !important;
+}
+
+.max_width40_td {
+    max-width: 40px !important;
+}
+
+.max_width100_td {
+    min-width: 60px !important;
+    max-width: 100px !important;
+}
+
+.max_width200_td {
+    min-width: 100px !important;
+    max-width: 200px !important;
 }
 
 @media only screen and (max-width: 1337px) {

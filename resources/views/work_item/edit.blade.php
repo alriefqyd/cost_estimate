@@ -8,7 +8,7 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                         <li class="breadcrumb-item">Work Item List</li>
-                        <li class="breadcrumb-item active">Add Work Item</li>
+                        <li class="breadcrumb-item active">Edit Work Item</li>
                     </ol>
                 </div>
             </div>
@@ -34,9 +34,10 @@
                     </div>
                     <div class="card-body mt-4 p-3">
                         <div class="mb-5 mt-2">
-                            <form method="post" action="/work-item">
+                            <form method="post" action="/work-item/{{$work_item->id}}">
                                 <div class="row">
                                     @csrf
+                                    @method('put')
                                     @include('work_item.form')
                                 </div>
                             </form>

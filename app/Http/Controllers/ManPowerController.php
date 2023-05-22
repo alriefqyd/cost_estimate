@@ -152,4 +152,19 @@ class ManPowerController extends Controller
         $value = str_replace(',','.',$value);
         return $value;
     }
+
+    public function getManPower(Request $request){
+        $response = array();
+        $data = ManPower::select('id','title','code','overall_rate_hourly')->where('title','like','%'.$request->q.'%')
+            ->orwhere('code','like','%'.$request->q.'%')->get();
+        foreach($data as $v){
+            $response[] = array(
+                "text" => "[".$v->code . "] - " . $v->title,
+                "id" => $v->id,
+                "rate" => $v->overall_rate_hourly
+            );
+        }
+
+        return response()->json($response);
+    }
 }

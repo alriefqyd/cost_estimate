@@ -4,57 +4,174 @@ namespace App\Http\Controllers;
 
 use App\Models\ManPowersWorkItems;
 use App\Models\WorkItem;
+use App\Models\WorkItemType;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class WorkItemController extends Controller
 {
     public function index(){
+        $workItem = WorkItem::with('workItemTypes')->filter(request(['q','category']))->orderBy('code','ASC')->paginate(20)->withQueryString();
+        $workItemCategory = WorkItemType::select('id','title')->get();
 
+        return view('work_item.index',[
+            'work_item' => $workItem,
+            'work_item_category' => $workItemCategory
+        ]);
     }
+
+    public function show(WorkItem $workItem){
+        return view('work_item.show',[
+            'work_item' => $workItem
+        ]);
+    }
+
+    public function create(){
+        $workItemCategory = WorkItemType::select('id','title')->get();
+        return view('work_item.create', [
+            'work_item_type' => $workItemCategory
+        ]);
+    }
+
+    public function edit(WorkItem $workItem){
+        $workItemCategory = WorkItemType::select('id','title')->get();
+        return view('work_item.edit', [
+            'work_item' => $workItem,
+            'work_item_type' => $workItemCategory
+        ]);
+    }
+
+    public function store(Request $request){
+        $this->validate($request,[
+            'code' => 'required|unique:work_items',
+            'work_item_type_id' => 'required',
+            'description' => 'required',
+            'volume' => 'required',
+            'unit' => 'required'
+        ]);
+
+        try{
+            DB::beginTransaction();
+            $workItem = new WorkItem([
+                'code' => $request->code,
+                'work_item_type_id' => $request->work_item_type_id,
+                'description' => $request->description,
+                'volume' => $request->volume,
+                'unit' => $request->unit,
+            ]);
+            $workItem->save();
+            DB::commit();
+            return redirect('work-item/'.$workItem->id);
+        } catch(\Exception $e){
+            DB::rollBack();
+            return redirect('work-item/create')->withErrors($e->getMessage());
+        }
+    }
+
+    public function update(WorkItem $workItem, Request $request){
+        $this->validate($request,[
+            Rule::unique('man_powers')->ignore($workItem->id),
+            'work_item_type_id' => 'required',
+            'description' => 'required',
+            'volume' => 'required',
+            'unit' => 'required'
+        ]);
+
+        try{
+            DB::beginTransaction();
+            $workItem->code = $request->code;
+            $workItem->work_item_type_id = $request->work_item_type_id;
+            $workItem->description = $request->description;
+            $workItem->volume = $request->volume;
+            $workItem->unit = $request->unit;
+
+            $workItem->save();
+            DB::commit();
+            return redirect('work-item/'.$workItem->id);
+        } catch(\Exception $e){
+            DB::rollBack();
+            return redirect('work-item/edit')->withErrors($e->getMessage());
+        }
+    }
+
+    public function createManPower(WorkItem $workItem){
+        return view('work_item.work_item_man_power.create',[
+            'workItem' => $workItem
+        ]);
+    }
+
+    public function editManPower(WorkItem $workItem, Request $request){
+        return view('work_item.work_item_man_power.edit',[
+            'workItem' => $workItem
+        ]);
+    }
+
+    public function storeManPower(WorkItem $workItem,Request $request){
+        try{
+            $this->processStoreManPower($workItem,$request);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data Saved Successfully'
+            ]);
+        } catch (Exception $e){
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateManPower(WorkItem $workItem, Request $request){
+        try{
+            $this->deleteExistingManPower($workItem,$request);
+            $this->processStoreManPower($workItem,$request);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data Saved Successfully'
+            ]);
+        } catch (Exception $e){
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function processStoreManPower(WorkItem $workItem,Request $request){
+        if(sizeof($request->data) > 0){
+            foreach($request->data as $item){
+                $additionalData = [
+                    'labor_unit' => $item['unit'],
+                    'labor_coefisient' => $item['coef'],
+                    'amount' => $this->removeCommaCurrencyFormat($item['amount']),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+
+                $workItem->manPowers()->attach($item['man_power'], $additionalData);
+                $workItem->save();
+            }
+        }
+    }
+
+    public function deleteExistingManPower(WorkItem $workItem, Request $request){
+        $workItem->manPowers()->detach();
+    }
+
     public function getWorkItems(Request $request){
-//        $workItem = WorkItem::with(['workItemTypes','manPowers'])->
-//            when(isset($request->q),function ($query) use ($request){
-//               return $query->whereHas('workItemTypes',function ($q) use ($request) {
-//                   return $q->where('title', 'like', '%' . $request->q . '%');
-//               });
-//            })->orWhere('description','like','%'.$request->q.'%');
-////            dd($workItem->get()->groupBy('workItemTypes.id')[175]);
-//        if($request->q) return $workItem->get()->groupBy('workItemTypes.id');
-//
-//        $item = DB::table('man_powers_work_items')
-//        return $workItem->first();
-
-//        select wi.code,wi.description,wi.unit,wi.unit,mp.title,mpwi.labor_unit,mpwi.labor_coefisient,mp.overall_rate_hourly,mpwi.amount,mpwi.id
-//        from man_powers_work_items mpwi join man_powers mp on mpwi.labor_id = mp.id join work_items wi on mpwi.work_item_id = wi.id where wi.code = "2080.07";
-
         try {
+
             $item = WorkItem::with(['manPowers','workItemTypes','equipmentTools','materials'])
                 ->whereHas('workItemTypes',function ($query) use ($request){
                     return $query->Where('title','like','%'.$request->q.'%');
-                })->orWhere('description','like','%'.$request->q.'%')
+                })->orWhere('description','like','%'."$request->q".'%')
                 ->get()->groupBy('workItemTypes.id');
             return $item;
         } catch (\Exception $e){
             return $e->getMessage();
         }
-
-//        $item = DB::table('man_powers_work_items as mpwi')
-//            ->join('man_powers as mp','mpwi.labor_id','=','mp.id')
-//            ->join('work_items as wi','mpwi.work_item_id','=','wi.id')
-//            ->join('work_item_types as wit','wi.work_item_type_id','=','wit.id')
-//            ->groupBy('wit.id')
-//            ->get();
-//        echo $item;
-//        dd($item);
-
-//        $items = DB::table('work_items as wi')
-//            ->join('work_item_types as wit','wit.id','wi.work_item_type_id')
-//            ->where('wit.title','like','%'.$request->q.'%')
-//            ->orWhere('wi.description','like','%'.$request->q.'%')
-//            ->get()->groupBy('wit.title');
-//
-//        dd($items);
     }
     /**
      * Set Work Item to Show in List Estimate Discipline Select2

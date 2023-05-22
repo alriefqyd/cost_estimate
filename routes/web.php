@@ -52,6 +52,15 @@ Route::get('/getWbsLevel2',[\App\Http\Controllers\WorkBreakdownStructureControll
 Route::get('/getWbsLevel3',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel3'])->middleware('auth');
 
 Route::get('/work-item/',[\App\Http\Controllers\WorkItemController::class,'index'])->middleware('auth');
+Route::get('/work-item/create',[\App\Http\Controllers\WorkItemController::class,'create'])->middleware('auth');
+Route::get('/work-item/edit/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'edit'])->middleware('auth');
+Route::post('/work-item/',[\App\Http\Controllers\WorkItemController::class,'store'])->middleware('auth');
+Route::put('/work-item/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'update'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/man-power',[\App\Http\Controllers\WorkItemController::class,'createManPower'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/man-power/edit',[\App\Http\Controllers\WorkItemController::class,'editManPower'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/man-power',[\App\Http\Controllers\WorkItemController::class,'storeManPower'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/man-power/update',[\App\Http\Controllers\WorkItemController::class,'updateManPower'])->middleware('auth');
+Route::get('/work-item/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'show'])->middleware('auth');
 
 Route::get('/man-power/',[\App\Http\Controllers\ManPowerController::class,'index'])->middleware('auth');
 Route::get('/man-power/create',[\App\Http\Controllers\ManPowerController::class,'create'])->middleware('auth');
@@ -92,6 +101,7 @@ Route::delete('/material-category/{materialCategory:id}',[\App\Http\Controllers\
 //Route::post('/saveDiscipline',[\App\Http\Controllers\DisciplineProjectsController::class,'saveDiscipline'])->name('saveLocation')->middleware('auth');
 
 
+Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getUserEmployee')->middleware('auth');
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');
 Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'checkDuplicateProjectNo'])->name('checkDuplicateProjectNo')->middleware('auth');
 

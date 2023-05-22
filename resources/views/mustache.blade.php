@@ -189,10 +189,14 @@
 </script>
 
 <script id="js-template-table-location_equipment" type="x-tmpl-mustache">
-    @include('work_item.location_mustache')
+    @include('estimate_all_discipline.location_mustache')
 </script>
 
 <script id="js-template-table-discipline_work-element" type="x-tmpl-mustache">
-    @include('work_item.discipline_work_element')
+    @include('estimate_all_discipline.discipline_work_element')
+</script>
+
+<script id="js-template-table-work_item_man_power" type="x-tmpl-mustache">
+    @include('work_item.work_item_man_power.man_power',['isEdit' => false])
 </script>
 

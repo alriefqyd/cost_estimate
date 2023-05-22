@@ -456,7 +456,8 @@ $(function(){
                     }
                 },
                 processResults: function (resp) {
-                    _dataAdvanceWorkItem = resp;
+                    // _dataAdvanceWorkItem = resp;
+                    console.log(resp)
                     return {
                         results: resp
                     }
@@ -497,6 +498,7 @@ $(function(){
 
     _selectWorkItems.on("change", function () {
         var _this = $(this);
+        console.log(_this.select2('data')[0]);
         var _vol = _this.select2('data')[0]?.vol;
         _array_manPowers = _this.select2('data')[0]?.manPowers;
         _array_equipments = _this.select2('data')[0]?.equipmentTools;

@@ -41,10 +41,10 @@
                 @php($existingDisciplines = isset($wbs) ? $wbs->groupBy('discipline') : null)
                 @if(isset($existingDisciplines))
                     @foreach($existingDisciplines as $key => $exDiscipline)
-                        @include('work_item.discipline_work_element',['key' => $key])
+                        @include('estimate_all_discipline.discipline_work_element',['key' => $key])
                     @endforeach
                 @else
-                    @include('work_item.discipline_work_element')
+                    @include('estimate_all_discipline.discipline_work_element')
                 @endif
             </div>
             <div class="col-md-7">
