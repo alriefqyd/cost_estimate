@@ -52,4 +52,12 @@ class WorkItem extends Model
             $query->where('work_item_type_id', $q)
         );
     }
+
+    public function getTotalSum(){
+       $total =  $this->materials->sum('pivot.amount') +
+                $this->equipmentTools->sum('pivot.amount') +
+                $this->manPowers->sum('pivot.amount');
+
+       return $total;
+    }
 }

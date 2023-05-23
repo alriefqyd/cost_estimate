@@ -4,10 +4,10 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3>Man Power</h3>
+                    <h3>Tools Equipment</h3>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item">Work Item List</li>
+                        <li class="breadcrumb-item">Material List</li>
                         <li class="breadcrumb-item active">{{$workItem->description}}</li>
                     </ol>
                 </div>
@@ -29,7 +29,7 @@
                 <div class="card">
                     <div class="card-header-costume">
                         <div class="float-start">
-                            <label>Man Power {{$workItem->description}}</label>
+                            <label>Material {{$workItem->description}}</label>
                         </div>
                     </div>
                     <div class="card-body mt-4 p-3">
@@ -37,24 +37,24 @@
                             <form method="post"
                                   data-method="post"
                                   data-id="{{$workItem->id}}"
-                                  action="/work-item/{{$workItem->id}}/man-power">
+                                  action="/work-item/{{$workItem->id}}/material">
                                 <div class="row">
                                     @csrf
                                     <div class="col-sm-12 col-lg-12 col-xl-12">
                                         <div class="table-responsive">
                                             <table class="table table-striped js-table-work-item-item">
                                                 <thead>
-                                                    <tr>
-                                                        <th scope="col" class="text-left min-w-160 ">Code - Description</th>
-                                                        <th scope="col" class="text-left">Unit</th>
-                                                        <th scope="col" class="text-left">Coef</th>
-                                                        <th scope="col" class="text-left min-w-100">Rate</th>
-                                                        <th scope="col" class="text-left min-w-100">Amount</th>
-                                                        <th scope="col" class="text-left min-w-30"></th>
-                                                    </tr>
+                                                <tr>
+                                                    <th scope="col" class="text-left">Description</th>
+                                                    <th scope="col" class="text-left min-w-65">Unit</th>
+                                                    <th scope="col" class="text-left">Quantity</th>
+                                                    <th scope="col" class="text-left min-w-100">Rate</th>
+                                                    <th scope="col" class="text-left min-w-100">Amount</th>
+                                                    <th scope="col" class="text-left min-w-30"></th>
+                                                </tr>
                                                 </thead>
                                                 <tbody class="js-table-body-work-item-item">
-                                                    @include('work_item.work_item_man_power.man_power', ['isEdit' => false])
+                                                @include('work_item.work_item_material.material', ['isEdit' => false])
                                                 </tbody>
                                             </table>
                                             <table class="table">
@@ -63,23 +63,28 @@
                                                     <th scope="col" class="text-left"></th>
                                                     <th scope="col" class="text-left"></th>
                                                     <th scope="col" class="text-left min-w-100"></th>
-                                                    <th scope="col" class="text-center min-w-100 js-item-total js-work-item-man-power-total"></th>
+                                                    <th scope="col"
+                                                        class="text-center min-w-100 js-item-total"></th>
                                                 </tr>
                                             </table>
                                             <div class="float-end mt-2 cursor-pointer js-add-new-item"
-                                                 data-template="#js-template-table-work_item_man_power">
-                                                <i class="fa fa-plus-circle"></i> Add New Man Power
+                                                data-template="#js-template-table-work_item_material">
+                                                <i class="fa fa-plus-circle"></i> Add New Material
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="mt-5">
-                                        <button class="btn btn-success float-end js-save-work-item-man-power js-save-item" style="margin-left: 3px" type="submit">
+                                        <button class="btn btn-success float-end js-save-work-item-material js-save-item"
+                                                style="margin-left: 3px" type="submit">
                                             <div class="loader-box" style="height: auto">
-                                                Save <div style="margin-left:3px" class="loader-34 d-none"></div>
+                                                Save
+                                                <div style="margin-left:3px" class="loader-34 d-none"></div>
                                             </div>
                                         </button>
-                                        <a href="/work-item/{{$workItem->id}}"><div class="btn btn-danger float-end">Back</div></a>
+                                        <a href="/work-item/{{$workItem->id}}">
+                                            <div class="btn btn-danger float-end">Back</div>
+                                        </a>
                                     </div>
                                 </div>
                             </form>

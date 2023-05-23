@@ -115,6 +115,21 @@
     max-width: 50px !important;
 }
 
+.min-w-65 {
+    min-width: 65px !important;
+    max-width: 65px !important;
+}
+
+.min-w-75 {
+    min-width: 75px !important;
+    max-width: 75px !important;
+}
+
+.min-w-80 {
+    min-width: 80px !important;
+    max-width: 80px !important;
+}
+
 .min-w-100 {
     min-width: 100px !important;
     max-width: 100px !important;
@@ -130,6 +145,11 @@
     max-width: 160px !important;
 }
 
+.min-w-170 {
+    min-width: 160px !important;
+    max-width: 160px !important;
+}
+
 .min-w-200 {
     min-width: 200px !important;
     max-width: 200px !important;
@@ -137,20 +157,24 @@
 
 .min-w-250 {
     min-width: 250px !important;
+    max-width: 250px !important;
 }
 
 .min-w-300 {
     min-width: 300px !important;
+    max-width: 300px !important;
 }
 
 .min-w-400 {
     min-width: 400px !important;
+    max-width: 400px !important;
 }
 .min-w-420 {
     min-width: 420px !important;
 }
 .min-w-450 {
     min-width: 450px !important;
+    max-width: 450px !important;
 }
 
 .min-w-500 {

@@ -21,7 +21,7 @@ class MaterialController extends Controller
     }
 
     public function index(){
-        $material = Material::with('materialsCategory')->filter(request(['q']))->orderBy('created_at','DESC')->paginate(20)->withQueryString();
+        $material = Material::with('materialsCategory')->filter(request(['q']))->orderBy('code','ASC')->paginate(20)->withQueryString();
         return view('material.index',[
             'material' => $material
         ]);
@@ -119,6 +119,21 @@ class MaterialController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function getMaterial(Request $request){
+        $response = array();
+        $data = Material::select('id','tool_equipment_description','code','rate')->where('tool_equipment_description','like','%'.$request->q.'%')
+            ->orwhere('code','like','%'.$request->q.'%')->get();
+        foreach($data as $v){
+            $response[] = array(
+                "text" => "[".$v->code . "] - " . $v->tool_equipment_description,
+                "id" => $v->id,
+                "rate" => $v->rate
+            );
+        }
+
+        return response()->json($response);
     }
 
     public function convertToDecimal($val){

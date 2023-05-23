@@ -56,6 +56,7 @@
                                     <th scope="col" class="text-left">Category</th>
                                     <th scope="col" class="text-left">Volume</th>
                                     <th scope="col" class="text-left">Unit</th>
+                                    <th scope="col" class="text-left">Total Price</th>
                                     <th scope="col" class="text-left">Action</th>
                                 </tr>
                                 </thead>
@@ -63,10 +64,11 @@
                                 @foreach($work_item as $item)
                                     <tr>
                                         <td><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
-                                        <td>{{$item->description}}</td>
-                                        <td>{{$item?->workItemTypes?->title}}</td>
-                                        <td>{{$item->volume}}</td>
+                                        <td class="min-w-300">{{$item->description}}</td>
+                                        <td class="max-w-250">{{$item?->workItemTypes?->title}}</td>
+                                        <td class="min-w-30">{{$item->volume}}</td>
                                         <td>{{$item->unit}}</td>
+                                        <td>{{number_format($item?->getTotalSum(),2,',','.')}}</td>
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                data-id="{{$item->id}}" class="text-danger js-delete-tool-equipment">Delete</a></td>
                                     </tr>

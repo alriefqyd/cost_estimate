@@ -29,32 +29,37 @@
                 <div class="card">
                     <div class="card-header-costume">
                         <div class="float-start">
-                            <label>Man Power {{$workItem->description}}</label>
+                            <label>Tools Equipment {{$workItem->description}}</label>
                         </div>
                     </div>
                     <div class="card-body mt-4 p-3">
                         <div class="mb-5 mt-2">
                             <form method="post"
-                                  data-method="post"
+                                  data-method="put"
                                   data-id="{{$workItem->id}}"
-                                  action="/work-item/{{$workItem->id}}/man-power">
+                                  class="js-edit-work-item-man-power"
+                                  action="/work-item/{{$workItem->id}}/tools-equipment/update">
                                 <div class="row">
                                     @csrf
                                     <div class="col-sm-12 col-lg-12 col-xl-12">
                                         <div class="table-responsive">
                                             <table class="table table-striped js-table-work-item-item">
                                                 <thead>
-                                                    <tr>
-                                                        <th scope="col" class="text-left min-w-160 ">Code - Description</th>
-                                                        <th scope="col" class="text-left">Unit</th>
-                                                        <th scope="col" class="text-left">Coef</th>
-                                                        <th scope="col" class="text-left min-w-100">Rate</th>
-                                                        <th scope="col" class="text-left min-w-100">Amount</th>
-                                                        <th scope="col" class="text-left min-w-30"></th>
-                                                    </tr>
+                                                <tr>
+                                                    <th scope="col" class="text-left min-w-160 ">Code - Description</th>
+                                                    <th scope="col" class="text-left">Unit</th>
+                                                    <th scope="col" class="text-left">Quantity</th>
+                                                    <th scope="col" class="text-left min-w-100">Rate</th>
+                                                    <th scope="col" class="text-left min-w-100">Amount</th>
+                                                    <th scope="col" class="text-left min-w-30"></th>
+                                                </tr>
                                                 </thead>
                                                 <tbody class="js-table-body-work-item-item">
-                                                    @include('work_item.work_item_man_power.man_power', ['isEdit' => false])
+                                                @if(isset($workItem->equipmentTools))
+                                                    @foreach($workItem->equipmentTools as $exEquipmentTools)
+                                                        @include('work_item.work_item_tools_equipment.tools_equipment', ['isEdit' => true])
+                                                    @endforeach
+                                                @endif
                                                 </tbody>
                                             </table>
                                             <table class="table">
@@ -63,18 +68,17 @@
                                                     <th scope="col" class="text-left"></th>
                                                     <th scope="col" class="text-left"></th>
                                                     <th scope="col" class="text-left min-w-100"></th>
-                                                    <th scope="col" class="text-center min-w-100 js-item-total js-work-item-man-power-total"></th>
+                                                    <th scope="col" class="text-center min-w-100 js-item-total"></th>
                                                 </tr>
                                             </table>
                                             <div class="float-end mt-2 cursor-pointer js-add-new-item"
-                                                 data-template="#js-template-table-work_item_man_power">
-                                                <i class="fa fa-plus-circle"></i> Add New Man Power
-                                            </div>
+                                                 data-template="#js-template-table-work_item_tools_equipment">
+                                                <i class="fa fa-plus-circle"></i> Add New Tools Equipment</div>
                                         </div>
                                     </div>
 
                                     <div class="mt-5">
-                                        <button class="btn btn-success float-end js-save-work-item-man-power js-save-item" style="margin-left: 3px" type="submit">
+                                        <button class="btn btn-success float-end js-save-work-item-tools-equipment js-save-item" style="margin-left: 3px" type="submit">
                                             <div class="loader-box" style="height: auto">
                                                 Save <div style="margin-left:3px" class="loader-34 d-none"></div>
                                             </div>

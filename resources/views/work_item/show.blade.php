@@ -58,6 +58,10 @@
                                     <td class="max_width100_td">Unit :</td>
                                     <td>{{$work_item->unit}}</td>
                                 </tr>
+                                <tr>
+                                    <td class="max_width100_td">Total Work Item Price :</td>
+                                    <td> {{number_format($work_item?->getTotalSum(),2,',','.')}}</td>
+                                </tr>
                             </table>
                         </div>
                     </div>
@@ -122,9 +126,19 @@
                             <label>Tools & Equipment</label>
                         </div>
                         <div class="float-end">
-                            <button class="btn btn-outline-success">
-                                {{isset($workItem->equipmentTools) ? 'Edit' : 'Create'}}
-                            </button>
+                            @if(sizeof($work_item->equipmentTools) > 0)
+                                <a href="/work-item/{{$work_item?->id}}/tools-equipment/edit">
+                                    <button class="btn btn-outline-success">
+                                        Edit
+                                    </button>
+                                </a>
+                            @else
+                                <a href="/work-item/{{$work_item?->id}}/tools-equipment/">
+                                    <button class="btn btn-outline-success">
+                                        Create
+                                    </button>
+                                </a>
+                            @endif
                         </div>
                     </div>
                     <div class="col-md-12 mt-3 mb-5">
@@ -141,17 +155,23 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($work_item->equipmentTools as $tools)
+                                    @foreach($work_item->equipmentTools as $tools)
+                                        <tr>
+                                            <td>{{$tools->code}}</td>
+                                            <td>{{$tools->description}}</td>
+                                            <td>{{$tools->pivot?->unit}}</td>
+                                            <td>{{$tools->pivot?->quantity}}</td>
+                                            <td>{{number_format($tools->local_rate,2,',','.')}}</td>
+                                            <td>{{number_format($tools->pivot?->amount,2,',','.')}}</td>
+                                            <td></td>
+                                        </tr>
+                                    @endforeach
                                     <tr>
-                                        <td>{{$tools->code}}</td>
-                                        <td>{{$tools->description}}</td>
-                                        <td>{{$tools->unit}}</td>
-                                        <td>{{$tools->quantity}}</td>
-                                        <td>{{number_format($tools->local_rate,2,',','.')}}</td>
-                                        <td>{{number_format($tools->pivot?->amount,2,',','.')}}</td>
-                                        <td></td>
+                                        <td><label>Total :</label></td>
+                                        <td colspan="5" class="text-end">
+                                            <label>{{number_format($work_item->equipmentTools->sum('pivot.amount'),2,'.',',')}}</label>
+                                        </td>
                                     </tr>
-                                @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -163,9 +183,19 @@
                             <label>Material</label>
                         </div>
                         <div class="float-end">
-                            <button class="btn btn-outline-success">
-                                {{isset($workItem->materials) ? 'Edit' : 'Create'}}
-                            </button>
+                            @if(sizeof($work_item->materials) > 0)
+                                <a href="/work-item/{{$work_item?->id}}/material/edit">
+                                    <button class="btn btn-outline-success">
+                                        Edit
+                                    </button>
+                                </a>
+                            @else
+                                <a href="/work-item/{{$work_item?->id}}/material/">
+                                    <button class="btn btn-outline-success">
+                                        Create
+                                    </button>
+                                </a>
+                            @endif
                         </div>
                     </div>
                     <div class="col-md-12 mt-3 mb-5">
@@ -186,13 +216,19 @@
                                     <tr>
                                         <td>{{$material->code}}</td>
                                         <td>{{$material->tool_equipment_description}}</td>
-                                        <td>{{$material->unit}}</td>
-                                        <td>{{$material->quantity}}</td>
+                                        <td>{{$material->pivot?->unit}}</td>
+                                        <td>{{$material->pivot?->quantity}}</td>
                                         <td>{{number_format($material->rate,2,',','.')}}</td>
                                         <td>{{number_format($material->pivot?->amount,2,',','.')}}</td>
                                         <td></td>
                                     </tr>
                                 @endforeach
+                                <tr>
+                                    <td><label>Total :</label></td>
+                                    <td colspan="5" class="text-end">
+                                        <label>{{number_format($work_item->materials->sum('pivot.amount'),2,'.',',')}}</label>
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>

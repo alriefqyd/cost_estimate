@@ -20,7 +20,7 @@ class EquipmentToolsController extends Controller
      */
     public function index()
     {
-        $equipmentTools = EquipmentTools::with(['equipmentToolsCategory'])->filter(request(['q','category']))->orderBy('created_at','DESC')->paginate(20)->withQueryString();
+        $equipmentTools = EquipmentTools::with(['equipmentToolsCategory'])->filter(request(['q','category']))->orderBy('code','ASC')->paginate(20)->withQueryString();
         $equipmentToolsCategory = EquipmentToolsCategory::select('id','description')->get();
 
         return view('equipment_tool.index',[
@@ -177,5 +177,20 @@ class EquipmentToolsController extends Controller
         $value = str_replace('.','',$val);
         $value = str_replace(',','.',$value);
         return $value;
+    }
+
+    public function getToolsEquipment(Request $request){
+        $response = array();
+        $data = EquipmentTools::select('id','description','code','local_rate')->where('description','like','%'.$request->q.'%')
+            ->orwhere('code','like','%'.$request->q.'%')->get();
+        foreach($data as $v){
+            $response[] = array(
+                "text" => "[".$v->code . "] - " . $v->description,
+                "id" => $v->id,
+                "rate" => $v->local_rate
+            );
+        }
+
+        return response()->json($response);
     }
 }

@@ -12,7 +12,7 @@ use Illuminate\Validation\Rule;
 class ManPowerController extends Controller
 {
     public function index(){
-        $man_power = ManPower::filter(request(['q','skill_level']))->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
+        $man_power = ManPower::filter(request(['q','skill_level']))->orderBy('code', 'ASC')->paginate(20)->withQueryString();
         return view('man_power.index',[
             'man_power' => $man_power
         ]);

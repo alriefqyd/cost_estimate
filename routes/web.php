@@ -61,6 +61,14 @@ Route::get('/work-item/{workItem:id}/man-power/edit',[\App\Http\Controllers\Work
 Route::post('/work-item/{workItem:id}/man-power',[\App\Http\Controllers\WorkItemController::class,'storeManPower'])->middleware('auth');
 Route::post('/work-item/{workItem:id}/man-power/update',[\App\Http\Controllers\WorkItemController::class,'updateManPower'])->middleware('auth');
 Route::get('/work-item/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'show'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/tools-equipment',[\App\Http\Controllers\WorkItemController::class,'createToolsEquipment'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/tools-equipment/edit',[\App\Http\Controllers\WorkItemController::class,'editToolsEquipment'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/tools-equipment',[\App\Http\Controllers\WorkItemController::class,'storeToolsEquipment'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/tools-equipment/update',[\App\Http\Controllers\WorkItemController::class,'updateToolsEquipment'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/material',[\App\Http\Controllers\WorkItemController::class,'createMaterial'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/material/edit',[\App\Http\Controllers\WorkItemController::class,'editMaterial'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/material',[\App\Http\Controllers\WorkItemController::class,'storeMaterial'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/material/update',[\App\Http\Controllers\WorkItemController::class,'updateMaterial'])->middleware('auth');
 
 Route::get('/man-power/',[\App\Http\Controllers\ManPowerController::class,'index'])->middleware('auth');
 Route::get('/man-power/create',[\App\Http\Controllers\ManPowerController::class,'create'])->middleware('auth');
@@ -101,7 +109,9 @@ Route::delete('/material-category/{materialCategory:id}',[\App\Http\Controllers\
 //Route::post('/saveDiscipline',[\App\Http\Controllers\DisciplineProjectsController::class,'saveDiscipline'])->name('saveLocation')->middleware('auth');
 
 
-Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getUserEmployee')->middleware('auth');
+Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
+Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getMaterial'])->name('getMaterial')->middleware('auth');
+Route::get('/getToolsEquipment',[\App\Http\Controllers\EquipmentToolsController::class,'getToolsEquipment'])->name('getToolsEquipment')->middleware('auth');
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');
 Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'checkDuplicateProjectNo'])->name('checkDuplicateProjectNo')->middleware('auth');
 

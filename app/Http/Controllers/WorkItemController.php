@@ -150,7 +150,7 @@ class WorkItemController extends Controller
                     'updated_at' => now()
                 ];
 
-                $workItem->manPowers()->attach($item['man_power'], $additionalData);
+                $workItem->manPowers()->attach($item['item'], $additionalData);
                 $workItem->save();
             }
         }
@@ -158,6 +158,126 @@ class WorkItemController extends Controller
 
     public function deleteExistingManPower(WorkItem $workItem, Request $request){
         $workItem->manPowers()->detach();
+    }
+
+    public function createToolsEquipment(WorkItem $workItem){
+        return view('work_item.work_item_tools_equipment.create',[
+            'workItem' => $workItem
+        ]);
+    }
+
+    public function editToolsEquipment(WorkItem $workItem, Request $request){
+        return view('work_item.work_item_tools_equipment.edit',[
+            'workItem' => $workItem
+        ]);
+    }
+
+    public function storeToolsEquipment(WorkItem $workItem,Request $request){
+        try{
+            $this->processStoreToolEquipment($workItem,$request);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data Saved Successfully'
+            ]);
+        } catch (Exception $e){
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateToolsEquipment(WorkItem $workItem, Request $request){
+        try{
+            $workItem->equipmentTools()->detach();
+            $this->processStoreToolEquipment($workItem,$request);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data Saved Successfully'
+            ]);
+        } catch (Exception $e){
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function processStoreToolEquipment(WorkItem $workItem,Request $request){
+        if(sizeof($request->data) > 0){
+            foreach($request->data as $item){
+                $additionalData = [
+                    'unit' => $item['unit'],
+                    'quantity' => $item['coef'],
+                    'amount' => $this->removeCommaCurrencyFormat($item['amount']),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+
+                $workItem->equipmentTools()->attach($item['item'], $additionalData);
+                $workItem->save();
+            }
+        }
+    }
+
+    public function createMaterial(WorkItem $workItem){
+        return view('work_item.work_item_material.create',[
+            'workItem' => $workItem
+        ]);
+    }
+
+    public function editMaterial(WorkItem $workItem, Request $request){
+        return view('work_item.work_item_material.edit',[
+            'workItem' => $workItem
+        ]);
+    }
+
+    public function storeMaterial(WorkItem $workItem,Request $request){
+        try{
+            $this->processStoreMaterial($workItem,$request);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data Saved Successfully'
+            ]);
+        } catch (Exception $e){
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateMaterial(WorkItem $workItem, Request $request){
+        try{
+            $workItem->materials()->detach();
+            $this->processStoreMaterial($workItem,$request);
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data Saved Successfully'
+            ]);
+        } catch (Exception $e){
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function processStoreMaterial(WorkItem $workItem,Request $request){
+        if(sizeof($request->data) > 0){
+            foreach($request->data as $item){
+                $additionalData = [
+                    'unit' => $item['unit'],
+                    'quantity' => $item['coef'],
+                    'amount' => $this->removeCommaCurrencyFormat($item['amount']),
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+
+                $workItem->materials()->attach($item['item'], $additionalData);
+                $workItem->save();
+            }
+        }
     }
 
     public function getWorkItems(Request $request){

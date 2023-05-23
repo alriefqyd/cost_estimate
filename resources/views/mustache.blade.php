@@ -200,3 +200,13 @@
     @include('work_item.work_item_man_power.man_power',['isEdit' => false])
 </script>
 
+<script id="js-template-table-work_item_tools_equipment" type="x-tmpl-mustache">
+    @include('work_item.work_item_tools_equipment.tools_equipment',['isEdit' => false])
+</script>
+
+<script id="js-template-table-work_item_material" type="x-tmpl-mustache">
+    @include('work_item.work_item_material.material',['isEdit' => false])
+</script>
+
+
+

@@ -43,7 +43,7 @@
                                     @csrf
                                     <div class="col-sm-12 col-lg-12 col-xl-12">
                                         <div class="table-responsive">
-                                            <table class="table table-striped js-table-work-item-man-power">
+                                            <table class="table table-striped js-table-work-item-item">
                                                 <thead>
                                                 <tr>
                                                     <th scope="col" class="text-left min-w-160 ">Code - Description</th>
@@ -54,7 +54,7 @@
                                                     <th scope="col" class="text-left min-w-30"></th>
                                                 </tr>
                                                 </thead>
-                                                <tbody class="js-table-body-work-item-man-power">
+                                                <tbody class="js-table-body-work-item-item">
                                                 @if(isset($workItem->manPowers))
                                                     @foreach($workItem->manPowers as $exManPower)
                                                         @include('work_item.work_item_man_power.man_power', ['isEdit' => true])
@@ -68,16 +68,17 @@
                                                     <th scope="col" class="text-left"></th>
                                                     <th scope="col" class="text-left"></th>
                                                     <th scope="col" class="text-left min-w-100"></th>
-                                                    <th scope="col" class="text-center min-w-100 js-work-item-man-power-total"></th>
+                                                    <th scope="col" class="text-center min-w-100 js-item-total"></th>
                                                 </tr>
                                             </table>
-                                            <div class="float-end mt-2 cursor-pointer js-add-new-man-power">
+                                            <div class="float-end mt-2 cursor-pointer js-add-new-item"
+                                                 data-template="#js-template-table-work_item_man_power">
                                                 <i class="fa fa-plus-circle"></i> Add New Man Power</div>
                                         </div>
                                     </div>
 
                                     <div class="mt-5">
-                                        <button class="btn btn-success float-end js-save-work-item-man-power" style="margin-left: 3px" type="submit">
+                                        <button class="btn btn-success float-end js-save-work-item-man-power js-save-item" style="margin-left: 3px" type="submit">
                                             <div class="loader-box" style="height: auto">
                                                 Save <div style="margin-left:3px" class="loader-34 d-none"></div>
                                             </div>

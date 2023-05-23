@@ -58,12 +58,12 @@
                                     <tr>
                                         <td><a href="/material/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td>{{$item?->materialsCategory?->description}}</td>
-                                        <td>{{$item->tool_equipment_description}}</td>
+                                        <td class="min-w-250">{{$item->tool_equipment_description}}</td>
                                         <td>{{$item->quantity}}</td>
                                         <td>{{$item->unit}}</td>
                                         <td>{{number_format($item->rate,2)}}</td>
-                                        <td>{{$item->ref_material_number}}</td>
-                                        <td>{{$item->stock_code}}</td>
+                                        <td class="min-w-170">{{$item->ref_material_number}}</td>
+                                        <td class="min-w-100">{{$item->stock_code}}</td>
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                 data-id="{{$item->id}}" class="text-danger js-delete-material">Delete</a></td>
                                     </tr>
