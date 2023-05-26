@@ -39,27 +39,27 @@
                         <div class="table-responsive">
                             <table class="table table-striped">
                                 <tr>
-                                    <td class="max_width100_td">code :</td>
+                                    <td class="min-w-250">code :</td>
                                     <td>{{$work_item->code}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="max_width100_td">Work Type :</td>
+                                    <td class="min-w-250">Work Type :</td>
                                     <td>{{$work_item->workItemTypes->title}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="max_width100_td">Description :</td>
+                                    <td class="min-w-250">Description :</td>
                                     <td>{{$work_item->description}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="max_width100_td">Volume :</td>
+                                    <td class="min-w-250">Volume :</td>
                                     <td>{{$work_item->volume}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="max_width100_td">Unit :</td>
+                                    <td class="min-w-250">Unit :</td>
                                     <td>{{$work_item->unit}}</td>
                                 </tr>
                                 <tr>
-                                    <td class="max_width100_td">Total Work Item Price :</td>
+                                    <td class="min-w-250">Total Work Item Price :</td>
                                     <td> {{number_format($work_item?->getTotalSum(),2,',','.')}}</td>
                                 </tr>
                             </table>

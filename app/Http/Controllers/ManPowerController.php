@@ -11,8 +11,16 @@ use Illuminate\Validation\Rule;
 
 class ManPowerController extends Controller
 {
-    public function index(){
-        $man_power = ManPower::filter(request(['q','skill_level']))->orderBy('code', 'ASC')->paginate(20)->withQueryString();
+    public function index(Request $request){
+        $order = $request->order;
+        $sort =  $request->sort;
+
+        $man_power = ManPower::filter(request(['q','skill_level']))
+            ->when(isset($request->sort), function($query) use ($request,$order,$sort){
+                return $query->orderBy($order,$sort);
+            })->when(!isset($request->sort), function($query) use ($request,$order) {
+                return $query->orderBy('code', 'ASC');
+            })->orderBy('code', 'ASC')->paginate(20)->withQueryString();
         return view('man_power.index',[
             'man_power' => $man_power
         ]);

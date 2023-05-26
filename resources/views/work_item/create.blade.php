@@ -37,7 +37,7 @@
                             <form method="post" action="/work-item">
                                 <div class="row">
                                     @csrf
-                                    @include('work_item.form')
+                                    @include('work_item.form',['isEdit' => false])
                                 </div>
                             </form>
                         </div>

@@ -20,15 +20,30 @@ class MaterialController extends Controller
         return $material;
     }
 
-    public function index(){
-        $material = Material::with('materialsCategory')->filter(request(['q']))->orderBy('code','ASC')->paginate(20)->withQueryString();
+    public function index(Request $request){
+        $order = $request->order;
+        $sort =  $request->sort;
+        $materialCategory = MaterialCategory::select('id','description','code')->get();
+
+        $material = Material::with('materialsCategory')->filter(request(['q','category']))->when(isset($request->sort), function($query) use ($request,$order,$sort){
+            return $query->when($request->order == 'category', function($qq) use ($request,$order,$sort){
+                return $qq->whereHas('materialsCategory',function($relation) use ($sort){
+                    $relation->orderBy('description',$sort);
+                });
+            })->when($request->order != 'category', function($qq) use ($request,$order, $sort){
+                return $qq->orderBy($order,$sort);
+            });
+        })->when(!isset($request->sort), function($query) use ($request,$order) {
+            return $query->orderBy('code', 'ASC');
+        })->paginate(20)->withQueryString();
         return view('material.index',[
+            'material_category' => $materialCategory,
             'material' => $material
         ]);
     }
 
     public function create(){
-        $materialCategory = MaterialCategory::select('id','description')->get();
+        $materialCategory = MaterialCategory::select('id','description','code')->get();
         return view('material.create',[
             'material_category' => $materialCategory
         ]);
@@ -67,7 +82,7 @@ class MaterialController extends Controller
     }
 
     public function show(Material $material){
-        $materialCategory = MaterialCategory::select('id','description')->get();
+        $materialCategory = MaterialCategory::select('id','description','code')->get();
         return view('material.detail',[
             'material' => $material,
             'material_category' => $materialCategory

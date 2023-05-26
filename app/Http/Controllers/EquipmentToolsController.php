@@ -18,9 +18,21 @@ class EquipmentToolsController extends Controller
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function index()
-    {
-        $equipmentTools = EquipmentTools::with(['equipmentToolsCategory'])->filter(request(['q','category']))->orderBy('code','ASC')->paginate(20)->withQueryString();
+    public function index(Request $request){
+        $order = $request->order;
+        $sort =  $request->sort;
+        $equipmentTools = EquipmentTools::with('equipmentToolsCategory')->filter(request(['q','category']))
+            ->when(isset($request->sort), function($query) use ($request,$order,$sort){
+                return $query->when($request->order == 'category', function($qq) use ($request,$order,$sort){
+                    return $qq->whereHas('equipmentToolsCategory',function($relation) use ($sort){
+                        $relation->orderBy('description',$sort);
+                    });
+                })->when($request->order != 'category', function($qq) use ($request,$order, $sort){
+                    return $qq->orderBy($order,$sort);
+                });
+            })->when(!isset($request->sort), function($query) use ($request,$order) {
+                return $query->orderBy('equipment_tools.code', 'ASC');
+            })->paginate(20)->withQueryString();
         $equipmentToolsCategory = EquipmentToolsCategory::select('id','description')->get();
 
         return view('equipment_tool.index',[
@@ -36,7 +48,7 @@ class EquipmentToolsController extends Controller
      */
     public function create()
     {
-        $equipmentToolsCategory = EquipmentToolsCategory::select('id','description')->get();
+        $equipmentToolsCategory = EquipmentToolsCategory::select('id','description','code')->get();
 
         return view('equipment_tool.create',[
             'equipment_tools_category' => $equipmentToolsCategory
@@ -92,7 +104,7 @@ class EquipmentToolsController extends Controller
      */
     public function show(EquipmentTools $equipmentTools)
     {
-        $equipmentToolsCategory = EquipmentToolsCategory::select('id','description')->get();
+        $equipmentToolsCategory = EquipmentToolsCategory::select('id','description','code')->get();
 
         return view('equipment_tool.edit',[
             'equipment_tools' => $equipmentTools,

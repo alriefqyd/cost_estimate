@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ManPowersWorkItems;
+use App\Models\Setting;
 use App\Models\WorkItem;
 use App\Models\WorkItemType;
 use Exception;
@@ -12,8 +13,16 @@ use Illuminate\Validation\Rule;
 
 class WorkItemController extends Controller
 {
-    public function index(){
-        $workItem = WorkItem::with('workItemTypes')->filter(request(['q','category']))->orderBy('code','ASC')->paginate(20)->withQueryString();
+    public function index(Request $request){
+        $order = $request->order;
+        $sort =  $request->sort;
+
+        $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter(request(['q','category']))
+            ->when(isset($request->sort), function($query) use ($request,$order,$sort){
+                return $query->orderBy($order,$sort);
+            })->when(!isset($request->sort), function($query) use ($request,$order){
+                return $query->orderBy('work_items.code','ASC');
+            })->paginate(20)->withQueryString();
         $workItemCategory = WorkItemType::select('id','title')->get();
 
         return view('work_item.index',[
@@ -29,14 +38,14 @@ class WorkItemController extends Controller
     }
 
     public function create(){
-        $workItemCategory = WorkItemType::select('id','title')->get();
+        $workItemCategory = WorkItemType::select('id','title','code')->get();
         return view('work_item.create', [
             'work_item_type' => $workItemCategory
         ]);
     }
 
     public function edit(WorkItem $workItem){
-        $workItemCategory = WorkItemType::select('id','title')->get();
+        $workItemCategory = WorkItemType::select('id','title','code')->get();
         return view('work_item.edit', [
             'work_item' => $workItem,
             'work_item_type' => $workItemCategory
@@ -44,8 +53,11 @@ class WorkItemController extends Controller
     }
 
     public function store(Request $request){
+        $code = $request->code;
         $this->validate($request,[
-            'code' => 'required|unique:work_items',
+            Rule::unique('work_items')->where(function ($query) use ($request, $code) {
+                return $query->where('code', $code);
+            }),
             'work_item_type_id' => 'required',
             'description' => 'required',
             'volume' => 'required',
@@ -55,7 +67,8 @@ class WorkItemController extends Controller
         try{
             DB::beginTransaction();
             $workItem = new WorkItem([
-                'code' => $request->code,
+                'code' => $code,
+                'parent_id' => $request->parent_id,
                 'work_item_type_id' => $request->work_item_type_id,
                 'description' => $request->description,
                 'volume' => $request->volume,
@@ -92,7 +105,7 @@ class WorkItemController extends Controller
             return redirect('work-item/'.$workItem->id);
         } catch(\Exception $e){
             DB::rollBack();
-            return redirect('work-item/edit')->withErrors($e->getMessage());
+            return redirect('work-item/edit/'.$workItem->id)->withErrors($e->getMessage());
         }
     }
 
@@ -282,12 +295,17 @@ class WorkItemController extends Controller
 
     public function getWorkItems(Request $request){
         try {
-
             $item = WorkItem::with(['manPowers','workItemTypes','equipmentTools','materials'])
-                ->whereHas('workItemTypes',function ($query) use ($request){
-                    return $query->Where('title','like','%'.$request->q.'%');
-                })->orWhere('description','like','%'."$request->q".'%')
-                ->get()->groupBy('workItemTypes.id');
+                ->when(isset($request->q), function($query) use ($request){
+                    $query->whereHas('workItemTypes',function ($query) use ($request){
+                        return $query->Where('title','like','%'.$request->q.'%');
+                    })->orWhere('description','like','%'."$request->q".'%');
+                })->when(isset($request->category), function($query) use ($request){
+                    return $query->where('work_item_type_id', $request->category);
+                })->when(isset($request->term), function($query) use ($request){
+                    return $query->where('description','like','%'.$request->term.'%');
+                })->get()->groupBy('workItemTypes.id');
+
             return $item;
         } catch (\Exception $e){
             return $e->getMessage();
@@ -347,6 +365,8 @@ class WorkItemController extends Controller
 
                 $children[] = array(
                     "id" => $subItems->id,
+                    "code" => $subItems->code,
+                    "totalChild" => $subItems->countChildren(),
                     "text" => $subItems->description,
                     "vol" => $subItems->unit,
                     "manPowers" => $manPowersArr,
@@ -514,7 +534,26 @@ class WorkItemController extends Controller
         return $data;
     }
 
-    public function sumTotalEstimateDiscipline($value){
+    public function getNumChild(WorkItem $workItem, Request $request){
+        $parent = $workItem?->parent;
+        $children = $workItem?->children;
 
+        if(!$parent) {// Data Ori
+            $codeNew = $workItem->code . Setting::CODE_NEW_CHILD_WORK_ITEM;
+            if($children){
+                $codeNew = $codeNew . $children->count() + 1;
+            }
+            $code = $codeNew;
+
+        } else { // Data Duplicate
+            $codeNew = $workItem->parent?->code . Setting::CODE_NEW_CHILD_WORK_ITEM . $workItem->parent?->children?->count() + 1;
+            $code = $codeNew;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'data' => $code
+        ]);
     }
+
 }

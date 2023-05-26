@@ -135,6 +135,11 @@
     max-width: 100px !important;
 }
 
+.min-w-120 {
+    min-width: 120px !important;
+    max-width: 120px !important;
+}
+
 .min-w-150 {
     min-width: 150px !important;
     max-width: 150px !important;

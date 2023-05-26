@@ -44,9 +44,9 @@ class WorkItem extends Model
 
     public function scopeFilter($query, array $filters){
         $query->when($filters['q'] ?? false, fn($query,$q) =>
-        $query->where('code','like','%'.$q.'%')
-            ->orWhere('description','like','%'.$q.'%')
-        );
+            $query->where('code','like','%'.$q.'%')
+                ->orWhere('description','like','%'.$q.'%')
+            );
 
         $query->when($filters['category'] ?? false, fn($query,$q) =>
             $query->where('work_item_type_id', $q)
@@ -59,5 +59,16 @@ class WorkItem extends Model
                 $this->manPowers->sum('pivot.amount');
 
        return $total;
+    }
+    public function parent(){
+        return $this->belongsTo(Workitem::class,'parent_id');
+    }
+
+    public function children(){
+        return $this->hasMany(WorkItem::class,'parent_id');
+    }
+
+    public function countChildren(){
+        return $this->children->count();
     }
 }

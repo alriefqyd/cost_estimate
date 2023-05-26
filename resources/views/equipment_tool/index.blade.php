@@ -41,6 +41,8 @@
                                     <input type="text" value="{{request()->q}}" name="q" placeholder="Man Power Code/Title" class="form-control" style="height: 40px">
                                 </div>
                                 <div class="col-md-2 mb-1" >
+                                    <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
+                                    <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                     <input type="submit" class="btn btn-outline-success btn btn-search-man-power" value="search" style="height: 40px"></input>
                                 </div>
                             </div>
@@ -51,26 +53,26 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    <th scope="col" class="text-left">Code</th>
-                                    <th scope="col" class="text-left">Description</th>
-                                    <th scope="col" class="text-left">Category</th>
-                                    <th scope="col" class="text-left">Quantity</th>
-                                    <th scope="col" class="text-left">Unit</th>
-                                    <th scope="col" class="text-left">Local Rate</th>
-                                    <th scope="col" class="text-left">National Rate</th>
+                                    <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.code"></i></th>
+                                    <th scope="col" class="text-left">Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.description"></i></th>
+                                    <th scope="col" class="text-left">Category <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="category"></i></th>
+                                    <th scope="col" class="text-left">Quantity <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.quantity"></i></th>
+                                    <th scope="col" class="text-left">Unit <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.unit"></i></th>
+                                    <th scope="col" class="text-left">Local Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.local_rate"></i></th>
+                                    <th scope="col" class="text-left">National Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.national_rate"></i></th>
                                     <th scope="col" class="text-left">Action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($equipment_tools as $item)
                                     <tr>
-                                        <td><a href="/tool-equipment/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
-                                        <td>{{$item->description}}</td>
-                                        <td>{{$item?->equipmentToolsCategory?->description}}</td>
-                                        <td>{{$item->quantity}}</td>
-                                        <td>{{$item->unit}}</td>
+                                        <td class="min-w-150"><a href="/tool-equipment/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
+                                        <td class="min-w-170">{{$item->description}}</td>
+                                        <td class="min-w-170">{{$item?->equipmentToolsCategory?->description}}</td>
+                                        <td class="min-w-100">{{$item->quantity}}</td>
+                                        <td class="min-w-80">{{$item->unit}}</td>
                                         <td>{{number_format($item->local_rate,2,',','.')}}</td>
-                                        <td>{{number_format($item->national_rate,2,',','.')}}</td>
+                                        <td class="min-w-150">{{number_format($item->national_rate,2,',','.')}}</td>
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                data-id="{{$item->id}}" class="text-danger js-delete-tool-equipment">Delete</a></td>
                                     </tr>

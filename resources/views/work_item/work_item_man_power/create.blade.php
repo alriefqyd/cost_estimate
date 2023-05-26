@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="page-header">
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-12">
                     <h3>Man Power</h3>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>

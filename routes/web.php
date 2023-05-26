@@ -110,6 +110,7 @@ Route::delete('/material-category/{materialCategory:id}',[\App\Http\Controllers\
 
 
 Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
+Route::get('/getNumChild/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChild'])->name('getNumChild')->middleware('auth');
 Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getMaterial'])->name('getMaterial')->middleware('auth');
 Route::get('/getToolsEquipment',[\App\Http\Controllers\EquipmentToolsController::class,'getToolsEquipment'])->name('getToolsEquipment')->middleware('auth');
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');

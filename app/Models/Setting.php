@@ -58,4 +58,6 @@ class Setting extends Model
     public const MAN_POWER_SAFETY_RATE = 'MAN_POWER_SAFETY_RATE';
     public const MAN_POWER = 'MAN_POWER';
     public const MPSAFETY = 'MPSAFETY';
+
+    public const CODE_NEW_CHILD_WORK_ITEM = 'A';
 }

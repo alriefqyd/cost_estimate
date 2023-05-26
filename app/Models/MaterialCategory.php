@@ -12,7 +12,7 @@ class MaterialCategory extends Model
     protected $table = 'materials_categorys';
 
     public function materials(){
-        $this->hasMany(Material::class,'category_id');
+        return $this->hasMany(Material::class,'category_id');
     }
 
     public function scopeFilter($query, array $filters){

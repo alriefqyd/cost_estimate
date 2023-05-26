@@ -29,4 +29,12 @@ $(function() {
             }
         })
     })
+
+    $(document).on('change','.js-select-category-material',function(){
+        var _this = $(this);
+        var _code = _this.find('option:selected').attr('data-code');
+        var _sufix = parseInt(_this.find('option:selected').attr('data-num-count')) + 1;
+        var _newCode = _code + '.' + _sufix.toString().padStart(3,'0');
+        $('.js-material-code').val(_newCode);
+    });
 })

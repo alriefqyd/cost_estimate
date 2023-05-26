@@ -30,7 +30,19 @@
                                 <div class="col-md-6 mb-1">
                                     <input type="text" value="{{request()->q}}" name="q" placeholder="Code / Description / Stock Code / Ref Material Numbar" class="form-control" style="height: 40px">
                                 </div>
+                                <div class="col-md-4">
+                                    <select class="select2 col-sm-12"
+                                            name="category"
+                                            data-placeholder="Category">
+                                        <option></option>
+                                        @foreach($material_category as $mc)
+                                            <option {{isset(request()->category) && request()->category == $mc->id ? 'selected' : ''}} value="{{$mc->id}}">{{$mc->description}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                 <div class="col-md-1 mb-1" >
+                                    <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
+                                    <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                     <input type="submit" class="btn btn-outline-success btn btn-search-man-power" value="search" style="height: 40px"></input>
                                 </div>
                             </div>
@@ -42,14 +54,14 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="text-left">Code</th>
-                                        <th scope="col" class="text-left">Category</th>
-                                        <th scope="col" class="text-left">Tool & Equipment Description</th>
-                                        <th scope="col" class="text-left">Qty</th>
-                                        <th scope="col" class="text-left">Unit</th>
-                                        <th scope="col" class="text-left">Rate</th>
-                                        <th scope="col" class="text-left">Ref Material Number</th>
-                                        <th scope="col" class="text-left">Stock Code</th>
+                                        <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="code"></i></th>
+                                        <th scope="col" class="text-left">Category <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="category"></i></th>
+                                        <th scope="col" class="text-left">Tool & Equip Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="tool_equipment_description"></i></th>
+                                        <th scope="col" class="text-left">Qty <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="quantity"></i></th>
+                                        <th scope="col" class="text-left">Unit <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="unit"></i></th>
+                                        <th scope="col" class="text-left">Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="rate"></i></th>
+                                        <th scope="col" class="text-left">Ref Material Num <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="ref_material_number"></i></th>
+                                        <th scope="col" class="text-left">Stock Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="stock_code"></i></th>
                                         <th scope="col" class="text-left">Action</th>
                                     </tr>
                                 </thead>
@@ -58,12 +70,12 @@
                                     <tr>
                                         <td><a href="/material/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td>{{$item?->materialsCategory?->description}}</td>
-                                        <td class="min-w-250">{{$item->tool_equipment_description}}</td>
-                                        <td>{{$item->quantity}}</td>
-                                        <td>{{$item->unit}}</td>
+                                        <td class="min-w-200">{{$item->tool_equipment_description}}</td>
+                                        <td class="min-w-50">{{$item->quantity}}</td>
+                                        <td class="min-w-65">{{$item->unit}}</td>
                                         <td>{{number_format($item->rate,2)}}</td>
-                                        <td class="min-w-170">{{$item->ref_material_number}}</td>
-                                        <td class="min-w-100">{{$item->stock_code}}</td>
+                                        <td class="min-w-150">{{$item->ref_material_number}}</td>
+                                        <td class="min-w-120">{{$item->stock_code}}</td>
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                 data-id="{{$item->id}}" class="text-danger js-delete-material">Delete</a></td>
                                     </tr>

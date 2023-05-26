@@ -26,7 +26,7 @@ class Material extends Model
         );
 
         $query->when($filters['category'] ?? false, fn($query,$q) =>
-            $query->where('category', $q)
+            $query->where('category_id', $q)
         );
     }
 }

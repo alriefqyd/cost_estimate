@@ -1,19 +1,20 @@
 @inject('setting',App\Models\Setting::class)
 <div class="row mb-1">
     <div class="col-md-5">
-        <label class="form-label form-label-black m-0" for="validationCustom01">Code</label>
-        <input class="form-control js-validate js-project_project_no height-40" name="code"  type="text"
-               value="{{isset($material?->code) ? $material->code : old('code')}}">
-    </div>
-    <div class="col-md-5">
         <label class="form-label form-label-black m-0" for="validationCustom01">Category</label>
-        <select class="select2"
+        <select class="select2 js-select-category-material"
                 data-allowClear="true"
                 name="category_id" >
+            <option selected disabled="disabled">Select Material Category</option>
             @foreach($material_category as $item)
-                <option {{isset($material?->category_id) && $material?->category_id == $item->id ? 'selected' : ''}} value="{{$item->id}}">{{$item->description}}</option>
+                <option data-code="{{$item->code}}" data-num-count="{{$item->materials->count()}}" {{isset($material?->category_id) && $material?->category_id == $item->id ? 'selected' : ''}} value="{{$item->id}}">{{$item->description}}</option>
             @endforeach
         </select>
+    </div>
+    <div class="col-md-5">
+        <label class="form-label form-label-black m-0" for="validationCustom01">Code</label>
+        <input class="form-control js-validate js-material-code height-40" name="code" readonly  type="text"
+               value="{{isset($material?->code) ? $material->code : old('code')}}">
     </div>
 </div>
 <div class="row mb-1">

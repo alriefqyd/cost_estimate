@@ -41,7 +41,9 @@
                                     <input type="text" value="{{request()->q}}" name="q" placeholder="Man Power Code/Title" class="form-control" style="height: 40px">
                                 </div>
                                 <div class="col-md-1 mb-1" >
-                                    <input type="submit" class="btn btn-outline-success btn btn-search-man-power" value="search" style="height: 40px"></input>
+                                    <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
+                                    <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
+                                    <input type="submit" class="btn btn-outline-success btn btn-search-man-power" value="search" style="height: 40px">
                                 </div>
                             </div>
                         </form>
@@ -52,12 +54,12 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        <th scope="col" class="text-left">Code</th>
-                                        <th scope="col" class="text-left">Skill Level</th>
-                                        <th scope="col" class="text-left">Title</th>
-                                        <th scope="col" class="text-left">Basic Rate Monthly</th>
-                                        <th scope="col" class="text-left">Basic Rate Monthly</th>
-                                        <th scope="col" class="text-left">Overall Rate Hourly</th>
+                                        <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="code"></i></th>
+                                        <th scope="col" class="text-left">Skill Level <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="skill_level"></i></th>
+                                        <th scope="col" class="text-left">Title <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="title"></i></th>
+                                        <th scope="col" class="text-left">Basic Rate Monthly <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="basic_rate_month"></i></th>
+                                        <th scope="col" class="text-left">Basic Rate Hour <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="basic_rate_hour"></i></th>
+                                        <th scope="col" class="text-left">Overall Rate Hourly <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="overall_rate_hourly"></i></th>
                                         <th scope="col" class="text-left">Action</th>
                                     </tr>
                                 </thead>
@@ -65,11 +67,11 @@
                                 @foreach($man_power as $item)
                                     <tr>
                                         <td><a href="/man-power/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
-                                        <td>{{$item->getSkillLevel()}}</td>
-                                        <td>{{$item->title}}</td>
-                                        <td>{{number_format($item->basic_rate_month,2)}}</td>
-                                        <td>{{number_format($item->basic_rate_hour,2)}}</td>
-                                        <td>{{number_format($item->overall_rate_hourly,2)}}</td>
+                                        <td class="min-w-100">{{$item->getSkillLevel()}}</td>
+                                        <td class="min-w-150">{{$item->title}}</td>
+                                        <td class="min-w-200">{{number_format($item->basic_rate_month,2)}}</td>
+                                        <td class="min-w-150">{{number_format($item->basic_rate_hour,2)}}</td>
+                                        <td class="min-w-170">{{number_format($item->overall_rate_hourly,2)}}</td>
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                 data-id="{{$item->id}}" class="text-danger js-delete-man-power">Delete</a></td>
                                     </tr>

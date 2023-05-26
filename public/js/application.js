@@ -117,4 +117,26 @@ $(function(){
         return  _split_comma[0]
     }
 
-})
+    $('.js-order-sort').each(function(){
+        var _this = $(this);
+        _this.on('click',function(){
+            var __this = $(this);
+            var _form = $(this).closest('.row').find('form')
+            var _data_order = $(this).data('sort');
+            var _data_sort = _form.find('.js-filter-sort').val();
+            if(_data_sort == ''){
+                _data_sort = 'desc'
+            } else if(_data_sort == 'asc'){
+                _data_sort = 'desc'
+            } else if (_data_sort == 'desc'){
+                _data_sort = 'asc'
+            }
+            _form.find('.js-filter-order').val(_data_order);
+            _form.find('.js-filter-sort').val(_data_sort);
+            setTimeout(function(){
+                _form.submit();
+            },200);
+        });
+    });
+
+});

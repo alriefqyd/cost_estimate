@@ -1,42 +1,36 @@
 @inject('setting',App\Models\Setting::class)
 
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8">
         <div class="mb-3">
-            <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Code</label>
-            <input class="form-control js-tool-equipment-code"
-                   value="{{isset($equipment_tools?->code) ? $equipment_tools->code : old('code')}}"
-                   name="code" type="text">
+            <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Category</label>
+            <select class="select2 js-select-category-equipment"
+                    data-allowClear="true"
+                    name="category" >
+                <option selected disabled="disabled">Select Category</option>
+                @foreach($equipment_tools_category as $etc)
+                    <option data-code="{{$etc->code}}" data-num-count="{{$etc->equipmentTools->count()}}"
+                            {{isset($equipment_tools?->category_id) && $equipment_tools?->category_id == $etc->id ? 'selected' : ''}} value="{{$etc->id}}">{{$etc->description}}</option>
+                @endforeach
+            </select>
         </div>
     </div>
+    <div class="col-md-2">
+        <div class="mb-3">
+            <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Code</label>
+            <input class="form-control js-tool-equipment-code height-40"
+                   value="{{isset($equipment_tools?->code) ? $equipment_tools->code : old('code')}}"
+                   readonly name="code" type="text">
+        </div>
+    </div>
+</div>
+<div class="row">
     <div class="col-md-8">
         <div class="mb-3">
             <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Description</label>
             <input class="form-control js-tool-equipment-description"
                    value="{{isset($equipment_tools?->description) ? $equipment_tools->description : old('description')}}"
                    name="description" type="text">
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <div class="mb-3">
-            <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Category</label>
-            <select class="select2"
-                    data-allowClear="true"
-                    name="category" >
-                @foreach($equipment_tools_category as $etc)
-                    <option {{isset($equipment_tools?->category_id) && $equipment_tools?->category_id == $etc->id ? 'selected' : ''}} value="{{$etc->id}}">{{$etc->description}}</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="mb-3">
-            <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Quantity</label>
-            <input class="form-control js-tool-equipment-quantity"
-                   value="{{isset($equipment_tools?->quantity) ? $equipment_tools->quantity : old('quantity')}}"
-                   name="quantity" type="number">
         </div>
     </div>
     <div class="col-md-4">
@@ -49,6 +43,14 @@
     </div>
 </div>
 <div class="row">
+    <div class="col-md-4">
+        <div class="mb-3">
+            <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Quantity</label>
+            <input class="form-control js-tool-equipment-quantity"
+                   value="{{isset($equipment_tools?->quantity) ? $equipment_tools->quantity : old('quantity')}}"
+                   name="quantity" type="number">
+        </div>
+    </div>
     <div class="col-md-4">
         <div class="mb-3">
             <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Local Rate</label>

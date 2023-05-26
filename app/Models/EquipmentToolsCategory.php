@@ -12,7 +12,7 @@ class EquipmentToolsCategory extends Model
     protected $guarded;
 
     public function equipmentTools(){
-        $this->hasMany(EquipmentTools::class,'category_id');
+        return $this->hasMany(EquipmentTools::class,'category_id');
     }
 
     public function scopeFilter($query, array $filters){

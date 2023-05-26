@@ -1,4 +1,7 @@
 $(function(){
+    $(document).on('change','.js-select-work-item-type',function(){
+
+    });
     var selectItemInit = function (el){
         var _this = $(el);
         if (_this.data("select2")) _this.select2("destroy");
@@ -187,6 +190,68 @@ $(function(){
        });
     });
 
+
+    $('.js-select-work-item-type').on('change', function(){
+        var _this = $(this);
+        var _val = _this.val();
+        var selectedOption = _this.find('option:selected');
+        var dataAttribute = selectedOption.data('code');
+
+        $('.js-work-item-code').val(dataAttribute);
+        $('.js-project_project_desc').val('').trigger('change');
+        $('.js-work-description').val('');
+        existingProjectDesc($('.js-project_project_desc'));
+    });
+
+
+    $('.js-project_project_desc').each(function(){
+        existingProjectDesc($(this));
+    });
+    function existingProjectDesc(el){
+        var _category = $('.js-select-work-item-type').val();
+        $(el).select2({
+            placeholder: "Select Existing Work Item",
+            allowClear: true,
+            width: '100%',
+            ajax: {
+                url:'/getWorkItems',
+                data: function (params) {
+                    return {
+                        term: params.term,
+                        category:_category
+                    }
+                },
+                method: 'get',
+                processResults: function (resp) {
+                    return {
+                        results: resp
+                    };
+                }
+            }
+        });
+    }
+
+
+    $('.js-project_project_desc').on('change',function(){
+        var _this = $(this);
+        var _val = _this.val();
+        if(_val){
+           $('.js-parent-work-item').val(_val);
+            var _code = _this.select2('data')[0].code;
+            var _work_item_desc = _this.select2('data')[0].text;
+
+            $.ajax({
+                method:'get',
+                url:'/getNumChild/'+_val,
+                success:function(result){
+                    $('.js-work-item-code').val(result.data);
+                }
+            });
+
+            $('.js-work-description').val(_work_item_desc);
+        }
+    });
+
     function errorSave(_this){
         notification('danger','Empty Data','fa fa-frown-o','Error');
         _this.removeAttr('disabled','disabled');
@@ -201,6 +266,6 @@ $(function(){
     function removeCurrency($val){
         if($val == null) return '';
         $val = $val.toString().replaceAll(",", "")
-        return $val
+        return $val;
     }
-})
+});

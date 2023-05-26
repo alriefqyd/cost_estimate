@@ -28,7 +28,7 @@
                         <form method="get" action="/work-item">
                             <div class="row">
                                 <div class="col-md-4">
-                                    <select class="select2 col-sm-12"
+                                    <select class="select2 js-select-category-work-item-list col-sm-12"
                                             name="category"
                                             data-placeholder="Category">
                                         <option></option>
@@ -38,7 +38,9 @@
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-1">
-                                    <input type="text" value="{{request()->q}}" name="q" placeholder="Work Item Code/Title" class="form-control" style="height: 40px">
+                                    <input type="text" value="{{request()->q}}" name="q" placeholder="Work Item Code/Title" class="form-control js-search-code-name-work-item-list" style="height: 40px">
+                                    <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
+                                    <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                 </div>
                                 <div class="col-md-2 mb-1" >
                                     <input type="submit" class="btn btn-outline-success btn btn-search-man-power" value="search" style="height: 40px"></input>
@@ -51,26 +53,36 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    <th scope="col" class="text-left">Code</th>
-                                    <th scope="col" class="text-left">Description</th>
-                                    <th scope="col" class="text-left">Category</th>
-                                    <th scope="col" class="text-left">Volume</th>
-                                    <th scope="col" class="text-left">Unit</th>
-                                    <th scope="col" class="text-left">Total Price</th>
-                                    <th scope="col" class="text-left">Action</th>
+                                    <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.code"></i>
+                                    </th>
+                                    <th scope="col" class="text-left">
+                                        Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.description"></i>
+                                    </th>
+                                    <th scope="col" class="text-left">
+                                        Category <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_item_types.title"></i>
+                                    </th>
+                                    <th scope="col" class="text-left">
+                                        Volume <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.volume"></i>
+                                    </th>
+                                    <th scope="col" class="text-left" >
+                                        Unit <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.unit"></i>
+                                    </th>
+                                    <th scope="col" class="text-left" >
+                                        Total Price
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($work_item as $item)
                                     <tr>
-                                        <td><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
+                                        <td class="min-w-100"><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td class="min-w-300">{{$item->description}}</td>
                                         <td class="max-w-250">{{$item?->workItemTypes?->title}}</td>
-                                        <td class="min-w-30">{{$item->volume}}</td>
-                                        <td>{{$item->unit}}</td>
-                                        <td>{{number_format($item?->getTotalSum(),2,',','.')}}</td>
-                                        <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
-                                               data-id="{{$item->id}}" class="text-danger js-delete-tool-equipment">Delete</a></td>
+                                        <td class="min-w-80">{{$item->volume}}</td>
+                                        <td class="min-w-65">{{$item->unit}}</td>
+                                        <td class="min-w-100">{{number_format($item?->getTotalSum(),2,',','.')}}</td>
+                                        {{--<td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
+                                               data-id="{{$item->id}}" class="text-danger js-delete-tool-equipment">Delete</a></td>--}}
                                     </tr>
                                 @endforeach
                                 </tbody>
