@@ -143,6 +143,7 @@
 <script src="{{'/js/material.js'}}"></script>
 <script src="{{'/js/material_category.js'}}"></script>
 <script src="{{'/js/work_item.js'}}"></script>
+<script src="{{'/js/setting_wbs.js'}}"></script>
 <!-- login js-->
 <!-- Plugin used-->
 </body>

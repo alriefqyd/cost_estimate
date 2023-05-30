@@ -16,6 +16,10 @@ class Setting extends Model
         'instrument' => 'Instrument'
     ];
 
+    /**
+     * Deprecated
+     * Move into Database
+     */
     public const DISCIPLINE = [
         'general' => 'GENERAL',
         'civil' => 'CIVIL / STRUCTURE WORK',
@@ -60,4 +64,6 @@ class Setting extends Model
     public const MPSAFETY = 'MPSAFETY';
 
     public const CODE_NEW_CHILD_WORK_ITEM = 'A';
+    public const LEVEL_DISCIPLINE = 2;
+    public const LEVEL_WORK_ELEMENT = 3;
 }

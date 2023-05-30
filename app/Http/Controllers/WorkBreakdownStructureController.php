@@ -27,8 +27,10 @@ class WorkBreakdownStructureController extends Controller
     public function create(Request $request, Project $project){
         $disciplines = WorkBreakdownStructure::where('level',2)->get();
         $workElement = WorkElement::where('project_id',$project->id)->where('work_scope',$request->discipline)->get();
+        $discipline = WorkBreakdownStructure::select('code')->with('wbsDiscipline')->where('level',2)->get();
+
         if(isset($request->discipline)
-            && !array_key_exists($request->discipline,Setting::DISCIPLINE)){
+            && !array_key_exists($request->discipline,$discipline)){
             abort(404);
         }
 

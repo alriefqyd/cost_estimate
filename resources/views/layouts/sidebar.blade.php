@@ -34,6 +34,7 @@
                             <li><a href="/material-category">Material Category </a></li>
                         </ul>
                     </li>
+                    <li><a class="nav-link menu-title" href="/work-breakdown-structure"><i data-feather=""></i><span>WBS</span></a></li>
                 </ul>
             </div>
             <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

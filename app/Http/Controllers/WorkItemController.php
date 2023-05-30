@@ -19,10 +19,14 @@ class WorkItemController extends Controller
 
         $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter(request(['q','category']))
             ->when(isset($request->sort), function($query) use ($request,$order,$sort){
-                return $query->orderBy($order,$sort);
+                return $query->when($request->order == 'work_items.volume', function($q) use ($request, $order, $sort){
+                    return $q->orderByRaw('CONVERT(work_items.volume, SIGNED)' . $sort);
+                })->when($request->sort != 'work_items.volume',function($q) use ($request, $order, $sort){
+                    return $q->orderBy($order,$sort);
+                });
             })->when(!isset($request->sort), function($query) use ($request,$order){
                 return $query->orderBy('work_items.code','ASC');
-            })->paginate(20)->withQueryString();
+            })->select('work_items.code','work_items.description','work_items.id','work_item_types.title as category','work_items.volume','work_items.unit')->paginate(20)->withQueryString();
         $workItemCategory = WorkItemType::select('id','title')->get();
 
         return view('work_item.index',[

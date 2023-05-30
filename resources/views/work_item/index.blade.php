@@ -77,7 +77,7 @@
                                     <tr>
                                         <td class="min-w-100"><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td class="min-w-300">{{$item->description}}</td>
-                                        <td class="max-w-250">{{$item?->workItemTypes?->title}}</td>
+                                        <td class="max-w-250">{{$item?->category}}</td>
                                         <td class="min-w-80">{{$item->volume}}</td>
                                         <td class="min-w-65">{{$item->unit}}</td>
                                         <td class="min-w-100">{{number_format($item?->getTotalSum(),2,',','.')}}</td>

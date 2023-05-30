@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\WorkBreakdownStructure;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -105,6 +106,18 @@ Route::put('/material-category/{materialCategory:id}',[\App\Http\Controllers\Mat
 Route::get('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'show'])->middleware('auth');
 Route::delete('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'destroy'])->middleware('auth');
 
+Route::get('/work-breakdown-structure',[\App\Http\Controllers\settingWbsController::class,'index'])->middleware('auth');
+Route::get('/work-breakdown-structure/create',[\App\Http\Controllers\settingWbsController::class,'create'])->middleware('auth');
+Route::get('/work-breakdown-structure/{id}/work-element/create',[\App\Http\Controllers\settingWbsController::class,'createWorkElement'])->middleware('auth');
+Route::get('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'edit'])->middleware('auth');
+Route::get('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'editWorkElement'])->middleware('auth');
+Route::put('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'update'])->middleware('auth');
+Route::put('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'updateWorkElement'])->middleware('auth');
+Route::post('/work-breakdown-structure/',[\App\Http\Controllers\settingWbsController::class,'store'])->middleware('auth');
+Route::post('/work-breakdown-structure/work-element',[\App\Http\Controllers\settingWbsController::class,'storeWorkElement'])->middleware('auth');
+Route::post('/work-breakdown-structure/',[\App\Http\Controllers\settingWbsController::class,'store'])->middleware('auth');
+Route::delete('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'delete'])->middleware('auth');
+Route::delete('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'deleteWorkElement'])->middleware('auth');
 //Route::post('/saveLocation',[\App\Http\Controllers\LocationEquipmentsController::class,'saveLocation'])->name('saveLocation')->middleware('auth');
 //Route::post('/saveDiscipline',[\App\Http\Controllers\DisciplineProjectsController::class,'saveDiscipline'])->name('saveLocation')->middleware('auth');
 

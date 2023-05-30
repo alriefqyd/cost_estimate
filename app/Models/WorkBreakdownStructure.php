@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class WorkBreakdownStructure extends Model
 {
     use HasFactory;
+    protected $guarded = ['id'];
     public function wbsLevel3s(){
         return $this->hasOne(WbsLevel3::class,'discipline');
     }
@@ -18,5 +19,13 @@ class WorkBreakdownStructure extends Model
 
     public function wbsLevel3WorkElements(){
         return $this->hasOne(WbsLevel3::class,'work_element');
+    }
+
+    public function parent(){
+        return $this->belongsTo(WorkBreakdownStructure::class,'parent_id');
+    }
+
+    public function children(){
+        return $this->hasMany(WorkBreakdownStructure::class,'parent_id');
     }
 }
