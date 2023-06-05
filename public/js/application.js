@@ -51,7 +51,7 @@ $(function(){
     }
 
     $('.js-design-engineer').each(function (){
-        designEngineerInit(this)
+        designEngineerInit(this);
     })
 
     /**
@@ -137,6 +137,24 @@ $(function(){
                 _form.submit();
             },200);
         });
+    });
+
+    $('.js-show-hide-password').on('click',function(){
+        var _this = $(this);
+        var _passFill = _this.closest('.input-group').find('.js-password');
+        if(_passFill.attr('type') == 'password'){
+            _this.removeClass('fa-eye');
+            _this.addClass('fa-eye-slash');
+            _passFill.attr('type', 'text');
+        } else {
+            _this.removeClass('fa-eye-slash');
+            _this.addClass('fa-eye');
+            _passFill.attr('type', 'password');
+        }
+    });
+
+    $('.dual-list').bootstrapDualListbox({
+
     });
 
 });

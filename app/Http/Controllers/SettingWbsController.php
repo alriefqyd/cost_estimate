@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class SettingWbsController extends Controller
 {
     public function index(){
-        $wbs = WorkBreakdownStructure::with(['parent','children'])->where('level',2)->paginate(20)->withQueryString();;
+        $wbs = WorkBreakdownStructure::with(['parent','children'])->filter(request(['q']))->where('level',2)->paginate(20)->withQueryString();
         return view('setting_work_breakdown_structure.index',[
             'wbs' => $wbs,
             'isWorkElement' => false

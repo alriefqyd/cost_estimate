@@ -549,7 +549,7 @@ $(function(){
                 if(data.status === 200){
                     notification('success',data.message)
                 } else {
-                    notification('error',data.message)
+                    notification('danger',data.message,'fa fa-frown-o','Error')
                 }
             }
         })

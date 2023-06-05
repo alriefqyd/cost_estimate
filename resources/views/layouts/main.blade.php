@@ -53,6 +53,7 @@
     <!-- Responsive css-->
     <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/custom.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/select2.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{asset('/assets/bootstrap-duallistbox/dist/bootstrap-duallistbox.min.css')}}">
 </head>
 <body>
 <!-- Loader starts-->
@@ -87,6 +88,7 @@
 <script src="{{'/assets/js/bootstrap/popper.min.js'}}"></script>
 <script src="{{'/assets/js/bootstrap/bootstrap.min.js'}}"></script>
 <!-- Plugins JS start-->
+<script src="{{asset('/assets/bootstrap-duallistbox/dist/jquery.bootstrap-duallistbox.min.js')}}"></script>
 <script src="{{'/assets/js/chart/chartist/chartist.js'}}"></script>
 <script src="{{'/assets/js/chart/chartist/chartist-plugin-tooltip.js'}}"></script>
 <script src="{{'/assets/js/chart/knob/knob.min.js'}}"></script>

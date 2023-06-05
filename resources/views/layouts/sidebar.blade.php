@@ -1,10 +1,10 @@
 <!-- Page Sidebar Start-->
 <header class="main-nav">
     <div class="sidebar-user text-center">
-        <img class="img-90 rounded-circle" src="{{asset('assets/images/dashboard/1.png')}}" alt="">
+        @customDirective()
         <a href="user-profile.html">
-            <h6 class="mt-3 f-14 f-w-600">{{auth()->user()->name}}</h6></a>
-        <p class="mb-0 font-roboto">Software Engineer</p>
+            <h6 class="mt-3 f-14 f-w-600">{{auth()->user()->profiles?->full_name}}</h6></a>
+        <p class="mb-0 font-roboto">{{auth()->user()->profiles?->getPosition()}}</p>
     </div>
     <nav>
         <div class="main-navbar">
@@ -17,7 +17,9 @@
                     <li class="sidebar-main-title">
 
                     </li>
-                    <li><a class="nav-link menu-title" href="/project"><i data-feather=""></i><span>Cost Estimate</span></a></li>
+                    @canAny(['viewAny','update','create','delete','view'], App\Models\Project::class)
+                        <li><a class="nav-link menu-title" href="/project"><i data-feather=""></i><span>Cost Estimate Project</span></a></li>
+                    @endCan
                     <li><a class="nav-link menu-title" href="/work-item"><i data-feather=""></i><span>Work Item</span></a></li>
                     <li><a class="nav-link menu-title" href="/man-power"><i data-feather=""></i><span>Man Power List</span></a></li>
                     <li class="dropdown">
@@ -35,6 +37,9 @@
                         </ul>
                     </li>
                     <li><a class="nav-link menu-title" href="/work-breakdown-structure"><i data-feather=""></i><span>WBS</span></a></li>
+                    @can('viewAny', App\Models\User::class)
+                        <li><a class="nav-link menu-title" href="/user"><i data-feather=""></i><span>User</span></a></li>
+                    @endcan
                 </ul>
             </div>
             <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

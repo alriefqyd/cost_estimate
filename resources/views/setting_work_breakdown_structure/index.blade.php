@@ -27,18 +27,8 @@
                     <div class="mt-5 mb-4">
                         <form method="get" action="/work-breakdown-structure">
                             <div class="row">
-                                <div class="col-md-6 mb-1">
-                                    <input type="text" value="{{request()->q}}" name="q" placeholder="Description" class="form-control" style="height: 40px">
-                                </div>
-                                <div class="col-md-4">
-{{--                                    <select class="select2 col-sm-12"--}}
-{{--                                            name="category"--}}
-{{--                                            data-placeholder="Category">--}}
-{{--                                        <option></option>--}}
-{{--                                        @foreach($material_category as $mc)--}}
-{{--                                            <option {{isset(request()->category) && request()->category == $mc->id ? 'selected' : ''}} value="{{$mc->id}}">{{$mc->description}}</option>--}}
-{{--                                        @endforeach--}}
-{{--                                    </select>--}}
+                                <div class="col-md-10 mb-1">
+                                    <input type="text" value="{{request()->q}}" name="q" placeholder="Discipline" class="form-control" style="height: 40px">
                                 </div>
                                 <div class="col-md-1 mb-1" >
                                     <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">

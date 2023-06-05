@@ -2,6 +2,8 @@
 
 use App\Models\WorkBreakdownStructure;
 use Illuminate\Support\Facades\Route;
+use App\Models\Project;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,10 +29,12 @@ Route::middleware([
 });
 
 Route::get('/project',[\App\Http\Controllers\ProjectController::class,'index'])->middleware('auth');
-Route::post('/project',[\App\Http\Controllers\ProjectController::class,'store'])->middleware('auth');
-Route::get('/project/create',[\App\Http\Controllers\ProjectController::class,'create'])->middleware('auth');
-Route::get('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth');
-Route::get('/project/{project:id}/discipline/{discipline}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth');
+Route::post('/project',[\App\Http\Controllers\ProjectController::class,'store'])->middleware('auth')->can('create',Project::class);
+Route::put('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'update'])->middleware('auth');
+Route::get('/project/create',[\App\Http\Controllers\ProjectController::class,'create'])->middleware('auth')->can('create',Project::class);
+Route::get('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth')->can('viewAny',Project::class);
+Route::get('/project/edit/{project:id}',[\App\Http\Controllers\ProjectController::class,'edit'])->middleware('auth')->can('viewAny',Project::class);
+Route::get('/project/{project:id}/discipline/{discipline}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth')->can('viewAny',Project::class);
 //Route::get('/cost-estimate/project/detail',[\App\Http\Controllers\CostEstimateController::class,'detail'])->middleware('auth');
 Route::get('/project/{project:id}/work-item/create',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth');
 Route::get('/getExistingWorkItemByWbs',[\App\Http\Controllers\EstimateAllDisciplineController::class,'setExistingWorkItemByWbs'])->middleware('auth');
@@ -40,10 +44,10 @@ Route::get('/project/{project:id}/wbs/edit',[\App\Http\Controllers\WorkBreakdown
 Route::post('/project/{project:id}/wbs/store',[\App\Http\Controllers\WorkBreakdownStructureController::class,'store'])->middleware('auth');
 Route::post('/project/{project:id}/wbs/update',[\App\Http\Controllers\WorkBreakdownStructureController::class,'update'])->middleware('auth');
 
-Route::get('/project/{project:id}/estimate-discipline/create',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth');
-Route::get('/project/{project:id}/estimate-discipline/create/{discipline}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth');
-Route::post('/project/{project:id}/estimate-discipline/store',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth');
-Route::post('/project/{project:id}/estimate-discipline/update',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth');
+Route::get('/project/{project:id}/estimate-discipline/create',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth')->can('create',App\Models\EstimateAllDiscipline::class);
+Route::get('/project/{project:id}/estimate-discipline/create/{discipline}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth')->can('create',App\Models\EstimateAllDiscipline::class);
+Route::post('/project/{project:id}/estimate-discipline/store',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth')->can('create',App\Models\EstimateAllDiscipline::class);
+Route::post('/project/{project:id}/estimate-discipline/update',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth')->can('update',App\Models\EstimateAllDiscipline::class);
 
 Route::post('/workElement/{project:id}',[\App\Http\Controllers\WorkElementController::class,'store'])->middleware('auth');
 Route::get('/getWorkItems',[\App\Http\Controllers\WorkItemController::class,'setWorkItems'])->name('getWorkItem')->middleware('auth');
@@ -118,9 +122,12 @@ Route::post('/work-breakdown-structure/work-element',[\App\Http\Controllers\sett
 Route::post('/work-breakdown-structure/',[\App\Http\Controllers\settingWbsController::class,'store'])->middleware('auth');
 Route::delete('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'delete'])->middleware('auth');
 Route::delete('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'deleteWorkElement'])->middleware('auth');
-//Route::post('/saveLocation',[\App\Http\Controllers\LocationEquipmentsController::class,'saveLocation'])->name('saveLocation')->middleware('auth');
-//Route::post('/saveDiscipline',[\App\Http\Controllers\DisciplineProjectsController::class,'saveDiscipline'])->name('saveLocation')->middleware('auth');
 
+Route::get('/user',[\App\Http\Controllers\UserController::class,'index'])->middleware('auth');
+Route::get('/user/create',[\App\Http\Controllers\UserController::class,'create'])->middleware('auth')->can('create',User::class);
+Route::post('/user',[\App\Http\Controllers\UserController::class,'store'])->middleware('auth')->can('create',User::class);
+Route::get('/user/{user:id}',[\App\Http\Controllers\UserController::class,'edit'])->middleware('auth')->can('viewAny',User::class);
+Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'update'])->middleware('auth');
 
 Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
 Route::get('/getNumChild/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChild'])->name('getNumChild')->middleware('auth');
@@ -128,5 +135,6 @@ Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getM
 Route::get('/getToolsEquipment',[\App\Http\Controllers\EquipmentToolsController::class,'getToolsEquipment'])->name('getToolsEquipment')->middleware('auth');
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');
 Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'checkDuplicateProjectNo'])->name('checkDuplicateProjectNo')->middleware('auth');
+Route::get('/dumpingRole',[\App\Http\Controllers\RoleController::class,'dumpingData'])->name('dumpingData')->middleware('auth');
 
 

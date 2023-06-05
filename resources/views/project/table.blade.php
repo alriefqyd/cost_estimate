@@ -23,10 +23,10 @@
                     </td>
                     <td>{{$project->project_sponsor}}</td>
                     <td>{{$project->project_manager}}</td>
-                    <td>{{$project->designEngineerMechanical?->name}}</td>
-                    <td>{{$project->designEngineerCivil?->name}}</td>
-                    <td>{{$project->designEngineerElectrical?->name}}</td>
-                    <td>{{$project->designEngineerInstrument?->name}}</td>
+                    <td>{{$project->designEngineerMechanical?->profiles?->full_name}}</td>
+                    <td>{{$project->designEngineerCivil?->profiles?->full_name}}</td>
+                    <td>{{$project->designEngineerElectrical?->profiles?->full_name}}</td>
+                    <td>{{$project->designEngineerInstrument?->profiles?->full_name}}</td>
                     <td>238.784.878,8</td>
                     <td>{{$project?->created_at}}</td>
                 </tr>

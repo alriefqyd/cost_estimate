@@ -25,6 +25,10 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function create(Request $request, Project $project){
+        if(!auth()->user()->can('create',WorkBreakdownStructure::class)){
+            return view('not_authorized');
+        }
+
         $disciplines = WorkBreakdownStructure::where('level',2)->get();
         $workElement = WorkElement::where('project_id',$project->id)->where('work_scope',$request->discipline)->get();
         $discipline = WorkBreakdownStructure::select('code')->with('wbsDiscipline')->where('level',2)->get();
@@ -43,9 +47,11 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function edit(Request $request, Project $project){
+        if(!auth()->user()->can('update',WorkBreakdownStructure::class)){
+            return view('not_authorized');
+        }
         $disciplines = WorkBreakdownStructure::where('level',2)->get();
         $workElement = WorkElement::where('project_id',$project->id)->where('work_scope',$request->discipline)->get();
-//         WbsLevel3::with(['workBreakdownStructures'])->where('project_id',$project->id)->get()->groupBy('title');
         $existingWbs = $this->generateWorkBreakdown($project);
         return view('work_breakdown_structure.create',[
             'project' => $project,
@@ -56,6 +62,10 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function store(Request $request, Project $project){
+        if(!auth()->user()->can('create',WorkBreakdownStructure::class)){
+            abort(403);
+        }
+
         try {
             $this->storeWbs($project,$request);
             $response = [
@@ -72,6 +82,10 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function update(Project $project, Request $request){
+        if(!auth()->user()->can('update',WorkBreakdownStructure::class)){
+            abort(403);
+        }
+
         try {
             $this->deleteWbs($project,$request);
             $this->storeWbs($project,$request);
@@ -90,7 +104,6 @@ class WorkBreakdownStructureController extends Controller
         }
     }
 
-
     public function storeWbs(Project $project, Request $request){
        $data = $this->processData($request);
        foreach($data as $item){
@@ -104,7 +117,7 @@ class WorkBreakdownStructureController extends Controller
            $wbsLevel3->save();
        }
     }
-//cari semua estimate discipline yang wbs_level3_id nya tidak ada di daftar wbsLevel3 by project
+
     public function processData(Request $request){
         $arrData = array();
         foreach ($request->wbs as $item){
@@ -160,41 +173,7 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function generateWorkBreakdown(Project $project){
-        $data2 = DB::table('wbs_level3s')->leftjoin('work_breakdown_structures','wbs_level3s.discipline','=','work_breakdown_structures.id')
-            ->select('type','wbs_level3s.*')->where('project_id',$project->id)->get()->groupBy('title');
         $data = WbsLevel3::with(['workElements'])->where('project_id',$project->id)->get()->groupBy('title');
-        $arrData = array();
-//        foreach($data2 as $key => $value){
-//            $arrList = array();
-//            dd($value->groupBy('discipline'));
-//            foreach($value as $list){
-//                $arrWorkElement = array();
-//                $obj = json_decode($list->work_element);
-//                foreach($obj as $work_element){
-//                    $titleWorkElement = WorkBreakdownStructure::where('id', $work_element->value)->first();
-//                    $title = '';
-//                    if($titleWorkElement) $title = $titleWorkElement->title;
-//                    $dataWorkElement = [
-//                        'id' => $work_element->value,
-//                        'desc' => $title
-//                    ];
-//                    array_push($arrWorkElement, $dataWorkElement);
-//                }
-//                $dataList = [
-//                    'discipline' => $list->discipline,
-//                    'work_element' => $arrWorkElement
-//                ];
-//                array_push($arrList,$dataList);
-//            }
-//            $formatData = [
-//                'location' => $key,
-//                'type' => $value[0]->type,
-//                'discipline_work_element' => $arrList
-//            ];
-//
-//            array_push($arrData,$formatData);
-//        }
-
         return $data;
     }
 

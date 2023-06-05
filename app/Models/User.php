@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Contracts\Encryption\DecryptException;
+use Illuminate\Support\Facades\Crypt;
 
 class User extends Authenticatable
 {
@@ -24,7 +26,7 @@ class User extends Authenticatable
      * @var string[]
      */
     protected $fillable = [
-        'name',
+        'user_name',
         'email',
         'password',
         'role',
@@ -65,18 +67,34 @@ class User extends Authenticatable
         return $this->hasOne(Profile::class);
     }
     public function projectEngineerMechanical(){
-        return $this->hasOne(Profile::class,'design_engineer_mechanical');
+        return $this->hasOne(Project::class,'design_engineer_mechanical');
     }
 
     public function projectEngineerCivil(){
-        return $this->hasOne(Profile::class,'design_engineer_civil');
+        return $this->hasOne(Project::class,'design_engineer_civil');
     }
 
     public function projectEngineerElectrical(){
-        return $this->hasOne(Profile::class,'design_engineer_electrical');
+        return $this->hasOne(Project::class,'design_engineer_electrical');
     }
 
     public function projectEngineerInstrument(){
-        return $this->hasOne(Profile::class,'design_engineer_instrument');
+        return $this->hasOne(Project::class,'design_engineer_instrument');
+    }
+
+    public function roles(){
+        return $this->belongsToMany(Role::class,'user_role')->withPivot('created_by','updated_by');
+    }
+
+    public function scopeFilter($query, array $filters){
+        $query->when($filters['q'] ?? false, fn($query,$q) =>
+        $query->where('name','like','%'.$q.'%')
+            ->orWhere('email','like','%'.$q.'%')
+        );
+    }
+
+    public function getDecryptPass(){
+//        dd($this->password);
+        return Crypt::decryptString($this->password);
     }
 }

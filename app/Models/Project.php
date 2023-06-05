@@ -50,5 +50,25 @@ class Project extends Model
         return $this->hasMany(WbsLevel3::class,'project_id');
     }
 
+    public function scopeAccess($query){
+        $position = auth()->user()->profiles?->position;
+        return $query->when($position == 'design_civil_engineer', function($q){
+            return $q->whereHas('designEngineerCivil.profiles',function($qq){
+                return $qq->where('design_engineer_civil',auth()->user()->id);
+            });
+        })->when($position == 'design_mechanical_engineer', function($q) {
+            return $q->whereHas('designEngineerMechanical.profiles', function ($qq) {
+                return $qq->where('design_engineer_mechanical', auth()->user()->id);
+            });
+        })->when($position == 'design_electrical_engineer', function($q) {
+            return $q->whereHas('designEngineerElectrical.profiles', function ($qq) {
+                return $qq->where('design_engineer_electrical', auth()->user()->id);
+            });
+        })->when($position == 'design_instrument_engineer', function($q) {
+            return $q->whereHas('designEngineerInstrument.profiles', function ($qq) {
+                return $qq->where('design_engineer_instrument', auth()->user()->id);
+            });
+        });
+    }
 
 }

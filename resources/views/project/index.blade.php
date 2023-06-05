@@ -10,11 +10,13 @@
                     <li class="breadcrumb-item active">project list</li>
                 </ol>
             </div>
-            <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                <div class="select2-drpdwn-product select-options d-inline-block">
-                    <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/project/create"> Create New Cost Estimate</a>
+            @can('create', App\Models\Project::class)
+                <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
+                    <div class="select2-drpdwn-product select-options d-inline-block">
+                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/project/create"> Create New Cost Estimate</a>
+                    </div>
                 </div>
-            </div>
+            @endcan
         </div>
     </div>
 </div>

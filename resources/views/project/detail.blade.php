@@ -28,7 +28,9 @@
                                 </p>
                             </div>
                             <div class="col-md-6">
-                                <button class="btn btn-outline-success float-end m-r-10">Edit Project Info</button>
+                                <a href="/project/edit/{{$project->id}}">
+                                    <button class="btn btn-outline-success float-end m-r-10">Edit Project Info</button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -42,10 +44,10 @@
                             <p class="font-weight-600-height-7">Project Manager : {{$project->project_manager}}</p>
                             <p class="font-weight-600-height-7">Project Engineer : {{$project->project_engineer}} </p>
                             <div class="linebreak"></div>
-                            <p class="font-weight-600-height-7">Design Engineer - Civil/Structure : {{$project?->designEngineerCivil?->name}}</p>
-                            <p class="font-weight-600-height-7">Design Engineer - Mechanical : {{$project?->designEngineerMechanical?->name}}</p>
-                            <p class="font-weight-600-height-7">Design Engineer - Electrical : {{$project?->designEngineerElectrical?->name}} </p>
-                            <p class="font-weight-600-height-7">Design Engineer - Instrument : {{$project?->designEngineerInstrument?->name}}</p>
+                            <p class="font-weight-600-height-7">Design Engineer - Civil/Structure : {{$project?->designEngineerCivil?->profiles?->full_name}}</p>
+                            <p class="font-weight-600-height-7">Design Engineer - Mechanical : {{$project?->designEngineerMechanical?->profiles?->full_name}}</p>
+                            <p class="font-weight-600-height-7">Design Engineer - Electrical : {{$project?->designEngineerElectrical?->profiles?->full_name}} </p>
+                            <p class="font-weight-600-height-7">Design Engineer - Instrument : {{$project?->designEngineerInstrument?->profiles?->full_name}}</p>
                         </div>
                     </div>
                 </div>
@@ -64,11 +66,24 @@
                                 </p>
                             </div>
                             <div class="col-md-6">
-                                <a href="/project/{{$project->id}}/wbs/{{sizeof($wbs) > 0 ? 'edit' : 'create'}}">
-                                    <button class="btn btn-outline-primary float-end m-r-10" type="button">
-                                        {{sizeof($wbs) > 0 ? 'Edit WBS' : 'Create WBS'}}
-                                    </button>
-                                </a>
+                                @if(sizeof($wbs) > 0)
+                                    @can('update',App\Models\WorkBreakdownStructure::class)
+                                        <a href="/project/{{$project->id}}/wbs/edit">
+                                            <button class="btn btn-outline-primary float-end m-r-10" type="button">
+                                                Edit WBS
+                                            </button>
+                                        </a>
+                                    @endcan
+                                @else
+                                    @can('create', App\Models\WorkBreakdownStructure::class)
+                                        <a href="/project/{{$project->id}}/wbs/create}}">
+                                            <button class="btn btn-outline-primary float-end m-r-10" type="button">
+                                                Create WBS
+                                            </button>
+                                        </a>
+                                    @endcan
+                                @endif
+
                             </div>
                         </div>
                     </div>
@@ -128,11 +143,13 @@
                                 </p>
                             </div>
                             <div class="col-md-6">
-                                <a href="/project/{{$project->id}}/work-item/create">
-                                    <button class="btn btn-outline-primary float-end m-r-10" type="button">
-                                        {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
-                                    </button>
-                                </a>
+                                @canAny(['create','update'], App\Models\EstimateAllDiscipline::class)
+                                    <a href="/project/{{$project->id}}/work-item/create">
+                                        <button class="btn btn-outline-primary float-end m-r-10" type="button">
+                                            {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
+                                        </button>
+                                    </a>
+                                @endcan
                             </div>
                         </div>
                     </div>

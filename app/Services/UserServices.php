@@ -23,17 +23,13 @@ class UserServices
     public function getUserEmployee(Request $request){
         $subject = $request->subject;
         $key = $request->q;
-        $data = User::with('profiles')->whereHas('profiles', function ($q) use ($subject){
-            $query = $q;
-            if(isset($subject)){
-                $query->where('subject',$subject);
-            }
-            return $query;
+        $data = User::with('profiles')->whereHas('profiles', function ($q) use ($subject, $key){
+            return $q->when((isset($subject)), function($qq) use ($subject,$key){
+                return $qq->where('position',$subject);
+            })->when((isset($key)), function($qq) use ($subject,$key){
+                return $qq->where('full_name','like','%'.$key.'%');
+            });
         });
-
-        if($key){
-            $data = $data->where('name','like','%'.$key.'%');
-        }
 
         $data = $data->get();
         $response = array();
@@ -41,7 +37,7 @@ class UserServices
         foreach ($data as $d){
             $response[] = array(
                 "id"=>$d->id,
-                "text" =>$d->name
+                "text" =>$d->profiles->full_name
             );
         }
 

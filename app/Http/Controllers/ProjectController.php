@@ -3,12 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\EstimateAllDiscipline;
+use App\Models\Profile;
 use App\Models\Project;
+use App\Models\Role;
+use App\Models\User;
 use App\Models\WbsLevel3;
 use App\Models\WorkBreakdownStructure;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -17,10 +23,16 @@ class ProjectController extends Controller
      *
      *
      */
-    public function index()
+    public function index(Project $project)
     {
         $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
-            ->filter(request(['q']))->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
+            ->access()->filter(request(['q']))->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
+
+        $authorization = Gate::inspect('viewAny', Project::class);
+        if(!$authorization->allowed()){
+            return view('not_authorized');
+        }
+
         return view('project.index',[
             'projects' => $projects
         ]);
@@ -92,9 +104,14 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Project $project)
     {
-        //
+        $user = User::with(['profiles','roles'])->get();
+
+        return view('project.edit',[
+            'project' => $project,
+            'users' => $user,
+        ]);
     }
 
     /**
@@ -104,9 +121,41 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Project $project)
     {
-        //
+        if(!auth()->user()->can('update',$project)){
+            abort(404);
+        }
+
+        $data = $this->validate($request,[
+            Rule::unique('projects')->ignore($project->project_no),
+            'project_title' => 'required',
+            'project_sponsor' => 'required',
+            'project_manager' => 'required',
+            'project_engineer' => 'required'
+        ]);
+
+        DB::beginTransaction();
+        try {
+           $project->project_no =  $request->project_no;
+           $project->project_title = $request->project_title;
+           $project->project_sponsor = $request->project_sponsor;
+           $project->sub_project_title = $request->sub_project_title;
+           $project->project_manager = $request->project_manager;
+           $project->project_engineer = $request->project_engineer;
+           $project->design_engineer_mechanical = $request->design_engineer_mechanical;
+           $project->design_engineer_civil = $request->design_engineer_civil;
+           $project->design_engineer_electrical = $request->design_engineer_electrical;
+           $project->design_engineer_instrument = $request->design_engineer_instrument;
+
+           $project->save();
+           DB::commit();
+           return redirect('project/'.$project->id);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect('project/edit/'.$project->id)->withErrors($e->getMessage());
+        }
+
     }
 
     /**

@@ -160,7 +160,7 @@
                                             <td>{{$tools->code}}</td>
                                             <td>{{$tools->description}}</td>
                                             <td>{{$tools->pivot?->unit}}</td>
-                                            <td>{{$tools->pivot?->quantity}}</td>
+                                            <td>{{number_format($tools->pivot?->quantity,2,',','.')}}</td>
                                             <td>{{number_format($tools->local_rate,2,',','.')}}</td>
                                             <td>{{number_format($tools->pivot?->amount,2,',','.')}}</td>
                                             <td></td>
@@ -217,7 +217,7 @@
                                         <td>{{$material->code}}</td>
                                         <td>{{$material->tool_equipment_description}}</td>
                                         <td>{{$material->pivot?->unit}}</td>
-                                        <td>{{$material->pivot?->quantity}}</td>
+                                        <td>{{number_format($material->pivot?->quantity,2,',','.')}}</td>
                                         <td>{{number_format($material->rate,2,',','.')}}</td>
                                         <td>{{number_format($material->pivot?->amount,2,',','.')}}</td>
                                         <td></td>

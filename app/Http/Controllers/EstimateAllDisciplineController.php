@@ -30,12 +30,17 @@ class EstimateAllDisciplineController extends Controller
         if(sizeof($request->work_items) > 0){
             $existingEstimateDiscipline = $this->getExistingWorkItemByWbs($request, $existingWbsLevel3Id);
             if($existingEstimateDiscipline){
+                if(!auth()->user()->can('update',EstimateAllDiscipline::class)){
+                    return response()->json([
+                        'status' => 403,
+                        'message' => "You're not authorized"
+                    ]);
+                }
                 foreach ($existingEstimateDiscipline as $item){
                     $item->delete();
                 }
             }
         }
-
 
         try {
             foreach ($request->work_items as $idx => $item){

@@ -24,8 +24,9 @@
                js-item-coef
                height-40">
     </td>
-    <td class="js-work-item-material-rate min-w-100 js-item-rate" data-rate="">
-        {{$isEdit ? number_format($exMaterials->local_rate,2,'.',',') : ''}}
+    <td class="js-work-item-material-rate min-w-100 js-item-rate"
+        data-rate="{{$isEdit ? $exMaterials->rate : ''}}">
+        {{$isEdit ? number_format($exMaterials->rate,2,'.',',') : ''}}
     </td>
     <td class="js-work-item-material-amount min-w-150 js-item-amount">
         {{$isEdit ? number_format($exMaterials->pivot->amount,2,'.',',') : ''}}

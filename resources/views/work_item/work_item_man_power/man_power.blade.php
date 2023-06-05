@@ -25,7 +25,8 @@
                js-item-coef
                height-40">
     </td>
-    <td class="js-work-item-man-power-rate min-w-100 js-item-rate" data-rate="">
+    <td class="js-work-item-man-power-rate min-w-100 js-item-rate"
+        data-rate="{{$isEdit ? $exManPower->overall_rate_hourly : ''}}">
         {{$isEdit ? number_format($exManPower->overall_rate_hourly,2,'.',',') : ''}}
     </td>
     <td class="js-work-item-man-power-amount min-w-100 js-item-amount">

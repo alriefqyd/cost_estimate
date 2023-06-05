@@ -28,4 +28,10 @@ class WorkBreakdownStructure extends Model
     public function children(){
         return $this->hasMany(WorkBreakdownStructure::class,'parent_id');
     }
+
+    public function scopeFilter($query, array $filters){
+        $query->when($filters['q'] ?? false, fn($query,$q) =>
+            $query->where('title','like','%'.$q.'%')
+        );
+    }
 }

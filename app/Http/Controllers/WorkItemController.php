@@ -6,6 +6,7 @@ use App\Models\ManPowersWorkItems;
 use App\Models\Setting;
 use App\Models\WorkItem;
 use App\Models\WorkItemType;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -126,13 +127,17 @@ class WorkItemController extends Controller
     }
 
     public function storeManPower(WorkItem $workItem,Request $request){
+        DB::beginTransaction();
         try{
-            $this->processStoreManPower($workItem,$request);
+            $pivotData = $this->processStoreManPower($workItem,$request);
+            $workItem->manPowers()->attach($pivotData);
+            DB::commit();
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
             ]);
         } catch (Exception $e){
+            DB::rollback();
             return response()->json([
                 'status' => 500,
                 'message' => $e->getMessage()
@@ -141,14 +146,17 @@ class WorkItemController extends Controller
     }
 
     public function updateManPower(WorkItem $workItem, Request $request){
+        DB::beginTransaction();
         try{
-            $this->deleteExistingManPower($workItem,$request);
-            $this->processStoreManPower($workItem,$request);
+            $pivotData = $this->processStoreManPower($workItem, $request);
+            $workItem->manPowers()->sync($pivotData);
+            DB::commit();
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
             ]);
         } catch (Exception $e){
+            DB::rollback();
             return response()->json([
                 'status' => 500,
                 'message' => $e->getMessage()
@@ -157,20 +165,19 @@ class WorkItemController extends Controller
     }
 
     public function processStoreManPower(WorkItem $workItem,Request $request){
+        $pivotData = [];
         if(sizeof($request->data) > 0){
             foreach($request->data as $item){
-                $additionalData = [
+                $pivotData[$item['item']] = [
                     'labor_unit' => $item['unit'],
                     'labor_coefisient' => $item['coef'],
                     'amount' => $this->removeCommaCurrencyFormat($item['amount']),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
-
-                $workItem->manPowers()->attach($item['item'], $additionalData);
-                $workItem->save();
             }
         }
+        return $pivotData;
     }
 
     public function deleteExistingManPower(WorkItem $workItem, Request $request){
@@ -191,12 +198,16 @@ class WorkItemController extends Controller
 
     public function storeToolsEquipment(WorkItem $workItem,Request $request){
         try{
-            $this->processStoreToolEquipment($workItem,$request);
+            DB::beginTransaction();
+            $pivotData = $this->processStoreToolEquipment($workItem,$request);
+            $workItem->equipmentTools()->attach($pivotData);
+            DB::commit();
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
             ]);
         } catch (Exception $e){
+            DB::rollback();
             return response()->json([
                 'status' => 500,
                 'message' => $e->getMessage()
@@ -206,8 +217,8 @@ class WorkItemController extends Controller
 
     public function updateToolsEquipment(WorkItem $workItem, Request $request){
         try{
-            $workItem->equipmentTools()->detach();
-            $this->processStoreToolEquipment($workItem,$request);
+            $pivotData = $this->processStoreToolEquipment($workItem,$request);
+            $workItem->equipmentTools()->sync($pivotData);
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
@@ -221,20 +232,19 @@ class WorkItemController extends Controller
     }
 
     public function processStoreToolEquipment(WorkItem $workItem,Request $request){
+        $pivotData = [];
         if(sizeof($request->data) > 0){
             foreach($request->data as $item){
-                $additionalData = [
+                $pivotData[$item['item']] = [
                     'unit' => $item['unit'],
                     'quantity' => $item['coef'],
                     'amount' => $this->removeCommaCurrencyFormat($item['amount']),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
-
-                $workItem->equipmentTools()->attach($item['item'], $additionalData);
-                $workItem->save();
             }
         }
+        return $pivotData;
     }
 
     public function createMaterial(WorkItem $workItem){
@@ -251,7 +261,8 @@ class WorkItemController extends Controller
 
     public function storeMaterial(WorkItem $workItem,Request $request){
         try{
-            $this->processStoreMaterial($workItem,$request);
+            $pivotData = $this->processStoreMaterial($workItem,$request);
+            $workItem->materials()->attach($pivotData);
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
@@ -266,8 +277,8 @@ class WorkItemController extends Controller
 
     public function updateMaterial(WorkItem $workItem, Request $request){
         try{
-            $workItem->materials()->detach();
-            $this->processStoreMaterial($workItem,$request);
+            $pivotData = $this->processStoreMaterial($workItem,$request);
+            $workItem->materials()->sync($pivotData);
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
@@ -281,20 +292,20 @@ class WorkItemController extends Controller
     }
 
     public function processStoreMaterial(WorkItem $workItem,Request $request){
+        $pivotData = [];
         if(sizeof($request->data) > 0){
             foreach($request->data as $item){
-                $additionalData = [
+                $pivotData[$item['item']] = [
                     'unit' => $item['unit'],
                     'quantity' => $item['coef'],
                     'amount' => $this->removeCommaCurrencyFormat($item['amount']),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
-
-                $workItem->materials()->attach($item['item'], $additionalData);
-                $workItem->save();
             }
         }
+
+        return $pivotData;
     }
 
     public function getWorkItems(Request $request){
