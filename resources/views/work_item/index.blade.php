@@ -12,11 +12,13 @@
                         <li class="breadcrumb-item active">Work Item list</li>
                     </ol>
                 </div>
-                <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                    <div class="select2-drpdwn-product select-options d-inline-block">
-                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/work-item/create"> Create New Work Item</a>
+                @can('create',App\Models\WorkItem::class)
+                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
+                        <div class="select2-drpdwn-product select-options d-inline-block">
+                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/work-item/create"> Create New Work Item</a>
+                        </div>
                     </div>
-                </div>
+                @endcan
             </div>
         </div>
     </div>

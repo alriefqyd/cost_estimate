@@ -28,6 +28,9 @@
                 @endif
             </div>
             <div class="row">
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="mt-5 mb-4 p-3">
                         <form method="post" action="/user/{{$user->id}}">

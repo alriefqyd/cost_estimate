@@ -12,17 +12,22 @@
                         <li class="breadcrumb-item active">Setting Work Breakdown Structure</li>
                     </ol>
                 </div>
-                <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                    <div class="select2-drpdwn-product select-options d-inline-block">
-                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/work-breakdown-structure/create"> Create New Discipline</a>
+                @can('create',App\Models\WorkBreakdownStructure::class)
+                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
+                        <div class="select2-drpdwn-product select-options d-inline-block">
+                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/work-breakdown-structure/create"> Create New Discipline</a>
+                        </div>
                     </div>
-                </div>
+                @endcan
             </div>
         </div>
     </div>
     <div class="container-fluid product-wrapper">
         <div class="col-sm-12">
             <div class="row">
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="mt-5 mb-4">
                         <form method="get" action="/work-breakdown-structure">
@@ -45,15 +50,19 @@
                                 <thead>
                                     <tr>
                                         <th scope="col" class="text-left">Discipline <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="category"></i></th>
-                                        <th scope="col" class="text-left">Action</th>
+                                        @can('delete',App\Models\WorkBreakdownStructure::class)
+                                            <th scope="col" class="text-left">Action</th>
+                                        @endcan
                                     </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($wbs as $item)
                                     <tr>
                                         <td class="min-w-200"><a href="/work-breakdown-structure/{{$item->id}}" class="font-weight-bold">{{$item->title}}</a></td>
+                                        @can('delete',App\Models\WorkBreakdownStructure::class)
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                 data-id="{{$item->id}}" class="text-danger js-delete-wbs">Delete</a></td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -77,7 +86,7 @@
         @endif
     </div>
 
-    {{--<div class="modal fade js-modal-delete-wbs" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade js-modal-delete-wbs" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -93,5 +102,5 @@
                 </div>
             </div>
         </div>
-    </div>--}}
+    </div>
 @endsection

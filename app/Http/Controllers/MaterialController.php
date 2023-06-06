@@ -8,6 +8,7 @@ use App\Models\MaterialCategory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 
 class MaterialController extends Controller
@@ -21,6 +22,10 @@ class MaterialController extends Controller
     }
 
     public function index(Request $request){
+        if(auth()->user()->cannot('viewAny',Material::class)){
+            return view('not_authorized');
+        }
+
         $order = $request->order;
         $sort =  $request->sort;
         $materialCategory = MaterialCategory::select('id','description','code')->get();
@@ -43,6 +48,10 @@ class MaterialController extends Controller
     }
 
     public function create(){
+        if(auth()->user()->cannot('create',Material::class)){
+            return view('not_authorized');
+        }
+
         $materialCategory = MaterialCategory::select('id','description','code')->get();
         return view('material.create',[
             'material_category' => $materialCategory
@@ -50,6 +59,10 @@ class MaterialController extends Controller
     }
 
     public function store(Request $request){
+        if(auth()->user()->cannot('create',Material::class)){
+            abort(403);
+        }
+
         $this->validate($request,[
             'code' => 'required|unique:materials',
             'tool_equipment_description' => 'required',
@@ -74,6 +87,7 @@ class MaterialController extends Controller
             ]);
             $material->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('material');
         } catch (Exception $e) {
             DB::rollback();
@@ -82,6 +96,9 @@ class MaterialController extends Controller
     }
 
     public function show(Material $material){
+        if(auth()->user()->cannot('viewAny',Material::class)){
+            return view('not_authorized');
+        }
         $materialCategory = MaterialCategory::select('id','description','code')->get();
         return view('material.detail',[
             'material' => $material,
@@ -90,6 +107,10 @@ class MaterialController extends Controller
     }
 
     public function update(Request $request, Material $material){
+        if(auth()->user()->cannot('update',Material::class)){
+            abort(403);
+        }
+
         $this->validate($request,[
             Rule::unique('materials')->ignore($material->id),
             'tool_equipment_description' => 'required',
@@ -112,6 +133,7 @@ class MaterialController extends Controller
             $material->ref_material_number = $request->ref_material_number;
             $material->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('material/'.$material->id);
 
         } catch (Exception $e){
@@ -122,6 +144,13 @@ class MaterialController extends Controller
 
     public function destroy(Material $material)
     {
+        if(auth()->user()->cannot('create',Material::class)){
+            return response()->json([
+                'status' => 403,
+                'message' => "You're not authorized"
+            ]);
+        }
+
         try{
             $material->delete();
             return response()->json([
@@ -156,5 +185,12 @@ class MaterialController extends Controller
         $value = str_replace('.','',$val);
         $value = str_replace(',','.',$value);
         return $value;
+    }
+
+    public function message($message, $type, $icon, $status){
+        Session::flash('message', $message);
+        Session::flash('type', $type);
+        Session::flash('icon', $icon);
+        Session::flash('status', $status);
     }
 }

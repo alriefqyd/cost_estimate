@@ -133,7 +133,6 @@ $(function(){
             item['discipline'] = arrDiscipline
 
             jsonObj.push(item)
-            console.log(jsonObj)
 
         })
 
@@ -142,7 +141,6 @@ $(function(){
             url: url,
             data : {wbs:jsonObj},
             success:function(result){
-                console.log(result)
                 if(result.status === 200){
                     notification('success',result.message)
                     // return false
@@ -150,7 +148,6 @@ $(function(){
                         window.location.href = '/project/' + id
                     },2000)
                 } else {
-                    console.log(result.message);
                     notification('danger',result.message,'fa fa-cross','Error')
                 }
             }
@@ -457,7 +454,6 @@ $(function(){
                 },
                 processResults: function (resp) {
                     // _dataAdvanceWorkItem = resp;
-                    console.log(resp)
                     return {
                         results: resp
                     }

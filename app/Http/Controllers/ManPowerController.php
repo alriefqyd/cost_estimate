@@ -7,11 +7,15 @@ use App\Models\Setting;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 
 class ManPowerController extends Controller
 {
     public function index(Request $request){
+        if(auth()->user()->cannot('viewAny',ManPower::class)){
+            return view('not_authorized');
+        }
         $order = $request->order;
         $sort =  $request->sort;
 
@@ -34,6 +38,10 @@ class ManPowerController extends Controller
     }
 
     public function detail(ManPower $manPower, Request $request){
+        if(auth()->user()->cannot('viewAny',ManPower::class)){
+            return view('not_authorized');
+        }
+
         $man_power_safety_rate = Setting::where('setting_type',Setting::MAN_POWER)->where('setting_name',Setting::MAN_POWER_SAFETY_RATE)->first();
 
         return view('man_power.detail',[
@@ -43,6 +51,10 @@ class ManPowerController extends Controller
     }
 
     public function create(){
+        if(auth()->user()->cannot('create',ManPower::class)){
+           return view('not_authorized');
+        }
+
         $man_power_safety_rate = Setting::where('setting_type',Setting::MAN_POWER)->where('setting_name',Setting::MAN_POWER_SAFETY_RATE)->first();
         return view('man_power.create',[
             'man_power_safety_rate' => $man_power_safety_rate->setting_value
@@ -50,6 +62,9 @@ class ManPowerController extends Controller
     }
 
     public function store(Request $request){
+        if(auth()->user()->cannot('create',ManPower::class)){
+            abort(403);
+        }
         $this->validate($request,[
             'code' => 'required|unique:man_powers',
             'skill_level' => 'required',
@@ -93,6 +108,7 @@ class ManPowerController extends Controller
             ]);
             $manPower->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('man-power');
         } catch (Exception $e){
             DB::rollback();
@@ -101,6 +117,10 @@ class ManPowerController extends Controller
     }
 
     public function update(ManPower $manPower, Request $request){
+        if(auth()->user()->cannot('update',ManPower::class)){
+           abort(403);
+        }
+
         $this->validate($request,[
             Rule::unique('man_powers')->ignore($manPower->id),
             'skill_level' => 'required',
@@ -131,6 +151,7 @@ class ManPowerController extends Controller
 
             $manPower->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('man-power/'.$manPower->id);
 
         } catch (Exception $e){
@@ -140,6 +161,13 @@ class ManPowerController extends Controller
     }
 
     public function delete(ManPower $manPower){
+        if(auth()->user()->cannot('delete',ManPower::class)){
+            return response()->json([
+                'status' => 403,
+                'message' => "You're not authorized"
+            ]);
+        }
+
         try{
             $manPower->delete();
             return response()->json([
@@ -175,4 +203,12 @@ class ManPowerController extends Controller
 
         return response()->json($response);
     }
+
+    public function message($message, $type, $icon, $status){
+        Session::flash('message', $message);
+        Session::flash('type', $type);
+        Session::flash('icon', $icon);
+        Session::flash('status', $status);
+    }
+
 }

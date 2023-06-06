@@ -12,17 +12,22 @@
                         <li class="breadcrumb-item active">Man Power list</li>
                     </ol>
                 </div>
-                <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                    <div class="select2-drpdwn-product select-options d-inline-block">
-                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/man-power/create"> Create New Man Power</a>
+                @can('create',App\Models\ManPower::class)
+                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
+                        <div class="select2-drpdwn-product select-options d-inline-block">
+                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/man-power/create"> Create New Man Power</a>
+                        </div>
                     </div>
-                </div>
+                @endcan
             </div>
         </div>
     </div>
     <div class="container-fluid product-wrapper">
         <div class="col-sm-12">
             <div class="row">
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="mt-5 mb-4">
                         <form method="get" action="/man-power">
@@ -60,7 +65,9 @@
                                         <th scope="col" class="text-left">Basic Rate Monthly <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="basic_rate_month"></i></th>
                                         <th scope="col" class="text-left">Basic Rate Hour <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="basic_rate_hour"></i></th>
                                         <th scope="col" class="text-left">Overall Rate Hourly <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="overall_rate_hourly"></i></th>
-                                        <th scope="col" class="text-left">Action</th>
+                                        @can('delete',App\Models\ManPower::class)
+                                            <th scope="col" class="text-left">Action</th>
+                                        @endcan
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -72,8 +79,10 @@
                                         <td class="min-w-200">{{number_format($item->basic_rate_month,2)}}</td>
                                         <td class="min-w-150">{{number_format($item->basic_rate_hour,2)}}</td>
                                         <td class="min-w-170">{{number_format($item->overall_rate_hourly,2)}}</td>
-                                        <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
+                                        @can('delete',App\Models\ManPower::class)
+                                            <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                 data-id="{{$item->id}}" class="text-danger js-delete-man-power">Delete</a></td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                                 </tbody>

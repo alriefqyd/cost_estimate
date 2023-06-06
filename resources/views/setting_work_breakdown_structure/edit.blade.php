@@ -25,6 +25,9 @@
                         @endforeach
                     </div>
                 @endif
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="card-body m-0 p-3">
                         <div class="mb-5 mt-2">
@@ -54,15 +57,19 @@
                                 <thead>
                                 <tr>
                                     <th scope="col" class="text-left">Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="category"></i></th>
-                                    <th scope="col" class="text-left">Action</th>
+                                    @can('delete',App\Models\WorkBreakdownStructure::class)
+                                        <th scope="col" class="text-left">Action</th>
+                                    @endcan
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @foreach($wbs?->children as $item)
                                     <tr>
                                         <td class="min-w-200"><a href="/work-breakdown-structure/work-element/{{$item->id}}" class="font-weight-bold">{{$item->title}}</a></td>
-                                        <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
+                                        @can('delete',App\Models\WorkBreakdownStructure::class)
+                                            <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                data-id="{{$item->id}}" class="text-danger js-delete-work-element">Delete</a></td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -72,7 +79,7 @@
                 </div>
             </div>
         </div>
-        {{--<div class="modal fade js-modal-work-element" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade js-modal-work-element" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div clss="modal-header">
@@ -88,7 +95,7 @@
                     </div>
                 </div>
             </div>
-        </div>--}}
+        </div>
         @endif
     </div>
 

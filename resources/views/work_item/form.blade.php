@@ -17,7 +17,7 @@
         <label class="form-label form-label-black m-0" for="validationCustom01">Existing Work Item</label>
         <select class="select2 form-control js-validate js-project_project_desc">
             @if($isEdit)
-                <option value="{{$work_item->parent->id}}">{{$work_item?->parent?->description}}</option>
+                <option value="{{$work_item->parent?->id}}">{{$work_item?->parent?->description}}</option>
             @endif
         </select>
     </div>

@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 
 class EquipmentToolsController extends Controller
@@ -19,6 +20,10 @@ class EquipmentToolsController extends Controller
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index(Request $request){
+        if(auth()->user()->cannot('viewAny',EquipmentTools::class)){
+            return view('not_authorized');
+        }
+
         $order = $request->order;
         $sort =  $request->sort;
         $equipmentTools = EquipmentTools::with('equipmentToolsCategory')->filter(request(['q','category']))
@@ -48,6 +53,9 @@ class EquipmentToolsController extends Controller
      */
     public function create()
     {
+        if(auth()->user()->cannot('create',EquipmentTools::class)){
+            return view('not_authorized');
+        }
         $equipmentToolsCategory = EquipmentToolsCategory::select('id','description','code')->get();
 
         return view('equipment_tool.create',[
@@ -63,6 +71,10 @@ class EquipmentToolsController extends Controller
      */
     public function store(Request $request)
     {
+        if(auth()->user()->cannot('create',EquipmentTools::class)){
+            abort(403);
+        }
+
         $this->validate($request,[
             'code' => 'required|unique:equipment_tools',
             'description' => 'required',
@@ -87,6 +99,7 @@ class EquipmentToolsController extends Controller
             ]);
             $equipmentTool->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('tool-equipment');
 
         } catch (Exception $e) {
@@ -104,6 +117,10 @@ class EquipmentToolsController extends Controller
      */
     public function show(EquipmentTools $equipmentTools)
     {
+        if(auth()->user()->cannot('viewAny',EquipmentTools::class)){
+            return view('not_authorized');
+        }
+
         $equipmentToolsCategory = EquipmentToolsCategory::select('id','description','code')->get();
 
         return view('equipment_tool.edit',[
@@ -132,6 +149,10 @@ class EquipmentToolsController extends Controller
      */
     public function update(Request $request, EquipmentTools $equipmentTools)
     {
+        if(auth()->user()->cannot('update',EquipmentTools::class)){
+            abort(403);
+        }
+
         $this->validate($request,[
             Rule::unique('equipment_tools')->ignore($equipmentTools->id),
             'description' => 'required',
@@ -154,8 +175,8 @@ class EquipmentToolsController extends Controller
             $equipmentTools->remark = $request->remark;
             $equipmentTools->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('tool-equipment/'.$equipmentTools->id);
-
         } catch (Exception $e){
             DB::rollback();
             return redirect('tool-equipment/'.$equipmentTools->id)->withErrors($e->getMessage());
@@ -170,13 +191,23 @@ class EquipmentToolsController extends Controller
      */
     public function destroy(EquipmentTools $equipmentTools)
     {
+        if(auth()->user()->cannot('delete',EquipmentTools::class)){
+            return response()->json([
+                'status' => 403,
+                'message' => "You're not authorized"
+            ]);
+        }
+
         try{
+            DB::beginTransaction();
             $equipmentTools->delete();
+            DB::commit();
             return response()->json([
                 'status' => 200,
                 'message' => 'Item Successfully Deleted'
             ]);
         } catch (Exception $e){
+            DB::rollback();
             return response()->json([
                 'status' => 500,
                 'message' => $e->getMessage()
@@ -204,5 +235,12 @@ class EquipmentToolsController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function message($message, $type, $icon, $status){
+        Session::flash('message', $message);
+        Session::flash('type', $type);
+        Session::flash('icon', $icon);
+        Session::flash('status', $status);
     }
 }

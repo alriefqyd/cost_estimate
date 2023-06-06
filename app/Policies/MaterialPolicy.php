@@ -2,10 +2,11 @@
 
 namespace App\Policies;
 
+use App\Models\Material;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class WorkBreakdownStructurePolicy
+class MaterialPolicy
 {
     use HandlesAuthorization;
 
@@ -19,12 +20,13 @@ class WorkBreakdownStructurePolicy
     {
         $userRoles = $user->roles;
         foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
+            if($role->feature == 'material'){
                 if($role->action == '*' || $role->action == 'read'){
                     return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -32,18 +34,20 @@ class WorkBreakdownStructurePolicy
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Material  $material
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function view(User $user)
     {
         $userRoles = $user->roles;
         foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
+            if($role->feature == 'material'){
                 if($role->action == '*' || $role->action == 'read'){
                     return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -57,12 +61,13 @@ class WorkBreakdownStructurePolicy
     {
         $userRoles = $user->roles;
         foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
+            if($role->feature == 'material'){
                 if($role->action == '*' || $role->action == 'create'){
                     return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -70,18 +75,20 @@ class WorkBreakdownStructurePolicy
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Material  $material
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function update(User $user)
     {
         $userRoles = $user->roles;
         foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
+            if($role->feature == 'material'){
                 if($role->action == '*' || $role->action == 'update'){
                     return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -89,18 +96,20 @@ class WorkBreakdownStructurePolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Material  $material
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function delete(User $user)
     {
         $userRoles = $user->roles;
         foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
+            if($role->feature == 'material'){
                 if($role->action == '*' || $role->action == 'delete'){
                     return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -108,9 +117,10 @@ class WorkBreakdownStructurePolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Material  $material
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user)
+    public function restore(User $user, Material $material)
     {
         //
     }
@@ -119,9 +129,10 @@ class WorkBreakdownStructurePolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
+     * @param  \App\Models\Material  $material
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user)
+    public function forceDelete(User $user, Material $material)
     {
         //
     }

@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EquipmentTools;
 use App\Models\EquipmentToolsCategory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 
 class EquipmentToolsCategoryController extends Controller
@@ -17,6 +19,10 @@ class EquipmentToolsCategoryController extends Controller
      */
     public function index()
     {
+        if(auth()->user()->cannot('viewAny',EquipmentToolsCategory::class)){
+            return view('not_authorized');
+        }
+
         $equipmentToolsCategory = EquipmentToolsCategory::filter(request(['q']))->orderBy('created_at','DESC')->paginate(20)->withQueryString();
 
         return view('equipment_tool_category.index',[
@@ -31,6 +37,10 @@ class EquipmentToolsCategoryController extends Controller
      */
     public function create()
     {
+        if(auth()->user()->cannot('create',EquipmentTools::class)){
+            return view('not_authorized');
+        }
+
         return view('equipment_tool_category.create');
     }
 
@@ -42,6 +52,10 @@ class EquipmentToolsCategoryController extends Controller
      */
     public function store(Request $request)
     {
+        if(auth()->user()->cannot('create',EquipmentTools::class)){
+            return view('not_authorized');
+        }
+
         $this->validate($request,[
             'code' => 'required|unique:equipment_tools_categorys',
             'description' => 'required',
@@ -55,6 +69,7 @@ class EquipmentToolsCategoryController extends Controller
             ]);
             $equipmentTool->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('tool-equipment-category');
 
         } catch (Exception $e) {
@@ -71,6 +86,9 @@ class EquipmentToolsCategoryController extends Controller
      */
     public function show(EquipmentToolsCategory $equipmentToolsCategory)
     {
+        if(auth()->user()->cannot('viewAny',EquipmentTools::class)){
+            return view('not_authorized');
+        }
         return view('equipment_tool_category.edit',[
             'equipment_tools_category' => $equipmentToolsCategory
         ]);
@@ -96,6 +114,9 @@ class EquipmentToolsCategoryController extends Controller
      */
     public function update(Request $request, EquipmentToolsCategory $equipmentToolsCategory)
     {
+        if(auth()->user()->cannot('update',EquipmentTools::class)){
+            return view('not_authorized');
+        }
         $this->validate($request,[
             Rule::unique('equipment_tools_categorys')->ignore($equipmentToolsCategory->id),
             'description' => 'required',
@@ -107,6 +128,7 @@ class EquipmentToolsCategoryController extends Controller
             $equipmentToolsCategory->description = $request->description;
             $equipmentToolsCategory->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('tool-equipment-category/'.$equipmentToolsCategory->id);
 
         } catch (Exception $e){
@@ -135,5 +157,12 @@ class EquipmentToolsCategoryController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function message($message, $type, $icon, $status){
+        Session::flash('message', $message);
+        Session::flash('type', $type);
+        Session::flash('icon', $icon);
+        Session::flash('status', $status);
     }
 }

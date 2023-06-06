@@ -20,23 +20,33 @@
                     @canAny(['viewAny','update','create','delete','view'], App\Models\Project::class)
                         <li><a class="nav-link menu-title" href="/project"><i data-feather=""></i><span>Cost Estimate Project</span></a></li>
                     @endCan
-                    <li><a class="nav-link menu-title" href="/work-item"><i data-feather=""></i><span>Work Item</span></a></li>
-                    <li><a class="nav-link menu-title" href="/man-power"><i data-feather=""></i><span>Man Power List</span></a></li>
-                    <li class="dropdown">
-                        <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather=""></i><span>Tool Equipment </span></a>
-                        <ul class="nav-submenu menu-content">
-                            <li><a href="/tool-equipment">Tool Equipment List</a></li>
-                            <li><a href="/tool-equipment-category">Tool Equipment Category </a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather=""></i><span>Material </span></a>
-                        <ul class="nav-submenu menu-content">
-                            <li><a href="/material">Material</a></li>
-                            <li><a href="/material-category">Material Category </a></li>
-                        </ul>
-                    </li>
-                    <li><a class="nav-link menu-title" href="/work-breakdown-structure"><i data-feather=""></i><span>WBS</span></a></li>
+                    @canAny(['viewAny','update','create','delete','view'], App\Models\WorkItem::class)
+                        <li><a class="nav-link menu-title" href="/work-item"><i data-feather=""></i><span>Work Item</span></a></li>
+                    @endcan
+                    @canAny(['viewAny','update','create','delete','view'], App\Models\ManPower::class)
+                        <li><a class="nav-link menu-title" href="/man-power"><i data-feather=""></i><span>Man Power List</span></a></li>
+                    @endCan
+                    @canAny(['viewAny','update','create','delete','view'], App\Models\EquipmentTools::class)
+                        <li class="dropdown">
+                            <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather=""></i><span>Tool Equipment </span></a>
+                            <ul class="nav-submenu menu-content">
+                                <li><a href="/tool-equipment">Tool Equipment List</a></li>
+                                <li><a href="/tool-equipment-category">Tool Equipment Category </a></li>
+                            </ul>
+                        </li>
+                    @endcan
+                    @canAny(['viewAny','update','create','delete','view'], App\Models\Material::class)
+                        <li class="dropdown">
+                            <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather=""></i><span>Material </span></a>
+                            <ul class="nav-submenu menu-content">
+                                <li><a href="/material">Material</a></li>
+                                <li><a href="/material-category">Material Category </a></li>
+                            </ul>
+                        </li>
+                    @endcan
+                    @canAny(['viewAny','update','create','delete','view'], App\Models\WorkBreakdownStructure::class)
+                        <li><a class="nav-link menu-title" href="/work-breakdown-structure"><i data-feather=""></i><span>WBS</span></a></li>
+                    @endcan
                     @can('viewAny', App\Models\User::class)
                         <li><a class="nav-link menu-title" href="/user"><i data-feather=""></i><span>User</span></a></li>
                     @endcan

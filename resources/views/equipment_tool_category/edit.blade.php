@@ -26,6 +26,9 @@
                 @endif
             </div>
             <div class="row">
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="card-body m-0 p-3">
                         <div class="mb-5 mt-2">

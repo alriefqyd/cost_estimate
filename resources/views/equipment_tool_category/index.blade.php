@@ -12,17 +12,22 @@
                         <li class="breadcrumb-item active">Tools Equipment Category list</li>
                     </ol>
                 </div>
-                <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                    <div class="select2-drpdwn-product select-options d-inline-block">
-                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/tool-equipment-category/create"> Create New Tools Equipment Category</a>
+                @can('create',App\Models\EquipmentToolsCategory::class)
+                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
+                        <div class="select2-drpdwn-product select-options d-inline-block">
+                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/tool-equipment-category/create"> Create New Tools Equipment Category</a>
+                        </div>
                     </div>
-                </div>
+                @endcan
             </div>
         </div>
     </div>
     <div class="container-fluid product-wrapper">
         <div class="col-sm-12">
             <div class="row">
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="mt-5 mb-4">
                         <form method="get" action="/tool-equipment-category">
@@ -43,7 +48,9 @@
                                 <tr>
                                     <th scope="col" class="text-left">Code</th>
                                     <th scope="col" class="text-left">Description</th>
-                                    <th scope="col" class="text-left">Action</th>
+                                    @can('delete',App\Models\EquipmentToolsCategory::class)
+                                        <th scope="col" class="text-left">Action</th>
+                                    @endcan
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -51,8 +58,10 @@
                                     <tr>
                                         <td><a href="/tool-equipment-category/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td>{{$item->description}}</td>
-                                        <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
+                                        @can('delete',App\Models\EquipmentToolsCategory::class)
+                                            <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                data-id="{{$item->id}}" class="text-danger js-delete-tool-equipment-category">Delete</a></td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                                 </tbody>

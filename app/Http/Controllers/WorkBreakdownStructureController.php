@@ -25,7 +25,7 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function create(Request $request, Project $project){
-        if(!auth()->user()->can('create',WorkBreakdownStructure::class)){
+        if(!auth()->user()->can('create',WbsLevel3::class)){
             return view('not_authorized');
         }
 
@@ -47,7 +47,7 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function edit(Request $request, Project $project){
-        if(!auth()->user()->can('update',WorkBreakdownStructure::class)){
+        if(!auth()->user()->can('update',WbsLevel3::class)){
             return view('not_authorized');
         }
         $disciplines = WorkBreakdownStructure::where('level',2)->get();
@@ -62,7 +62,7 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function store(Request $request, Project $project){
-        if(!auth()->user()->can('create',WorkBreakdownStructure::class)){
+        if(!auth()->user()->can('create',WbsLevel3::class)){
             abort(403);
         }
 
@@ -82,7 +82,7 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function update(Project $project, Request $request){
-        if(!auth()->user()->can('update',WorkBreakdownStructure::class)){
+        if(!auth()->user()->can('update',WbsLevel3::class)){
             abort(403);
         }
 

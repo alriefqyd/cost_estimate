@@ -41,7 +41,6 @@ $(function(){
             url : url,
             type : 'DELETE',
             success : function(data){
-                console.log(data);
                 $('.js-modal-work-element').hide();
                 if(data.status === 200){
                     notification('success',data.message)

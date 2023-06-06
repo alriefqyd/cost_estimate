@@ -129,7 +129,7 @@ $(function() {
        return parseFloat(_val2);
     }
 
-    $('.js-btn-save-man-power').on('click',function(){
+    $('.js-btn-save-man-power').on('click',function(e){
         $('.js-currency').removeAttr('disabled','disabled');
     })
 

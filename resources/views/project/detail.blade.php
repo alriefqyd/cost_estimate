@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('main')
-@inject('wbsLevel3Controller','App\Http\Controllers\WbsLevel3Controller')
+
     <div class="container-fluid">
         <div class="page-header">
             <div class="row">
@@ -67,7 +67,7 @@
                             </div>
                             <div class="col-md-6">
                                 @if(sizeof($wbs) > 0)
-                                    @can('update',App\Models\WorkBreakdownStructure::class)
+                                    @can('update',App\Models\WbsLevel3::class)
                                         <a href="/project/{{$project->id}}/wbs/edit">
                                             <button class="btn btn-outline-primary float-end m-r-10" type="button">
                                                 Edit WBS
@@ -75,7 +75,7 @@
                                         </a>
                                     @endcan
                                 @else
-                                    @can('create', App\Models\WorkBreakdownStructure::class)
+                                    @can('create', App\Models\WbsLevel3::class)
                                         <a href="/project/{{$project->id}}/wbs/create}}">
                                             <button class="btn btn-outline-primary float-end m-r-10" type="button">
                                                 Create WBS

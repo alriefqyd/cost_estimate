@@ -29,11 +29,13 @@
                         <div class="float-start">
                             <label>Work Item Detail</label>
                         </div>
-                        <div class="float-end">
-                            <a href="/work-item/edit/{{$work_item->id}}">
-                                <div class="btn btn-outline-success">Edit</div>
-                            </a>
-                        </div>
+                        @can('update',App\Models\WorkItem::class)
+                            <div class="float-end">
+                                <a href="/work-item/edit/{{$work_item->id}}">
+                                    <div class="btn btn-outline-success">Edit</div>
+                                </a>
+                            </div>
+                        @endcan
                     </div>
                     <div class="col-md-12 mt-3 mb-3">
                         <div class="table-responsive">
@@ -71,6 +73,7 @@
                         <div class="float-start">
                             <label>Man Power</label>
                         </div>
+                        @canAny(['update','create'],App\Models\WorkItem::class)
                         <div class="float-end">
                             @if(sizeof($work_item->manPowers) > 0)
                                 <a href="/work-item/{{$work_item?->id}}/man-power/edit">
@@ -86,6 +89,7 @@
                                 </a>
                             @endif
                         </div>
+                        @endcan
                     </div>
                     <div class="col-md-12 mt-3 mb-5">
                         <div class="table-responsive mt-3">
@@ -126,19 +130,21 @@
                             <label>Tools & Equipment</label>
                         </div>
                         <div class="float-end">
-                            @if(sizeof($work_item->equipmentTools) > 0)
-                                <a href="/work-item/{{$work_item?->id}}/tools-equipment/edit">
-                                    <button class="btn btn-outline-success">
-                                        Edit
-                                    </button>
-                                </a>
-                            @else
-                                <a href="/work-item/{{$work_item?->id}}/tools-equipment/">
-                                    <button class="btn btn-outline-success">
-                                        Create
-                                    </button>
-                                </a>
-                            @endif
+                            @canAny(['update','create'],App\Models\WorkItem::class)
+                                @if(sizeof($work_item->equipmentTools) > 0)
+                                    <a href="/work-item/{{$work_item?->id}}/tools-equipment/edit">
+                                        <button class="btn btn-outline-success">
+                                            Edit
+                                        </button>
+                                    </a>
+                                @else
+                                    <a href="/work-item/{{$work_item?->id}}/tools-equipment/">
+                                        <button class="btn btn-outline-success">
+                                            Create
+                                        </button>
+                                    </a>
+                                @endif
+                            @endcan
                         </div>
                     </div>
                     <div class="col-md-12 mt-3 mb-5">
@@ -183,19 +189,21 @@
                             <label>Material</label>
                         </div>
                         <div class="float-end">
-                            @if(sizeof($work_item->materials) > 0)
-                                <a href="/work-item/{{$work_item?->id}}/material/edit">
-                                    <button class="btn btn-outline-success">
-                                        Edit
-                                    </button>
-                                </a>
-                            @else
-                                <a href="/work-item/{{$work_item?->id}}/material/">
-                                    <button class="btn btn-outline-success">
-                                        Create
-                                    </button>
-                                </a>
-                            @endif
+                            @canAny(['update','create'],App\Models\WorkItem::class)
+                                @if(sizeof($work_item->materials) > 0)
+                                    <a href="/work-item/{{$work_item?->id}}/material/edit">
+                                        <button class="btn btn-outline-success">
+                                            Edit
+                                        </button>
+                                    </a>
+                                @else
+                                    <a href="/work-item/{{$work_item?->id}}/material/">
+                                        <button class="btn btn-outline-success">
+                                            Create
+                                        </button>
+                                    </a>
+                                @endif
+                            @endcan
                         </div>
                     </div>
                     <div class="col-md-12 mt-3 mb-5">

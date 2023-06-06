@@ -76,7 +76,7 @@ class UserPolicy
      * @param  \App\Models\User  $user
      * @param  \App\Models\User  $model
      */
-    public function update(User $user, User $userTarget)
+    public function update(User $user)
     {
         $userRoles = $user->roles;
         foreach($userRoles as $role){

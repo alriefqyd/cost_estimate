@@ -12,17 +12,22 @@
                         <li class="breadcrumb-item active">Tools Equipment list</li>
                     </ol>
                 </div>
-                <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                    <div class="select2-drpdwn-product select-options d-inline-block">
-                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/tool-equipment/create"> Create New Tools Equipment</a>
+                @can('create',App\Models\EquipmentTools::class)
+                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
+                        <div class="select2-drpdwn-product select-options d-inline-block">
+                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/tool-equipment/create"> Create New Tools Equipment</a>
+                        </div>
                     </div>
-                </div>
+                @endcan
             </div>
         </div>
     </div>
     <div class="container-fluid product-wrapper">
         <div class="col-sm-12">
             <div class="row">
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="mt-5 mb-4">
                         <form method="get" action="/tool-equipment">
@@ -56,11 +61,13 @@
                                     <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.code"></i></th>
                                     <th scope="col" class="text-left">Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.description"></i></th>
                                     <th scope="col" class="text-left">Category <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="category"></i></th>
-                                    <th scope="col" class="text-left">Quantity <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.quantity"></i></th>
+                                    <th scope="col" class="text-left">Qty <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.quantity"></i></th>
                                     <th scope="col" class="text-left">Unit <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.unit"></i></th>
                                     <th scope="col" class="text-left">Local Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.local_rate"></i></th>
                                     <th scope="col" class="text-left">National Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.national_rate"></i></th>
-                                    <th scope="col" class="text-left">Action</th>
+                                    @can('delete',App\Models\EquipmentTools::class)
+                                        <th scope="col" class="text-left">Action</th>
+                                    @endcan
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -69,12 +76,14 @@
                                         <td class="min-w-150"><a href="/tool-equipment/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td class="min-w-170">{{$item->description}}</td>
                                         <td class="min-w-170">{{$item?->equipmentToolsCategory?->description}}</td>
-                                        <td class="min-w-100">{{$item->quantity}}</td>
+                                        <td class="min-w-60">{{$item->quantity}}</td>
                                         <td class="min-w-80">{{$item->unit}}</td>
                                         <td>{{number_format($item->local_rate,2,',','.')}}</td>
                                         <td class="min-w-150">{{number_format($item->national_rate,2,',','.')}}</td>
-                                        <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
+                                        @can('delete',App\Models\EquipmentTools::class)
+                                            <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                data-id="{{$item->id}}" class="text-danger js-delete-tool-equipment">Delete</a></td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                                 </tbody>

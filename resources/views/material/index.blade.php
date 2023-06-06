@@ -12,24 +12,26 @@
                         <li class="breadcrumb-item active">Material list</li>
                     </ol>
                 </div>
-                <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                    <div class="select2-drpdwn-product select-options d-inline-block">
-                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/material/create"> Create New Material</a>
+                @can('create',App\Models\Material::class)
+                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
+                        <div class="select2-drpdwn-product select-options d-inline-block">
+                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/material/create"> Create New Material</a>
+                        </div>
                     </div>
-                </div>
+                @endcan
             </div>
         </div>
     </div>
     <div class="container-fluid product-wrapper">
         <div class="col-sm-12">
             <div class="row">
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="mt-5 mb-4">
                         <form method="get" action="/material">
                             <div class="row">
-                                <div class="col-md-6 mb-1">
-                                    <input type="text" value="{{request()->q}}" name="q" placeholder="Code / Description / Stock Code / Ref Material Numbar" class="form-control" style="height: 40px">
-                                </div>
                                 <div class="col-md-4">
                                     <select class="select2 col-sm-12"
                                             name="category"
@@ -39,6 +41,9 @@
                                             <option {{isset(request()->category) && request()->category == $mc->id ? 'selected' : ''}} value="{{$mc->id}}">{{$mc->description}}</option>
                                         @endforeach
                                     </select>
+                                </div>
+                                <div class="col-md-6 mb-1">
+                                    <input type="text" value="{{request()->q}}" name="q" placeholder="Code / Description / Stock Code / Ref Material Numbar" class="form-control" style="height: 40px">
                                 </div>
                                 <div class="col-md-1 mb-1" >
                                     <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
@@ -62,7 +67,9 @@
                                         <th scope="col" class="text-left">Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="rate"></i></th>
                                         <th scope="col" class="text-left">Ref Material Num <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="ref_material_number"></i></th>
                                         <th scope="col" class="text-left">Stock Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="stock_code"></i></th>
-                                        <th scope="col" class="text-left">Action</th>
+                                        @can('delete',App\Models\Material::class)
+                                            <th scope="col" class="text-left">Action</th>
+                                        @endcan
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -76,8 +83,10 @@
                                         <td>{{number_format($item->rate,2)}}</td>
                                         <td class="min-w-150">{{$item->ref_material_number}}</td>
                                         <td class="min-w-120">{{$item->stock_code}}</td>
+                                        @can('delete',App\Models\Material::class)
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                 data-id="{{$item->id}}" class="text-danger js-delete-material">Delete</a></td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                                 </tbody>

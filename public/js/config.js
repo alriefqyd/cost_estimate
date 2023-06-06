@@ -27,7 +27,6 @@ $(function (){
                 }
             },
             processResults: function (resp) {
-                console.log(resp)
                 return {
                     results : resp
                 }

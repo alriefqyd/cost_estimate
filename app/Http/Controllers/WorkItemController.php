@@ -15,6 +15,9 @@ use Illuminate\Validation\Rule;
 class WorkItemController extends Controller
 {
     public function index(Request $request){
+        if(!auth()->user()->can('viewAny',WorkItem::class)){
+            return view('not_authorized');
+        }
         $order = $request->order;
         $sort =  $request->sort;
 
@@ -37,12 +40,18 @@ class WorkItemController extends Controller
     }
 
     public function show(WorkItem $workItem){
+        if(!auth()->user()->can('viewAny',WorkItem::class)){
+            return view('not_authorized');
+        }
         return view('work_item.show',[
             'work_item' => $workItem
         ]);
     }
 
     public function create(){
+        if(!auth()->user()->can('create',WorkItem::class)){
+            return view('not_authorized');
+        }
         $workItemCategory = WorkItemType::select('id','title','code')->get();
         return view('work_item.create', [
             'work_item_type' => $workItemCategory
@@ -50,6 +59,9 @@ class WorkItemController extends Controller
     }
 
     public function edit(WorkItem $workItem){
+        if(!auth()->user()->can('update',WorkItem::class)){
+            return view('not_authorized');
+        }
         $workItemCategory = WorkItemType::select('id','title','code')->get();
         return view('work_item.edit', [
             'work_item' => $workItem,
@@ -58,6 +70,9 @@ class WorkItemController extends Controller
     }
 
     public function store(Request $request){
+        if(!auth()->user()->can('create',WorkItem::class)){
+            abort(403);
+        }
         $code = $request->code;
         $this->validate($request,[
             Rule::unique('work_items')->where(function ($query) use ($request, $code) {
@@ -89,6 +104,9 @@ class WorkItemController extends Controller
     }
 
     public function update(WorkItem $workItem, Request $request){
+        if(!auth()->user()->can('update',WorkItem::class)){
+            abort(403);
+        }
         $this->validate($request,[
             Rule::unique('man_powers')->ignore($workItem->id),
             'work_item_type_id' => 'required',
@@ -115,18 +133,27 @@ class WorkItemController extends Controller
     }
 
     public function createManPower(WorkItem $workItem){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         return view('work_item.work_item_man_power.create',[
             'workItem' => $workItem
         ]);
     }
 
     public function editManPower(WorkItem $workItem, Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         return view('work_item.work_item_man_power.edit',[
             'workItem' => $workItem
         ]);
     }
 
     public function storeManPower(WorkItem $workItem,Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         DB::beginTransaction();
         try{
             $pivotData = $this->processStoreManPower($workItem,$request);
@@ -146,6 +173,9 @@ class WorkItemController extends Controller
     }
 
     public function updateManPower(WorkItem $workItem, Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            abort(403);
+        }
         DB::beginTransaction();
         try{
             $pivotData = $this->processStoreManPower($workItem, $request);
@@ -185,18 +215,27 @@ class WorkItemController extends Controller
     }
 
     public function createToolsEquipment(WorkItem $workItem){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         return view('work_item.work_item_tools_equipment.create',[
             'workItem' => $workItem
         ]);
     }
 
     public function editToolsEquipment(WorkItem $workItem, Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         return view('work_item.work_item_tools_equipment.edit',[
             'workItem' => $workItem
         ]);
     }
 
     public function storeToolsEquipment(WorkItem $workItem,Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         try{
             DB::beginTransaction();
             $pivotData = $this->processStoreToolEquipment($workItem,$request);
@@ -216,6 +255,9 @@ class WorkItemController extends Controller
     }
 
     public function updateToolsEquipment(WorkItem $workItem, Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         try{
             $pivotData = $this->processStoreToolEquipment($workItem,$request);
             $workItem->equipmentTools()->sync($pivotData);
@@ -248,18 +290,27 @@ class WorkItemController extends Controller
     }
 
     public function createMaterial(WorkItem $workItem){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         return view('work_item.work_item_material.create',[
             'workItem' => $workItem
         ]);
     }
 
     public function editMaterial(WorkItem $workItem, Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         return view('work_item.work_item_material.edit',[
             'workItem' => $workItem
         ]);
     }
 
     public function storeMaterial(WorkItem $workItem,Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         try{
             $pivotData = $this->processStoreMaterial($workItem,$request);
             $workItem->materials()->attach($pivotData);
@@ -276,6 +327,9 @@ class WorkItemController extends Controller
     }
 
     public function updateMaterial(WorkItem $workItem, Request $request){
+        if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
+            return (view('not_authorized'));
+        }
         try{
             $pivotData = $this->processStoreMaterial($workItem,$request);
             $workItem->materials()->sync($pivotData);

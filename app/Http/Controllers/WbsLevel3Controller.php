@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\WbsLevel3;
 use App\Models\WorkBreakdownStructure;
 
+/**
+ * Deprecated
+ */
 class WbsLevel3Controller extends Controller
 {
     public function getWorkElementJson($value){

@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -39,6 +40,9 @@ class UserController extends Controller
     }
 
     public function create(){
+        if(auth()->user()->cannot('create',User::class)){
+            return view('not_authorized');
+        }
         $role = Role::with('users')->get();
         $position = PROFILE::POSITION;
         return view('user.create',[
@@ -48,6 +52,9 @@ class UserController extends Controller
     }
 
     public function edit(User $user, Request $request){
+        if(auth()->user()->cannot('update',User::class)){
+            return view('not_authorized');
+        }
         $role = Role::with(['users'])->get();
         $position = PROFILE::POSITION;
         $existingRole = [];
@@ -65,6 +72,9 @@ class UserController extends Controller
     }
 
     public function store(Request $request){
+        if(auth()->user()->cannot('update',User::class)){
+            abort(403);
+        }
 
         $this->validate($request,[
             'email' => 'required|unique:profiles|email',
@@ -101,6 +111,8 @@ class UserController extends Controller
             }
             $user->roles()->attach($pivotData);
             DB::commit();
+
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('/user/');
         } catch (Exception $e) {
             DB::rollback();
@@ -109,6 +121,9 @@ class UserController extends Controller
     }
 
     public function update(User $user, Request $request){
+        if(auth()->user()->cannot('update',User::class)){
+            abort(403);
+        }
         $this->validate($request, [
             Rule::unique('users')->ignore($user->user_name),
             Rule::unique('profiles')->ignore($user->profiles->email),
@@ -116,10 +131,6 @@ class UserController extends Controller
             'position' => 'required',
             'role' => 'required',
         ]);
-
-        if(!auth()->user()->can('update',$user)){
-            return view('not_authorized');
-        }
 
         DB::beginTransaction();
         try{
@@ -148,11 +159,19 @@ class UserController extends Controller
             }
             $user->roles()->sync($pivotData);
             DB::commit();
+
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('/user/');
         } catch (Exception $e) {
             DB::rollback();
             return redirect('/user/'. $user->id)->withErrors($e->getMessage());
         }
+    }
 
+    public function message($message, $type, $icon, $status){
+        Session::flash('message', $message);
+        Session::flash('type', $type);
+        Session::flash('icon', $icon);
+        Session::flash('status', $status);
     }
 }
