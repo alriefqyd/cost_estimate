@@ -3,21 +3,37 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th scope="col" class="text-left">Project Title</th>
-                    <th scope="col" class="text-left">Project Sponsor</th>
-                    <th scope="col" class="text-left">Project Manager</th>
-                    <th scope="col" class="text-left">Mechanical</th>
-                    <th scope="col" class="text-left">Civil</th>
-                    <th scope="col" class="text-left">Electrical</th>
-                    <th scope="col" class="text-left">Instrument</th>
-                    <th scope="col" class="text-left">Total Work Cost</th>
-                    <th scope="col" class="text-left">Date</th>
+                    <th scope="col" class="text-left min-w-160">
+                        Project Title <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-135">
+                        Project Sponsor  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-140">
+                        Project Manager  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-140">
+                        Mechanical  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-140">
+                        Civil  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-140">
+                        Electrical  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-140">
+                        Instrument  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-100">
+                        Total Cost  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    {{--<th scope="col" class="text-left min-w-50">Date</th>--}}
                 </tr>
             </thead>
             <tbody>
             @foreach($projects as $project)
                 <tr>
-                    <td>
+                    <td class="min-w-120">
                         <a href="/project/{{$project->id}}" class="font-weight-bold">{{$project->project_no}}</a>
                         <br> {{$project->project_title}}
                     </td>
@@ -28,7 +44,7 @@
                     <td>{{$project->designEngineerElectrical?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerInstrument?->profiles?->full_name}}</td>
                     <td>238.784.878,8</td>
-                    <td>{{$project?->created_at}}</td>
+                    {{--<td>{{$project?->created_at}}</td>--}}
                 </tr>
             @endforeach
             </tbody>

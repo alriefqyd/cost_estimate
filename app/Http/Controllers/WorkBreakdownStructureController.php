@@ -83,7 +83,10 @@ class WorkBreakdownStructureController extends Controller
 
     public function update(Project $project, Request $request){
         if(!auth()->user()->can('update',WbsLevel3::class)){
-            abort(403);
+            return response()->json([
+                'status' => 403,
+                'message' => "You're not authorized"
+            ]);
         }
 
         try {

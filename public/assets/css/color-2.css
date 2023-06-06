@@ -5240,7 +5240,7 @@ table tbody .border-bottom-warning td {
         -webkit-transition: 0.5s;
         transition: 0.5s; }
       .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav.close_icon ~ footer {
-        margin-left: 78px;
+        margin-left: 0px;
         -webkit-transition: 0.5s;
         transition: 0.5s; }
     .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .left-arrow, .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .right-arrow {

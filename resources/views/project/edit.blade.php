@@ -18,6 +18,9 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
+                @if(session('message'))
+                    @include('flash')
+                @endif
                 <div class="card">
                     <div class="card-body">
                         <div class="row m-b-50">
@@ -29,15 +32,14 @@
                                 </div>
                             @endif
                         </div>
+
                         <div class="row">
                             <form class="needs-validation js-add-project-form" method="post" action="/project/{{$project->id}}" novalidate="">
                                 @csrf
                                 @method('put')
                                 @include('project.form')
-                                @can('update', App\Models\Project::class)
-                                    <button type="submit" class="btn btn-success float-end">Save Data</button>
-                                    <button type="" class="btn btn-light float-end m-r-5">Cancel</button>
-                                @endcan
+                                <button type="submit" class="btn btn-success float-end">Save Data</button>
+                                <button type="" class="btn btn-light float-end m-r-5">Cancel</button>
                             </form>
                         </div>
                     </div>

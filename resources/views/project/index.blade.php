@@ -23,16 +23,15 @@
 <div class="container-fluid product-wrapper">
     <div class="row project-cards">
         <div class="col-sm-12">
+            @if(session('message'))
+                @include('flash')
+            @endif
             <div class="card">
                 <div class="card-body m-0 p-3">
                     <div class="mb-5 mt-2">
                         <form class="js-form-project-search" method="get" action="/project">
                         <div class="row">
-                            <div class="col-md-1">
-                                <label>Filter By</label>
-                            </div>
-
-                            <div class="col-md-3 mb-1 mb-1-responsive">
+                            <div class="col-md-4 mb-1 mb-1-responsive">
                                 <select class="select2 col-sm-12"
                                         data-placeholder="Project Sponsor">
                                     <option></option>

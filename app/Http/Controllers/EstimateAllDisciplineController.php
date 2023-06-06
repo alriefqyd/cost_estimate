@@ -30,7 +30,7 @@ class EstimateAllDisciplineController extends Controller
         if(sizeof($request->work_items) > 0){
             $existingEstimateDiscipline = $this->getExistingWorkItemByWbs($request, $existingWbsLevel3Id);
             if($existingEstimateDiscipline){
-                if(!auth()->user()->can('update',EstimateAllDiscipline::class)){
+                if(!auth()->user()->canAny(['update','create'],EstimateAllDiscipline::class)){
                     return response()->json([
                         'status' => 403,
                         'message' => "You're not authorized"

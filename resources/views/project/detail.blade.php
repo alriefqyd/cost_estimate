@@ -17,6 +17,9 @@
     <!-- Container-fluid starts-->
     <div class="container-fluid">
         <div class="row">
+            @if(session('message'))
+                @include('flash')
+            @endif
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-header pb-0 card-header-custom">
@@ -27,11 +30,13 @@
                                 <i class="fa fa-chevron-circle-down cursor-pointer js-chev-show-content d-none"></i>
                                 </p>
                             </div>
-                            <div class="col-md-6">
-                                <a href="/project/edit/{{$project->id}}">
-                                    <button class="btn btn-outline-success float-end m-r-10">Edit Project Info</button>
-                                </a>
-                            </div>
+                            @can('update',$project)
+                                <div class="col-md-6">
+                                    <a href="/project/edit/{{$project->id}}">
+                                        <button class="btn btn-outline-success float-end m-r-10">Edit Project Info</button>
+                                    </a>
+                                </div>
+                            @endcan
                         </div>
                     </div>
                     <div class="card-body card-body-custom">
@@ -76,7 +81,7 @@
                                     @endcan
                                 @else
                                     @can('create', App\Models\WbsLevel3::class)
-                                        <a href="/project/{{$project->id}}/wbs/create}}">
+                                        <a href="/project/{{$project->id}}/wbs/create">
                                             <button class="btn btn-outline-primary float-end m-r-10" type="button">
                                                 Create WBS
                                             </button>

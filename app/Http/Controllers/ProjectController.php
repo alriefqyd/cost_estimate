@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
@@ -23,15 +24,14 @@ class ProjectController extends Controller
      *
      *
      */
-    public function index(Project $project)
+    public function index(Request $request, Project $project)
     {
+        $order = $request->order;
+        $sort =  $request->sort;
+
+        $this->authorize('viewAny', Project::class);
         $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
             ->access()->filter(request(['q']))->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
-
-        $authorization = Gate::inspect('viewAny', Project::class);
-        if(!$authorization->allowed()){
-            return view('not_authorized');
-        }
 
         return view('project.index',[
             'projects' => $projects
@@ -45,6 +45,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
+        $this->authorize('create',Project::class);
         return view('project.create');
     }
 
@@ -56,6 +57,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        $this->authorize('create',Project::class);
         $data = $this->validate($request,[
             'project_no' => 'required|unique:projects',
             'project_title' => 'required',
@@ -80,6 +82,7 @@ class ProjectController extends Controller
             ]);
             $project->save();
             DB::commit();
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('project/'.$project->id);
         } catch(\Exception $e){
             DB::rollBack();
@@ -106,6 +109,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
+        $this->authorize('update', $project);
         $user = User::with(['profiles','roles'])->get();
 
         return view('project.edit',[
@@ -123,10 +127,7 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        if(!auth()->user()->can('update',$project)){
-            abort(404);
-        }
-
+        $this->authorize('update',$project);
         $data = $this->validate($request,[
             Rule::unique('projects')->ignore($project->project_no),
             'project_title' => 'required',
@@ -150,7 +151,9 @@ class ProjectController extends Controller
 
            $project->save();
            DB::commit();
-           return redirect('project/'.$project->id);
+
+            $this->message('Data was successfully saved','success','fa fa-check','Success');
+            return redirect('project/'.$project->id);
         } catch (Exception $e) {
             DB::rollBack();
             return redirect('project/edit/'.$project->id)->withErrors($e->getMessage());
@@ -174,6 +177,9 @@ class ProjectController extends Controller
         $estimateDisciplines = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.title');
         $wbs = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$project->id)->get()->groupBy('title');
         $summary = $this->getSummaryCostEstimate($project, $request);
+
+        $this->authorize('view',$project);
+
         return view('project.detail',[
             'project' => $project,
             'wbs' => $wbs,
@@ -235,5 +241,12 @@ class ProjectController extends Controller
         ]);
 
         return $summary;
+    }
+
+    public function message($message, $type, $icon, $status){
+        Session::flash('message', $message);
+        Session::flash('type', $type);
+        Session::flash('icon', $icon);
+        Session::flash('status', $status);
     }
 }

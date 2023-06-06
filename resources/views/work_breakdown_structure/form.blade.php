@@ -25,8 +25,9 @@
                         Save <div style="margin-left:3px" class="loader-34 d-none"></div>
                     </div>
                 </button>
-                <button class="btn btn-success">Cancel</button>
-
+                <a href="/project/{{$project->id}}/">
+                    <div class="btn btn-success">Cancel</div>
+                </a>
             </div>
         </div>
     </div>
