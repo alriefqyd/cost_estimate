@@ -1,5 +1,5 @@
 @inject('workItemController','App\Http\Controllers\WorkItemController')
-<table class="table table-bordered">
+<table class="table table-bordered" style="border-color: black !important;">
     <thead class="bg-primary">
         <tr>
             <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-250 th-lg">Location/Equipment</th>
@@ -43,7 +43,7 @@
     @foreach($estimateAllDisciplines as $key => $value)
         @php ($totalByWorkElement = $workItemController->sumTotalByLocation($value)['totalWorkCostByElement'])
         @php ($totalCost += $totalByWorkElement)
-        <tr style="background-color: #c4bd97">
+        <tr class="font-weight-bold" style="background-color: #c4bd97">
             <td>{{$key}}</td>
             <td></td>
             <td></td>
@@ -83,8 +83,12 @@
         @endforeach
     @endforeach
     <tr class="bg-brown font-weight-bold">
-        <td colspan="12" ><label>TOTAL</label></td>
-        <td colspan="4">{{$project->getTotalCost()}}</td>
+        <td colspan="12">CONTINGENCY</td>
+        <td colspan="4">{{number_format($project->getTotalWithContingencyCost(),2,',','.')}}</td>
+    </tr>
+    <tr class="bg-brown font-weight-bold">
+        <td colspan="12" >TOTAL</td>
+        <td colspan="4">{{number_format($project->getTotalCost(),2,',','.')}}</td>
     </tr>
     </tbody>
 </table>

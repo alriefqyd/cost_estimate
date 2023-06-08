@@ -43,7 +43,7 @@
                     <td>{{$project->designEngineerCivil?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerElectrical?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerInstrument?->profiles?->full_name}}</td>
-                    <td>{{$project->getTotalCost()}}</td>
+                    <td>{{number_format($project->getTotalWithContingencyCost(),2,',','.')}}</td>
                     {{--<td>{{$project?->created_at}}</td>--}}
                 </tr>
 

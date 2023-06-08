@@ -2,7 +2,7 @@
 <header class="main-nav">
     <div class="sidebar-user text-center">
         @customDirective()
-        <a href="user-profile.html">
+        <a href="">
             <h6 class="mt-3 f-14 f-w-600">{{auth()->user()->profiles?->full_name}}</h6></a>
         <p class="mb-0 font-roboto">{{auth()->user()->profiles?->getPosition()}}</p>
     </div>

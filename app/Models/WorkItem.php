@@ -9,6 +9,11 @@ class WorkItem extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+
+    const DRAFT = 'DRAFT';
+    const PUBLISH = 'PUBLISH';
+    const ARCHIVE = 'ARCHIVE';
+
     public function estimateAllDisciplines(){
         return $this->hasMany(EstimateAllDiscipline::class,'work_item_id');
     }

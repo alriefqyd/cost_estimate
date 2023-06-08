@@ -79,7 +79,17 @@ class Project extends Model
             $material = $this->estimateAllDisciplines->sum('material_unit_rate_total');
 
             $total =  $labor + $tool + $material;
-            return number_format($total,2,',','.');
+            return $total;
+        } catch(Exception $e){
+            return '0';
+        }
+
+    }
+
+    public function getTotalWithContingencyCost(){
+        try{
+            $total = $this->getTotalCost() * (15/100);
+            return $total;
         } catch(Exception $e){
             return '0';
         }

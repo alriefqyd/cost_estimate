@@ -161,7 +161,13 @@
                         <div class="col-sm-12 col-lg-12 col-xl-12">
                             <div class="clearfix"></div>
                             <a href="/cost-estimate-summary/export/{{$project->id}}">
-                                <div class="btn btn-outline-success mb-3">Download XLSX</div>
+                                <button data-id="{{$project->id}}"
+                                    class="js-download-summary-xlsx btn btn-success mb-3">
+                                    <div class="float-start">Download XLSX</div>
+                                    <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
+                                        <div class="loader-34"></div>
+                                    </div>
+                                </button>
                             </a>
                             <div class="table-responsive table-striped">
                                 @include('project.detail_table')

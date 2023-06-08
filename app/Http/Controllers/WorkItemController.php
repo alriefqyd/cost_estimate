@@ -93,6 +93,7 @@ class WorkItemController extends Controller
                 'description' => $request->description,
                 'volume' => $request->volume,
                 'unit' => $request->unit,
+                'status' => WorkItem::DRAFT
             ]);
             $workItem->save();
             DB::commit();
