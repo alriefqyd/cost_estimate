@@ -77,7 +77,7 @@ class Project extends Model
             $labor = $this->estimateAllDisciplines->sum('labor_cost_total_rate');
             $tool = $this->estimateAllDisciplines->sum('tool_unit_rate_total');
             $material = $this->estimateAllDisciplines->sum('material_unit_rate_total');
-            
+
             $total =  $labor + $tool + $material;
             return number_format($total,2,',','.');
         } catch(Exception $e){

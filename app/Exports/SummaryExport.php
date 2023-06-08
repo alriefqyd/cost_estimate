@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class SummaryExport extends AfterSheet implements FromView, ShouldAutoSize, WithStyles
@@ -71,6 +72,8 @@ class SummaryExport extends AfterSheet implements FromView, ShouldAutoSize, With
                 'color'=> '#2978ff'
             ],
         ]);
+
+        $sheet->getStyle('F3:I100')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
 
     }
 }

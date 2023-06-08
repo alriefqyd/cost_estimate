@@ -7,10 +7,10 @@
             <th rowspan="2" style="background-color: #FFC000">Work Element</th>
             <th rowspan="2" style="background-color: #FFC000">Description</th>
             <th rowspan="2" style="background-color: #FFC000">Work Item</th>
-            <th rowspan="2" style="background-color: #FFC000">Labor Cost</th>
-            <th rowspan="2" style="background-color: #FFC000">Tool and Equipment Cost</th>
-            <th rowspan="2" style="background-color: #FFC000">Material Cost</th>
-            <th rowspan="2" style="background-color: #FFC000">Total Work Cost</th>
+            <th rowspan="2" style="background-color: #FFC000">Labor Cost (IDR)</th>
+            <th rowspan="2" style="background-color: #FFC000">Tool and Equipment Cost (IDR)</th>
+            <th rowspan="2" style="background-color: #FFC000">Material Cost (IDR)</th>
+            <th rowspan="2" style="background-color: #FFC000">Total Work Cost (IDR)</th>
         </tr>
         <tr></tr>
     </thead>
@@ -68,9 +68,9 @@
                 <td></td>
                 <td></td>
                 <td>{{$item?->workItems?->description}}</td>
-                <td>{{$workItemController->getResultCount($item->labor_cost_total_rate, $item->volume)}}</td>
-                <td>{{$workItemController->getResultCount($item->tool_unit_rate_total, $item->volume) }}</td>
-                <td>{{$workItemController->getResultCount($item->material_unit_rate_total, $item->volume)}}</td>
+                <td>{{number_format($item->labor_cost_total_rate,2,',','.')}}</td>
+                <td>{{number_format($item->tool_unit_rate_total,2,',','.') }}</td>
+                <td>{{number_format($item->material_unit_rate_total,2,',','.')}}</td>
             </tr>
             @php($previousLocation = $key)
             @php($previousWbsLevel3 = $item->wbsLevels3->identifier)
@@ -78,8 +78,20 @@
             @php($previousElement = $item->wbsLevels3->workElements->id)
         @endforeach
     @endforeach
+    @php($contigency = $totalCost * (15/100))
         <tr>
-            <td style="background-color: #FFC000"></td>
+            <td style="background-color: #C4BD97">{{chr(64 + sizeof($estimateAllDisciplines) + 1)}}</td>
+            <td style="background-color: #C4BD97"></td>
+            <td style="background-color: #C4BD97"></td>
+            <td style="background-color: #C4BD97">CONTINGENCY</td>
+            <td style="background-color: #C4BD97"></td>
+            <td style="background-color: #C4BD97"></td>
+            <td style="background-color: #C4BD97"></td>
+            <td style="background-color: #C4BD97"></td>
+            <td style="background-color: #C4BD97">{{$workItemController->toCurrency($contigency)}}</td>
+        </tr>
+        <tr>
+            <td style="background-color: #FFC000">{{chr(64 + sizeof($estimateAllDisciplines) + 2)}}</td>
             <td style="background-color: #FFC000"></td>
             <td style="background-color: #FFC000"></td>
             <td style="background-color: #FFC000">TOTAL PROJECT COST</td>
@@ -87,7 +99,7 @@
             <td style="background-color: #FFC000"></td>
             <td style="background-color: #FFC000"></td>
             <td style="background-color: #FFC000"></td>
-            <td style="background-color: #FFC000">{{$workItemController->toCurrency($totalCost)}}</td>
+            <td style="background-color: #FFC000">{{$workItemController->toCurrency($totalCost + $contigency)}}</td>
         </tr>
     </tbody>
 </table>
