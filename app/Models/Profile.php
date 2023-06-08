@@ -26,7 +26,9 @@ class Profile extends Model
         'design_civil_engineer' => 'Design Civil Engineer',
         'design_mechanical_engineer' => 'Design Mechanical Engineer',
         'design_electrical_engineer' => 'Design Electrical Engineer',
-        'design_instrument_engineer' => 'Design Instrument Engineer'
+        'design_instrument_engineer' => 'Design Instrument Engineer',
+        'super_administrator' => 'Super Administrator',
+        'administrator' => 'Administrator'
     ];
 
     public function users(){
