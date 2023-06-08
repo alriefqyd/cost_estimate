@@ -77,7 +77,7 @@
                             </div>
                         @endif
                         <div class="form-group">
-                            <label>Email Address</label>
+                            <label>User Name</label>
                             <div class="input-group"><span class="input-group-text"><i class="icon-user"></i></span>
                                 <input class="form-control" name="user_name" value="{{old('user_name')}}" required autofocus>
                             </div>
