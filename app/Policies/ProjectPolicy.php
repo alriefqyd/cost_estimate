@@ -148,7 +148,7 @@ class ProjectPolicy
 
     public function projectAccess(User $user, Project $project){
         $position = $user->profiles?->position;
-
+        $access = ['project_manager','super_administrator','administrator'];
         if($position == 'design_civil_engineer'){
             return $user->id == $project->design_engineer_civil;
         }
@@ -161,7 +161,7 @@ class ProjectPolicy
         if($position == 'design_instrument_engineer'){
             return $user->id == $project->design_engineer_instrument;
         }
-        if($position == 'project_manager'){
+        if(in_array($position,$access)){
             return true;
         }
 
