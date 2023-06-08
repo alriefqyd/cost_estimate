@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\DisciplineProjects;
 use App\Models\EstimateAllDiscipline;
-use App\Models\LocationEquipments;
 use App\Models\Project;
 use App\Models\WbsLevel3;
 use Illuminate\Http\Request;
@@ -24,25 +22,24 @@ class EstimateAllDisciplineController extends Controller
         return $wbsLevel3->id;
     }
     public function update(Request $request){
-
         $workItemController = new WorkItemController();
-        $existingWbsLevel3Id = $this->getExistingWbsLevel3Id($request);
-        if(sizeof($request->work_items) > 0){
-            $existingEstimateDiscipline = $this->getExistingWorkItemByWbs($request, $existingWbsLevel3Id);
-            if($existingEstimateDiscipline){
-                if(!auth()->user()->canAny(['update','create'],EstimateAllDiscipline::class)){
-                    return response()->json([
-                        'status' => 403,
-                        'message' => "You're not authorized"
-                    ]);
-                }
-                foreach ($existingEstimateDiscipline as $item){
-                    $item->delete();
+        try {
+            $existingWbsLevel3Id = $this->getExistingWbsLevel3Id($request);
+            if(sizeof($request->work_items) > 0){
+                $existingEstimateDiscipline = $this->getExistingWorkItemByWbs($request, $existingWbsLevel3Id);
+                if($existingEstimateDiscipline){
+                    if(!auth()->user()->canAny(['update','create'],EstimateAllDiscipline::class)){
+                        return response()->json([
+                            'status' => 403,
+                            'message' => "You're not authorized"
+                        ]);
+                    }
+                    foreach ($existingEstimateDiscipline as $item){
+                        $item->delete();
+                    }
                 }
             }
-        }
 
-        try {
             foreach ($request->work_items as $idx => $item){
                 $estimateAllDiscipline = new EstimateAllDiscipline();
                 $estimateAllDiscipline->title = '';
@@ -53,11 +50,11 @@ class EstimateAllDisciplineController extends Controller
                 $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'];
                 $estimateAllDiscipline->material_factorial = $item['materialFactorial'];
                 $estimateAllDiscipline->labor_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['labourUnitRate']);
-                $estimateAllDiscipline->labor_cost_total_rate =  $workItemController->removeCommaCurrencyFormat($item['totalRateManPowers']);
+                $estimateAllDiscipline->labor_cost_total_rate = $workItemController->removeCommaCurrencyFormat($item['totalRateManPowers']) * $item['vol'];
                 $estimateAllDiscipline->tool_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['equipmentUnitRate']);
-                $estimateAllDiscipline->tool_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateEquipments']);
+                $estimateAllDiscipline->tool_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateEquipments']) * $item['vol'];
                 $estimateAllDiscipline->material_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['materialUnitRate']);
-                $estimateAllDiscipline->material_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateMaterials']);
+                $estimateAllDiscipline->material_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateMaterials']) * $item['vol'];
                 $estimateAllDiscipline->wbs_level3_id = $existingWbsLevel3Id;
                 $estimateAllDiscipline->equipment_location_id = $request->work_element;
                 $estimateAllDiscipline->save();

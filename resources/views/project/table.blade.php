@@ -43,9 +43,10 @@
                     <td>{{$project->designEngineerCivil?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerElectrical?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerInstrument?->profiles?->full_name}}</td>
-                    <td>238.784.878,8</td>
+                    <td>{{$project->getTotalCost()}}</td>
                     {{--<td>{{$project?->created_at}}</td>--}}
                 </tr>
+
             @endforeach
             </tbody>
         </table>

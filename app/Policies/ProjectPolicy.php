@@ -156,7 +156,7 @@ class ProjectPolicy
             return $user->id == $project->design_engineer_mechanical;
         }
         if($position == 'design_electrical_engineer'){
-            return $user->id == $project->design_electrical_engineer;
+            return $user->id == $project->design_engineer_electrical;
         }
         if($position == 'design_instrument_engineer'){
             return $user->id == $project->design_engineer_instrument;

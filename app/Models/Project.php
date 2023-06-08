@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -69,6 +70,20 @@ class Project extends Model
                 return $qq->where('design_engineer_instrument', auth()->user()->id);
             });
         });
+    }
+
+    public function getTotalCost(){
+        try{
+            $labor = $this->estimateAllDisciplines->sum('labor_cost_total_rate');
+            $tool = $this->estimateAllDisciplines->sum('tool_unit_rate_total');
+            $material = $this->estimateAllDisciplines->sum('material_unit_rate_total');
+            
+            $total =  $labor + $tool + $material;
+            return number_format($total,2,',','.');
+        } catch(Exception $e){
+            return '0';
+        }
+
     }
 
 }

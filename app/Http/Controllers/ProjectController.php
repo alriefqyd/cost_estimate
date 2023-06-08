@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SummaryExport;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Profile;
 use App\Models\Project;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends Controller
 {
@@ -173,17 +175,17 @@ class ProjectController extends Controller
     }
 
     public function detail(Project $project, Request $request){
-        $workItemController = new workItemController();
         $estimateDisciplines = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.title');
         $wbs = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$project->id)->get()->groupBy('title');
-        $summary = $this->getSummaryCostEstimate($project, $request);
+        //this function is not use temporary
+        //$summary = $this->getSummaryCostEstimate($project, $request);
 
         $this->authorize('view',$project);
 
         return view('project.detail',[
+            //'summary' => $summary,
             'project' => $project,
             'wbs' => $wbs,
-            'summary' => $summary,
             'estimateAllDisciplines' => $estimateDisciplines,
             'project_date' => Carbon::parse($project->created_at)->format('d-M-Y'),
         ]);
@@ -241,6 +243,11 @@ class ProjectController extends Controller
         ]);
 
         return $summary;
+    }
+
+    public function export(Project $project, Request $request){
+        $estimateDisciplines = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.title');
+        return Excel::download(new SummaryExport($estimateDisciplines), 'summary.xlsx');
     }
 
     public function message($message, $type, $icon, $status){

@@ -570,24 +570,24 @@ class WorkItemController extends Controller
     }
 
     public function removeCommaCurrencyFormat($val){
-        if(!$val) return "";
+        if(!$val) return 0;
         return str_replace(',','',$val);
     }
 
     /**
-     * Sum total price category by work element in project detail page estimate discipline
+     * Sum total price category by location in project detail page estimate discipline
      * @return array
      */
-    public function sumTotalByWorkElement($estimateDiscipline){
+    public function sumTotalByLocation($estimateDiscipline){
         $totalPriceLabor = 0;
         $totalPriceEquipment = 0;
         $totalPriceMaterial = 0;
 
         if($estimateDiscipline){
             foreach($estimateDiscipline as $v){
-                $totalPriceLabor += $v->labor_cost_total_rate * $v->volume;
-                $totalPriceEquipment += $v->tool_unit_rate_total * $v->volume;
-                $totalPriceMaterial += $v->material_unit_rate_total * $v->volume;
+                $totalPriceLabor += $v->labor_cost_total_rate;
+                $totalPriceEquipment += $v->tool_unit_rate_total;
+                $totalPriceMaterial += $v->material_unit_rate_total;
             }
         }
 
@@ -623,6 +623,10 @@ class WorkItemController extends Controller
             'status' => 200,
             'data' => $code
         ]);
+    }
+
+    public function sumTotalByDiscipline(){
+
     }
 
 }

@@ -92,7 +92,7 @@
                         <select class="select2 form-control js-design-engineer js-project_engineer_electrical"
                                 data-allowClear="true"
                                 data-url="/getUserEmployee"
-                                data-subject="design_electrical_engineer}}"
+                                data-subject="design_electrical_engineer"
                                 data-minimumInputLength="3"
                                 name="design_engineer_electrical" >
                             @if(isset($project->design_engineer_electrical))

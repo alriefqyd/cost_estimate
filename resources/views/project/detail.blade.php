@@ -88,7 +88,6 @@
                                         </a>
                                     @endcan
                                 @endif
-
                             </div>
                         </div>
                     </div>
@@ -159,7 +158,15 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        @include('project.detail_table')
+                        <div class="col-sm-12 col-lg-12 col-xl-12">
+                            <div class="clearfix"></div>
+                            <a href="/cost-estimate-summary/export/{{$project->id}}">
+                                <div class="btn btn-outline-success mb-3">Download XLSX</div>
+                            </a>
+                            <div class="table-responsive table-striped">
+                                @include('project.detail_table')
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
