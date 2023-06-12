@@ -93,7 +93,26 @@ class Project extends Model
         } catch(Exception $e){
             return '0';
         }
+    }
 
+    public function getMechanicalEngineer(){
+        if(!$this->designEngineerMechanical) return '-';
+        return $this->designEngineerMechanical?->profiles?->full_name;
+    }
+
+    public function getCivilEngineer(){
+        if(!$this->designEngineerCivil) return '-';
+        return $this->designEngineerCivil?->profiles?->full_name;
+    }
+
+    public function getElectricalEngineer(){
+        if(!$this->designEngineerElectrical) return '-';
+        return $this->designEngineerElectrical?->profiles?->full_name;
+    }
+
+    public function getInstrumentEngineer(){
+        if(!$this->designEngineerInstrument) return '-';
+        return $this->designEngineerInstrument?->profiles?->full_name;
     }
 
 }

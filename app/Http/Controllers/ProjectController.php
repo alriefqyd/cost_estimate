@@ -247,7 +247,7 @@ class ProjectController extends Controller
 
     public function export(Project $project, Request $request){
         $estimateDisciplines = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.title');
-        return Excel::download(new SummaryExport($estimateDisciplines), 'summary.xlsx');
+        return Excel::download(new SummaryExport($estimateDisciplines,$project), 'summary.xlsx');
     }
 
     public function message($message, $type, $icon, $status){

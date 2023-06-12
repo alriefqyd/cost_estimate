@@ -1,16 +1,64 @@
 @inject('workItemController','App\Http\Controllers\WorkItemController')
 <table class="tg">
+    <tr>
+        <td></td>
+    </tr>
+    <tr>
+        <td>PT VALE INDONESIA, TBK</td>
+    </tr>
+    <tr>
+        <td>
+            DEPARTEMENT ENGINEERING AND CONSTRUCTION - ENGINEERING SERVICE
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+    </tr>
+    <tr>
+        <td>SUMMARY COST ESTIMATE</td>
+    </tr>
+    <tr></tr>
+
+    <tr>
+        <td>
+            <div class="col-md-12">
+                <div class="col-md-2">
+                    PROJECT NO
+                </div>
+                <div class="col-md-2">
+                    : {{$project->project_no}}
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td>PROJECT TITLE : {{$project->project_title}}</td>
+    </tr>
+    <tr>
+        <td>PROJECT MANAGER : {{$project->project_manager}}</td>
+    </tr>
+    <tr>
+        <td>PROJECT ENGINEER : {{$project->project_engineer}}</td>
+    </tr>
+    <tr>
+        <td>DESIGN ENGINEER : {{$project->getMechanicalEngineer()}},{{$project->getCivilEngineer()}}
+            ,{{$project->getElectricalEngineer()}},{{$project->getInstrumentEngineer()}}</td>
+    </tr>
+    <tr>
+        <td></td>
+    </tr>
+
     <thead>
         <tr>
-            <th rowspan="2" style="background-color: #FFC000" class="text-center-table">Loc/Equip</th>
-            <th rowspan="2" style="background-color: #FFC000">Discipline</th>
-            <th rowspan="2" style="background-color: #FFC000">Work Element</th>
-            <th rowspan="2" style="background-color: #FFC000">Description</th>
-            <th rowspan="2" style="background-color: #FFC000">Work Item</th>
-            <th rowspan="2" style="background-color: #FFC000">Labor Cost (IDR)</th>
-            <th rowspan="2" style="background-color: #FFC000">Tool and Equipment Cost (IDR)</th>
-            <th rowspan="2" style="background-color: #FFC000">Material Cost (IDR)</th>
-            <th rowspan="2" style="background-color: #FFC000">Total Work Cost (IDR)</th>
+            <th rowspan="2" style="background-color: #FFC000">LOC/<br>EQUIP</th>
+            <th rowspan="2" style="background-color: #FFC000">DISCI<br>PLINE</th>
+            <th rowspan="2" style="background-color: #FFC000">WORK<br>ELEMENT</th>
+            <th rowspan="2" style="background-color: #FFC000">DESCRIPTION</th>
+            <th rowspan="2" style="background-color: #FFC000">WORK ITEM</th>
+            <th rowspan="2" style="background-color: #FFC000">LABOR COST (IDR)</th>
+            <th rowspan="2" style="background-color: #FFC000">TOOL AND <br>EQUIPMENT COST (IDR)</th>
+            <th rowspan="2" style="background-color: #FFC000">MATERIAL COST (IDR)</th>
+            <th rowspan="2" style="background-color: #FFC000">TOTAL WORK COST (IDR)</th>
         </tr>
         <tr></tr>
     </thead>
@@ -68,9 +116,9 @@
                 <td></td>
                 <td></td>
                 <td>{{$item?->workItems?->description}}</td>
-                <td>{{number_format($item->labor_cost_total_rate,2,',','.')}}</td>
-                <td>{{number_format($item->tool_unit_rate_total,2,',','.') }}</td>
-                <td>{{number_format($item->material_unit_rate_total,2,',','.')}}</td>
+                <td>{{$workItemController->toCurrency($item->labor_cost_total_rate)}}</td>
+                <td>{{$workItemController->toCurrency($item->tool_unit_rate_total) }}</td>
+                <td>{{$workItemController->toCurrency($item->material_unit_rate_total)}}</td>
             </tr>
             @php($previousLocation = $key)
             @php($previousWbsLevel3 = $item->wbsLevels3->identifier)
@@ -81,7 +129,7 @@
     @php($contigency = $totalCost * (15/100))
         <tr>
             <td style="background-color: #C4BD97">{{chr(64 + sizeof($estimateAllDisciplines) + 1)}}</td>
-            <td style="background-color: #C4BD97"></td>
+            <td style="background-color: #C4BD97"></td>-
             <td style="background-color: #C4BD97"></td>
             <td style="background-color: #C4BD97">CONTINGENCY</td>
             <td style="background-color: #C4BD97"></td>
