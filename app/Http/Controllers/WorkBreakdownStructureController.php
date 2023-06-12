@@ -90,9 +90,31 @@ class WorkBreakdownStructureController extends Controller
         }
 
         try {
-            $this->deleteWbs($project,$request);
-            $this->storeWbs($project,$request);
-            $this->updateEstimateWbs($project,$request);
+              $data = $this->processData($request);
+              $arrIdToDelete = [];
+              foreach($data as $item){
+                  $existing = WbsLevel3::where('identifier',$item->identifier)->where('type',$item->type)->where('discipline',$item->discipline)
+                      ->where('work_element',$item->work_element)->where('project_id',$project->id)->first();
+                  if(!$existing){ // add new if there's a wbs to add
+                      $wbsLevel3 = new WbsLevel3();
+                      $wbsLevel3->type = $item->type;
+                      $wbsLevel3->title = $item->title;
+                      $wbsLevel3->discipline = $item->discipline;
+                      $wbsLevel3->work_element = $item->work_element;
+                      $wbsLevel3->project_id = $project->id;
+                      $wbsLevel3->identifier = $item->identifier;
+                      $wbsLevel3->save();
+                      $arrIdToDelete[] = $wbsLevel3->id;
+                  } else {
+                      $existing->type = $item->type;
+                      $existing->title = $item->title;
+                      $existing->save();
+                      $arrIdToDelete[] = $existing->id;
+                  }
+              }
+
+              WbsLevel3::whereNotIn('id',$arrIdToDelete)->where('project_id',$project->id)->delete(); //delete wbsLevel3 that not exist anymore
+              EstimateAllDiscipline::whereNotIn('wbs_level3_id',$arrIdToDelete)->where('project_id',$project->id)->delete();
 
             $response = [
                 'status' => 200,
@@ -132,7 +154,8 @@ class WorkBreakdownStructureController extends Controller
                         $workElement = $value;
                         $oldWbsId = '';
                         $jsonArray = json_decode($workElement);
-                        if (isset($jsonArray?->value) && isset($jsonArray?->oldWbsId) && (json_last_error() == JSON_ERROR_NONE)) {
+                        if (isset($jsonArray?->value) && isset($jsonArray?->oldWbsId)
+                            && (json_last_error() == JSON_ERROR_NONE)) {
                             $workElement = $jsonArray?->value;
                             $oldWbsId = $jsonArray?->oldWbsId;
                         }
@@ -154,6 +177,12 @@ class WorkBreakdownStructureController extends Controller
         return $arrData;
     }
 
+    /**
+     * Deprecated
+     * @param Project $project
+     * @param Request $request
+     * @return void
+     */
     public function updateEstimateWbs(Project $project, Request $request){
         $data = $this->processData($request);
         $arrayIdEstimate = array();

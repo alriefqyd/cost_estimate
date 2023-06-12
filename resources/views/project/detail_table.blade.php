@@ -84,11 +84,11 @@
     @endforeach
     <tr class="bg-brown font-weight-bold">
         <td colspan="12">CONTINGENCY</td>
-        <td colspan="4">{{number_format($project->getTotalWithContingencyCost(),2,',','.')}}</td>
+        <td colspan="4">{{number_format($project->getContingencyCost(),2,',','.')}}</td>
     </tr>
     <tr class="bg-brown font-weight-bold">
         <td colspan="12" >TOTAL</td>
-        <td colspan="4">{{number_format($project->getTotalCost(),2,',','.')}}</td>
+        <td colspan="4">{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
     </tr>
     </tbody>
 </table>

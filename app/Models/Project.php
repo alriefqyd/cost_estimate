@@ -81,18 +81,24 @@ class Project extends Model
             $total =  $labor + $tool + $material;
             return $total;
         } catch(Exception $e){
-            return '0';
+            return 0;
         }
 
     }
 
-    public function getTotalWithContingencyCost(){
+    public function getContingencyCost(){
         try{
             $total = $this->getTotalCost() * (15/100);
             return $total;
         } catch(Exception $e){
-            return '0';
+            return 0;
         }
+    }
+
+    public function getTotalCostWithContingency(){
+        $total = $this->getTotalCost();
+        $contingency = $this->getContingencyCost();
+        return $total + $contingency;
     }
 
     public function getMechanicalEngineer(){
