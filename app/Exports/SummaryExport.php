@@ -16,26 +16,32 @@ use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 
 class SummaryExport extends AfterSheet implements FromView, WithStyles
 {
-    public function __construct($estimateDisciplines, $project){
+    public function __construct($estimateDisciplines, $project, $costProjects){
         $worksheet = new WorkSheet();
         $this->worksheet = $worksheet;
         $this->size = 100; //temporary
         $this->estimateDiscipline = $estimateDisciplines;
         $this->project = $project;
+        $this->costProject = $costProjects;
     }
 
     public function view(): View
     {
         $estimateAllDisciplines = $this->estimateDiscipline;
+        $costProject = $this->costProject;
         return view('project.excel_table',[
             'project' => $this->project,
-            'estimateAllDisciplines' => $estimateAllDisciplines
+            'estimateAllDisciplines' => $estimateAllDisciplines,
+            'costProject' => $costProject
         ]);
     }
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A2:I5')->applyFromArray([
+        /**
+         * Title
+         */
+        $sheet->getStyle('A2:H5')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'italic' => false,
@@ -46,7 +52,10 @@ class SummaryExport extends AfterSheet implements FromView, WithStyles
             ],
         ]);
 
-        $sheet->getStyle('A13:I14')->applyFromArray([
+        /**
+         * Table Header
+         */
+        $sheet->getStyle('A13:H14')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'italic' => false,
@@ -79,7 +88,7 @@ class SummaryExport extends AfterSheet implements FromView, WithStyles
             ],
         ]);
 
-        $sheet->getStyle('F16:I100')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_IDR);
+        $sheet->getStyle('E15:I100')->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_IDR);
         $sheet->getStyle('A2:D5')->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -90,14 +99,14 @@ class SummaryExport extends AfterSheet implements FromView, WithStyles
                 'vertical' => Alignment::HORIZONTAL_LEFT
             ],
         ]);
-        $sheet->getStyle('A1:I12')
+        $sheet->getStyle('A1:H12')
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
             ->getStartColor()
             ->setRGB('FFFFFF');
 
         // Remove borders for each cell
-        $sheet->getStyle('A1:I11')
+        $sheet->getStyle('A1:H11')
             ->getBorders()
             ->getAllBorders()
             ->setBorderStyle(Border::BORDER_NONE);
@@ -114,13 +123,14 @@ class SummaryExport extends AfterSheet implements FromView, WithStyles
             $sheet->getStyle($cell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
             $sheet->getStyle($cell)->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
         }
+        $sheet->getStyle('H15:H100')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-        $sheet->getColumnDimension('E')->setWidth(60);
+        $sheet->getColumnDimension('E')->setWidth(30);
         $sheet->getColumnDimension('D')->setWidth(40);
-        $sheet->getColumnDimension('F')->setWidth(20);
-        $sheet->getColumnDimension('G')->setWidth(20);
-        $sheet->getColumnDimension('H')->setWidth(20);
-        $sheet->getColumnDimension('I')->setWidth(25);
+        $sheet->getColumnDimension('F')->setWidth(30);
+        $sheet->getColumnDimension('G')->setWidth(30);
+        $sheet->getColumnDimension('H')->setWidth(30);
+        $sheet->getColumnDimension('I')->setWidth(30);
 
         // Enable text wrapping in column A
         $sheet->getStyle('E')->getAlignment()->setWrapText(true);
@@ -132,8 +142,8 @@ class SummaryExport extends AfterSheet implements FromView, WithStyles
 
         $drawing->setWidth(50);
         $drawing->setHeight(50);
-        $drawing->setCoordinates('I2'); // Starting cell for the image
-        $drawing->setOffsetX(10); // Adjust the X offset to position the image within the cell
+        $drawing->setCoordinates('H2'); // Starting cell for the image
+        $drawing->setOffsetX(100); // Adjust the X offset to position the image within the cell
         $drawing->setOffsetY(10); // Adjust the Y offset to position the image within the cell
         $drawing->setWorksheet($sheet);
         $pageSetup = new PageSetup();

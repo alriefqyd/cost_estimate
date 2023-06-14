@@ -91,7 +91,7 @@ class WorkBreakdownStructureController extends Controller
 
         try {
               $data = $this->processData($request);
-              $arrIdToDelete = [];
+              $arrIdNotDelete = [];
               foreach($data as $item){
                   $existing = WbsLevel3::where('identifier',$item->identifier)->where('type',$item->type)->where('discipline',$item->discipline)
                       ->where('work_element',$item->work_element)->where('project_id',$project->id)->first();
@@ -104,17 +104,17 @@ class WorkBreakdownStructureController extends Controller
                       $wbsLevel3->project_id = $project->id;
                       $wbsLevel3->identifier = $item->identifier;
                       $wbsLevel3->save();
-                      $arrIdToDelete[] = $wbsLevel3->id;
+                      $arrIdNotDelete[] = $wbsLevel3->id;
                   } else {
                       $existing->type = $item->type;
                       $existing->title = $item->title;
                       $existing->save();
-                      $arrIdToDelete[] = $existing->id;
+                      $arrIdNotDelete[] = $existing->id;
                   }
               }
 
-              WbsLevel3::whereNotIn('id',$arrIdToDelete)->where('project_id',$project->id)->delete(); //delete wbsLevel3 that not exist anymore
-              EstimateAllDiscipline::whereNotIn('wbs_level3_id',$arrIdToDelete)->where('project_id',$project->id)->delete();
+              WbsLevel3::whereNotIn('id',$arrIdNotDelete)->where('project_id',$project->id)->delete(); //delete wbsLevel3 that not exist anymore
+              EstimateAllDiscipline::whereNotIn('wbs_level3_id',$arrIdNotDelete)->where('project_id',$project->id)->delete();
 
             $response = [
                 'status' => 200,

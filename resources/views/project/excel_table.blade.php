@@ -8,7 +8,7 @@
     </tr>
     <tr>
         <td>
-            DEPARTEMENT ENGINEERING AND CONSTRUCTION - ENGINEERING SERVICE
+            DEPARTMENT ENGINEERING AND CONSTRUCTION - ENGINEERING SERVICE
         </td>
     </tr>
     <tr>
@@ -54,7 +54,7 @@
             <th rowspan="2" style="background-color: #FFC000">DISCI<br>PLINE</th>
             <th rowspan="2" style="background-color: #FFC000">WORK<br>ELEMENT</th>
             <th rowspan="2" style="background-color: #FFC000">DESCRIPTION</th>
-            <th rowspan="2" style="background-color: #FFC000">WORK ITEM</th>
+            {{-- <th rowspan="2" style="background-color: #FFC000">WORK ITEM</th>--}}
             <th rowspan="2" style="background-color: #FFC000">LABOR COST (IDR)</th>
             <th rowspan="2" style="background-color: #FFC000">TOOL AND <br>EQUIPMENT COST (IDR)</th>
             <th rowspan="2" style="background-color: #FFC000">MATERIAL COST (IDR)</th>
@@ -73,8 +73,6 @@
     @php($previousWbsLevel3 = null)
 
     @foreach($estimateAllDisciplines as $key => $value)
-        @php ($totalByWorkElement = $workItemController->sumTotalByLocation($value)['totalWorkCostByElement'])
-        @php ($totalCost += $totalByWorkElement)
         @php($alpha = $idxAlphabet)
         @php($idElement2 = 1)
 
@@ -85,45 +83,53 @@
                     <td style="background-color: #C4BD97">{{$idxAlphabet++}}</td>
                     <td style="background-color: #C4BD97"></td>
                     <td style="background-color: #C4BD97"></td>
-                    <td colspan="5" style="background-color: #C4BD97;font-weight: bold">{{$key}}</td>
-                    <td colspan="" style="background-color: #C4BD97">{{$workItemController->toCurrency($totalByWorkElement)}}</td>
+                    <td colspan="4" style="background-color: #C4BD97;font-weight: bold">{{$key}}</td>
+                    <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost}}</td>
                 </tr>
             @endif
             @php($codeDiscipline = null);
-            @if($item->wbsLevels3->wbsDiscipline->id !== $previousDiscipline
+            @if($item->disciplineTitle !== $previousDiscipline
                 || $key !== $previousLocation)
                 @php($idElement2 = 1)
                 <tr>
-                    <td></td>
-                    <td colspan="">{{$alpha}}.{{$idNum++}}</td>
-                    <td></td>
-                    <td colspan="">{{$item->wbsLevels3->wbsDiscipline->title}}</td>
-                    <td></td>
+                    <td style="background-color: #DDD9C4"></td>
+                    <td style="background-color: #DDD9C4" colspan="">{{$alpha}}.{{$idNum++}}</td>
+                    <td style="background-color: #DDD9C4"></td>
+                    <td style="background-color: #DDD9C4" colspan="">{{$item?->disciplineTitle}}</td>
+                    <td style="background-color: #DDD9C4">{{$costProject[$key]->disciplineLaborCost[$item->disciplineTitle]}}</td>
+                    <td style="background-color: #DDD9C4">{{$costProject[$key]->disciplineToolCost[$item->disciplineTitle]}}</td>
+                    <td style="background-color: #DDD9C4">{{$costProject[$key]->disciplineMaterialCost[$item->disciplineTitle]}}</td>
+                    <td style="background-color: #DDD9C4"></td>
                 </tr>
             @endif
-            @if($item->wbsLevels3->workElements->id !== $previousElement || $key !== $previousLocation)
+            @if($item->workElementTitle !== $previousElement || $key !== $previousLocation)
                 {{$idElement = $idNum - 1}}
                 <tr>
                     <td></td>
                     <td></td>
                     <td>{{$alpha}} . {{$idElement}}. {{$idElement2++}}</td>
-                    <td colspan="">{{$item?->wbsLevels3->workElements?->title}}</td>
+                    <td colspan="">{{$item?->workElementTitle}}</td>
+                    <td>{{$costProject[$key]->elementLaborCost[$item->workElementTitle]}}</td>
+                    <td>{{$costProject[$key]->elementToolCost[$item->workElementTitle]}}</td>
+                    <td>{{$costProject[$key]->elementMaterialCost[$item->workElementTitle]}}</td>
                 </tr>
             @endif
+            {{--
             <tr>
                 <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
-                <td>{{$item?->workItems?->description}}</td>
-                <td>{{$workItemController->toCurrency($item->labor_cost_total_rate)}}</td>
-                <td>{{$workItemController->toCurrency($item->tool_unit_rate_total) }}</td>
-                <td>{{$workItemController->toCurrency($item->material_unit_rate_total)}}</td>
+                <td>{{$item?->workItemDescription}}</td>
+                <td>{{number_format($item->workItemTotalLaborCost,2,'.',',')}}</td>
+                <td>{{number_format($item->workItemTotalToolCost,2,'.',',')}}</td>
+                <td>{{number_format($item->workItemTotalMaterialCost,2,'.',',')}}</td>
             </tr>
+            --}}
             @php($previousLocation = $key)
-            @php($previousWbsLevel3 = $item->wbsLevels3->identifier)
-            @php($previousDiscipline = $item->wbsLevels3->wbsDiscipline->id)
-            @php($previousElement = $item->wbsLevels3->workElements->id)
+            @php($previousWbsLevel3 = $item->identifier)
+            @php($previousDiscipline = $item->disciplineTitle)
+            @php($previousElement = $item->workElementTitle)
         @endforeach
     @endforeach
     @php($contigency = $totalCost * (15/100))
@@ -136,7 +142,6 @@
             <td style="background-color: #C4BD97"></td>
             <td style="background-color: #C4BD97"></td>
             <td style="background-color: #C4BD97"></td>
-            <td style="background-color: #C4BD97">{{$workItemController->toCurrency($contigency)}}</td>
         </tr>
         <tr>
             <td style="background-color: #FFC000">{{chr(64 + sizeof($estimateAllDisciplines) + 2)}}</td>
@@ -147,7 +152,6 @@
             <td style="background-color: #FFC000"></td>
             <td style="background-color: #FFC000"></td>
             <td style="background-color: #FFC000"></td>
-            <td style="background-color: #FFC000">{{$workItemController->toCurrency($totalCost + $contigency)}}</td>
         </tr>
     </tbody>
 </table>

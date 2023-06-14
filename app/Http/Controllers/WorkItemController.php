@@ -525,12 +525,6 @@ class WorkItemController extends Controller
 
     }
 
-    public function getResultCount($value,$factorial){
-        if(!$value) return '';
-        if(!$factorial) $factorial = 1;
-        $newValue = $value * $factorial;
-        return $this->toCurrency($newValue);
-    }
 
     public function removeCurrencyFormat($value){
         if(!$value) return '';
@@ -573,35 +567,6 @@ class WorkItemController extends Controller
     public function removeCommaCurrencyFormat($val){
         if(!$val) return 0;
         return str_replace(',','',$val);
-    }
-
-    /**
-     * Sum total price category by location in project detail page estimate discipline
-     * @return array
-     */
-    public function sumTotalByLocation($estimateDiscipline){
-        $totalPriceLabor = 0;
-        $totalPriceEquipment = 0;
-        $totalPriceMaterial = 0;
-
-        if($estimateDiscipline){
-            foreach($estimateDiscipline as $v){
-                $totalPriceLabor += $v->labor_cost_total_rate;
-                $totalPriceEquipment += $v->tool_unit_rate_total;
-                $totalPriceMaterial += $v->material_unit_rate_total;
-            }
-        }
-
-        $totalWorkCostByElement = $totalPriceLabor + $totalPriceEquipment + $totalPriceMaterial;
-
-        $data = [
-            'totalLaborByWorkElement' => $this->toCurrency($totalPriceLabor),
-            'totalEquipmentByWorkElement' => $this->toCurrency($totalPriceEquipment),
-            'totalMaterialByWorkElement' => $this->toCurrency($totalPriceMaterial),
-            'totalWorkCostByElement' => $totalWorkCostByElement
-        ];
-
-        return $data;
     }
 
     public function getNumChild(WorkItem $workItem, Request $request){

@@ -3,18 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Exports\SummaryExport;
-use App\Models\EstimateAllDiscipline;
-use App\Models\Profile;
 use App\Models\Project;
-use App\Models\Role;
 use App\Models\User;
 use App\Models\WbsLevel3;
-use App\Models\WorkBreakdownStructure;
+use App\Services\ProjectServices;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
@@ -88,6 +85,7 @@ class ProjectController extends Controller
             return redirect('project/'.$project->id);
         } catch(\Exception $e){
             DB::rollBack();
+            log::error($e->getMessage());
             return redirect('project/create')->withErrors($e->getMessage());
         }
     }
@@ -158,6 +156,7 @@ class ProjectController extends Controller
             return redirect('project/'.$project->id);
         } catch (Exception $e) {
             DB::rollBack();
+            log::error($e->getMessage());
             return redirect('project/edit/'.$project->id)->withErrors($e->getMessage());
         }
 
@@ -175,7 +174,9 @@ class ProjectController extends Controller
     }
 
     public function detail(Project $project, Request $request){
-        $estimateDisciplines = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.title');
+        $projectServices = new ProjectServices();
+        $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
+        $costProjects = $projectServices->getAllProjectCost($project, $request);
         $wbs = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$project->id)->get()->groupBy('title');
         //this function is not use temporary
         //$summary = $this->getSummaryCostEstimate($project, $request);
@@ -185,26 +186,13 @@ class ProjectController extends Controller
         return view('project.detail',[
             //'summary' => $summary,
             'project' => $project,
+            'costProject' => $costProjects,
             'wbs' => $wbs,
             'estimateAllDisciplines' => $estimateDisciplines,
             'project_date' => Carbon::parse($project->created_at)->format('d-M-Y'),
         ]);
     }
 
-    public function getEstimateDisciplineByProject(Project $project, Request $request){
-        $data = EstimateAllDiscipline::with(['wbss','wbsLevels3.workElements','workItems.manPowers','workItems.equipmentTools','workItems.materials'])
-            ->when($request->discipline == 'civil', function($q){
-                return $q->where('work_scope','=','civil');
-            })->when($request->discipline == 'mechanical', function($q){
-                return $q->where('work_scope','=','mechanical');
-            })->when($request->discipline == 'electrical', function($q){
-                return $q->where('work_scope','=','electrical');
-            })->when($request->discipline == 'instrument', function($q){
-                return $q->where('work_scope','=','instrument');
-            })->where('project_id',$project->id);
-
-        return $data;
-    }
     public function checkDuplicateProjectNo(Request $request){
         $data = Project::where('project_no',$request->projectNo)->first();
         return response()->json([
@@ -246,8 +234,10 @@ class ProjectController extends Controller
     }
 
     public function export(Project $project, Request $request){
-        $estimateDisciplines = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.title');
-        return Excel::download(new SummaryExport($estimateDisciplines,$project), 'summary.xlsx');
+        $projectServices = new ProjectServices();
+        $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
+        $costProjects = $projectServices->getAllProjectCost($project, $request);
+        return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary.xlsx');
     }
 
     public function message($message, $type, $icon, $status){

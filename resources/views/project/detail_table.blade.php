@@ -39,10 +39,7 @@
     </thead>
     <tbody>
 
-    @php ($totalCost = 0)
     @foreach($estimateAllDisciplines as $key => $value)
-        @php ($totalByWorkElement = $workItemController->sumTotalByLocation($value)['totalWorkCostByElement'])
-        @php ($totalCost += $totalByWorkElement)
         <tr class="font-weight-bold" style="background-color: #c4bd97">
             <td>{{$key}}</td>
             <td></td>
@@ -51,12 +48,12 @@
             <td></td>
             <td></td>
             <td></td>
-            <td>{{$workItemController->sumTotalByLocation($value)['totalLaborByWorkElement']}}</td>
+            <td>{{$costProject[$key]->totalLaborCost}}</td>
             <td></td>
-            <td>{{$workItemController->sumTotalByLocation($value)['totalEquipmentByWorkElement']}}</td>
+            <td>{{$costProject[$key]->totalEquipmentCost}}</td>
             <td></td>
-            <td>{{$workItemController->sumTotalByLocation($value)['totalMaterialByWorkElement']}}</td>
-            <td>{{$workItemController->toCurrency($totalByWorkElement)}}</td>
+            <td>{{$costProject[$key]->totalMaterialCost}}</td>
+            <td>{{number_format($costProject[$key]->totalWorkCost,2,'.',',')}}</td>
             <td></td>
             <td></td>
             <td></td>
@@ -64,21 +61,21 @@
         @foreach($value as $item)
             <tr>
                 <td></td>
-                <td>{{$item->wbsLevels3->wbsDiscipline->title}}</td>
-                <td>{{$item?->wbsLevels3->workElements?->title}}</td>
-                <td>{{$item?->workItems?->description}}</td>
-                <td>{{$item?->volume}}</td>
-                <td>{{$item?->workItems?->unit}}</td>
-                <td>{{$workItemController->getResultCount($item->labor_unit_rate, $item->labour_factorial)}}</td>
-                <td>{{number_format($item->labor_cost_total_rate,2,',','.')}}</td>
-                <td>{{$workItemController->getResultCount($item->tool_unit_rate, $item->equipment_factorial)}}</td>
-                <td>{{number_format($item->tool_unit_rate_total,2,',','.')}}</td>
-                <td>{{$workItemController->getResultCount($item->material_unit_rate,$item->material_factorial) }}</td>
-                <td>{{number_format($item->material_unit_rate_total,2,',','.')}}</td>
+                <td>{{$item->disciplineTitle}}</td>
+                <td>{{$item->workElementTitle}}</td>
+                <td>{{$item->workItemDescription}}</td>
+                <td>{{$item->estimateVolume}}</td>
+                <td>{{$item->workItemUnit}}</td>
+                <td>{{$item->workItemUnitRateLaborCost}}</td>
+                <td>{{number_format($item->workItemTotalLaborCost,2,'.',',')}}</td>
+                <td>{{$item->workItemUnitRateToolCost}}</td>
+                <td>{{number_format($item->workItemTotalToolCost,2,'.',',')}}</td>
+                <td>{{$item->workItemUnitRateMaterialCost}}</td>
+                <td>{{number_format($item->workItemTotalMaterialCost,2,'.',',')}}</td>
                 <td></td>
-                <td>{{$item->labour_factorial}}</td>
-                <td>{{$item->equipment_factorial}}</td>
-                <td>{{$item->material_factorial}}</td>
+                <td>{{$item->workItemLaborFactorial}}</td>
+                <td>{{$item->workItemEquipmentFactorial}}</td>
+                <td>{{$item->workItemMaterialFactorial}}</td>
             </tr>
         @endforeach
     @endforeach

@@ -58,6 +58,9 @@
 </div>
 <div class="row">
     <div class="col-md-12 mt-5 text-end">
+        <a href="/work-item/">
+            <div class="btn js-btn-save-work-item btn-outline-danger">Cancel</div>
+        </a>
         <button class="btn js-btn-save-work-item btn-outline-success">Save</button>
     </div>
 </div>
