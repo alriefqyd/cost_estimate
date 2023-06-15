@@ -107,7 +107,7 @@
                 <tr>
                     <td></td>
                     <td></td>
-                    <td>{{$alpha}} . {{$idElement}}. {{$idElement2++}}</td>
+                    <td>{{$alpha}}.{{$idElement}}.{{$idElement2++}}</td>
                     <td colspan="">{{$item?->workElementTitle}}</td>
                     <td>{{$costProject[$key]->elementLaborCost[$item->workElementTitle]}}</td>
                     <td>{{$costProject[$key]->elementToolCost[$item->workElementTitle]}}</td>
