@@ -163,6 +163,7 @@
                             @if(sizeof($estimateAllDisciplines) > 0)
                                 <a href="/cost-estimate-summary/export/{{$project->id}}">
                                     <button data-id="{{$project->id}}"
+                                        data-name="Cost Estimate - {{$project->project_no}} - {{$project->project_title}}.xlsx"
                                         class="js-download-summary-xlsx btn btn-success mb-3">
                                         <div class="float-start">Download XLSX</div>
                                         <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">

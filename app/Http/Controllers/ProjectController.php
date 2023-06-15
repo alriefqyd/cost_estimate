@@ -237,7 +237,7 @@ class ProjectController extends Controller
         $projectServices = new ProjectServices();
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
-        return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary.xlsx');
+        return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary-export.xlsx');
     }
 
     public function message($message, $type, $icon, $status){
