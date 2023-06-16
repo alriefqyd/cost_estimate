@@ -127,7 +127,7 @@
             </tr>
             --}}
             @php($previousLocation = $key)
-            @php($previousWbsLevel3 = $item->identifier)
+            @php($previousWbsLevel3 = $item->workItemIdentifier)
             @php($previousDiscipline = $item->disciplineTitle)
             @php($previousElement = $item->workElementTitle)
         @endforeach
