@@ -22,6 +22,7 @@ class WbsLevel3 extends Model
         return $this->belongsTo(WorkBreakdownStructure::class,'work_element');
     }
 
+    /** Deprecated */
     public function estimateDisciplines(){
         return $this->hasMany(EstimateAllDiscipline::class,'equipment_location_id','work_element');
     }

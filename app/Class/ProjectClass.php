@@ -4,7 +4,6 @@ namespace App\Class;
 
 class ProjectClass
 {
-    public $identifier;
     public $disciplineTitle;
     public $workElementTitle;
     public $workItemDescription;

@@ -20,8 +20,10 @@ class ProjectController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     *
+     * @param Request $request
+     * @param Project $project
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index(Request $request, Project $project)
     {
@@ -39,8 +41,8 @@ class ProjectController extends Controller
 
     /**
      * Show the form for creating a new resource.
-     *
-     *
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create()
     {
@@ -50,12 +52,14 @@ class ProjectController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request)
     {
+        $projectService = new ProjectServices();
         $this->authorize('create',Project::class);
         $data = $this->validate($request,[
             'project_no' => 'required|unique:projects',
@@ -81,7 +85,7 @@ class ProjectController extends Controller
             ]);
             $project->save();
             DB::commit();
-            $this->message('Data was successfully saved','success','fa fa-check','Success');
+            $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('project/'.$project->id);
         } catch(\Exception $e){
             DB::rollBack();
@@ -127,6 +131,7 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
+        $projectService = new ProjectServices();
         $this->authorize('update',$project);
         $data = $this->validate($request,[
             Rule::unique('projects')->ignore($project->project_no),
@@ -152,7 +157,7 @@ class ProjectController extends Controller
            $project->save();
            DB::commit();
 
-            $this->message('Data was successfully saved','success','fa fa-check','Success');
+            $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('project/'.$project->id);
         } catch (Exception $e) {
             DB::rollBack();
@@ -201,8 +206,9 @@ class ProjectController extends Controller
         ]);
     }
 
+    /** Deprecated */
     public function getSummaryCostEstimate(Project $project, Request $request){
-        $data = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbsLevels3.wbsDiscipline.title');
+        $data = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.wbsDiscipline.title');
         $arrValueManPower = array();
         $arrValueEquipment = array();
         $summaryCollection = array();
@@ -240,10 +246,4 @@ class ProjectController extends Controller
         return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary-export.xlsx');
     }
 
-    public function message($message, $type, $icon, $status){
-        Session::flash('message', $message);
-        Session::flash('type', $type);
-        Session::flash('icon', $icon);
-        Session::flash('status', $status);
-    }
 }

@@ -106,7 +106,7 @@ class EstimateAllDisciplineController extends Controller
     }
 
     public function getExistingWorkItemByWbs($request, $existingWbsLevel3Id){
-        $data = EstimateAllDiscipline::with(['wbss','wbsLevels3.workElements.wbsDiscipline','workItems.materials',
+        $data = EstimateAllDiscipline::with(['wbss.workElements.wbsDiscipline','workItems.materials',
             'workItems.manPowers','workItems.equipmentTools'])
             ->where('wbs_level3_id',$existingWbsLevel3Id )
             ->where('project_id',$request->project_id)->get();

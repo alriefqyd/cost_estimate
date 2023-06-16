@@ -7,17 +7,25 @@ use App\Class\ProjectTotalCostClass;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class ProjectServices
 {
+    /**
+     * Get all data estimate discipline by project id
+     * @param Project $project
+     * @param Request $request
+     * @return mixed
+     */
     public function getEstimateDisciplineByProject(Project $project, Request $request){
         $data = $this->getDataEstimateDiscipline($project,$request);
+//        ['2537','2538','2539','2540','2541'];
         $result = $data->mapToGroups(function ($location) use ($data) {
             $projectClass = new ProjectClass();
             $projectClass->estimateVolume = $location->volume;
-            $projectClass->disciplineTitle = $location?->wbsLevels3?->wbsDiscipline?->title;
-            $projectClass->workItemIdentifier = $location?->wbsLevels3?->identifier;
-            $projectClass->workElementTitle = $location?->wbsLevels3?->workElements?->title;
+            $projectClass->disciplineTitle = $location?->wbss?->wbsDiscipline?->title;
+            $projectClass->workItemIdentifier = $location?->wbss?->identifier;
+            $projectClass->workElementTitle = $location?->wbss?->workElements?->title;
             $projectClass->workItemDescription = $location?->workItems?->description;
             $projectClass->workItemUnit = $location?->workItems?->unit;
             $projectClass->workItemUnitRateLaborCost = $this->getResultCount($location?->labor_unit_rate, $location?->labour_factorial);
@@ -29,16 +37,21 @@ class ProjectServices
             $projectClass->workItemLaborFactorial = $location?->labour_factorial;
             $projectClass->workItemEquipmentFactorial = $location?->equipment_factorial;
             $projectClass->workItemMaterialFactorial = $location?->material_factorial;
-            $projectClass->identifier = $location->wbsLevels3->identifier;
 
             return [
-                $location->wbsLevels3->title => $projectClass,
+                $location->wbss->title => $projectClass,
             ];
         });
 
         return $result;
     }
 
+    /**
+     * Get All cost of Project
+     * @param Project $project
+     * @param Request $request
+     * @return ProjectTotalCostClass
+     */
     public function getAllProjectCost(Project $project, Request $request){
         $data = $this->getEstimateDisciplineByProject($project,$request);
         $projectTotalCost = $this->getProjectTotalCost($data);
@@ -46,7 +59,7 @@ class ProjectServices
     }
 
     public function getDataEstimateDiscipline(Project $project, Request $request){
-        $data = EstimateAllDiscipline::with(['wbss','wbsLevels3.workElements','workItems.manPowers','workItems.equipmentTools','workItems.materials'])
+        $data = EstimateAllDiscipline::with(['wbss.workElements','workItems.manPowers','workItems.equipmentTools','workItems.materials'])
             ->when($request->discipline == 'civil', function($q){
                 return $q->where('work_scope','=','civil');
             })->when($request->discipline == 'mechanical', function($q){
@@ -141,5 +154,12 @@ class ProjectServices
         if(!$factorial) $factorial = 1;
         $newValue = $value * $factorial;
         return $this->toCurrency($newValue);
+    }
+
+    public function message($message, $type, $icon, $status){
+        Session::flash('message', $message);
+        Session::flash('type', $type);
+        Session::flash('icon', $icon);
+        Session::flash('status', $status);
     }
 }
