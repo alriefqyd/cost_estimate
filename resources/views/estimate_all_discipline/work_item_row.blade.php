@@ -43,7 +43,7 @@
                    value="{{$item->estimateVolume ?? ''}}"
                    {{!isset($item) ? 'disabled="disabled"' : '' }}
                    aria-label="Vol">
-            <span class="input-group-text fontjs-vol-result-ajax" style="font-size: 10px">{{isset($item) ? $item->workItemUnit : 'Kg'}}</span>
+            <span class="input-group-text font js-vol-result-ajax" style="font-size: 10px">{{isset($item) ? $item->workItemUnit : 'Kg'}}</span>
         </div>
     </td>
     <td class="min-w-140">
