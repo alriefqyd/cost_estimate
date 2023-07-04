@@ -37,7 +37,10 @@ Route::get('/project/edit/{project:id}',[\App\Http\Controllers\ProjectController
 Route::get('/project/{project:id}/discipline/{discipline}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth');
 //Route::get('/cost-estimate/project/detail',[\App\Http\Controllers\CostEstimateController::class,'detail'])->middleware('auth');
 Route::get('/project/{project:id}/work-item/create',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth');
-Route::get('/getExistingWorkItemByWbs',[\App\Http\Controllers\EstimateAllDisciplineController::class,'setExistingWorkItemByWbs'])->middleware('auth');
+/**
+ * Deprecated
+ */
+//Route::get('/getExistingWorkItemByWbs',[\App\Http\Controllers\EstimateAllDisciplineController::class,'setExistingWorkItemByWbs'])->middleware('auth');
 
 Route::get('/project/{project:id}/wbs/create',[\App\Http\Controllers\WorkBreakdownStructureController::class,'create'])->middleware('auth');
 Route::get('/project/{project:id}/wbs/edit',[\App\Http\Controllers\WorkBreakdownStructureController::class,'edit'])->middleware('auth');
@@ -131,6 +134,9 @@ Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'updat
 
 Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
 
+/**
+ * Request by AJAX
+ */
 Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
 Route::get('/getNumChild/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChild'])->name('getNumChild')->middleware('auth');
 Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getMaterial'])->name('getMaterial')->middleware('auth');
@@ -138,5 +144,6 @@ Route::get('/getToolsEquipment',[\App\Http\Controllers\EquipmentToolsController:
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');
 Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'checkDuplicateProjectNo'])->name('checkDuplicateProjectNo')->middleware('auth');
 Route::get('/dumpingRole',[\App\Http\Controllers\RoleController::class,'dumpingData'])->name('dumpingData')->middleware('auth');
+Route::get('/getDetailWorkItem',[\App\Http\Controllers\WorkItemController::class,'getDetail'])->name('dumpingData')->middleware('auth');
 
 

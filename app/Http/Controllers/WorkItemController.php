@@ -432,6 +432,7 @@ class WorkItemController extends Controller
                 $totalRateManPowers = $this->getTotalRateManPowers($manPowers);
                 $totalRateEquipments = $this->getTotalRateEquipments($equipmentTools);
                 $totalRateMaterials = $this->getTotalRateMaterials($materials);
+                $totalRateWorkItem = (float) $totalRateManPowers + (float) $totalRateEquipments + (float) $totalRateMaterials;
 
                 $children[] = array(
                     "id" => $subItems->id,
@@ -440,12 +441,16 @@ class WorkItemController extends Controller
                     "text" => $subItems->description,
                     "vol" => $subItems->unit,
                     "manPowers" => $manPowersArr,
-                    "manPowersTotalRate" => $totalRateManPowers,
+                    "manPowersTotalRate" => $this->toCurrency($totalRateManPowers),
+                    "manPowersTotalRateInt" => $totalRateManPowers,
                     "equipmentTools" => $equipmentToolsArr,
-                    "equipmentToolsRate" => $totalRateEquipments,
+                    "equipmentToolsRate" => $this->toCurrency($totalRateEquipments),
+                    "equipmentToolsRateInt" => $totalRateEquipments,
                     "materials" => $materialsArr,
-                    "materialsRate" => $totalRateMaterials,
-
+                    "materialsRate" => $this->toCurrency($totalRateMaterials),
+                    "materialsRateInt" => $totalRateMaterials,
+                    "totalWorkItemRate" => $totalRateWorkItem,
+                    "totalWorkItemRateStr" => number_format($totalRateWorkItem,2)
                 );
             }
 
@@ -539,7 +544,7 @@ class WorkItemController extends Controller
             return $tot;
         })->all();
 
-        return $this->toCurrency(array_sum($data));
+        return array_sum($data);
     }
 
     public function getTotalRateEquipments($value){
@@ -550,7 +555,7 @@ class WorkItemController extends Controller
             return $tot;
         })->all();
 
-        return $this->toCurrency(array_sum($data));
+        return array_sum($data);
     }
 
     public function getTotalRateMaterials($value){
@@ -561,10 +566,10 @@ class WorkItemController extends Controller
             return $tot;
         })->all();
 
-        return $this->toCurrency(array_sum($data));
+        return array_sum($data);
     }
 
-    public function removeCommaCurrencyFormat($val){
+        public function removeCommaCurrencyFormat($val){
         if(!$val) return 0;
         return str_replace(',','',$val);
     }
@@ -591,7 +596,68 @@ class WorkItemController extends Controller
         ]);
     }
 
-    public function sumTotalByDiscipline(){
+    public function getDetail(Request $request){
+        $data = WorkItem::with(['equipmentTools:id,description,unit,quantity,local_rate',
+            'materials:id,tool_equipment_description,unit,quantity,rate',
+            'manPowers:id,title,basic_rate_month,overall_rate_hourly'])
+            ->select('work_items.id')
+            ->where('id', $request->id)
+            ->first();
+
+
+        if(isset($data)){
+            $manPower = $data->manPowers?->map(function($mp){
+                return [
+                    'id' => $mp->id,
+                    'title' => $mp->title,
+                    'basic_rate_month' => $mp->basic_rate_month,
+                    'overall_rate_hourly' => number_format($mp->overall_rate_hourly,2,',','.'),
+                    'labor_unit' => $mp->pivot->labor_unit,
+                    'labor_coefisient' => number_format((float) $mp->pivot->labor_coefisient,2),
+                    'amount' => number_format($mp->pivot->amount,2,'.',',')
+                ];
+            });
+
+            $equipment = $data->equipmentTools?->map(function($mp){
+                return [
+                    'id' => $mp->id,
+                    'description' => $mp->description,
+                    'unit' => $mp->unit,
+                    'quantity' => number_format($mp->pivot->quantity,2),
+                    'local_rate' => number_format($mp->local_rate,2),
+                    'amount' => number_format($mp->pivot->amount,2,'.',',')
+                ];
+            });
+
+            $material = $data->materials?->map(function($mp){
+               return [
+                   'id' => $mp->id,
+                   'description' => $mp->tool_equipment_description,
+                   'unit' => $mp->unit,
+                   'quantity' => number_format($mp->pivot->quantity,2),
+                   'rate' => number_format($mp->rate,2),
+                   'amount' => number_format($mp->pivot->amount,2,'.',',')
+               ];
+            });
+
+
+
+            return response()->json([
+                'data' => [
+                    'manPower' => $manPower,
+                    'equipment' => $equipment,
+                    'material' => $material
+                ],
+
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'status' => 500
+            ]);
+        }
+
+
 
     }
 

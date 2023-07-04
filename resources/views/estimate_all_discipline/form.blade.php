@@ -1,139 +1,117 @@
-<div class="card">
-    <div class="card-body">
-        <div class="row js-row-work-breakdown-work-item">
-            <div class="col-md-4">
-                <h6>Level 1 Location/Equipment</h6>
-                <div class="mb-3 col-md-10 mb-2">
-                    <div style="height: 3px; background-color: #24695c "></div>
-                </div>
-                <div class="form-group">
-                    <select class="select2 form-control js-select-level1" data-id="{{$project?->id}}" data-placeholder="Select WBS Level 1">
-                        <option></option>
-                        @foreach($wbsLevel3 as $key => $wbs)
-                            <option value="{{$wbs->first()->identifier}}">{{$key}}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4 js-level2-checkbox ">
-                <h6>Level 2 Discipline</h6>
-                <div class="mb-3 col-md-10 mb-2">
-                    <div style="height: 3px; background-color: #24695c "></div>
-                </div>
-                <div class="form-group">
-                    <select class="select2 form-control js-select-level2"
-                            data-placeholder="Select WBS Level 2"
-                            data-id="{{$project?->id}}">
-                        <option></option>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-4 js-level3-checkbox">
-                <h6>Level 3 Work Element</h6>
-                <div class="mb-3 col-md-10 mb-2">
-                    <div style="height: 3px; background-color: #24695c "></div>
-                </div>
-                <div class="form-group">
-                    <select class="select2 form-control js-select-level3" data-id="{{$project->id}}" data-placeholder="Select WBS Level 3">
-                        <option></option>
-                    </select>
-                </div>
+<div class="row mb-5">
+    <div class="col-md-12">
+        <div class="card mb-1 pb-2">
+            <div class="card-body p-0">
+                <form method="post"
+                      class="js-form-estimate-discipline"
+                      data-method="post"
+                      data-id="{{$project?->id}}"
+                      action="">
+                        @csrf
+                    <div class="col-sm-12 col-lg-12 col-xl-12">
+                        <div class="table-responsive ">
+                            <table class="table table-bordered js-table-work-item-item js-font-sm">
+                                <thead class="bg-primary">
+                                    <tr>
+                                        <th scope="col" class="text-left min-w-200">Loc/Equip</th>
+                                        <th scope="col" class="text-left min-w-250">Discipline</th>
+                                        <th scope="col" class="text-left min-w-250">Work Element</th>
+                                        <th scope="col" class="text-left min-w-400">Work Item</th>
+                                        <th scope="col" class="text-left min-w-75">Vol</th>
+                                        <th scope="col" class="text-left min-w-120">Man Power Cost</th>
+                                        <th scope="col" class="text-left min-w-120">Equipment Cost</th>
+                                        <th scope="col" class="text-left min-w-120">Material Cost</th>
+                                        <th scope="col" class="text-left min-w-100">Labor Fac</th>
+                                        <th scope="col" class="text-left min-w-100">Equip Fac</th>
+                                        <th scope="col" class="text-left min-w-100">Material Fac</th>
+                                        <th scope="col" class="text-left min-w-50">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="js-table-body-work-item-item">
+                                @php($previousWorkElement = null)
+                                @foreach($estimateAllDiscipline as $key => $discipline)
+                                    <tr class="js-column-location" style="background-color: #C5C5C7D0">
+                                        <td class="min-w-100">
+                                            <span class="float-start">
+                                                    {{ucwords(strtolower($key))}}
+                                                </span>
+                                            <div class="d-inline-block float-end">
+                                                <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
+                                                <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
+                                            </div>
+                                        </td>
+                                        <td colspan="10"></td>
+                                        <td></td>
+                                    </tr>
+                                    @foreach($discipline as $k => $workElement)
+                                        <tr class="js-column-discipline" style="background-color: #DEDEDED0">
+                                            <td></td>
+                                            <td class="min-w-100 js-discipline">
+                                                <span class="float-start">
+                                                    {{ucwords(strtolower($k))}}
+                                                </span>
+                                                <div class="d-inline-block float-end">
+                                                    <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
+                                                    <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
+                                                </div>
+                                            </td>
+                                            <td colspan="9"></td>
+                                            <td></td>
+                                        </tr>
+                                        @foreach($workElement as $a => $b)
+                                            @if($a !== $previousWorkElement)
+                                                <tr class="js-column-work-element" style="background-color: #EFEFEFD0">
+                                                    <td></td>
+                                                    <td>
+
+                                                    </td>
+                                                    <td class="min-w-170">
+                                                        <div>
+                                                            <span class="float-start js-text-work-element">
+                                                                {{ucwords(strtolower($a))}}
+                                                            </span>
+                                                            <div class="d-inline-block float-end">
+                                                                <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
+                                                                <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
+                                                                <i class="fa fa-plus-circle cursor-pointer font-success
+                                                                js-add-work-item-element"
+                                                                data-id="{{isset($b?->id) ? $b->id : $b[0]->wbs_level3_id}}" data-work-element="{{isset($b?->work_element) ? $b->work_element : $b[0]->work_element_id}}"></i>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td colspan="8"></td>
+                                                    <td></td>
+                                                </tr>
+                                            @endif
+
+                                            @foreach($b as $item)
+                                                @if(isset($item->workItemId))
+                                                    @include('estimate_all_discipline.work_item_row', ['item' => $item])
+                                                @endif
+                                            @endforeach
+                                            @php($previousWorkElement = $a)
+
+                                        @endforeach
+                                    @endforeach
+                                @endforeach
+                                </tbody>
+                            </table>
+                            <div class="js-modal-detail-estimate-template"></div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
-
-<div class="card js-card-section-work-item d-none" data-id="{{$project?->id}}">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-10">
-                <label>Work Item</label>
-                <select class="select2 js-select-work-items"
-                        data-url="/getWorkItems"
-                        style="max-width: 100% !important;">
-                </select>
-            </div>
-            <div class="col-md-2 js-column-vol">
-                <label>Volume</label>
-                <div class="input-group">
-                    <input class="form-control js-input-vol" style="height:40px" type="text" placeholder="Vol"
-                           aria-label="Vol">
-                    <span class="input-group-text js-vol-result-ajax">Kg</span>
-                </div>
-            </div>
-            <div class="col-md-4 mt-3">
-                <label>Labor Factorial</label>
-                <input class="form-control js-input-labor_factorial" type="number">
-            </div>
-            <div class="col-md-4 mt-3">
-                <label>Equipment Factorial</label>
-                <input class="form-control js-input-equipment_factorial" type="number">
-            </div>
-            <div class="col-md-4 mt-3">
-                <label>Material Factorial</label>
-                <input class="form-control js-input-material_factorial" type="number" >
-            </div>
-            <div class="col-md-4 mt-3">
-                <label>Labours Unit Price (Rp)</label>
-                <input type="text" class="form-control js-labour-unit-price-preview" disabled="disabled">
-            </div>
-            <div class="col-md-4 mt-3">
-                <label>Equipment Tools Unit Price (Rp)</label>
-                <input type="text" class="form-control js-equipment-unit-price-preview" disabled="disabled">
-            </div>
-            <div class="col-md-4 mt-3">
-                <label>Materials Unit Price (Rp)</label>
-                <input type="text" class="form-control js-material-unit-price-preview" disabled="disabled">
-            </div>
-            <div class="col-md-12 mt-3">
-                <div class="float-end text-12 cursor-pointer js-add-work-item">
-                    <i class="fa fa-plus-circle"></i> Add new work item
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12 m-t-40">
-                <div class="table-responsive mb-2" style="table-layout: auto">
-                    <table class="table table-striped js-work-item-table d-none">
-                        <thead>
-                        <tr>
-                            <th class="text-center min-w-300">Work Item</th>
-                            <th class="text-center min-w-100">Vol</th>
-                            <th class="text-center min-w-200" style="">
-                                Labour
-                            </th>
-                            <th class="text-center min-w-200" style="">
-                                Tool And Equipment
-                            </th>
-                            <th class="text-center min-w-200" style="">
-                                Material
-                            </th>
-                            <th class="text-center min-w-150" style="">
-                                Labor Factorial
-                            </th>
-                            <th class="text-center min-w-160" style="">
-                                Equipment Factorial
-                            </th>
-                            <th class="text-center min-w-150" style="">
-                                Material Factorial
-                            </th>
-                            <th class="text-center" style="width: 15%">Action</th>
-                        </tr>
-                        </thead>
-                        <tbody class="js-body-work-item-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<div class="row mb-5">
+    <div class="col-md-12">
+        <div class="float-end">
+            <button class="btn btn-primary js-save-estimate-discipline" >Save As Draft</button>
+            <button class="btn btn-primary js-save-estimate-discipline" >Publish</button>
         </div>
     </div>
 </div>
-
-<div class="mb-5 float-end">
-    <button class="btn btn-primary js-save-estimate-discipline d-none" >Save As Draft</button>
-    <button class="btn btn-primary js-save-estimate-discipline d-none" >Publish</button>
-</div>
-@include('estimate_all_discipline.modal_detail')
 
 
 

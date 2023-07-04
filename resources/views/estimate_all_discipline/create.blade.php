@@ -34,12 +34,8 @@
                     @endforeach
                 </div>
             @endif
-
-            <div class="col-sm-12">
-                @include('estimate_all_discipline.form')
-            </div>
-
         </div>
+        @include('estimate_all_discipline.form')
     </div>
 @endsection
 <!-- Container-fluid Ends-->

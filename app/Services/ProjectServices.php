@@ -19,7 +19,6 @@ class ProjectServices
      */
     public function getEstimateDisciplineByProject(Project $project, Request $request){
         $data = $this->getDataEstimateDiscipline($project,$request);
-//        ['2537','2538','2539','2540','2541'];
         $result = $data->mapToGroups(function ($location) use ($data) {
             $projectClass = new ProjectClass();
             $projectClass->estimateVolume = $location->volume;
@@ -27,6 +26,7 @@ class ProjectServices
             $projectClass->workItemIdentifier = $location?->wbss?->identifier;
             $projectClass->workElementTitle = $location?->wbss?->workElements?->title;
             $projectClass->workItemDescription = $location?->workItems?->description;
+            $projectClass->workItemId = $location?->workItems?->id;
             $projectClass->workItemUnit = $location?->workItems?->unit;
             $projectClass->workItemUnitRateLaborCost = $this->getResultCount($location?->labor_unit_rate, $location?->labour_factorial);
             $projectClass->workItemTotalLaborCost = (float) $location?->labor_cost_total_rate;
@@ -37,6 +37,8 @@ class ProjectServices
             $projectClass->workItemLaborFactorial = $location?->labour_factorial;
             $projectClass->workItemEquipmentFactorial = $location?->equipment_factorial;
             $projectClass->workItemMaterialFactorial = $location?->material_factorial;
+            $projectClass->workItemTotalCostStr = number_format($this->getTotalCostWorkItem($location),2);
+            $projectClass->workItemTotalCost = $this->getTotalCostWorkItem($location);
 
             return [
                 $location->wbss->title => $projectClass,
@@ -144,6 +146,18 @@ class ProjectServices
     }
 
 
+    public function getTotalCostWorkItem($location){
+        $labor_factorial = $location?->labour_factorial ?: 1;
+        $tool_factorial = $location?->tool_factorial ?: 1;
+        $material_factorial = $location?->material_factorial ?: 1;
+        $man_power_cost = (float) $location?->labor_unit_rate * $labor_factorial;
+        $tool_cost = (float) $location?->tool_unit_rate * $tool_factorial;
+        $material_cost = (float) $location?->material_unit_rate * $material_factorial;
+        $totalWorkItemCost = $man_power_cost +  $tool_cost + $material_cost;
+        $totalWorkItemCost = $totalWorkItemCost * $location->volume;
+
+        return $totalWorkItemCost;
+    }
     public function toCurrency($val){
         if(!$val) return '';
         return number_format($val, 2);
