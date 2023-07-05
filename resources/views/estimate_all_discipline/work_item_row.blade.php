@@ -77,7 +77,7 @@
         </span>
         <span class="float-end">
             <i class="fa fa-exclamation-circle cursor-pointer
-            {{isset($item) && $item->workItemTotalMaterialCost > 0 ? 'd-block' : 'd-none'}}
+            {{isset($item) && $item->workItemUnitRateTotalMaterialCost > 0 ? 'd-block' : 'd-none'}}
             js-open-modal-detail js-work-item-material-cost-modal"
                data-id="{{$item->workItemId ?? ''}}"></i>
         </span>
