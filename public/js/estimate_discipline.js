@@ -130,7 +130,7 @@ $(function(){
             var _tool_unit_rate_total = _parent.find('.js-work-item-equipment-cost').text();
             var _tool_unit_rate = _parent.find('.js-select-work-items').attr('data-cost-tools');
             var _material_unit_rate = _parent.find('.js-select-work-items').attr('data-cost-material');
-            var _material_unit_rate_total = _parent.find('.js-work-item-equipment.cost').text();
+            var _material_unit_rate_total = _parent.find('.js-work-item-material-cost').text();
             _labor_cost_total_rate = removeBlankSpace(_labor_cost_total_rate)
             _tool_unit_rate_total = removeBlankSpace(_tool_unit_rate_total)
             _material_unit_rate_total = removeBlankSpace(_material_unit_rate_total)
@@ -139,8 +139,6 @@ $(function(){
             _labor_cost_total_rate = removeCurrency(_labor_cost_total_rate)
             _tool_unit_rate_total = removeCurrency(_tool_unit_rate_total)
             _material_unit_rate_total = removeCurrency(_material_unit_rate_total)
-            // var _equipment_unit_price = _totalRateEquipment;
-            // var _materials_unit_price = _totalRateMaterial;
 
             var _data = {
                 "idx": generateId(),
@@ -165,7 +163,7 @@ $(function(){
             }
             _array_estimate_disciplines.push(_data);
         })
-        console.log(_project_id);
+
         var _data = {
             'work_items' : _array_estimate_disciplines,
             'project_id' : _project_id,

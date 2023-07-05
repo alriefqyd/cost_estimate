@@ -159,7 +159,7 @@ class ProjectServices
         return $totalWorkItemCost;
     }
     public function toCurrency($val){
-        if(!$val) return '';
+        if(!$val) return 0.00;
         return number_format($val, 2);
     }
 
