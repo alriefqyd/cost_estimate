@@ -36,7 +36,6 @@ Route::get('/project/{project:id}',[\App\Http\Controllers\ProjectController::cla
 Route::get('/project/edit/{project:id}',[\App\Http\Controllers\ProjectController::class,'edit'])->middleware('auth');
 Route::get('/project/{project:id}/discipline/{discipline}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth');
 //Route::get('/cost-estimate/project/detail',[\App\Http\Controllers\CostEstimateController::class,'detail'])->middleware('auth');
-Route::get('/project/{project:id}/work-item/create',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth');
 /**
  * Deprecated
  */
@@ -132,8 +131,6 @@ Route::post('/user',[\App\Http\Controllers\UserController::class,'store'])->midd
 Route::get('/user/{user:id}',[\App\Http\Controllers\UserController::class,'edit'])->middleware('auth')->can('viewAny',User::class);
 Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'update'])->middleware('auth');
 
-Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
-
 /**
  * Request by AJAX
  */
@@ -145,5 +142,6 @@ Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getU
 Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'checkDuplicateProjectNo'])->name('checkDuplicateProjectNo')->middleware('auth');
 Route::get('/dumpingRole',[\App\Http\Controllers\RoleController::class,'dumpingData'])->name('dumpingData')->middleware('auth');
 Route::get('/getDetailWorkItem',[\App\Http\Controllers\WorkItemController::class,'getDetail'])->name('dumpingData')->middleware('auth');
+Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
 
 

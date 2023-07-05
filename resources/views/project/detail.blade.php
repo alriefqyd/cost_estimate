@@ -148,7 +148,7 @@
                             </div>
                             <div class="col-md-6">
                                 @canAny(['create','update'], App\Models\EstimateAllDiscipline::class)
-                                    <a href="/project/{{$project->id}}/work-item/create">
+                                    <a href="/project/{{$project->id}}/estimate-discipline/create">
                                         <button class="btn btn-outline-primary float-end m-r-10" type="button">
                                             {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
                                         </button>
@@ -172,9 +172,7 @@
                                     </button>
                                 </a>
                             @endif
-                            <div class="table-responsive table-striped">
-                                @include('project.detail_table')
-                            </div>
+                            @include('project.detail_table')
                         </div>
                     </div>
                 </div>

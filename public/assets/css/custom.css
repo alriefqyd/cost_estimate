@@ -303,6 +303,11 @@
     display:inline-block;
     animation:loadingspinner .7s linear infinite;
 }
+
+.text-align-right {
+    text-align: right !important;
+}
+
 @keyframes loadingspinner{
     0%{
         transform:rotate(0deg)
