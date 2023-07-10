@@ -89,6 +89,7 @@ class ProjectController extends Controller
                 'design_engineer_civil' => $request->design_engineer_civil,
                 'design_engineer_electrical' => $request->design_engineer_electrical,
                 'design_engineer_instrument' => $request->design_engineer_instrument,
+                'status' => 'DRAFT'
             ]);
             $project->save();
             DB::commit();
@@ -160,6 +161,7 @@ class ProjectController extends Controller
            $project->design_engineer_civil = $request->design_engineer_civil;
            $project->design_engineer_electrical = $request->design_engineer_electrical;
            $project->design_engineer_instrument = $request->design_engineer_instrument;
+           $project->status = $request->status ?? 'DRAFT';
 
            $project->save();
            DB::commit();
