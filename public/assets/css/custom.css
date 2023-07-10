@@ -68,16 +68,18 @@
 }
 
 .text-12 {
-    font-size: 12px;
+    font-size: 12px !important;
 }
 
 .text-10 {
-    font-size: 10px;
+    font-size: 10px !important;
 }
 
 .text-20 {
     font-size: 20px;
 }
+
+
 
 .centering {
     margin: auto;
@@ -232,6 +234,17 @@
     right: 10px;
 }
 
+.card-body-custom {
+    padding-left:0.1rem !important;
+    padding-right:0.1rem !important;
+    padding-top: 0.1rem; !important;
+    padding-bottom: 0.1rem; !important;
+}
+
+.table-small-text tr td {
+    font-size: 12.2px;
+}
+
 .checkbox label {
     margin-top: -20px !important;
 }
@@ -307,6 +320,89 @@
 .text-align-right {
     text-align: right !important;
 }
+
+.mr-4 {
+    margin-right: 1rem;
+}
+
+.mr-5 {
+    margin-right: 1.25rem;
+}
+
+.mr-6 {
+    margin-right: 1.50rem;
+}
+
+.text-small {
+    font-size: 11px;
+}
+
+.margin-sm {
+    margin-bottom: 0.3rem;
+}
+
+.margin-05 {
+    margin-bottom: 0.5rem;
+}
+
+.tooltip-text {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.nav-link:hover .tooltip-text {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media screen and (max-width:1199px) {
+    .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav{
+        top : 65px !important;
+    }
+}
+
+.page-wrapper .page-main-header .main-header-right .main-header-left .toggle-sidebar {
+    visibility: visible;
+    color: #24695c;
+}
+
+@media screen and (max-width: 976px){
+    .page-wrapper .page-main-header .main-header-right .main-header-left {
+        padding : 5px 30px 5px 10px
+    }
+
+    .page-wrapper .page-main-header .main-header-right .main-header-left .toggle-sidebar {
+        visibility: visible;
+    }
+}
+
+@media screen and (max-width: 972px){
+    .page-wrapper.compact-wrapper .page-main-header.close_icon {
+        height:80px;
+    }
+
+    .page-wrapper .page-main-header .main-header-right .main-header-left {
+        height : 80px;
+    }
+
+    .page-wrapper .page-main-header .main-header-right .main-header-left {
+
+    }
+    .page-wrapper .page-main-header .main-header-right .main-header-left .img-fluid {
+        max-width: 80px !important;
+    }
+}
+
 
 @keyframes loadingspinner{
     0%{

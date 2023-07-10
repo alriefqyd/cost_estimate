@@ -82,9 +82,6 @@ $(function(){
 
         _this.val(_val)
         if(e.which === 44 || e.which === 45) return true
-        // if(!_val.match(/[\d,]+\.\d+/)){
-        //     console.log('false')
-        // }
     })
 
     function currencyFormat(_value){

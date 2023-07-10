@@ -204,7 +204,6 @@ $(function(){
     });
 
     $(document).on('change keyup','.js-input-labor_factorial, .js-input-equipment_factorial, .js-input-material_factorial', function(){
-        console.log('change');
         var _this = $(this);
         countTotalWorkItem(_this, workItemSelected);
     });

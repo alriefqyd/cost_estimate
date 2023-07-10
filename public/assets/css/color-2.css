@@ -4294,13 +4294,14 @@ table tbody .border-bottom-warning td {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  box-shadow: 0 0 20px rgba(25, 124, 207, 0.08) !important;
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
   -webkit-transition: 0.5s;
   transition: 0.5s;
   background-color: #fff;
-  -webkit-box-shadow: 0 0 20px rgba(25, 124, 207, 0.08);
+  -webkit-box-shadow: 0 0 20px rgba(25, 124, 207, 0.08);cus
           box-shadow: 0 0 20px rgba(25, 124, 207, 0.08); }
   .page-wrapper .page-main-header.open {
     margin-left: 0;

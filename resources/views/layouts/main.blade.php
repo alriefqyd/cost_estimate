@@ -27,14 +27,15 @@
 <!-- latest jquery-->
 <script src="{{asset('/assets/js/jquery-3.6.0.min.js')}}"></script>
 <!-- feather icon js-->
-{{--<script src="{{'/assets/js/icons/feather-icon/feather.min.js'}}"></script>--}}
-{{--<script src="{{'/assets/js/icons/feather-icon/feather-icon.js'}}"></script>--}}
+<script src="{{'/assets/js/icons/feather-icon/feather.min.js'}}"></script>
+<script src="{{'/assets/js/icons/feather-icon/feather-icon.js'}}"></script>
 <!-- Sidebar jquery-->
 <script src="{{'/assets/js/sidebar-menu.js'}}"></script>
 <script src="{{'/assets/js/config.js'}}"></script>
 <!-- Bootstrap js-->
 <script src="{{'/assets/js/bootstrap/popper.min.js'}}"></script>
 <script src="{{'/assets/js/bootstrap/bootstrap.min.js'}}"></script>
+<script src="{{'/assets/js/tooltip-init.js'}}"></script>
 <!-- Plugins JS start-->
 <script src="{{asset('/assets/bootstrap-duallistbox/dist/jquery.bootstrap-duallistbox.min.js')}}"></script>
 <script src="{{'/assets/js/chart/chartist/chartist.js'}}"></script>

@@ -150,7 +150,6 @@ class SummaryExport extends AfterSheet implements FromView, WithStyles
 
         // Set the page setup options
         $pageSetup->setFitToPage(true); // Fit the content to a single page
-//        $pageSetup->setPrintArea('A1:K20');
         $pageSetup->setFitToHeight(0); // Disable fitting to page height
         $pageSetup->setFitToWidth(1); // Fit the content to the page width
         $pageSetup->setOrientation(PageSetup::ORIENTATION_LANDSCAPE); // Set the page orientation to landscape

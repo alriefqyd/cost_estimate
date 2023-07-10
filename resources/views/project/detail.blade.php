@@ -40,7 +40,7 @@
                         </div>
                     </div>
                     <div class="card-body card-body-custom">
-                        <div class="col-sm-10 float-start">
+                        <div class="col-sm-10 float-start" style="margin-left: 20px!important">
                             <p class="font-weight-600-height-7">Date : {{$project_date}} </p>
                             <p class="font-weight-600-height-7">Project No : {{$project->project_no}} </p>
                             <p class="font-weight-600-height-7">Project Title : {{$project->project_title}} </p>

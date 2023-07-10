@@ -28,7 +28,7 @@ $(function () {
   var uploadedImageName = 'cropped.jpg';
   var uploadedImageType = 'image/jpeg';
   var uploadedImageURL;
-  $('[data-bs-toggle="tooltip"]').tooltip();
+  // $('[data-bs-toggle="tooltip"]').tooltip();
   $image.on({
     ready: function (e) {
       console.log(e.type);

@@ -244,8 +244,8 @@ input:focus {
             transform: none; } }
 
 .setting-primary, .setting-secondary, .setting-white {
-  width: 32px;
-  height: 32px;
+  width: 50px !important;
+  height: 50px !important;
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -4287,24 +4287,24 @@ table tbody .border-bottom-warning td {
     z-index: 1; }
 
 /*======= Page Header css Start ======= */
+/*======= Page Header css Start ======= */
 .page-wrapper .page-main-header {
-  position: fixed;
-  top: 0;
-  z-index: 9;
-  width: 100%;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-transition: 0.5s;
-  transition: 0.5s;
-  background-color: #FFFFFF;
-  /*-webkit-box-shadow: 0 0 20px rgba(25, 124, 207, 0.08);*/
-  /*        box-shadow: 0 0 20px rgba(25, 124, 207, 0.08); */
-  }
-  .page-wrapper .page-main-header.open {
+    position: fixed;
+    top: 0;
+    z-index: 9;
+    width: 100%;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-transition: 0.5s;
+    transition: 0.5s;
+    background-color: #fff;
+    -webkit-box-shadow: 0 0 20px rgba(25, 124, 207, 0.08);
+    box-shadow: 0 0 20px rgba(25, 124, 207, 0.08); }
+.page-wrapper .page-main-header.open {
     margin-left: 0;
     width: 100%;
     -webkit-transition: 0.5s;
@@ -4369,7 +4369,8 @@ table tbody .border-bottom-warning td {
       display: -webkit-box;
       display: -ms-flexbox;
       display: flex;
-      width: 265px;
+      width: 115px;
+        height:75px;
         background-color: #ffffff;
       -webkit-box-pack: justify;
           -ms-flex-pack: justify;
@@ -4377,7 +4378,7 @@ table tbody .border-bottom-warning td {
       -webkit-box-align: center;
           -ms-flex-align: center;
               align-items: center;
-      padding: 24px 40px;
+      padding: 0px;
       border-right: 1px solid #e6edef; }
       .page-main-header .main-header-right .main-header-left .dark-logo-wrapper {
         display: none; }
@@ -5165,7 +5166,7 @@ table tbody .border-bottom-warning td {
     line-height: inherit;
     background: #fff;
     border-right: 1px solid #e6edef;
-    width: 265px;
+    width: 115px;
     text-align: left;
     -webkit-transition: 0.3s ease;
     transition: 0.3s ease; }
@@ -5250,7 +5251,8 @@ table tbody .border-bottom-warning td {
       display: none; }
     .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .nav-menu {
       border-radius: 0;
-      height: calc(100vh - 355px);
+      /*height: auto;*/
+      height: calc(100vh - 140px);
       left: -300px;
       z-index: 99;
       -webkit-transition: color 1s ease;
@@ -5308,11 +5310,11 @@ table tbody .border-bottom-warning td {
         display: block;
         float: none;
         width: 100%;
-        padding: 0 20px; }
+        padding: 0 13px; }
         .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .nav-menu > li span {
           font-weight: 500; }
         .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .nav-menu > li a {
-          padding: 10px 15px;
+          /*padding: 10px 15px;*/
           position: relative;
           color: #222222; }
           .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .nav-menu > li a svg {
@@ -5337,7 +5339,7 @@ table tbody .border-bottom-warning td {
           position: relative !important;
           display: none; }
           .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .nav-menu > li .nav-submenu > li a {
-            padding-left: 45px !important;
+            /*padding-left: 45px !important;*/
             font-weight: 400; }
           .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .nav-menu > li .nav-submenu .submenu-title .according-menu {
             top: 8px; }
@@ -5357,8 +5359,8 @@ table tbody .border-bottom-warning td {
               .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .nav-menu > li .nav-submenu li .nav-sub-childmenu li a:after {
                 display: none; }
           .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav .main-navbar .nav-menu > li .nav-submenu li a {
-            padding: 8px 25px;
-            font-size: 13px;
+            padding: 8px 9px;
+            font-size: 16px;
             color: #717171;
             display: block;
             position: relative;
@@ -5450,8 +5452,8 @@ table tbody .border-bottom-warning td {
       padding-left: 5px;
       text-transform: uppercase; }
   .page-wrapper.compact-wrapper .page-body-wrapper .page-body {
-    padding-top: 30px;
-    margin-left: 265px; }
+    padding-top: 40px;
+    margin-left: 115px; }
   .page-wrapper.compact-sidebar.compact-wrapper .page-body-wrapper .according-menu {
     display: none !important; }
   .page-wrapper.compact-sidebar.compact-wrapper .page-body-wrapper header.main-nav {
@@ -5747,7 +5749,7 @@ table tbody .border-bottom-warning td {
     06. Button CSS start
 ==========================**/
 .btn {
-  font-size: 14px;
+  font-size: 12px;
   padding: 0.375rem 1.75rem;
   font-weight: 500; }
 
@@ -16340,7 +16342,7 @@ footer {
   padding: 15px;
   bottom: 0;
   left: 0;
-  margin-left: 265px; }
+  margin-left: 115px; }
   footer a {
     font-weight: 500; }
   footer.footer-starter-kit {
@@ -27307,8 +27309,8 @@ span.twitter-typeahead .tt-suggestion {
       .dashboard-default-sec .setting-list .setting-option li:first-child i.icon-angle-double-right {
         font-size: 12px; }
     .dashboard-default-sec .setting-list .setting-primary, .dashboard-default-sec .setting-list .setting-secondary, .dashboard-default-sec .setting-list .setting-white {
-      width: 25px;
-      height: 25px; }
+      width: 50px !important;
+      height: 50px !important; }
   .dashboard-default-sec .profile-greeting h3 {
     font-size: 22px; }
   .dashboard-default-sec .profile-greeting p {
@@ -27634,8 +27636,8 @@ span.twitter-typeahead .tt-suggestion {
 
 @media screen and (min-width: 1200px) and (max-width: 1500px) {
   .dashboard-2-main .setting-primary, .dashboard-2-main .setting-secondary, .dashboard-2-main .setting-white {
-    width: 25px;
-    height: 25px; }
+    width: 50px; !important;
+    height: 50px; !important}
   .dashboard-2-main .setting-list .setting-option {
     width: 25px;
     height: 25px; }
