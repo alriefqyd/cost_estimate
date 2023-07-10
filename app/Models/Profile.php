@@ -35,7 +35,8 @@ class Profile extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getPosition(){
+    public function getPosition(): string
+    {
         return Profile::POSITION[$this->position];
     }
 

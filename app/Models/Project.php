@@ -40,11 +40,24 @@ class Project extends Model
         return $this->hasMany(WbsLevel3::class,'project_id');
     }
 
-    public function scopeFilter($query, array $filters){
-        $query->when($filters['q'] ?? false, fn($query, $q) =>
-        $query->where('project_title','like','%'.$q.'%')
-            ->orWhere('project_no','like','%'.$q.'%')
-        );
+    public function scopeFilter($query, array $filters, $isCount){
+
+        $query->when($filters['status'] ?? false, function ($query, $status) use ($isCount) {
+            if($isCount) $query->where('status', $status);
+        })->when($filters['q'] ?? false, function ($query, $q) {
+                $query->where(function ($query) use ($q) {
+                    $query->where('project_title', 'like', '%' . $q . '%')
+                        ->orWhere('project_no', 'like', '%' . $q . '%');
+                });
+            })->when($filters['mechanical'] ?? false, function($query, $q){
+                $query->where('design_engineer_mechanical',$q);
+        })->when($filters['civil'] ?? false, function($query, $q){
+            $query->where('design_engineer_civil',$q);
+        })->when($filters['electrical'] ?? false, function($query, $q){
+            $query->where('design_engineer_electrical',$q);
+        })->when($filters['instrument'] ?? false, function($query, $q){
+            $query->where('design_engineer_instrument',$q);
+        });
     }
 
     public function projectWbsLevel3(){

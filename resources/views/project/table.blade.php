@@ -36,6 +36,7 @@
                     <td class="min-w-120">
                         <a href="/project/{{$project->id}}" class="font-weight-bold">{{$project->project_no}}</a>
                         <br> {{$project->project_title}}
+                        <br> {{$project->status}}
                     </td>
                     <td>{{$project->project_sponsor}}</td>
                     <td>{{$project->project_manager}}</td>

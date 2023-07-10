@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\SummaryExport;
 use App\Models\Project;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\WbsLevel3;
 use App\Services\ProjectServices;
@@ -27,15 +28,21 @@ class ProjectController extends Controller
      */
     public function index(Request $request, Project $project)
     {
-        $order = $request->order;
-        $sort =  $request->sort;
-
+        $projectService = new ProjectServices();
+        $civilEngineerList = $projectService->getDataEngineer('design_civil_engineer');
+        $mechanicalEngineerList = $projectService->getDataEngineer('design_mechanical_engineer');
+        $electricalEngineerList = $projectService->getDataEngineer('design_electrical_engineer');
+        $instrumentEngineerList = $projectService->getDataEngineer('design_instrument_engineer');
         $this->authorize('viewAny', Project::class);
-        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
-            ->access()->filter(request(['q']))->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
-
+        $projectList = $projectService->getProjectsData($request)['projectList'];
         return view('project.index',[
-            'projects' => $projects
+            'projects' => $projectList,
+            'projectDraft' => $projectService->getProjectsData($request)['draft'],
+            'projectPublish' => $projectService->getProjectsData($request)['publish'],
+            'civilEngineerList' => $civilEngineerList,
+            'mechanicalEngineerList' => $mechanicalEngineerList,
+            'electricalEngineerList' => $electricalEngineerList,
+            'instrumentEngineerList' => $instrumentEngineerList,
         ]);
     }
 

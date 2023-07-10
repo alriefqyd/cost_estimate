@@ -6,11 +6,34 @@ use App\Class\ProjectClass;
 use App\Class\ProjectTotalCostClass;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 class ProjectServices
 {
+    public function getProjectsData(Request $request){
+        $order = $request->order;
+        $sort =  $request->sort;
+
+        $requestFilter = request(['q','status','civil','mechanical','electrical','instrument']);
+
+        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
+            ->access();
+
+        $countDraft = clone $projects;
+        $countPublish = clone $projects;
+
+        $projectList = $projects->filter($requestFilter, true)->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
+        $countDraft = $countDraft->filter($requestFilter,false)->where('status','DRAFT')->count();
+        $countPublish = $countPublish->filter($requestFilter,false)->where('status','PUBLISH')->count();
+
+        return [
+            'projectList' => $projectList,
+            'draft' => $countDraft,
+            'publish' => $countPublish
+        ];
+    }
     /**
      * Get all data estimate discipline by project id
      * @param Project $project
@@ -157,6 +180,12 @@ class ProjectServices
         $totalWorkItemCost = $totalWorkItemCost * $location->volume;
 
         return $totalWorkItemCost;
+    }
+
+    public function getDataEngineer($subject){
+        return User::with('profiles')->whereHas('profiles', function ($q) use ($subject) {
+            return $q->where('position', $subject);
+        })->get();
     }
     public function toCurrency($val){
         if(!$val) return 0.00;

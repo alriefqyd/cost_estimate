@@ -32,13 +32,15 @@
                     <form class="js-form-project-search" method="get" action="/project">
                         <div class="row margin-05">
                             <div class="col-md-3 mb-1-responsive">
-                                <select class="select2 col-sm-12"
+                                <select class="select2 col-sm-12 js-search-form"
+                                        name="sponsor"
                                         data-placeholder="Project Sponsor">
                                     <option>Process Plant</option>
+                                    <option>Utilities</option>
                                 </select>
                             </div>
                             <div class="col-md-4">
-                                <input type="text" name="q" value="{{request()->q}}" placeholder="Project No/Project Name" class="form-control" style="height: 40px">
+                                <input type="text" name="q" value="{{request()->q}}" placeholder="Project No/Project Name" class="form-control js-search-form" style="height: 40px">
                             </div>
                             {{--<div class="col-md-2 mb-1" >
                                 <button class="btn btn-outline-success btn btn-search-project" style="height: 40px">Search <i class="fa fa-search"></i></button>
@@ -46,35 +48,56 @@
                         </div>
                         <div class="row mb-2">
                             <div class="col-md-2 mb-1-responsive">
-                                <select class="select2 col-sm-12"
+                                <select class="select2 col-sm-12 js-search-form"
+                                        name="mechanical"
                                         data-placeholder="Mechanical">
-                                    <option>Mechanical Engineer</option>
+                                    <option disabled selected></option>
+                                    @foreach($mechanicalEngineerList as $data)
+                                        <option value="{{$data->id}}" {{request()->mechanical == $data->id ? 'selected' : ''}}>{{$data->profiles->full_name}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-2 mb-1 mb-1-responsive">
-                                <select class="select2 col-sm-12"
+                                <select class="select2 col-sm-12 js-search-form"
+                                        name="civil"
                                         data-placeholder="Civil">
-                                    <option>Civil Engineer</option>
+                                    <option disabled selected></option>
+                                    @foreach($civilEngineerList as $civil)
+                                        <option value="{{$civil->id}}" {{request()->civil == $civil->id ? 'selected' : ''}}>{{$civil->profiles->full_name}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-2 mb-1-responsive">
-                                <select class="select2 col-sm-12"
+                                <select class="select2 col-sm-12 js-search-form"
+                                        name="electrical"
                                         data-placeholder="Electrical">
-                                    <option>Electrical Engineer</option>
+                                    <option disabled selected></option>
+                                    @foreach($electricalEngineerList as $data)
+                                        <option value="{{$data->id}}" {{request()->electrical == $data->id ? 'selected' : ''}}>{{$data->profiles->full_name}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-2 mb-1-responsive">
-                                <select class="select2 col-sm-12"
+                                <select class="select2 col-sm-12 js-search-form"
+                                        name="instrument"
                                         data-placeholder="Instrument">
-                                    <option>Instrument Engineer</option>
+                                    <option disabled selected></option>
+                                    @foreach($instrumentEngineerList as $data)
+                                        <option value="{{$data->id}}" {{request()->instrument == $data->id ? 'selected' : ''}}>{{$data->profiles->full_name}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-3">
                                 <div class="btn-group btn-group-square" role="group" aria-label="Basic example">
-                                    <button class="btn btn-outline-light txt-dark active" type="button">Draft (90)</button>
-                                    <button class="btn btn-outline-light txt-dark" type="button">Publish (101)</button>
+                                    <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
+                                    <button class="btn btn-outline-light txt-dark {{request()->status == 'DRAFT' ? 'active' : ''}} js-btn-status" data-value="DRAFT" type="button">
+                                        Draft ({{$projectDraft}})
+                                    </button>
+                                    <button class="btn btn-outline-light txt-dark {{request()->status == 'PUBLISH' ? 'active' : ''}} js-btn-status" data-value="PUBLISH" type="button">
+                                        Publish ({{$projectPublish}})
+                                    </button>
                                 </div>
                             </div>
                         </div>
