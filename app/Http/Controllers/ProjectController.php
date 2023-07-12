@@ -38,7 +38,7 @@ class ProjectController extends Controller
         return view('project.index',[
             'projects' => $projectList,
             'projectDraft' => $projectService->getProjectsData($request)['draft'],
-            'projectPublish' => $projectService->getProjectsData($request)['publish'],
+            'projectApprove' => $projectService->getProjectsData($request)['approve'],
             'civilEngineerList' => $civilEngineerList,
             'mechanicalEngineerList' => $mechanicalEngineerList,
             'electricalEngineerList' => $electricalEngineerList,
@@ -89,7 +89,7 @@ class ProjectController extends Controller
                 'design_engineer_civil' => $request->design_engineer_civil,
                 'design_engineer_electrical' => $request->design_engineer_electrical,
                 'design_engineer_instrument' => $request->design_engineer_instrument,
-                'status' => 'DRAFT'
+                'status' => Project::DRAFT
             ]);
             $project->save();
             DB::commit();
@@ -161,7 +161,7 @@ class ProjectController extends Controller
            $project->design_engineer_civil = $request->design_engineer_civil;
            $project->design_engineer_electrical = $request->design_engineer_electrical;
            $project->design_engineer_instrument = $request->design_engineer_instrument;
-           $project->status = $request->status ?? 'DRAFT';
+           $project->status = $request->status ?? Project::DRAFT;
 
            $project->save();
            DB::commit();
@@ -192,13 +192,9 @@ class ProjectController extends Controller
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
         $wbs = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$project->id)->get()->groupBy('title');
-        //this function is not use temporary
-        //$summary = $this->getSummaryCostEstimate($project, $request);
-
         $this->authorize('view',$project);
 
         return view('project.detail',[
-            //'summary' => $summary,
             'project' => $project,
             'costProject' => $costProjects,
             'wbs' => $wbs,
@@ -253,6 +249,26 @@ class ProjectController extends Controller
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
         return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary-export.xlsx');
+    }
+
+    public function updateStatus(Project $project){
+        try{
+            DB::beginTransaction();
+            $project->status = Project::APPROVE;
+            $project->save();
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Project successfully approved',
+                'data' => Project::APPROVE
+            ]);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
 }

@@ -12,6 +12,28 @@ class Project extends Model
     protected $guarded = ['id'];
 
 
+    const APPROVE = 'APPROVE';
+    const DRAFT = 'DRAFT';
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            if (!in_array($model->status, self::getStatuses())) {
+                throw new \InvalidArgumentException('Invalid status value.');
+            }
+        });
+    }
+
+    public static function getStatuses()
+    {
+        return [
+            self::DRAFT,
+            self::APPROVE,
+        ];
+    }
+
     public function estimateAllDisciplines(){
         return $this->hasMany(EstimateAllDiscipline::class,'project_id');
     }
@@ -106,6 +128,11 @@ class Project extends Model
         } catch(Exception $e){
             return 0;
         }
+    }
+
+    public function isReviewer(){
+        return $this->project_manager == auth()->user()?->id
+            || $this->project_engineer == auth()->user()?->id;
     }
 
     public function getTotalCostWithContingency(){

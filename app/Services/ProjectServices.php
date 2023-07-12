@@ -22,16 +22,16 @@ class ProjectServices
             ->access();
 
         $countDraft = clone $projects;
-        $countPublish = clone $projects;
+        $countApprove = clone $projects;
 
         $projectList = $projects->filter($requestFilter, true)->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
-        $countDraft = $countDraft->filter($requestFilter,false)->where('status','DRAFT')->count();
-        $countPublish = $countPublish->filter($requestFilter,false)->where('status','PUBLISH')->count();
+        $countDraft = $countDraft->filter($requestFilter,false)->where('status',Project::DRAFT)->count();
+        $countApprove = $countApprove->filter($requestFilter,false)->where('status',Project::APPROVE)->count();
 
         return [
             'projectList' => $projectList,
             'draft' => $countDraft,
-            'publish' => $countPublish
+            'approve' => $countApprove
         ];
     }
     /**
