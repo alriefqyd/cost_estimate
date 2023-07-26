@@ -4,7 +4,7 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-12">
-                    <h3>Tools Equipment</h3>
+                    <h4>Tools Equipment</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                         <li class="breadcrumb-item">Tools Equipment list</li>

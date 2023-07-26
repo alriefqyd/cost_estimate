@@ -212,6 +212,87 @@
     @include('estimate_all_discipline.work_item_row')
 </script>
 
+<script id="js-template-nestable-wbs" type="x-tmpl-mustache">
+    @include('work_breakdown_structure.nestable_form')
+</script>
+
+<script id="js-template-location-nestable-wbs" type="x-tmpl-mustache">
+         <li class="dd-item" data-id="@{{ text }}">
+             <div class="dd-handle">
+                <div class="float-start col-md-10">
+                    @{{ text }}
+                </div>
+                <div class="float-end">
+                    <span class="js-add-new-nestable-wbs" data-is-element="false">
+                       <i data-feather="plus-circle"></i>
+                    </span>
+                    <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                        <i data-feather="x"></i>
+                    </span>
+                </div>
+             </div>
+
+            @{{#dataList}}
+             <ol class="dd-list js-get-idx" data-idx="2">
+                <li class="dd-item" data-id="@{{id}}">
+                    <div class="dd-handle">
+                        <div class="float-start col-md-10 js-dd-handle-edit">
+                            <span class="js-dd-title">@{{title}}</span>
+                        </div>
+                        <div class="float-end">
+                            <span class="js-add-new-nestable-wbs" data-is-element="true">
+                                <i data-feather="plus-circle"></i>
+                            </span>
+
+                            <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                                <i data-feather="x"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <span class="js-dd-select d-none">
+                        <select class="select2 js-select-update-discipline">
+                        @{{#dataList}}
+                          <option value="@{{ id }}">@{{ title }}</option>
+                        @{{ /dataList }}
+                        </select>
+                    </span>
+                </li>
+            </ol>
+            @{{/dataList}}
+         </li>
+
+</script>
+
+<script id="js-template-sub-nestable" type="x-templ-mustache">
+   <ol class="dd-list js-get-idx" data-idx="2">
+        <li class="dd-item" data-id="@{{id}}">
+            <div class="dd-handle">
+                <div class="float-start col-md-10 js-dd-handle-edit">
+                    <span class="js-dd-title">@{{ text }}</span>
+                </div>
+                <div class="float-end">
+                    @{{ #showButton }}
+                        <span class="js-add-new-nestable-wbs" data-is-element="true">
+                            <i data-feather="plus-circle"></i>
+                        </span>
+                    @{{ /showButton }}
+
+                    <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                        <i data-feather="x"></i>
+                    </span>
+                </div>
+            </div>
+            <span class="js-dd-select d-none">
+                <select class="select2 js-select-update-discipline">
+                    @{{#dataList}}
+                      <option value="@{{ id }}">@{{ title }}</option>
+                    @{{ /dataList }}
+                </select>
+            </span>
+        </li>
+   </ol>
+</script>
+
 <script id="js-template-modal-detail-estimate" type="x-templ-mustache">
     <div class="modal fade js-modal-detail-estimate" id="workItemDetailModal"
     data-backdrop="static" data-keyboard="false"

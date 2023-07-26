@@ -48,5 +48,6 @@
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/responsive.css')}}">
 <!-- Responsive css-->
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/custom.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/css/nestable.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/select2.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/bootstrap-duallistbox/dist/bootstrap-duallistbox.min.css')}}">

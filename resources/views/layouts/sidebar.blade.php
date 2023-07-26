@@ -1,7 +1,7 @@
 <!-- Page Sidebar Start-->
 <header class="main-nav">
     <nav>
-        <div class="main-navbar mt-5">
+        <div class="main-navbar mt-1">
             <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
             <div id="mainnav">
                 <ul class="nav-menu custom-scrollbar">

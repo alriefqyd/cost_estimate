@@ -56,7 +56,6 @@ Route::post('/workElement/{project:id}',[\App\Http\Controllers\WorkElementContro
 Route::get('/getWorkItems',[\App\Http\Controllers\WorkItemController::class,'setWorkItems'])->name('getWorkItem')->middleware('auth');
 Route::get('/getWorkElement',[\App\Http\Controllers\WorkElementController::class,'setWorkElements'])->name('getWorkElement');
 Route::get('/getItemAdditional/{type}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getItemAdditional'])->name('getItemAdditional');
-Route::get('/getWbsLevel2',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel2'])->middleware('auth');
 Route::get('/getWbsLevel3',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel3'])->middleware('auth');
 
 Route::get('/work-item/',[\App\Http\Controllers\WorkItemController::class,'index'])->middleware('auth');
@@ -120,7 +119,6 @@ Route::get('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsCon
 Route::get('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'editWorkElement'])->middleware('auth');
 Route::put('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'update'])->middleware('auth');
 Route::put('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'updateWorkElement'])->middleware('auth');
-Route::post('/work-breakdown-structure/',[\App\Http\Controllers\settingWbsController::class,'store'])->middleware('auth');
 Route::post('/work-breakdown-structure/work-element',[\App\Http\Controllers\settingWbsController::class,'storeWorkElement'])->middleware('auth');
 Route::post('/work-breakdown-structure/',[\App\Http\Controllers\settingWbsController::class,'store'])->middleware('auth');
 Route::delete('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'delete'])->middleware('auth');
@@ -144,5 +142,7 @@ Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'ch
 Route::get('/dumpingRole',[\App\Http\Controllers\RoleController::class,'dumpingData'])->name('dumpingData')->middleware('auth');
 Route::get('/getDetailWorkItem',[\App\Http\Controllers\WorkItemController::class,'getDetail'])->name('dumpingData')->middleware('auth');
 Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
+Route::get('/getDisciplineList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getDisciplineList'])->middleware('auth');
+Route::get('/getWorkElementList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWorkElementList'])->middleware('auth');
 
 

@@ -27,6 +27,9 @@
                     <th scope="col" class="text-left min-w-100">
                         Total Cost  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
                     </th>
+                    <th class="text-left min-w-100">
+                        Status
+                    </th>
                     {{--<th scope="col" class="text-left min-w-50">Date</th>--}}
                 </tr>
             </thead>
@@ -36,7 +39,6 @@
                     <td class="min-w-120">
                         <a href="/project/{{$project->id}}" class="font-weight-bold">{{$project->project_no}}</a>
                         <br> {{$project->project_title}}
-                        <br> {{$project->status}}
                     </td>
                     <td>{{$project->project_sponsor}}</td>
                     <td>{{$project->project_manager}}</td>
@@ -45,9 +47,8 @@
                     <td>{{$project->designEngineerElectrical?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerInstrument?->profiles?->full_name}}</td>
                     <td>{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
-                    {{--<td>{{$project?->created_at}}</td>--}}
+                    <td>{{$project->status}}</td>
                 </tr>
-
             @endforeach
             </tbody>
         </table>

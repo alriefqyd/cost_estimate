@@ -6,7 +6,7 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3>Material</h3>
+                    <h4>Material</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="">Home</a></li>
                         <li class="breadcrumb-item active">Material list</li>

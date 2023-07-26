@@ -1,16 +1,17 @@
+@php use App\Models\Project @endphp
 @extends('layouts.main')
 @section('main')
 <div class="container-fluid">
     <div class="page-header">
         <div class="row">
             <div class="col-sm-6">
-                <h4>Project Management</h4>
+                <h4>Project Management </h4>
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                     <li class="breadcrumb-item active">project list</li>
                 </ol>
             </div>
-            @can('create', App\Models\Project::class)
+            @can('create', Project::class)
                 <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
                     <div class="select2-drpdwn-product select-options d-inline-block">
                         <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/project/create"> Create New Cost Estimate</a>
@@ -89,15 +90,14 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-3">
-                                <div class="btn-group btn-group-square" role="group" aria-label="Basic example">
+                            <div class="col-md-6">
+                                <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                     <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
-                                    <button class="btn btn-outline-light txt-dark {{request()->status == 'DRAFT' ? 'active' : ''}} js-btn-status" data-value="DRAFT" type="button">
-                                        Draft ({{$projectDraft}})
-                                    </button>
-                                    <button class="btn btn-outline-light txt-dark {{request()->status == 'PUBLISH' ? 'active' : ''}} js-btn-status" data-value="PUBLISH" type="button">
-                                        Publish ({{$projectPublish}})
-                                    </button>
+                                    @foreach(Project::getStatuses() as $status)
+                                        <button class="btn btn-outline-light txt-dark {{request()->status == $status ? 'active' : ''}} js-btn-status" data-value="{{$status}}" type="button">
+                                            {{$status}} ({{$status == Project::DRAFT ? $projectDraft : $projectApprove}})
+                                        </button>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>

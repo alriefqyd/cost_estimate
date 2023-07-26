@@ -169,4 +169,56 @@ $(function(){
 
     });
 
+    var _count = 0;
+    $('.js-select-project-to-review').each(function(){
+        var _this = $(this);
+        var arrId = [];
+        _this.on('change',function(){
+            if($(this).is(':checked')){
+                _count+=1;
+            } else {
+                _count-=1;
+            }
+
+            $('.js-select-to-reviewed').text(_count);
+
+            if(_count > 0) {
+                $('.js-btn-to-review').removeAttr('disabled');
+            } else {
+                $('.js-btn-to-review').attr('disabled','disabled');
+            }
+        });
+    });
+
+    $('.js-select-all-project-to-review').on('change',function(){
+        var _this = $(this);
+        var _checkbox =  $('.js-select-project-to-review');
+        if(_this.is(':checked')){
+            _checkbox.attr('checked','checked');
+            var _countAll =_checkbox.length;
+            $('.js-select-to-reviewed').text(_countAll);
+        } else {
+            $('.js-select-to-reviewed').text('0');
+            _checkbox.removeAttr('checked');
+        }
+    });
+
+    $('.dd .js-add-new-nestable-wbs').on('mousedown', function (event){
+        event.preventDefault();
+        return false;
+    })
+
+    $('.dd .js-delete-wbs-discipline').on('mousedown', function (event){
+        event.preventDefault();
+        return false;
+    })
+
+    function reverse(character){
+        var _length = character.length
+        var _temp = '';
+        for(var i=_length; i>=0; i--){
+            _temp = _temp + character.charAt(i)
+        }
+        return character === _temp
+    }
 });

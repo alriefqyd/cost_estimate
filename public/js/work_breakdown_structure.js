@@ -99,56 +99,38 @@ $(function(){
     }
 
     $(document).on('click','.js-form-list-location-submit',function (e){
-        e.preventDefault()
-        var _this = $(this)
-        var _item_parent = $('.js-card-items-wbs-level-3')
-        var jsonObj = [];
-        var url = $('.js-form-wbs-estimate-discipline').data('url')
-        var id = $('.js-form-wbs-estimate-discipline').data('id')
-
-        _this.find('.loader-34').removeClass('d-none');
-        _this.attr('disabled','disabled')
-        $.each(_item_parent,function (index,value){
-            var __this = $(this);
-            var __type = __this.find('.js-wbs-l3-type')
-            var __title = __this.find('.js-wbs-l3-location_equipment-title')
-            var __identifier = __this.find('.js-wbs-l3-identifier')
-            var __discipline = __this.find('.js-wbs-l3-discipline')
-            var arrDiscipline = []
-            var arrWorkElement = []
-
-            $.each(__discipline,function (index,value){
-                var ___this = $(this)
-                var ___work_element = ___this.closest('.js-form-row-discipline').find('.js-wbs-l3-work_element')
-                var itemDiscipline = {}
-                itemDiscipline['id'] = ___this.val();
-                itemDiscipline['work_element'] = ___work_element.val().length > 0 ? ___work_element.val() : ['null'];
-                arrDiscipline.push(itemDiscipline)
-            })
-
-            var item = {}
-            item['title'] = __title.val();
-            item['identifier'] = __identifier.val();
-            item['type'] = __type.val();
-            item['discipline'] = arrDiscipline
-
-            jsonObj.push(item)
-
-        })
+        $('.js-modal-loading-wbs').modal('show');
+        e.preventDefault();
+        var _nestable = $('.dd');
+        _nestable.nestable({
+            data: function (item, source){
+                var additionalData = {
+                    identifier:source.data('identifier')
+                };
+                return additionalData;
+            }
+        });
+        var _data = _nestable.nestable('serialize');
+        var url = $('.js-form-wbs-estimate-discipline').data('url');
+        var id = $('.js-form-wbs-estimate-discipline').data('id');
 
         $.ajax({
             type:'post',
             url: url,
-            data : {wbs:jsonObj},
+            data : {wbs:_data},
             success:function(result){
+                console.log(result);
                 if(result.status === 200){
-                    notification('success',result.message)
+                    $('.js-modal-loading-wbs').modal('hide');
+                    notification('success',result.message);
                     // return false
                     setTimeout(function (){
-                        window.location.href = '/project/' + id
-                    },2000)
+                        window.location.href = '/project/' + id;
+                    },2000);
                 } else {
-                    notification('danger',result.message,'fa fa-cross','Error')
+                    console.log(result.message);
+                    $('.js-modal-loading-wbs').modal('hide');
+                    notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error')
                 }
             }
         })
@@ -165,9 +147,6 @@ $(function(){
         $(this).siblings('.js-chev-hide-content').removeClass('d-none');
         $(this).closest('.card').find('.card-body').removeClass('d-none');
     })
-    /** Deprecated */
-
-    /** /Deprecated */
 
     //add work item
     var _table_item = 0;
@@ -313,6 +292,172 @@ $(function(){
         _amount.text(toCurrency(_totalAmount));
     })
 
+    $('.js-add-btn-wbs').on('click', function(){
+        var _modal_loading = $('.js-modal-loading-wbs');
+        var _data_discipline = ''
+        var _template_discipline = $('#js-template-nestable-wbs').html();
+        var _template_location = $('#js-template-location-nestable-wbs').html();
+        var _location_form = $('.js-form-location');
+
+        _modal_loading.modal('show');
+
+        Mustache.parse(_template_location);
+
+        $.ajax({
+            url : '/getDisciplineList',
+            type : 'GET',
+            data : {'isMustache':true},
+            success : function(result){
+                if(result.status === 200){
+                    _data_discipline = result.data
+                    var _data = {
+                        'text' : _location_form.val(),
+                        'child' : 'js-add-discipline',
+                        'dataList':_data_discipline
+                    }
+                    $('.dd-empty').remove();
+                    var _temp_location = Mustache.render(_template_location,_data)
+                    $('.js-nestable-wbs').append(_temp_location)
+
+
+                    feather.replace()
+                    $('.select2').select2()
+                    _location_form.val('')
+                } else {
+                    notification('danger','cannot get data discipline','fa fa-exclamation','Error')
+                }
+            },
+            complete: function() {
+                // Hide loading modal after AJAX request is complete
+                $('#modal-loading').modal('hide');
+            }
+        })
+    })
+
+    $(document).on('click','.js-add-new-nestable-wbs',function(){
+        var _this = $(this);
+        var _template = $('#js-template-sub-nestable').html();
+        var _parent = _this.closest('.dd-item');
+        var _url = '/getDisciplineList';
+        var _text = 'Select Discipline'
+        var _discipline = '';
+        var _showButton = true
+        var _modal_loading = $('.js-modal-loading-wbs');
+
+        _modal_loading.modal('show');
+
+        if(_this.attr('data-is-element') === 'true'){
+            _url =  '/getWorkElementList';
+            _text = 'Select Work Element'
+            _discipline = _parent.attr('data-id');
+            _showButton = false;
+        }
+
+        Mustache.parse(_template);
+        $.ajax({
+            url : _url,
+            type : 'GET',
+            data : {
+                'isMustache':true,
+                'discipline': _discipline
+            },
+            success : function(result){
+                if(result.status === 200){
+                    var _data = {
+                        'dataList':result.data,
+                        'text' : _text,
+                        'showButton':_showButton
+                    }
+                    var _temp = Mustache.render(_template,_data)
+                    _parent.append(_temp)
+                    $('.select2').select2();
+                    feather.replace()
+                } else {
+                    notification('danger','cannot get data discipline','fa fa-exclamation','Error')
+                }
+            },
+            complete: function() {
+                // Hide loading modal after AJAX request is complete
+                $('.js-modal-loading-wbs').modal('hide');
+            }
+        })
+    });
+
+    $(document).on('click','.js-add-discipline', function(){
+        var _this = $(this)
+        var _el = $(this).closest('.js-nestable-wbs')
+
+
+        var _template_location = $('#js-template-location-nestable-wbs').html();
+        Mustache.parse(_template_location);
+
+
+        var _data = {
+            'text' : 'New',
+            'child' : 'js-add-discipline',
+            'disciplines' : _data_discipline,
+        }
+
+        var _temp_location = Mustache.render(_template_location,_data)
+        _el.append(_temp_location)
+
+        feather.replace()
+
+    });
+
+    $(document).on('click','.js-delete-wbs-discipline',function(){
+        var _this = $(this);
+        var _parent = _this.closest('li')
+        _parent.remove();
+    });
+
+    $(document).on('change','.js-select-update-wbs',function(){
+        var _this = $(this);
+    })
+
+    $(document).on('click','.js-dd-title',function(){
+        var _this = $(this);
+        var _parent = _this.closest('.dd-item');
+        _parent.find('.dd-handle').first().addClass('d-none');
+        _parent.find('.js-dd-select').first().removeClass('d-none')
+    })
+
+    $(document).on('click','.js-dd-title-element',function(e){
+        var _this = $(this);
+        var _select2 = _this.closest('li').find('.js-select-element')
+        var _val = _this.closest('.js-get-idx').find('.js-select-update-element').val()
+        _select2.select2({
+            placeholder: "Please Select Work Element",
+            allowClear: true,
+            width: '100%',
+            ajax: {
+                url: '/getWorkElement',
+                data: {discipline:_val},
+                processResults: function (resp) {
+                    return {
+                        results: resp
+                    }
+                }
+            }
+        });
+    })
+
+    $(document).on('select2:select','.js-select-update-discipline', function(e){
+        var _this = $(this);
+        var _parent = _this.closest('.dd-item');
+        var _val = _this.val();
+        var selectedData = e.params.data;
+        var selectedText = selectedData.text;
+        var _child = _parent.find('ol')
+
+        _parent.find('.dd-handle').removeClass('d-none');
+        _parent.find('.js-dd-select').addClass('d-none');
+        _parent.find('.js-dd-title').text(selectedText);
+        _parent.attr('data-id',_val);
+        if(_child.length > 0){
+            _child.remove();
+        }
+    });
     function showButtonSubmit(){
         $('.js-save-estimate-discipline').removeClass('d-none')
     }

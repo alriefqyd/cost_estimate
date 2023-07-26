@@ -29,6 +29,7 @@
 <!-- feather icon js-->
 <script src="{{'/assets/js/icons/feather-icon/feather.min.js'}}"></script>
 <script src="{{'/assets/js/icons/feather-icon/feather-icon.js'}}"></script>
+
 <!-- Sidebar jquery-->
 <script src="{{'/assets/js/sidebar-menu.js'}}"></script>
 <script src="{{'/assets/js/config.js'}}"></script>
@@ -85,6 +86,7 @@
 <script src="{{'/js/config.js'}}"></script>
 <script src="{{'/assets/select2/dist/js/select2.min.js'}}"></script>
 <script src="{{'/js/notification.js'}}"></script>
+<script src="{{'/js/nestable.js'}}"></script>
 <script src="{{'/js/application.js'}}"></script>
 <script src="{{'/js/project.js'}}"></script>
 <script src="{{'/js/estimate_discipline.js'}}"></script>

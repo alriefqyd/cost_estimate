@@ -6,7 +6,7 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3>Work Item</h3>
+                    <h4>Work Item</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="">Home</a></li>
                         <li class="breadcrumb-item active">Work Item list</li>
@@ -48,6 +48,16 @@
                                     <input type="submit" class="btn btn-outline-success btn btn-search-man-power" value="search" style="height: 40px"></input>
                                 </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-6">
+
+                                </div>
+                                <div class="col-md-6">
+                                    <button class="btn btn-outline-light txt-dark float-end js-btn-to-review" disabled="disabled" type="button">
+                                        Set to Reviewed (<span class="js-select-to-reviewed">0</span>)
+                                    </button>
+                                </div>
+                            </div>
                         </form>
                     </div>
                     <div class="col-sm-12 col-lg-12 col-xl-12">
@@ -55,6 +65,7 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
+                                    <th scope="col"><input type="checkbox" class="js-select-all-project-to-review custom-checkbox"></th>
                                     <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.code"></i>
                                     </th>
                                     <th scope="col" class="text-left">
@@ -77,6 +88,9 @@
                                 <tbody>
                                 @foreach($work_item as $item)
                                     <tr>
+                                        <td class="text-center">
+                                            <input type="checkbox" class="js-select-project-to-review custom-checkbox" value="{{$item->id}}">
+                                        </td>
                                         <td class="min-w-100"><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td class="min-w-300">{{$item->description}}</td>
                                         <td class="max-w-250">{{$item?->category}}</td>
