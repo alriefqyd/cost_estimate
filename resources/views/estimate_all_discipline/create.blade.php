@@ -21,7 +21,14 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body p-3">
-                        <h6>Project : {{$project->project_title}}</h6>
+                        <h6 class="float-start">Project : {{$project->project_title}}</h6>
+                        @if($project->wbsLevel3s())
+                            <a href="/project/{{$project->id}}/wbs/edit">
+                                <button class="float-end btn btn-primary">
+                                    Work Breakdown Structure
+                                </button>
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>

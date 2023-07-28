@@ -113,8 +113,8 @@
 <div class="row mb-5">
     <div class="col-md-12">
         <div class="float-end">
+            <a href="/project/{{$project->id}}"><button class="btn btn-danger cancel" >Cancel</button></a>
             <button class="btn btn-primary js-save-estimate-discipline" >Save As Draft</button>
-            <button class="btn btn-primary js-save-estimate-discipline" >Publish</button>
         </div>
     </div>
 </div>

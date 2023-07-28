@@ -67,12 +67,12 @@ class Project extends Model
         $query->when($filters['status'] ?? false, function ($query, $status) use ($isCount) {
             if($isCount) $query->where('status', $status);
         })->when($filters['q'] ?? false, function ($query, $q) {
-                $query->where(function ($query) use ($q) {
-                    $query->where('project_title', 'like', '%' . $q . '%')
-                        ->orWhere('project_no', 'like', '%' . $q . '%');
-                });
-            })->when($filters['mechanical'] ?? false, function($query, $q){
-                $query->where('design_engineer_mechanical',$q);
+            $query->where(function ($query) use ($q) {
+                $query->where('project_title', 'like', '%' . $q . '%')
+                    ->orWhere('project_no', 'like', '%' . $q . '%');
+            });
+        })->when($filters['mechanical'] ?? false, function($query, $q){
+            $query->where('design_engineer_mechanical',$q);
         })->when($filters['civil'] ?? false, function($query, $q){
             $query->where('design_engineer_civil',$q);
         })->when($filters['electrical'] ?? false, function($query, $q){
@@ -131,8 +131,7 @@ class Project extends Model
     }
 
     public function isReviewer(){
-        return $this->project_manager == auth()->user()?->id
-            || $this->project_engineer == auth()->user()?->id;
+        return (in_array(auth()->user()->profiles?->position, PROFILE::REVIEWER));
     }
 
     public function getTotalCostWithContingency(){

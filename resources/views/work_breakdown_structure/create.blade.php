@@ -1,6 +1,6 @@
 @extends('layouts.main')
 @section('main')
-    <div class="container-fluid">
+    <div class="container-fluid js-confirm-load-page js-confirm-row">
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-12">

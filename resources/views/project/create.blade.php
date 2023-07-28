@@ -34,7 +34,7 @@
                             @csrf
                             @include('project.form')
                             <button type="submit" class="btn btn-success float-end">Save Data</button>
-                            <button type="" class="btn btn-light float-end m-r-5">Cancel</button>
+                            <a href="/project"><div class="btn btn-danger float-end m-r-5">Cancel</div></a>
                         </form>
                     </div>
                 </div>

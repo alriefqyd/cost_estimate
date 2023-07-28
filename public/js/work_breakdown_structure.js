@@ -123,6 +123,7 @@ $(function(){
                     $('.js-modal-loading-wbs').modal('hide');
                     notification('success',result.message);
                     // return false
+                    $(window).off('beforeunload');
                     setTimeout(function (){
                         window.location.href = '/project/' + id;
                     },2000);
@@ -299,6 +300,7 @@ $(function(){
         var _location_form = $('.js-form-location');
 
         _modal_loading.modal('show');
+        bindBeforeUnloadEvent();
 
         Mustache.parse(_template_location);
 
@@ -347,8 +349,6 @@ $(function(){
         _modal_loading.modal('show');
 
         if(_this.attr('data-is-element') === 'true'){
-            _url =  '/getWorkElementList';
-            _text = 'Select Work Element'
             _discipline = _parent.attr('data-id');
             _showButton = false;
             _isSelect = false;
@@ -372,6 +372,7 @@ $(function(){
                     }
                     var _temp = Mustache.render(_template,_data)
                     _parent.append(_temp)
+                    bindBeforeUnloadEvent();
                     $('.select2').select2();
                     feather.replace()
                 } else {
@@ -411,6 +412,7 @@ $(function(){
         var _this = $(this);
         var _parent = _this.closest('li')
         _parent.remove();
+        bindBeforeUnloadEvent();
     });
 
     $(document).on('change','.js-select-update-wbs',function(){
@@ -438,6 +440,7 @@ $(function(){
         var _this = $(this);
         var _select2 = _this.closest('li').find('.js-select-element')
         var _val = _this.closest('.js-get-idx').find('.js-select-update-element').val()
+        bindBeforeUnloadEvent();
         _select2.select2({
             placeholder: "Please Select Work Element",
             allowClear: true,
@@ -470,6 +473,7 @@ $(function(){
         var selectedText = selectedData.text;
         var _child = _parent.find('ol')
 
+        bindBeforeUnloadEvent();
         _parent.find('.dd-handle').removeClass('d-none');
         _parent.find('.js-dd-select').addClass('d-none');
         _parent.find('.js-dd-title').text(selectedText);
@@ -478,6 +482,18 @@ $(function(){
             _child.remove();
         }
     });
+
+    function bindBeforeUnloadEvent(){
+        var _confirm_page = $('.js-confirm-row')
+        if(_confirm_page.length > 0){
+            $(window).on('beforeunload', function(e) {
+                e.preventDefault()
+                // Return a confirmation message to prompt the user
+                return 'Are you sure you want to leave this page?';
+            });
+        }
+    }
+
     function showButtonSubmit(){
         $('.js-save-estimate-discipline').removeClass('d-none')
     }
