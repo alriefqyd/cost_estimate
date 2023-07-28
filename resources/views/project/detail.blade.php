@@ -143,7 +143,7 @@
                                                 <td>
                                                     {{$wbs->wbsDiscipline?->title}}
                                                 </td>
-                                                <td>{{$wbs->workElements?->title}}</td>
+                                                <td>{{$wbs->work_element}}</td>
                                             </tr>
                                         @endforeach
                                     @endforeach

@@ -191,7 +191,7 @@ class ProjectController extends Controller
         $projectServices = new ProjectServices();
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
-        $wbs = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$project->id)->get()->groupBy('title');
+        $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
 
         return view('project.detail',[

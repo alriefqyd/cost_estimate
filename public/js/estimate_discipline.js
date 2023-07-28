@@ -58,6 +58,7 @@ $(function(){
         } else {
             _parent_row.find('.js-work-item-equipment-cost-modal').addClass('d-none');
         }
+        bindBeforeUnloadEvent();
     });
 
     $(document).on('click','.js-work-item-text',function(){
@@ -74,6 +75,7 @@ $(function(){
         var _this = $(this);
         var _parent = _this.closest('tr');
         _parent.remove();
+        bindBeforeUnloadEvent();
     });
 
     var workItemSelectInit = function (el) {
@@ -176,6 +178,7 @@ $(function(){
             success : function(data){
                 if(data.status === 200){
                     notification('success',data.message)
+                    $(window).off('beforeunload');
                 } else {
                     notification('danger',data.message,'fa fa-frown-o','Error')
                 }
@@ -183,6 +186,17 @@ $(function(){
         })
 
     });
+
+    function bindBeforeUnloadEvent(){
+        var _confirm_page = $('.js-confirm-row')
+        if(_confirm_page.length > 0){
+            $(window).on('beforeunload', function(e) {
+                e.preventDefault()
+                // Return a confirmation message to prompt the user
+                return 'Are you sure you want to leave this page?';
+            });
+        }
+    }
 
     $(document).on('click','.js-add-work-item-element',function(){
         var _this = $(this)
@@ -192,20 +206,28 @@ $(function(){
             'workElement' : _this.data('work-element')
         }
         var _temp =  $(Mustache.render(_template,_data));
-        _temp.insertAfter(_this.closest('.js-column-work-element'));
+        if(_this.hasClass('.js-button-work-element')){
+            _temp.insertAfter(_this.closest('.js-column-work-element'));
+        } else {
+            _temp.insertAfter(_this.closest('tr'));
+        }
         var _select2 = _temp.find('.js-select-work-items');
         workItemSelectInit(_select2)
+        bindBeforeUnloadEvent()
+
     })
 
     $(document).on('change keyup','.js-input-vol', function(){
         var _this = $(this);
         var _parent_row = _this.closest('tr');
        countTotalWorkItem(_this, workItemSelected);
+        bindBeforeUnloadEvent();
     });
 
     $(document).on('change keyup','.js-input-labor_factorial, .js-input-equipment_factorial, .js-input-material_factorial', function(){
         var _this = $(this);
         countTotalWorkItem(_this, workItemSelected);
+        bindBeforeUnloadEvent();
     });
 
     $(document).on('click','.js-minimize',function(){
@@ -355,26 +377,5 @@ $(function(){
     function removeBlankSpace(str){
         return str.replace(/\s/g, "")
     }
-
-    /**tableStripped($('.js-table-body-work-item-item').find('tr'))
-    function generateStrippedTable(_this){
-        setTimeout(function(){
-            var _table = _this.find('tbody tr:not(.d-none)')
-            tableStripped(_table)
-        },100)
-
-    }
-
-    function tableStripped(_table){
-        _table.each(function(index){
-            var _el = $(this);
-            index = index + 1;
-            if(index % 2 === 0){
-                _el.css('background-color','#ffffff');
-            } else {
-                _el.css('background-color','#edeeef');
-            }
-        })
-    }**/
 
 });

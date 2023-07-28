@@ -31,9 +31,16 @@
                 <span class="float-start">
                     {{$item->workItemDescription ?? ''}}
                 </span>
-                <div class="d-inline-block float-end">
-                    <i class="fa fa-minus-circle cursor-pointer font-danger js-delete-work-item"></i>
-                </div>
+            </div>
+            <div class="d-inline-block float-end">
+                <i class="fa fa-minus-circle cursor-pointer font-danger js-delete-work-item"></i>
+                <i class="fa fa-plus-circle cursor-pointer font-success js-add-work-item-element"
+                   @if(isset($wbsId) && isset($workElement))
+                        data-id="{{$wbsId}}" data-work-element="{{isset($workElement) ? $workElement : ''}}">
+                   @else
+                        data-id="@{{ wbsLevel3 }}" data-work-element="@{{ workElement }}">
+                   @endif
+                </i>
             </div>
         </div>
     </td>
@@ -56,6 +63,7 @@
             {{isset($item->workItemUnitRateTotalLaborCost) && $item->workItemUnitRateTotalLaborCost > 0 ? 'd-block' : 'd-none'}}
             js-open-modal-detail js-work-item-man-power-cost-modal"
                data-id="{{$item->workItemId ?? ''}}"></i>
+            </span>
         </span>
     </td>
     <td class="min-w-140">

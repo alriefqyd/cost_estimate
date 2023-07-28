@@ -72,7 +72,7 @@ class EstimateAllDisciplineController extends Controller
 
                     $returnData = $e;
                     if(sizeof($map) > 0) $returnData = $map;
-                    return [$e->workElements?->title => $returnData];
+                    return [$e->work_element => $returnData];
                 });
             });
         });

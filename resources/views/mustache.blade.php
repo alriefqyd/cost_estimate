@@ -265,10 +265,16 @@
 
 <script id="js-template-sub-nestable" type="x-templ-mustache">
    <ol class="dd-list js-get-idx" data-idx="2">
-        <li class="dd-item" data-id="@{{id}}">
+        <li class="dd-item" data-id="@{{id}}" data-old-element="@{{ id }}">
             <div class="dd-handle">
                 <div class="float-start col-md-10 js-dd-handle-edit">
+                @{{ #isSelect }}
                     <span class="js-dd-title">@{{ text }}</span>
+                @{{ /isSelect }}
+                @{{ ^isSelect }}
+                    <span class="text-strong js-dd-title-text" contenteditable="true">Work Element</span>
+                @{{ /isSelect }}
+
                 </div>
                 <div class="float-end">
                     @{{ #showButton }}
@@ -282,13 +288,15 @@
                     </span>
                 </div>
             </div>
-            <span class="js-dd-select d-none">
-                <select class="select2 js-select-update-discipline">
-                    @{{#dataList}}
-                      <option value="@{{ id }}">@{{ title }}</option>
-                    @{{ /dataList }}
-                </select>
-            </span>
+             @{{ #isSelect }}
+                <span class="js-dd-select d-none">
+                    <select class="select2 js-select-update-discipline">
+                        @{{#dataList}}
+                          <option value="@{{ id }}">@{{ title }}</option>
+                        @{{ /dataList }}
+                    </select>
+                </span>
+            @{{ /isSelect }}
         </li>
    </ol>
 </script>

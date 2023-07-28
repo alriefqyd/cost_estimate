@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
-use App\Models\Setting;
 use App\Models\WbsLevel3;
 use App\Models\WorkBreakdownStructure;
 use App\Models\WorkElement;
@@ -88,7 +87,6 @@ class WorkBreakdownStructureController extends Controller
             ]);
         }
 
-
         try {
               DB::beginTransaction();
               $arrIdNotDelete = [];
@@ -98,7 +96,7 @@ class WorkBreakdownStructureController extends Controller
                             $uniqId = uniqid();
                             if($loc['id']) $uniqId = $loc['id'];
                             $existing = WbsLevel3::where('identifier',$uniqId)->where('discipline',$disc['id'])
-                                ->where('work_element',$el['id'])->where('project_id',$project->id)->first();
+                                ->where('work_element',$el['oldElement'])->where('project_id',$project->id)->first();
                             if(!$existing){ // add new if there's a wbs to add
                                 $wbsLevel3 = new WbsLevel3();
                                 $wbsLevel3->title = $loc['id'];
@@ -110,6 +108,7 @@ class WorkBreakdownStructureController extends Controller
                                 $arrIdNotDelete[] = $wbsLevel3->id;
                             } else {
                                 $existing->title = $loc['id'];
+                                $existing->work_element = $el['id'];
                                 $existing->save();
                                 $arrIdNotDelete[] = $existing->id;
                             }
@@ -218,15 +217,12 @@ class WorkBreakdownStructureController extends Controller
         $data = WbsLevel3::with(['wbsDiscipline','workElements.parent'])->where('project_id',$project->id)->get()->groupBy('identifier');
         $data = $data->map(function($discipline){
             return $discipline->mapToGroups(function($d) use ($discipline) {
-                $disciplineId = $discipline->filter(function($item) use ($d){
-                    return $item->work_element == $d->workElements?->id;
-                })->first();
                 return [
                     $d->wbsDiscipline?->title => [
                         'id' => $d->id,
-                        'title' => $d->workElements?->title,
+                        'title' => $d->work_element,
                         'identifier' => $discipline->first()->identifier,
-                        'disciplineId' => $disciplineId->discipline,
+                        'disciplineId' => $d->discipline,
                         'elementId' => $d->workElements?->id
                     ]
                 ];

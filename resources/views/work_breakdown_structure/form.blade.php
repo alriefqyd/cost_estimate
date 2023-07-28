@@ -5,6 +5,7 @@
     <div class="card">
         <div class="card-body">
             <div class="col-md-12">
+
                 <div class="col-md-12 mb-5">
                     <div class="input-group">
                         <input class="form-control js-form-location" type="text" placeholder="Location Equipment">
@@ -61,10 +62,10 @@
                                             </span>
                                             @foreach($discipline as $d)
                                                 <ol class="dd-list" data-idx="2">
-                                                    <li class="dd-item" data-id="{{$d['elementId']}}">
+                                                    <li class="dd-item" data-id="{{$d['title']}}" data-old-element="{{$d['title']}}">
                                                         <div class="dd-handle">
-                                                            <div class="float-start col-md-10 js-dd-handle-edit">
-                                                                <span class="js-dd-title js-dd-title-element">{{$d['title']}}</span>
+                                                            <div class="float-start col-md-10 cursor-text p-1 js-dd-handle-edit">
+                                                                <div class="js-dd-title-text js-dd-title-element" contenteditable="true">{{$d['title']}}</div>
                                                             </div>
                                                             <div class="float-end">
                                                                 <span class="cursor-pointer text-danger js-delete-wbs-discipline">
@@ -72,11 +73,6 @@
                                                                 </span>
                                                             </div>
                                                         </div>
-                                                        <span class="js-dd-select d-none">
-                                                            <select class="select2 js-select-element js-select-update-discipline">
-                                                                <option value="{{$d['elementId']}}">{{$d['title']}}</option>
-                                                            </select>
-                                                        </span>
                                                     </li>
                                                 </ol>
                                             @endforeach

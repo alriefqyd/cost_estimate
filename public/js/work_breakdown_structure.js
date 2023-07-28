@@ -119,7 +119,6 @@ $(function(){
             url: url,
             data : {wbs:_data},
             success:function(result){
-                console.log(result);
                 if(result.status === 200){
                     $('.js-modal-loading-wbs').modal('hide');
                     notification('success',result.message);
@@ -343,6 +342,7 @@ $(function(){
         var _discipline = '';
         var _showButton = true
         var _modal_loading = $('.js-modal-loading-wbs');
+        var _isSelect = true;
 
         _modal_loading.modal('show');
 
@@ -351,6 +351,7 @@ $(function(){
             _text = 'Select Work Element'
             _discipline = _parent.attr('data-id');
             _showButton = false;
+            _isSelect = false;
         }
 
         Mustache.parse(_template);
@@ -366,7 +367,8 @@ $(function(){
                     var _data = {
                         'dataList':result.data,
                         'text' : _text,
-                        'showButton':_showButton
+                        'showButton':_showButton,
+                        'isSelect':_isSelect
                     }
                     var _temp = Mustache.render(_template,_data)
                     _parent.append(_temp)
@@ -422,6 +424,16 @@ $(function(){
         _parent.find('.js-dd-select').first().removeClass('d-none')
     })
 
+    $(document).on('focusout','.js-dd-title-text',function(){
+       var _this = $(this);
+       if(_this.text().length < 1) _this.text('Work Element');
+    });
+
+    $(document).on('keyup keydown change','.js-dd-title-text', function(){
+        var _this = $(this);
+        _this.closest('.dd-item').attr('data-id',_this.text());
+    })
+
     $(document).on('click','.js-dd-title-element',function(e){
         var _this = $(this);
         var _select2 = _this.closest('li').find('.js-select-element')
@@ -440,6 +452,14 @@ $(function(){
                 }
             }
         });
+    });
+
+    $(document).on('keyup keydown','.js-dd-title-text', function(e){
+        if((e.which != 8 && $(this).text().length > 80) || (e.which == 13))
+        {
+            // $('#'+content_id).text($('#'+content_id).text().substring(0, max));
+            e.preventDefault();
+        }
     })
 
     $(document).on('select2:select','.js-select-update-discipline', function(e){

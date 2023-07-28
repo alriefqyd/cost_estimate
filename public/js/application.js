@@ -212,13 +212,4 @@ $(function(){
         event.preventDefault();
         return false;
     })
-
-    function reverse(character){
-        var _length = character.length
-        var _temp = '';
-        for(var i=_length; i>=0; i--){
-            _temp = _temp + character.charAt(i)
-        }
-        return character === _temp
-    }
 });

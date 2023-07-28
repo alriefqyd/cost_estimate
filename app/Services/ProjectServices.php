@@ -47,7 +47,7 @@ class ProjectServices
             $projectClass->estimateVolume = $location->volume;
             $projectClass->disciplineTitle = $location?->wbss?->wbsDiscipline?->title;
             $projectClass->workItemIdentifier = $location?->wbss?->identifier;
-            $projectClass->workElementTitle = $location?->wbss?->workElements?->title;
+            $projectClass->workElementTitle = $location?->wbss?->work_element;
             $projectClass->workItemDescription = $location?->workItems?->description;
             $projectClass->workItemId = $location?->workItems?->id;
             $projectClass->workItemUnit = $location?->workItems?->unit;
@@ -64,7 +64,7 @@ class ProjectServices
             $projectClass->workItemTotalCost = $this->getTotalCostWorkItem($location);
 
             return [
-                $location->wbss->title => $projectClass,
+                $location->wbss?->title => $projectClass,
             ];
         });
 

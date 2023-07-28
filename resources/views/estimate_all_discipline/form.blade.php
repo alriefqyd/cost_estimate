@@ -1,4 +1,4 @@
-<div class="row mb-5">
+<div class="row mb-5 js-confirm-load-page js-confirm-row" data-confirm-onload="false">
     <div class="col-md-12">
         <div class="card mb-1 pb-2">
             <div class="card-body p-0">
@@ -59,6 +59,8 @@
                                             <td></td>
                                         </tr>
                                         @foreach($workElement as $a => $b)
+                                            @php ($wbsId = isset($b?->id) ? $b->id : $b[0]->wbs_level3_id)
+                                            @php ($workElement = isset($b?->work_element) ? $b->work_element : $b[0]->work_element_id)
                                             @if($a !== $previousWorkElement)
                                                 <tr class="js-column-work-element" style="background-color: #EFEFEFD0">
                                                     <td></td>
@@ -68,14 +70,14 @@
                                                     <td class="min-w-170">
                                                         <div>
                                                             <span class="float-start js-text-work-element">
-                                                                {{ucwords(strtolower($a))}}
+                                                                {{$a}}
                                                             </span>
                                                             <div class="d-inline-block float-end">
                                                                 <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
                                                                 <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
-                                                                <i class="fa fa-plus-circle cursor-pointer font-success
-                                                                js-add-work-item-element"
-                                                                data-id="{{isset($b?->id) ? $b->id : $b[0]->wbs_level3_id}}" data-work-element="{{isset($b?->work_element) ? $b->work_element : $b[0]->work_element_id}}"></i>
+                                                                <i class="fa fa-plus-circle cursor-pointer font-success js-add-work-item-element js-button-work-element"
+                                                                    data-id="{{$wbsId}}" data-work-element="{{$workElement}}"
+                                                                ></i>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -83,10 +85,14 @@
                                                     <td></td>
                                                 </tr>
                                             @endif
-
                                             @foreach($b as $item)
                                                 @if(isset($item->workItemId))
-                                                    @include('estimate_all_discipline.work_item_row', ['item' => $item])
+                                                    @include('estimate_all_discipline.work_item_row',
+                                                            [
+                                                                'item' => $item,
+                                                                'wbsId' => $wbsId,
+                                                                'workElement' => $workElement
+                                                            ])
                                                 @endif
                                             @endforeach
                                             @php($previousWorkElement = $a)
