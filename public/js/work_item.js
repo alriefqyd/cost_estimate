@@ -1,7 +1,4 @@
 $(function(){
-    $(document).on('change','.js-select-work-item-type',function(){
-
-    });
     var selectItemInit = function (el){
         var _this = $(el);
         if (_this.data("select2")) _this.select2("destroy");
@@ -250,6 +247,82 @@ $(function(){
 
             $('.js-work-description').val(_work_item_desc);
         }
+    });
+
+    $('.js-btn-edit-status-work-item').on('click', function(){
+        var _this = $(this);
+        var _label = _this.siblings('.js-status-work-item');
+        var _select_status = _this.siblings('.js-select-status-work-item');
+
+        _select_status.removeClass('d-none');
+        _this.addClass('d-none');
+        _label.addClass('d-none');
+        _select_status.find('.js-select-work-item').next('.select2-container').show();
+    });
+
+    $(document).on('select2:select','.js-select-work-item', function(e){
+        $('#approveModalWorkItem').modal('show');
+    });
+
+    $(document).on('click','.js-btn-approve-work-item', function(){
+        var _status = $('.js-select-work-item').val();
+        var _id = getUrlSegment(2);
+        $.ajax({
+            method:'post',
+            url : '/updateStatusWorkItem',
+            data : {id:_id, status: _status},
+            success:function(result){
+                if(result.status === 200){
+                    $('.js-status-work-item').text(_status);
+                    $('.js-status-work-item').removeClass('d-none');
+                    $('.js-btn-edit-status-work-item').removeClass('d-none');
+                    $('.js-select-work-item').next('.select2-container').hide();
+                    $('#approveModalWorkItem').modal('hide');
+                    notification('success',result.message,'','success');
+                } else {
+                    notification('danger',result.message,'','danger');
+                }
+            }
+        });
+    });
+
+    $(document).on('click', '.js-work-item-check-review', function() {
+        var _url = 'workItem/update-list?ids=';
+
+        // Get the collection of checked checkboxes
+        var $checkedCheckboxes = $('.js-work-item-check-review').filter(':checked');
+        var _length_check = $checkedCheckboxes.length;
+
+        var ids = $checkedCheckboxes.map(function() {
+            return $(this).val();
+        }).get().join(',');
+
+        _url += ids;
+        $('.js-btn-to-review').attr('data-url',_url);
+    });
+
+    $('.js-btn-to-review').on('click',function(e){
+        e.preventDefault();
+        $('.js-modal-approve-list').modal('show');
+    });
+
+    $('.js-approve-confirmation-work-item').on('click', function(){
+        var _url = $('.js-btn-to-review').data('url');
+        $.ajax({
+            url:_url,
+            method:'post',
+            success:function(result){
+                $('.js-modal-approve-list').modal('hide');
+                if(result.status === 200){
+                    notification('success',result.message,'','success');
+                    setTimeout(function(){
+                        location.reload();
+                    },2000);
+                } else {
+                    notification('danger',result.message,'','Error');
+                }
+            }
+        });
     });
 
     function errorSave(_this){

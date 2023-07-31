@@ -144,5 +144,6 @@ Route::get('/getDetailWorkItem',[\App\Http\Controllers\WorkItemController::class
 Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
 Route::get('/getDisciplineList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getDisciplineList'])->middleware('auth');
 Route::get('/getWorkElementList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWorkElementList'])->middleware('auth');
-
+Route::post('/updateStatusWorkItem',[\App\Http\Controllers\WorkItemController::class,'updateStatusWorkItem'])->middleware('auth');
+Route::post('/workItem/update-list/',[\App\Http\Controllers\WorkItemController::class,'updateList'])->middleware('auth');
 

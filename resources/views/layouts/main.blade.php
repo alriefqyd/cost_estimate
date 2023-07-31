@@ -86,6 +86,7 @@
 <script src="{{'/js/config.js'}}"></script>
 <script src="{{'/assets/select2/dist/js/select2.min.js'}}"></script>
 <script src="{{'/js/notification.js'}}"></script>
+<script src="{{'/js/getUrlSegment.js'}}"></script>
 <script src="{{'/js/nestable.js'}}"></script>
 <script src="{{'/js/application.js'}}"></script>
 <script src="{{'/js/project.js'}}"></script>

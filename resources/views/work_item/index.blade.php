@@ -45,9 +45,6 @@
                                     <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
                                     <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                 </div>
-{{--                                <div class="col-md-2 mb-1" >--}}
-{{--                                    <input type="submit" class="btn btn-outline-success btn btn-search-man-power" value="search" style="height: 40px"></input>--}}
-{{--                                </div>--}}
                             </div>
                             <div class="row">
                                 <div class="col-md-6">
@@ -106,7 +103,7 @@
                                 @foreach($work_item as $item)
                                     <tr>
                                         <td class="text-center">
-                                            <input type="checkbox" class="js-select-project-to-review custom-checkbox" value="{{$item->id}}">
+                                            <input type="checkbox" class="js-select-project-to-review js-work-item-check-review custom-checkbox" value="{{$item->id}}">
                                         </td>
                                         <td class="min-w-100"><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td class="min-w-250">{{$item->description}}</td>
@@ -140,7 +137,7 @@
         @endif
     </div>
 
-    <div class="modal fade js-modal-delete-tool-equipment" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade js-modal-approve-list" id="" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -152,7 +149,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-success" type="button" data-bs-dismiss="modal">Close</button>
-                    <button class="btn btn-danger js-delete-confirmation-tool-equipment" type="button">Delete</button>
+                    <button class="btn btn-danger js-approve-confirmation-work-item" type="button">Reviewed</button>
                 </div>
             </div>
         </div>

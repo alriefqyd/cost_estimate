@@ -194,12 +194,14 @@ $(function(){
         var _this = $(this);
         var _checkbox =  $('.js-select-project-to-review');
         if(_this.is(':checked')){
-            _checkbox.attr('checked','checked');
+            $('.js-btn-to-review').removeAttr('disabled');
+            _checkbox.prop('checked', true);
             var _countAll =_checkbox.length;
             $('.js-select-to-reviewed').text(_countAll);
         } else {
             $('.js-select-to-reviewed').text('0');
-            _checkbox.removeAttr('checked');
+            _checkbox.prop('checked', false);
+            $('.js-btn-to-review').attr('disabled','disabled');
         }
     });
 

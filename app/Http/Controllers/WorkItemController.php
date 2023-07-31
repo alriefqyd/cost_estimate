@@ -656,9 +656,49 @@ class WorkItemController extends Controller
                 'status' => 500
             ]);
         }
-
-
-
     }
 
+    public function updateStatusWorkItem(Request $request){
+        DB::beginTransaction();
+        try{
+            $data = WorkItem::where('id',$request->id)->first();
+            $data->status = $request->status;
+            $data->save();
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data successfully update'
+            ]);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateList(Request $request){
+        $ids = (string) $request->ids;
+        DB::beginTransaction();
+        $ids = explode(',',$ids);
+        try {
+            $items = WorkItem::whereIn('id',$ids)->get();
+
+            $items->each(function ($item){
+                $item->update(['status' => WorkItem::REVIEWED]);
+            });
+            DB::commit();
+            return response()->json([
+                'message' => 'Data successfully update',
+                'status' => 200
+            ]);
+        } catch (Exception $e){
+            DB::rollback();
+            return response()->json([
+                'message' => $e->getMessage(),
+                'status' => 500
+            ]);
+        }
+    }
 }
