@@ -14,9 +14,9 @@
                 </div>
                 <div class="dd js-nestable-wbs-form" style="max-width: 100%" id="nestable">
                     <div class="row">
-                         <div class="col-md-1">Loc/Equip</div>
-                        <div class="col-md-1">Discipline</div>
-                        <div class="col-md-2">Work Element</div>
+                         <div class="col-md-1 text-12-custom">Loc/Equip</div>
+                        <div class="col-md-1 text-12-custom">Discipline</div>
+                        <div class="col-md-2 text-12-custom">Work Element</div>
                     </div>
                 <ol class="dd-list js-nestable-wbs js-get-idx" data-idx="1">
                     @if(isset($existingWbs))

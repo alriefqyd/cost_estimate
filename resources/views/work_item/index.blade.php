@@ -76,25 +76,25 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    <th scope="col"><input type="checkbox" class="js-select-all-project-to-review custom-checkbox"></th>
-                                    <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.code"></i>
+                                    <th><input type="checkbox" class="js-select-all-project-to-review custom-checkbox"></th>
+                                    <th class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.code"></i>
                                     </th>
-                                    <th scope="col" class="text-left">
+                                    <th class="text-left">
                                         Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.description"></i>
                                     </th>
-                                    <th scope="col" class="text-left">
+                                    <th class="min-w-100 text-left">
                                         Category <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_item_types.title"></i>
                                     </th>
-                                    <th scope="col" class="text-left">
-                                        Volume <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.volume"></i>
+                                    <th class="text-left">
+                                        Vol <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.volume"></i>
                                     </th>
-                                    <th scope="col" class="text-left" >
+                                    <th class="text-left" >
                                         Unit <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.unit"></i>
                                     </th>
-                                    <th scope="col" class="text-left" >
+                                    <th class="text-left" >
                                         Total Price
                                     </th>
-                                    <th scope="col" class="text-left">
+                                    <th class="text-left">
                                         Status
                                     </th>
                                 </tr>
@@ -107,11 +107,11 @@
                                         </td>
                                         <td class="min-w-100"><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td class="min-w-250">{{$item->description}}</td>
-                                        <td class="max-w-250">{{$item?->category}}</td>
-                                        <td class="min-w-80">{{$item->volume}}</td>
+                                        <td class="max-w-200">{{$item?->category}}</td>
+                                        <td class="min-w-50">{{$item->volume}}</td>
                                         <td class="min-w-65">{{$item->unit}}</td>
-                                        <td class="min-w-100">{{number_format($item?->getTotalSum(),2,',','.')}}</td>
-                                        <td class="min-w-50">{{$item->status}}</td>
+                                        <td class="min-w-120">{{number_format($item?->getTotalSum(),2,',','.')}}</td>
+                                        <td class="min-w-90">{{$item->status}}</td>
                                         {{--<td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                data-id="{{$item->id}}" class="text-danger js-delete-tool-equipment">Delete</a></td>--}}
                                     </tr>

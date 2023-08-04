@@ -52,7 +52,7 @@ $(function(){
 
     $('.js-design-engineer').each(function (){
         designEngineerInit(this);
-    })
+    });
 
     /**
      * Project List
@@ -208,10 +208,10 @@ $(function(){
     $('.dd .js-add-new-nestable-wbs').on('mousedown', function (event){
         event.preventDefault();
         return false;
-    })
+    });
 
     $('.dd .js-delete-wbs-discipline').on('mousedown', function (event){
         event.preventDefault();
         return false;
-    })
+    });
 });

@@ -3,6 +3,7 @@
  */
 $(function(){
     var workItemSelected = null;
+    $('.js-select-work-items').select2();
     $(document).on('select2:select','.js-select-work-items', function(e){
         var _this = $(this);
         var _parent_row = _this.closest('tr');
@@ -20,6 +21,19 @@ $(function(){
         workItemSelected = selectedOption;
         var _column = _this.closest('td');
         var _text_column = _column.find('.js-work-item-text');
+        var $select2 = _this.data('select2').$container;
+        var $tableResponsive = $select2.closest('.table-responsive');
+        var tableResponsiveWidth = $tableResponsive.width();
+        var select2Offset = $select2.offset();
+        var select2Width = $select2.outerWidth();
+
+        // Calculate if the dropdown is going to go beyond the right edge of the container
+        if (select2Offset.left + select2Width > tableResponsiveWidth) {
+            $select2.addClass('select2-repositioned');
+        } else {
+            $select2.removeClass('select2-repositioned');
+        }
+
         _this.attr('data-cost-man-power', _totalRateManPower);
         _this.attr('data-cost-tools', _totalRateEquipment);
         _this.attr('data-cost-material', _totalRateMaterial);
@@ -81,8 +95,15 @@ $(function(){
     var workItemSelectInit = function (el) {
         var _this = $(el);
         if (_this.data("select2")) _this.select2("destroy");
+        _this.closest('table').siblings();
+        var dropdown_parent = ''
+        if (document.fullscreenElement) {
+            dropdown_parent = $('.js-card-parent');
+        }
+
         _this.select2({
             minimumInputLength: 3,
+            dropdownParent: dropdown_parent,
             placeholder: "Please Select Work Item",
             allowClear: true,
             width: '100%',
@@ -100,7 +121,7 @@ $(function(){
                     }
                 },
             }
-        })
+        });
     }
 
 
@@ -177,8 +198,13 @@ $(function(){
             type : 'POST',
             success : function(data){
                 if(data.status === 200){
-                    notification('success',data.message)
+                    if (document.fullscreenElement) {
+                        showNotification('.js-fullscreen-element', 'Your data was successfully saved');
+                    } else {
+                        notification('success',data.message)
+                    }
                     $(window).off('beforeunload');
+
                 } else {
                     notification('danger',data.message,'fa fa-frown-o','Error')
                 }
@@ -186,6 +212,27 @@ $(function(){
         })
 
     });
+
+    function showNotification(element, message) {
+        var notificationElement = $('<div data-notify="container" class="col-xs-11 col-sm-4 js-manual-notify alert alert-success notify-alert animated fadeIn" role="alert" data-notify-position="top-right" style="display: inline-block; margin: 0px auto; position: fixed; transition: all 0.5s ease-in-out 0s; z-index: 1031; top: 20px; right: 20px;" data-closing="true">')
+            .text(message)
+            .appendTo($(element));
+
+        notificationElement.notify({
+            type: 'info',
+            placement: {
+                from: 'top',
+                align: 'center'
+            },
+            animate: {
+                enter: 'animated fadeInDown',
+                exit: 'animated fadeOutUp'
+            },
+            showDuration: 10000, // Set the show duration to 10 seconds (10,000 milliseconds)
+            hideDuration: 1000   // Set the hide duration to 1 second (1,000 milliseconds)
+        });
+
+    }
 
     function bindBeforeUnloadEvent(){
         var _confirm_page = $('.js-confirm-row')
@@ -213,14 +260,14 @@ $(function(){
         }
         var _select2 = _temp.find('.js-select-work-items');
         workItemSelectInit(_select2)
+        setWhiteBackground(document.querySelector('.table-overflow'));
         bindBeforeUnloadEvent()
-
-    })
+    });
 
     $(document).on('change keyup','.js-input-vol', function(){
         var _this = $(this);
         var _parent_row = _this.closest('tr');
-       countTotalWorkItem(_this, workItemSelected);
+        countTotalWorkItem(_this, workItemSelected);
         bindBeforeUnloadEvent();
     });
 
@@ -359,6 +406,67 @@ $(function(){
     $(document).on('hidden.bs.modal','#workItemDetailModal',function(){
         $(this).remove();
     });
+
+
+    $('.js-fullscreen').on('click', function () {
+        var _table = document.querySelector('.js-fullscreen-element');
+        var scrollLeft = _table.scrollLeft;
+
+        // Remove rows with empty Select2 dropdowns
+        $(_table).find('.select2').each(function () {
+            var _val = $(this).val();
+            var _label = $(this).closest('td').find('.js-work-item-text').find('span').text();
+            if (_val === null || _val === '') {
+                if (_label.trim().length < 1) {
+                    this.closest('tr').remove();
+                }
+            }
+        });
+
+        // Go full screen
+        _table.requestFullscreen();
+        var _element_full_screen = $('.js-fullscreen-element');
+        _element_full_screen.css('background-color','#f4f7fb')
+        _element_full_screen.css('padding','0')
+        _element_full_screen.find('.table-overflow').css('height','92vh')
+        _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0.8em')
+        _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0.8em')
+        setWhiteBackground(_table);
+
+        // Select2 repositioning code
+        $(_table).find('.select2').each(function () {
+            workItemSelectInit(this);
+        });
+
+        // Scroll the table to the left
+        _table.scrollLeft = 0;
+    });
+
+    $(document).on('fullscreenchange', function () {
+        // Check if the document is currently in fullscreen mode
+        if (!document.fullscreenElement) {
+            var _element_full_screen = $('.js-fullscreen-element');
+            _element_full_screen.css('padding-left','0.8em')
+            _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0')
+            _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0')
+            $('.js-manual-notify').remove();
+        }
+    });
+
+    setInterval(function(){
+        if(document.fullscreenElement){
+            $(document).find('.js-manual-notify').addClass('fadeOut');
+        }
+    },10000)
+
+    function setWhiteBackground(_table){
+        // Find all elements with the class "js-row-item-estimate" that are descendants of _table
+        const elements = _table.querySelectorAll('.js-row-item-estimate');
+        // Loop through the matched elements and set the background color for each of them
+        elements.forEach(element => {
+            element.style.backgroundColor = 'white';
+        });
+    }
 
     function removeCurrency($val){
         if($val == null || $val == '') return 0;

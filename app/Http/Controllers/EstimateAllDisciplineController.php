@@ -108,7 +108,7 @@ class EstimateAllDisciplineController extends Controller
                 $estimateAllDiscipline = new EstimateAllDiscipline();
                 $estimateAllDiscipline->title = '';
                 $estimateAllDiscipline->work_item_id = $item['workItem'];
-                $estimateAllDiscipline->volume = $item['vol'];
+                $estimateAllDiscipline->volume = $item['vol'] > 0 ? $item['vol'] : 1;
                 $estimateAllDiscipline->project_id = $request->project_id;
                 $estimateAllDiscipline->labour_factorial = $item['labourFactorial'];
                 $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'];

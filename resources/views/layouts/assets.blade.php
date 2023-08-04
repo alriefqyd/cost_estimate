@@ -51,3 +51,5 @@
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/nestable.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/select2.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/bootstrap-duallistbox/dist/bootstrap-duallistbox.min.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/datatable/datatables.min.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/datatable/FixedHeader-3.4.0/css/fixedHeader.dataTables.min.css')}}">

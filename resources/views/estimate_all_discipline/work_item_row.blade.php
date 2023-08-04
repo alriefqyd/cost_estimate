@@ -1,4 +1,4 @@
-<tr>
+<tr class="js-row-item-estimate">
     <td></td>
     <td></td>
     <td>
@@ -101,15 +101,4 @@
     </td>
     <td class="min-w-150 js-total-work-item-rate"><span>{{$item->workItemTotalCostStr ?? ''}}</span></td>
 </tr>
-
-<div class="modal" id="modal-loading" data-backdrop="static">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loading-spinner mb-2"></div>
-                <div>Loading....</div>
-            </div>
-        </div>
-    </div>
-</div>
 

@@ -42,6 +42,10 @@
     font-size: 14px !important;
 }
 
+.text-12-custom {
+    font-size: 12px !important;
+}
+
 .cursor-text {
     cursor:text;
 }
@@ -135,6 +139,11 @@
 .min-w-80 {
     min-width: 80px !important;
     max-width: 80px !important;
+}
+
+.min-w-90 {
+    min-width: 90px !important;
+    max-width: 90px !important;
 }
 
 .min-w-100 {
@@ -441,19 +450,6 @@ custom-checkbox:checked:before {
     width: 100%;
 }
 
-/*.dd-list {*/
-/*    padding-left: 30px;*/
-/*}*/
-
-/*.dd-handle {*/
-/*    display: block;*/
-/*    padding: 10px;*/
-/*    background: #f5f5f5;*/
-/*    border: 1px solid #ddd;*/
-/*    border-radius: 4px;*/
-/*    margin-bottom: 5px;*/
-/*}*/
-
 @keyframes loadingspinner{
     0%{
         transform:rotate(0deg)
@@ -461,4 +457,44 @@ custom-checkbox:checked:before {
     100%{
         transform:rotate(360deg)
     }
+}
+
+.table-custom th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table-overflow {
+    overflow: auto;
+    height: 60vh;
+}
+
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-custom th, .table-custom td {
+    padding: 8px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.select2-container.select2-repositioned {
+    position: absolute;
+    top: 100%;
+    left: auto;
+    right: 0;
+}
+
+.notification {
+    position: fixed; /* or absolute, depending on your layout needs */
+    top: 50%; /* adjust the position as needed */
+    left: 50%; /* adjust the position as needed */
+    transform: translate(-50%, -50%);
+    background-color: #f8f8f8;
+    padding: 10px;
+    border: 1px solid #ccc;
+    z-index: 9999;
 }

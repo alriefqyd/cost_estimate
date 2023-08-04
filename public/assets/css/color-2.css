@@ -108,7 +108,7 @@ html {
 
 body {
   font-size: 14px;
-  overflow-x: hidden;
+  /*overflow-x: hidden; */
   font-family: "Montserrat", sans-serif;
   color: #242934;
   background-color: #f5f7fb; }
