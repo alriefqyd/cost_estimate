@@ -69,8 +69,8 @@
                                     <td class="min-w-250">Status</td>
                                     <td>
                                         <label class="js-status-work-item m-1">{{$work_item->status}}</label>
-                                        <i class="fa fa-pencil-square-o js-btn-edit-status-work-item cursor-pointer"></i>
                                         @if(auth()->user()->profiles?->position == 'project_manager')
+                                        <i class="fa fa-pencil-square-o js-btn-edit-status-work-item cursor-pointer"></i>
                                             <div class="col-md-3 js-select-status-work-item d-none">
                                                 <select class="select2 js-select-work-item col-md-3">
                                                     <option value="{{$workItem::DRAFT}}" {{$work_item->status == $workItem::DRAFT ? 'selected' : ''}}>{{$workItem::DRAFT}}</option>

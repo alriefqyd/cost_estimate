@@ -173,6 +173,7 @@ $(function(){
            data : { 'data' : _array },
            success : function(result){
                if(result.status === 200) {
+                   $(window).off('beforeunload');
                    notification('success',result.message,'','Success');
                    setTimeout(function(){
                       window.location.href = '/work-item/' + _form.data('id');
@@ -284,21 +285,6 @@ $(function(){
                 }
             }
         });
-    });
-
-    $(document).on('click', '.js-work-item-check-review', function() {
-        var _url = 'workItem/update-list?ids=';
-
-        // Get the collection of checked checkboxes
-        var $checkedCheckboxes = $('.js-work-item-check-review').filter(':checked');
-        var _length_check = $checkedCheckboxes.length;
-
-        var ids = $checkedCheckboxes.map(function() {
-            return $(this).val();
-        }).get().join(',');
-
-        _url += ids;
-        $('.js-btn-to-review').attr('data-url',_url);
     });
 
     $('.js-btn-to-review').on('click',function(e){

@@ -59,16 +59,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6">
+                            @if(auth()->user()->isReviewer())
+                                <div class="row">
+                                    <div class="col-md-6">
 
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-outline-light txt-dark float-end js-btn-to-review" disabled="disabled" type="button">
+                                            Set to Reviewed (<span class="js-select-to-reviewed">0</span>)
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <button class="btn btn-outline-light txt-dark float-end js-btn-to-review" disabled="disabled" type="button">
-                                        Set to Reviewed (<span class="js-select-to-reviewed">0</span>)
-                                    </button>
-                                </div>
-                            </div>
+                            @endif
                         </form>
                     </div>
                     <div class="col-sm-12 col-lg-12 col-xl-12">
@@ -76,7 +78,9 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    <th><input type="checkbox" class="js-select-all-project-to-review custom-checkbox"></th>
+                                    @if(auth()->user()->isReviewer())
+                                        <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="workItem"></th>
+                                    @endif
                                     <th class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.code"></i>
                                     </th>
                                     <th class="text-left">
@@ -102,9 +106,13 @@
                                 <tbody>
                                 @foreach($work_item as $item)
                                     <tr>
-                                        <td class="text-center">
-                                            <input type="checkbox" class="js-select-project-to-review js-work-item-check-review custom-checkbox" value="{{$item->id}}">
-                                        </td>
+                                        @if(auth()->user()->isReviewer())
+                                            <td class="text-center">
+                                                <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox"
+                                                       data-url="workItem"
+                                                       value="{{$item->id}}">
+                                            </td>
+                                        @endif
                                         <td class="min-w-100"><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
                                         <td class="min-w-250">{{$item->description}}</td>
                                         <td class="max-w-200">{{$item?->category}}</td>
@@ -141,11 +149,11 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Delete Tool Equipment</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Update Work Items</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    Are you sure you want to delete this item?
+                    Are you sure you want to update this item?
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-success" type="button" data-bs-dismiss="modal">Close</button>

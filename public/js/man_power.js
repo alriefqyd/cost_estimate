@@ -163,4 +163,23 @@ $(function() {
             }
         })
     })
+
+    $('.js-approve-confirmation-man-power').on('click', function(){
+        var _url = $('.js-btn-to-review').data('url');
+        $.ajax({
+            url:_url,
+            method:'post',
+            success:function(result){
+                $('.js-modal-approve-list').modal('hide');
+                if(result.status === 200){
+                    notification('success',result.message,'','success');
+                    setTimeout(function(){
+                        location.reload();
+                    },2000);
+                } else {
+                    notification('danger',result.message,'','Error');
+                }
+            }
+        });
+    });
 })

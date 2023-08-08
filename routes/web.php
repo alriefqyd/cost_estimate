@@ -146,4 +146,5 @@ Route::get('/getDisciplineList',[\App\Http\Controllers\WorkBreakdownStructureCon
 Route::get('/getWorkElementList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWorkElementList'])->middleware('auth');
 Route::post('/updateStatusWorkItem',[\App\Http\Controllers\WorkItemController::class,'updateStatusWorkItem'])->middleware('auth');
 Route::post('/workItem/update-list/',[\App\Http\Controllers\WorkItemController::class,'updateList'])->middleware('auth');
+Route::post('/manPower/update-list/',[\App\Http\Controllers\ManPowerController::class,'updateList'])->middleware('auth');
 

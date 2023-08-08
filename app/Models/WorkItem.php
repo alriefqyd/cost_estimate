@@ -78,4 +78,13 @@ class WorkItem extends Model
     public function countChildren(){
         return $this->children->count();
     }
+
+    public function isAuthorized(){
+        if(auth()->user()->isReviewer()
+            || $this->created_by == auth()->user()->id
+            || $this->status == $this::REVIEWED) {
+            return true;
+        }
+        return false;
+    }
 }

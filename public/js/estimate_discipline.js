@@ -234,17 +234,6 @@ $(function(){
 
     }
 
-    function bindBeforeUnloadEvent(){
-        var _confirm_page = $('.js-confirm-row')
-        if(_confirm_page.length > 0){
-            $(window).on('beforeunload', function(e) {
-                e.preventDefault()
-                // Return a confirmation message to prompt the user
-                return 'Are you sure you want to leave this page?';
-            });
-        }
-    }
-
     $(document).on('click','.js-add-work-item-element',function(){
         var _this = $(this)
         var _template = $('#js-template-table-work_item_column').html()
@@ -457,7 +446,7 @@ $(function(){
         if(document.fullscreenElement){
             $(document).find('.js-manual-notify').addClass('fadeOut');
         }
-    },10000)
+    },6000)
 
     function setWhiteBackground(_table){
         // Find all elements with the class "js-row-item-estimate" that are descendants of _table

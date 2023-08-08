@@ -25,7 +25,7 @@
                     </div>
                 @endif
             </div>
-            <div class="row">
+            <div class="row js-confirm-row">
                 <div class="card">
                     <div class="card-header-costume">
                         <div class="float-start">

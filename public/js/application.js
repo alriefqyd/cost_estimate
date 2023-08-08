@@ -166,7 +166,6 @@ $(function(){
        var _data_value = _this.data('value');
         _this.siblings('.js-status-filter').val(_data_value);
         _this.closest('form').submit();
-
     });
 
     var _count = 0;
@@ -213,5 +212,43 @@ $(function(){
     $('.dd .js-delete-wbs-discipline').on('mousedown', function (event){
         event.preventDefault();
         return false;
+    });
+
+    $(document).on('click', '.js-check-review', function() {
+        var _url = $(this).data('url') + '/update-list?ids=';
+
+        // Get the collection of checked checkboxes
+        var $checkedCheckboxes = $('.js-check-review').filter(':checked');
+        var _length_check = $checkedCheckboxes.length;
+
+        var ids = $checkedCheckboxes.map(function() {
+            return $(this).val();
+        }).get().join(',');
+
+        console.log(ids);
+        _url += ids;
+        $('.js-btn-to-review').attr('data-url',_url);
+    });
+
+    $(document).on('click','.js-check-review-all',function(){
+        var _url = $(this).data('url') + '/update-list?ids=';
+        setTimeout(function(){
+            var $checkedCheckboxes = $('.js-check-review').filter(':checked');
+            var ids = $checkedCheckboxes.map(function() {
+                return $(this).val();
+            }).get().join(',');
+            _url += ids;
+            $('.js-btn-to-review').attr('data-url',_url);
+        },500);
+    });
+
+    $(document).on('change click','.js-confirm-form',function(){
+        bindBeforeUnloadEvent();
+    });
+
+    $(document).on('click','.js-save-confirm-form', function(e){
+        e.preventDefault();
+        $(window).off('beforeunload');
+        $(this).closest('form').submit();
     });
 });
