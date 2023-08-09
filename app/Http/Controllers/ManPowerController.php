@@ -111,6 +111,7 @@ class ManPowerController extends Controller
                 'overall_rate_hourly' => $this->convertToDecimal($request->overall_rate_hourly),
                 'factor_hourly' => $this->convertToDecimal($request->factor_hourly),
                 'created_by' => auth()->user()->id,
+                'status' => ManPower::DRAFT
             ]);
             $manPower->save();
             DB::commit();

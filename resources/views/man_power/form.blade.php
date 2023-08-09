@@ -2,12 +2,12 @@
 <div class="row mb-1">
     <div class="col-md-5">
         <label class="form-label form-label-black m-0" for="validationCustom01">Code</label>
-        <input class="form-control js-validate js-project_project_no height-40" name="code"  type="text"
+        <input class="form-control js-validate js-project_project_no height-40 js-confirm-form" name="code"  type="text"
                value="{{isset($man_power?->code) ? $man_power->code : old('code')}}">
     </div>
     <div class="col-md-4">
         <label class="form-label form-label-black m-0" for="validationCustom01">Skill Level</label>
-        <select class="select2"
+        <select class="select2 js-confirm-form"
                 data-allowClear="true"
                 name="skill_level" >
             @foreach($setting::SKILL_LEVEL as $key => $value)
@@ -19,12 +19,12 @@
 <div class="row mb-1">
     <div class="col-md-5">
         <label class="form-label form-label-black m-0" for="validationCustom01">Title</label>
-        <input class="form-control js-validate js-project_project_no height-40" name="title"  type="text"
+        <input class="form-control js-validate js-project_project_no js-confirm-form height-40" name="title"  type="text"
                value="{{isset($man_power?->title) ? $man_power->title : old('title')}}">
     </div>
     <div class="col-md-4">
         <label class="form-label form-label-black m-0" for="validationCustom01">Basic Rate Month</label>
-        <input class="form-control js-validate height-40 js-currency-idr js-basic-rate-monthly"
+        <input class="form-control js-validate height-40 js-currency-idr js-confirm-form js-basic-rate-monthly"
                data-safety-rate="{{$man_power_safety_rate}}"
                name="basic_rate_month" type="text"
                value="{{isset($man_power?->basic_rate_month) ? number_format($man_power->basic_rate_month, 2, ',', '.') : old('basic_rate_month')}}">
@@ -111,6 +111,6 @@
 </div>
 <div class="row">
     <div class="col-md-12 mt-5 text-end">
-        <button class="btn js-btn-save-man-power btn-outline-success">Save</button>
+        <button class="btn js-save-confirm-form js-btn-save-man-power btn-outline-success">Save</button>
     </div>
 </div>

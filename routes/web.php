@@ -147,4 +147,6 @@ Route::get('/getWorkElementList',[\App\Http\Controllers\WorkBreakdownStructureCo
 Route::post('/updateStatusWorkItem',[\App\Http\Controllers\WorkItemController::class,'updateStatusWorkItem'])->middleware('auth');
 Route::post('/workItem/update-list/',[\App\Http\Controllers\WorkItemController::class,'updateList'])->middleware('auth');
 Route::post('/manPower/update-list/',[\App\Http\Controllers\ManPowerController::class,'updateList'])->middleware('auth');
+Route::post('/equipmentTools/update-list/',[\App\Http\Controllers\EquipmentToolsController::class,'updateList'])->middleware('auth');
+Route::post('/material/update-list/',[\App\Http\Controllers\MaterialController::class,'updateList'])->middleware('auth');
 

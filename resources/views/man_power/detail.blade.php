@@ -16,7 +16,7 @@
     </div>
     <div class="container-fluid product-wrapper">
         <div class="col-sm-12">
-            <div class="row">
+            <div class="row js-confirm-row">
                 @if($errors->any())
                     <div class="col-md-12 alert alert-danger">
                         @foreach ($errors->all() as $error)

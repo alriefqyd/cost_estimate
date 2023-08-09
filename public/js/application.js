@@ -151,7 +151,11 @@ $(function(){
     });
 
     $('.dual-list').bootstrapDualListbox({
-
+        nonSelectedListLabel: 'Available Roles',
+        selectedListLabel: 'Selected Roles',
+        preserveSelectionOnMove: 'moved',
+        moveAllLabel: 'Move all',
+        removeAllLabel: 'Remove all'
     });
 
     $('.js-search-form').on('change',function(){
@@ -225,7 +229,6 @@ $(function(){
             return $(this).val();
         }).get().join(',');
 
-        console.log(ids);
         _url += ids;
         $('.js-btn-to-review').attr('data-url',_url);
     });
@@ -242,7 +245,7 @@ $(function(){
         },500);
     });
 
-    $(document).on('change click','.js-confirm-form',function(){
+    $(document).on('change click keyup','.js-confirm-form',function(){
         bindBeforeUnloadEvent();
     });
 

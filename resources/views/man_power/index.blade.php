@@ -169,8 +169,8 @@
                     Are you sure you want to update this item?
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-success" type="button" data-bs-dismiss="modal">Close</button>
-                    <button class="btn btn-danger js-approve-confirmation-man-power" type="button">Reviewed</button>
+                    <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+                    <button class="btn btn-success js-approve-confirmation-man-power" type="button">Reviewed</button>
                 </div>
             </div>
         </div>

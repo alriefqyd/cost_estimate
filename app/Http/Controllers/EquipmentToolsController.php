@@ -26,7 +26,7 @@ class EquipmentToolsController extends Controller
 
         $order = $request->order;
         $sort =  $request->sort;
-        $equipmentTools = EquipmentTools::with('equipmentToolsCategory')->filter(request(['q','category']))
+        $equipmentTools = EquipmentTools::with('equipmentToolsCategory')->filter(request(['q','category','status']))
             ->when(isset($request->sort), function($query) use ($request,$order,$sort){
                 return $query->when($request->order == 'category', function($qq) use ($request,$order,$sort){
                     return $qq->whereHas('equipmentToolsCategory',function($relation) use ($sort){
@@ -34,6 +34,10 @@ class EquipmentToolsController extends Controller
                     });
                 })->when($request->order != 'category', function($qq) use ($request,$order, $sort){
                     return $qq->orderBy($order,$sort);
+                });
+            })->when(!auth()->user()->isReviewer(), function($query){
+                return $query->where(function($q){
+                   return $q->where('status',EquipmentTools::REVIEWED)->orWhere('created_by', auth()->user()->id);
                 });
             })->when(!isset($request->sort), function($query) use ($request,$order) {
                 return $query->orderBy('equipment_tools.code', 'ASC');
@@ -95,7 +99,9 @@ class EquipmentToolsController extends Controller
                 'unit' => $request->unit,
                 'local_rate' => $this->convertToDecimal($request->local_rate),
                 'national_rate' => $this->convertToDecimal($request->national_rate),
-                'remark' => $request->remark
+                'remark' => $request->remark,
+                'status' => EquipmentTools::DRAFT,
+                'created_by' => auth()->user()->id,
             ]);
             $equipmentTool->save();
             DB::commit();
@@ -224,7 +230,13 @@ class EquipmentToolsController extends Controller
 
     public function getToolsEquipment(Request $request){
         $response = array();
-        $data = EquipmentTools::select('id','description','code','local_rate')->where('description','like','%'.$request->q.'%')
+        $data = EquipmentTools::select('id','description','code','local_rate')
+            ->when(!auth()->user()->isReviewer(), function($query){
+                return $query->where(function($q){
+                    return $q->where('status', EquipmentTools::REVIEWED)
+                        ->orWhere('created_by', auth()->user()->id);
+                });
+            })->where('description','like','%'.$request->q.'%')
             ->orwhere('code','like','%'.$request->q.'%')->get();
         foreach($data as $v){
             $response[] = array(
@@ -235,6 +247,30 @@ class EquipmentToolsController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function updateList(Request $request){
+        $ids = (string) $request->ids;
+        DB::beginTransaction();
+        $ids = explode(',',$ids);
+        try {
+            $items = EquipmentTools::whereIn('id',$ids)->get();
+
+            $items->each(function ($item){
+                $item->update(['status' => EquipmentTools::REVIEWED]);
+            });
+            DB::commit();
+            return response()->json([
+                'message' => 'Data successfully update',
+                'status' => 200
+            ]);
+        } catch (Exception $e){
+            DB::rollback();
+            return response()->json([
+                'message' => $e->getMessage(),
+                'status' => 500
+            ]);
+        }
     }
 
     public function message($message, $type, $icon, $status){

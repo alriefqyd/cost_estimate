@@ -25,7 +25,7 @@
                     </div>
                 @endif
             </div>
-            <div class="row">
+            <div class="row js-confirm-row">
                 @if(session('message'))
                     @include('flash')
                 @endif
