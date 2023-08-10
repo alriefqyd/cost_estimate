@@ -98,7 +98,7 @@ $(function(){
         _this.closest('table').siblings();
         var dropdown_parent = ''
         if (document.fullscreenElement) {
-            dropdown_parent = $('.js-card-parent');
+            dropdown_parent = $('.js-fullscreen-element');
         }
 
         _this.select2({

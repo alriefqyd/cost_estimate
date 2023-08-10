@@ -503,12 +503,10 @@ custom-checkbox:checked:before {
 .removeall {
     border: 1px solid #ccc !important;
 
-&:hover {
-     background: #efefef;
- }
+    &:hover {
+         background: #efefef;
+     }
 }
-
-/*// Only included because button labels aren't showing*/
 
 .moveall::after {
     content: attr(title);
@@ -519,7 +517,6 @@ custom-checkbox:checked:before {
     content: attr(title);
 }
 
-/*// Custom styling form*/
 .form-control option {
    padding: 5px;
    border-bottom: 1px solid #efefef;

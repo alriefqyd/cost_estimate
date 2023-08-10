@@ -12,7 +12,7 @@
                           data-id="{{$project?->id}}"
                           action="">
                             @csrf
-                        <div class="table-responsive js-card-parent col-sm-12 col-lg-12 col-xl-12 table-overflow">
+                        <div class="table-responsive col-sm-12 col-lg-12 col-xl-12 table-overflow">
                             <div class="table-custom table-container">
                                 <table class="table table-custom">
                                     <thead class="bg-primary">
