@@ -17,17 +17,16 @@ class ManPowerPolicy
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function viewAny(User $user)
-    {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'man_power'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+    { // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'man_power' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -39,16 +38,16 @@ class ManPowerPolicy
      */
     public function view(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'man_power'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'man_power' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -59,16 +58,16 @@ class ManPowerPolicy
      */
     public function create(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'man_power'){
-                if($role->action == '*' || $role->action == 'create'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'man_power' &&
+                ($role->action === '*' || $role->action === 'create');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -80,16 +79,16 @@ class ManPowerPolicy
      */
     public function update(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'man_power'){
-                if($role->action == '*' || $role->action == 'update'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'man_power' &&
+                ($role->action === '*' || $role->action === 'update');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -101,16 +100,16 @@ class ManPowerPolicy
      */
     public function delete(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'man_power'){
-                if($role->action == '*' || $role->action == 'delete'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'man_power' &&
+                ($role->action === '*' || $role->action === 'delete');
+        });
+
+        return $hasPermission;
     }
 
     /**

@@ -18,16 +18,16 @@ class WbsLevel3Policy
      */
     public function viewAny(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbs'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbs' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -39,16 +39,16 @@ class WbsLevel3Policy
      */
     public function view(User $user, WorkBreakdownStructure $workBreakdownStructure)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbs'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbs' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -59,16 +59,16 @@ class WbsLevel3Policy
      */
     public function create(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbs'){
-                if($role->action == '*' || $role->action == 'create'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbs' &&
+                ($role->action === '*' || $role->action === 'create');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -80,16 +80,16 @@ class WbsLevel3Policy
      */
     public function update(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbs'){
-                if($role->action == '*' || $role->action == 'update'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbs' &&
+                ($role->action === '*' || $role->action === 'update');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -101,16 +101,16 @@ class WbsLevel3Policy
      */
     public function delete(User $user, WorkBreakdownStructure $workBreakdownStructure)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbs'){
-                if($role->action == '*' || $role->action == 'delete'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbs' &&
+                ($role->action === '*' || $role->action === 'delete');
+        });
+
+        return $hasPermission;
     }
 
     /**

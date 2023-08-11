@@ -18,16 +18,16 @@ class ProjectPolicy
      */
     public function viewAny(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'cost_estimate'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'cost_estimate' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasCostEstimateUpdatePermission;
     }
 
     /**
@@ -39,20 +39,21 @@ class ProjectPolicy
      */
     public function view(User $user, Project $project)
     {
-        $userRoles = $user->roles;
-        $projectAccess = $this->projectAccess($user,$project);
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        if(!$projectAccess) return false;
-
-        foreach($userRoles as $role){
-            if($role->feature == 'cost_estimate'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
+        // Check project access
+        if (!$this->projectAccess($user, $project)) {
+            return false;
         }
 
-        return false;
+        // Check if the user has the required role
+        $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'cost_estimate' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasCostEstimateUpdatePermission;
     }
 
     /**
@@ -63,16 +64,16 @@ class ProjectPolicy
      */
     public function create(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'cost_estimate'){
-                if($role->action == '*' || $role->action == 'create'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'cost_estimate' &&
+                ($role->action === '*' || $role->action === 'create');
+        });
+
+        return $hasCostEstimateUpdatePermission;
     }
 
     /**
@@ -84,19 +85,21 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project)
     {
-        $userRoles = $user->roles;
-        $projectAccess = $this->projectAccess($user,$project);
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        if(!$projectAccess) return false;
-        foreach($userRoles as $role){
-            if($role->feature == 'cost_estimate'){
-                if($role->action == '*' || $role->action == 'update'){
-                    return true;
-                }
-            }
+        // Check project access
+        if (!$this->projectAccess($user, $project)) {
+            return false;
         }
 
-        return false;
+        // Check if the user has the required role
+        $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'cost_estimate' &&
+                ($role->action === '*' || $role->action === 'update');
+        });
+
+        return $hasCostEstimateUpdatePermission;
 
     }
 
@@ -109,17 +112,16 @@ class ProjectPolicy
      */
     public function delete(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'cost_estimate'){
-                if($role->action == '*' || $role->action == 'delete'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'cost_estimate' &&
+                ($role->action === '*' || $role->action === 'delete');
+        });
 
+        return $hasCostEstimateUpdatePermission;
     }
 
     /**
@@ -144,6 +146,10 @@ class ProjectPolicy
     public function forceDelete(User $user, Project $project)
     {
         //
+    }
+
+    public function review(User $user, Project $project){
+        $userRoles = $user->roles;
     }
 
     public function projectAccess(User $user, Project $project){

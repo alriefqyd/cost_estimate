@@ -17,15 +17,16 @@ class WorkBreakdownStructurePolicy
      */
     public function viewAny(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
-        return false;
+        // Eager load roles to minimize database queries
+        $user->load('roles');
+
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbss' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -36,15 +37,16 @@ class WorkBreakdownStructurePolicy
      */
     public function view(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
-        return false;
+        // Eager load roles to minimize database queries
+        $user->load('roles');
+
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbss' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -55,15 +57,16 @@ class WorkBreakdownStructurePolicy
      */
     public function create(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
-                if($role->action == '*' || $role->action == 'create'){
-                    return true;
-                }
-            }
-        }
-        return false;
+        // Eager load roles to minimize database queries
+        $user->load('roles');
+
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbss' &&
+                ($role->action === '*' || $role->action === 'create');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -74,15 +77,16 @@ class WorkBreakdownStructurePolicy
      */
     public function update(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
-                if($role->action == '*' || $role->action == 'update'){
-                    return true;
-                }
-            }
-        }
-        return false;
+        // Eager load roles to minimize database queries
+        $user->load('roles');
+
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbss' &&
+                ($role->action === '*' || $role->action === 'update');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -93,15 +97,16 @@ class WorkBreakdownStructurePolicy
      */
     public function delete(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'wbss'){
-                if($role->action == '*' || $role->action == 'delete'){
-                    return true;
-                }
-            }
-        }
-        return false;
+        // Eager load roles to minimize database queries
+        $user->load('roles');
+
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'wbss' &&
+                ($role->action === '*' || $role->action === 'delete');
+        });
+
+        return $hasPermission;
     }
 
     /**

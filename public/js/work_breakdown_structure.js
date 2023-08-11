@@ -128,7 +128,6 @@ $(function(){
                         window.location.href = '/project/' + id;
                     },2000);
                 } else {
-                    console.log(result.message);
                     $('.js-modal-loading-wbs').modal('hide');
                     notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error')
                 }

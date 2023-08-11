@@ -170,19 +170,4 @@ class EstimateAllDisciplineController extends Controller
 
         return $data;
     }
-
-    /**
-     * Hapus Estimate Discipline Yang Worlk Element nya tidak dari id terdaftar
-     * @param $ids
-     * @param $project_id
-     * @return void
-     */
-    public function removeEstimatedDisciplineByEquipmentLocationId($ids,$project_id){
-        if($ids) {
-            $data = EstimateAllDiscipline::where('project_id',$project_id)->whereNotIn('wbs_level3_id',$ids)->get();
-            foreach($data as $item){
-                $item->delete();
-            }
-        }
-    }
 }
