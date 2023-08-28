@@ -263,7 +263,7 @@
                                             @endif
                                         </div>
                                         @if($project->getProjectStatusApproval() == $projectModel::WAITING_FOR_APPROVAL
-                                                && auth()->user()->isCostEstimateReviewer())
+                                                && auth()->user()->isCostEstimateReviewer() && $project->status != $projectModel::APPROVE)
                                             <div>
                                                 <button class="btn btn-outline-success js-btn-approve-modal" data-bs-toggle="modal" data-original-title="test" data-bs-target="#approveModal"><i class="fa fa-check"></i> Approve Cost Estimate</button>
 

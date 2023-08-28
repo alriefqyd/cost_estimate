@@ -37,9 +37,12 @@ $(function(){
                 if(result.status === 200){
                     $('#approveModal').hide();
                     $('.modal-backdrop').remove();
-                    $('.js-detail-status').text(result.data);
-                    $('.js-btn-approve-modal').remove();
+                    // $('.js-detail-status').text(result.data);
+                    // $('.js-btn-approve-modal').remove();
                     notification('success', result.message, 'fa fa-check', 'success');
+                    setTimeout(function (){
+                        window.location.href = '/project/' + segment;
+                    },2000);
                 } else {
                     notification('danger', result.message, 'fa fa-light', 'Error');
                 }

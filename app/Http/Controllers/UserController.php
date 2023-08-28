@@ -72,7 +72,7 @@ class UserController extends Controller
     }
 
     public function store(Request $request){
-        if(auth()->user()->cannot('update',User::class)){
+        if(auth()->user()->cannot('create',User::class)){
             abort(403);
         }
 
