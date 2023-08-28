@@ -64,7 +64,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(auth()->user()->isReviewer())
+                            @if(auth()->user()->isToolsEquipmentReviewerRole())
                                 <div class="row">
                                     <div class="col-md-6">
 
@@ -83,7 +83,7 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    @if(auth()->user()->isReviewer())
+                                    @if(auth()->user()->isToolsEquipmentReviewerRole())
                                         <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="equipmentTools"></th>
                                     @endif
                                     <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.code"></i></th>
@@ -102,7 +102,7 @@
                                 <tbody>
                                 @foreach($equipment_tools as $item)
                                     <tr>
-                                        @if(auth()->user()->isReviewer())
+                                        @if(auth()->user()->isToolsEquipmentReviewerRole())
                                             <td class="text-center">
                                                 <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox"
                                                        data-url="equipmentTools"

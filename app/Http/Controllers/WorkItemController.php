@@ -28,7 +28,7 @@ class WorkItemController extends Controller
                 })->when($request->sort != 'work_items.volume', function ($q) use ($request, $order, $sort) {
                     return $q->orderBy($order, $sort);
                 });
-            })->when(!auth()->user()->isReviewer(), function($query) {
+            })->when(!auth()->user()->isWorkItemReviewer(), function($query) {
                 return $query->where(function($q){
                     return $q->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id);
                 });
@@ -379,7 +379,7 @@ class WorkItemController extends Controller
                             return $q->Where('title','like','%'.$request->q.'%');
                         })->orWhere('description','like','%'."$request->q".'%');
                     });
-                })->when(!auth()->user()->isReviewer(), function($query) {
+                })->when(!auth()->user()->isWorkItemReviewer(), function($query) {
                     return $query->where(function($q){
                       return $q->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id);
                     });

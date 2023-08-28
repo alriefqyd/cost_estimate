@@ -97,7 +97,82 @@ class User extends Authenticatable
         return Crypt::decryptString($this->password);
     }
 
-    public function isReviewer(){
-        return (in_array(auth()->user()->profiles?->position, PROFILE::REVIEWER));
+    /*
+     * Below is checking for cost estimate role
+     */
+    public function isCostEstimateReviewer(){
+        return auth()->user()->roles->contains('name',Role::ACTION_COST_ESTIMATE['review_cost_estimate']);
     }
+
+    public function isDisciplineReviewer($discipline) {
+        $reviewerDiscipline = '';
+        if ($discipline) $reviewerDiscipline = Role::ACTION_COST_ESTIMATE["review_{$discipline}_cost_estimate"];
+        $reviewerRoles = [
+            $reviewerDiscipline,
+            Role::ACTION_COST_ESTIMATE['review_cost_estimate'],
+            Role::ACTION_COST_ESTIMATE['review_all_discipline_cost_estimate']
+        ];
+
+        return auth()->user()->roles->whereIn('name', $reviewerRoles)->isNotEmpty();
+    }
+
+    public function isViewAllCostEstimateRole(){
+        return auth()->user()->roles->contains('name', Role::ACTION_COST_ESTIMATE['read_all']);
+    }
+    public function isAssigneeCostEstimateRole(){
+        return auth()->user()->roles->contains('name',Role::ACTION_COST_ESTIMATE['read_assignee']);
+    }
+
+    public function isAllInstrumentCostEstimateRole(){
+        return auth()->user()->roles->contains('name', Role::ACTION_COST_ESTIMATE['read_instrument']);
+    }
+
+    public function isAllElectricalCostEstimateRole(){
+        return auth()->user()->roles->contains('name', Role::ACTION_COST_ESTIMATE['read_electrical']);
+    }
+    public function isAllMechanicalCostEstimateRole(){
+        return auth()->user()->roles->contains('name', Role::ACTION_COST_ESTIMATE['read_mechanical']);
+    }
+    public function isAllCivilCostEstimateRole(){
+        return auth()->user()->roles->contains('name', Role::ACTION_COST_ESTIMATE['read_civil']);
+    }
+
+    /*
+     * Function for checking role feature
+     */
+    public function checkReviewerAuthorization($action, $feature){
+        return auth()->user()->roles->contains(function ($role) use ($action, $feature) {
+            return $role->action === $action
+                && $role->feature === $feature;
+        });
+    }
+
+    /*
+     * Below is checking for work item role
+     */
+    public function isWorkItemReviewer(){
+        return $this->checkReviewerAuthorization('reviewer','work_item');
+    }
+
+    /*
+     * Checking for Man Power Role
+     */
+    public function isManPowerReviewer(){
+        return $this->checkReviewerAuthorization('reviewer','man_power');
+    }
+
+    /*
+     * Checking for Tools and Equipment Role
+     */
+    public function isToolsEquipmentReviewerRole(){
+        return $this->checkReviewerAuthorization('reviewer','tool_equipment');
+    }
+
+    /*
+     * Checking for Material Role
+     */
+    public function isMaterialReviewerRole(){
+        return $this->checkReviewerAuthorization('reviewer','material');
+    }
+
 }

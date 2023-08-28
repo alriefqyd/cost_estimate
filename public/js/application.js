@@ -1,3 +1,4 @@
+
 $(function(){
     /**
      * Project Form
@@ -253,5 +254,9 @@ $(function(){
         e.preventDefault();
         $(window).off('beforeunload');
         $(this).closest('form').submit();
+    });
+
+    var quill = new Quill('.js-quill',{
+        theme:'snow',
     });
 });

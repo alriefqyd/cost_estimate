@@ -63,7 +63,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(auth()->user()->isReviewer())
+                            @if(auth()->user()->isManPowerReviewer())
                                 <div class="row">
                                     <div class="col-md-6">
 
@@ -83,7 +83,7 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        @if(auth()->user()->isReviewer())
+                                        @if(auth()->user()->isManPowerReviewer())
                                             <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="manPower"></th>
                                         @endif
                                         <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="code"></i></th>
@@ -101,7 +101,7 @@
                                 <tbody>
                                 @foreach($man_power as $item)
                                     <tr>
-                                        @if(auth()->user()->isReviewer())
+                                        @if(auth()->user()->isManPowerReviewer())
                                             <td class="text-center">
                                                 <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox" data-url="manPower" value="{{$item->id}}">
                                             </td>

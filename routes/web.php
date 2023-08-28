@@ -56,7 +56,6 @@ Route::post('/workElement/{project:id}',[\App\Http\Controllers\WorkElementContro
 Route::get('/getWorkItems',[\App\Http\Controllers\WorkItemController::class,'setWorkItems'])->name('getWorkItem')->middleware('auth');
 Route::get('/getWorkElement',[\App\Http\Controllers\WorkElementController::class,'setWorkElements'])->name('getWorkElement');
 Route::get('/getItemAdditional/{type}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getItemAdditional'])->name('getItemAdditional');
-Route::get('/getWbsLevel3',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel3'])->middleware('auth');
 
 Route::get('/work-item/',[\App\Http\Controllers\WorkItemController::class,'index'])->middleware('auth');
 Route::get('/work-item/create',[\App\Http\Controllers\WorkItemController::class,'create'])->middleware('auth');
@@ -149,4 +148,5 @@ Route::post('/workItem/update-list/',[\App\Http\Controllers\WorkItemController::
 Route::post('/manPower/update-list/',[\App\Http\Controllers\ManPowerController::class,'updateList'])->middleware('auth');
 Route::post('/equipmentTools/update-list/',[\App\Http\Controllers\EquipmentToolsController::class,'updateList'])->middleware('auth');
 Route::post('/material/update-list/',[\App\Http\Controllers\MaterialController::class,'updateList'])->middleware('auth');
+Route::post('/project/{project:id}/update-remark',[\App\Http\Controllers\ProjectController::class,'updateRemark'])->middleware('auth');
 

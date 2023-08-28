@@ -39,7 +39,7 @@ class MaterialController extends Controller
                 })->when($request->order != 'category', function ($qq) use ($request, $order, $sort) {
                     return $qq->orderBy($order, $sort);
                 });
-        })->when(!auth()->user()->isReviewer(), function($query){
+        })->when(!auth()->user()->isMaterialReviewerRole(), function($query){
             return $query->where(function($subQuery){
                 return $subQuery->where('status',Material::REVIEWED)
                     ->orWhere('created_by', auth()->user()->id);
@@ -176,7 +176,7 @@ class MaterialController extends Controller
     public function getMaterial(Request $request){
         $response = array();
         $data = Material::select('id','tool_equipment_description','code','rate')
-            ->when(!auth()->user()->isReviewer(), function($query){
+            ->when(!auth()->user()->isMaterialReviewerRole(), function($query){
                 return $query->where(function($subQuery){
                     return $subQuery->where('status',Material::REVIEWED)
                         ->orWhere('created_by',auth()->user()->id);

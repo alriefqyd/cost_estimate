@@ -167,7 +167,7 @@ $(function(){
                 "idx": generateId(),
                 "workItem":_work_item,
                 "workItemText":_work_item_text,
-                "vol":_vol ? _vol : 0,
+                "vol":_vol ? _vol : 1,
                 "unit":_unit,
                 "totalRateManPowers":_labor_cost_total_rate,
                 "totalRateEquipments":_tool_unit_rate_total,

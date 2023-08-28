@@ -11,16 +11,30 @@ class Role extends Model
     protected $fillable = ['action','feature'];
 
     public const ACTION = [
-        '*' => 'All',
         'create' => 'Create',
         'read' => 'Read',
         'update' => 'Update',
         'delete' => 'Delete',
-        'civil_reviewer' => 'Civil Reviewer',
-        'mechanical_reviewer' => 'Mechanical Reviewer',
-        'electrical_reviewer' => 'Electrical Reviewer',
-        'instrument_reviewer' => 'Instrument Reviewer',
-        'master_reviewer' => 'Master Reviewer'
+        'reviewer' => 'Reviewer',
+        'civil_reviewer' => 'Civil Reviewer', //deprecated
+        'mechanical_reviewer' => 'Mechanical Reviewer', //deprecated
+        'electrical_reviewer' => 'Electrical Reviewer', //deprecated
+        'instrument_reviewer' => 'Instrument Reviewer', //deprecated
+    ];
+
+    public const ACTION_COST_ESTIMATE = [
+        'read_all' => 'View All Cost Estimate',
+        'read_civil' => 'View All Civil Cost Estimate',
+        'read_mechanical' => 'View All Mechanical Cost Estimate',
+        'read_electrical' => 'View All Electrical Cost Estimate',
+        'read_instrument' => 'View All Instrument Cost Estimate',
+        'read_assignee' => 'View Cost Estimate Assignee',
+        'review_civil_cost_estimate' => 'Review Civil Discipline Cost Estimates',
+        'review_mechanical_cost_estimate' => 'Review Mechanical Discipline Cost Estimates',
+        'review_electrical_cost_estimate' => 'Review Electrical Discipline Cost Estimates',
+        'review_instrument_cost_estimate' => 'Review Instrument Discipline Cost Estimates',
+        'review_all_discipline_cost_estimate' => 'Review All Discipline Cost Estimates',
+        'review_cost_estimate' => 'Review Cost Estimates',
     ];
 
     public const FEATURE = [

@@ -24,7 +24,7 @@ class ManPowerController extends Controller
                 return $query->orderBy($order,$sort);
             })->when(!isset($request->sort), function($query) use ($request,$order) {
                 return $query->orderBy('code', 'ASC');
-            })->when(!auth()->user()->isReviewer(), function($query){
+            })->when(!auth()->user()->isManPowerReviewer(), function($query){
                 return $query->where(function($q){
                     return $q->where('status',ManPower::REVIEWED)->orWhere('created_by', auth()->user()->id);
                 });
@@ -204,7 +204,7 @@ class ManPowerController extends Controller
             ->where(function($query) use ($request) {
                 return $query->where('title','like','%'.$request->q.'%')
                     ->orwhere('code','like','%'.$request->q.'%');
-            })->when(!auth()->user()->isReviewer(), function($query){
+            })->when(!auth()->user()->isManPowerReviewer(), function($query){
                 return $query->where(function($q){
                    return $q->where('status', ManPower::REVIEWED)
                        ->orwhere('created_by', auth()->user()->id);

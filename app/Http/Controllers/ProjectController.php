@@ -33,7 +33,7 @@ class ProjectController extends Controller
         $mechanicalEngineerList = $projectService->getDataEngineer('design_mechanical_engineer');
         $electricalEngineerList = $projectService->getDataEngineer('design_electrical_engineer');
         $instrumentEngineerList = $projectService->getDataEngineer('design_instrument_engineer');
-        $this->authorize('viewAny', Project::class);
+        $this->authorize('viewAny',$project);
         $projectList = $projectService->getProjectsData($request)['projectList'];
         return view('project.index',[
             'projects' => $projectList,
@@ -188,9 +188,9 @@ class ProjectController extends Controller
     }
 
     public function detail(Project $project, Request $request){
-        $projectServices = new ProjectServices();
-        $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
-        $costProjects = $projectServices->getAllProjectCost($project, $request);
+        $projectService = new ProjectServices();
+        $estimateDisciplines = $projectService->getEstimateDisciplineByProject($project,$request);
+        $costProjects = $projectService->getAllProjectCost($project, $request);
         $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
 
@@ -211,39 +211,6 @@ class ProjectController extends Controller
         ]);
     }
 
-    /** Deprecated */
-    public function getSummaryCostEstimate(Project $project, Request $request){
-        $data = $this->getEstimateDisciplineByProject($project,$request)->get()->groupBy('wbss.wbsDiscipline.title');
-        $arrValueManPower = array();
-        $arrValueEquipment = array();
-        $summaryCollection = array();
-        foreach($data as $key => $value){
-            foreach($value as $k => $v){
-                $totalManPower = $v->workItems->ManPowers->sum(function($item){
-                   return (float) $item->pivot->amount;
-                });
-
-                $totalEquipment = $v->workItems->equipmentTools->sum(function($item) {
-                    return (float) $item->pivot->amount;
-                });
-
-                $totalManPowerAmount = $v->volume * $totalManPower;
-                $totalToolEquipmentAmount = $v->volume * $totalEquipment;
-                array_push($arrValueManPower,$totalManPowerAmount);
-                array_push($arrValueEquipment,$totalToolEquipmentAmount);
-            }
-        }
-
-        $summaryTotalAmountManPower = array_sum($arrValueManPower);
-        $summaryTotalEquipment = array_sum($arrValueEquipment);
-        $summary = ([
-            'manPowerAmount' => $summaryTotalAmountManPower,
-            'toolEquipmentAmount' => $summaryTotalEquipment,
-        ]);
-
-        return $summary;
-    }
-
     public function export(Project $project, Request $request){
         $projectServices = new ProjectServices();
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
@@ -251,19 +218,57 @@ class ProjectController extends Controller
         return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary-export.xlsx');
     }
 
-    public function updateStatus(Project $project){
+    public function updateStatus(Project $project, Request $request){
+        $projectServices = new ProjectServices();
         try{
             DB::beginTransaction();
-            $project->status = Project::APPROVE;
+            if($request->discipline) {
+                switch ($request->discipline) {
+                    case Setting::DESIGN_ENGINEER_LIST['civil']:
+                        $project->civil_approval_status = $request->status;
+                        break;
+                    case Setting::DESIGN_ENGINEER_LIST['mechanical']:
+                        $project->mechanical_approval_status = $request->status;
+                        break;
+                    case Setting::DESIGN_ENGINEER_LIST['electrical']:
+                        $project->electrical_approval_status = $request->status;
+                        break;
+                    case Setting::DESIGN_ENGINEER_LIST['instrument']:
+                        $project->instrument_approval_status = $request->status;
+                        break;
+                }
+                $projectServices->updateStatusProject($project);
+            } else {
+                $project->status = Project::APPROVE;
+            }
             $project->save();
             DB::commit();
             return response()->json([
                 'status' => 200,
                 'message' => 'Project successfully approved',
-                'data' => Project::APPROVE
+                'data' => Project::APPROVE,
             ]);
         } catch (Exception $e) {
             DB::rollback();
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateRemark(Project $project, Request $request){
+        DB::beginTransaction();
+        try{
+            $project->remark = $request->remark;
+            $project->save();
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Remark successfully added'
+            ]);
+        } catch (Exception $e){
+            DB::rollBack();
             return response()->json([
                 'status' => 500,
                 'message' => $e->getMessage()

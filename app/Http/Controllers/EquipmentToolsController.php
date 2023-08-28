@@ -35,7 +35,7 @@ class EquipmentToolsController extends Controller
                 })->when($request->order != 'category', function($qq) use ($request,$order, $sort){
                     return $qq->orderBy($order,$sort);
                 });
-            })->when(!auth()->user()->isReviewer(), function($query){
+            })->when(!auth()->user()->isToolsEquipmentReviewerRole(), function($query){
                 return $query->where(function($q){
                    return $q->where('status',EquipmentTools::REVIEWED)->orWhere('created_by', auth()->user()->id);
                 });
@@ -231,7 +231,7 @@ class EquipmentToolsController extends Controller
     public function getToolsEquipment(Request $request){
         $response = array();
         $data = EquipmentTools::select('id','description','code','local_rate')
-            ->when(!auth()->user()->isReviewer(), function($query){
+            ->when(!auth()->user()->isToolsEquipmentReviewerRole(), function($query){
                 return $query->where(function($q){
                     return $q->where('status', EquipmentTools::REVIEWED)
                         ->orWhere('created_by', auth()->user()->id);

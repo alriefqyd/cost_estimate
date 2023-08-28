@@ -19,7 +19,9 @@ class ProjectServices
         $requestFilter = request(['q','status','civil','mechanical','electrical','instrument']);
 
         $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
-            ->access();
+            ->when(!auth()->user()->isViewAllCostEstimateRole(), function ($subQuery){
+                return $subQuery->access();
+            });
 
         $countDraft = clone $projects;
         $countApprove = clone $projects;
@@ -180,6 +182,14 @@ class ProjectServices
         $totalWorkItemCost = $totalWorkItemCost * $location->volume;
 
         return $totalWorkItemCost;
+    }
+
+    public function updateStatusProject(Project $project){
+        if($project->getProjectStatusApproval() ==  Project::WAITING_FOR_APPROVAL){
+            $project->status = Project::WAITING_FOR_APPROVAL;
+        } else {
+            $project->status = Project::PENDING_DISCIPLINE_APPROVAL;
+        }
     }
 
     public function getDataEngineer($subject){

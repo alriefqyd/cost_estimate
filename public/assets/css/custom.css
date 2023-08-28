@@ -521,3 +521,8 @@ custom-checkbox:checked:before {
    padding: 5px;
    border-bottom: 1px solid #efefef;
 }
+
+.radio .label-radio {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+}

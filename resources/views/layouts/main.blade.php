@@ -83,6 +83,8 @@
 <script src="{{'/assets/js/form-wizard/form-wizard-three.js'}}"></script>
 <script src="{{'/assets/js/form-wizard/jquery.backstretch.min.js'}}"></script>
 
+<script src="{{'/assets/js/quill/quill.js'}}"></script>
+
 <script src="{{'/js/config.js'}}"></script>
 <script src="{{'/assets/select2/dist/js/select2.min.js'}}"></script>
 <script src="{{'/js/notification.js'}}"></script>

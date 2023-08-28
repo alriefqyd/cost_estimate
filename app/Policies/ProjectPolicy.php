@@ -2,8 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Profile;
 use App\Models\Project;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -18,16 +18,21 @@ class ProjectPolicy
      */
     public function viewAny(User $user)
     {
-        // Eager load roles to minimize database queries
-        $user->load('roles');
+        if ($user->isViewAllCostEstimateRole()) {
+            return true;
+        }
 
-        // Check if the user has the required role
-        $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
-            return $role->feature === 'cost_estimate' &&
-                ($role->action === '*' || $role->action === 'read');
-        });
+        $roleMapping = [
+            Role::ACTION_COST_ESTIMATE['read_all'],
+            Role::ACTION_COST_ESTIMATE['read_electrical'],
+            Role::ACTION_COST_ESTIMATE['read_instrument'],
+            Role::ACTION_COST_ESTIMATE['read_assignee'],
+            Role::ACTION_COST_ESTIMATE['read_civil'],
+            Role::ACTION_COST_ESTIMATE['read_mechanical'],
+        ];
 
-        return $hasCostEstimateUpdatePermission;
+        return auth()->user()->roles->whereIn('name', $roleMapping)->isNotEmpty();
+
     }
 
     /**
@@ -37,23 +42,29 @@ class ProjectPolicy
      * @param  \App\Models\Project  $project
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, Project $project)
-    {
-        // Eager load roles to minimize database queries
-        $user->load('roles');
-
-        // Check project access
-        if (!$this->projectAccess($user, $project)) {
-            return false;
+    public function view(User $user, Project $project){
+        if ($user->isViewAllCostEstimateRole()) {
+            return true;
         }
 
-        // Check if the user has the required role
-        $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
-            return $role->feature === 'cost_estimate' &&
-                ($role->action === '*' || $role->action === 'read');
-        });
+        $roleMapping = [
+            'mechanical' => 'design_engineer_mechanical',
+            'civil' => 'design_engineer_civil',
+            'electrical' => 'design_engineer_electrical',
+            'instrument' => 'design_engineer_instrument'
+        ];
 
-        return $hasCostEstimateUpdatePermission;
+        foreach ($roleMapping as $role => $field) {
+            if ($user->isAssigneeCostEstimateRole() && $project->$field == $user->id) {
+                return true;
+            }
+
+            if ($user->{"isAll{$role}CostEstimateRole"}() && isset($project->$field) && $project->$field !== '') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -70,7 +81,7 @@ class ProjectPolicy
         // Check if the user has the required role
         $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
             return $role->feature === 'cost_estimate' &&
-                ($role->action === '*' || $role->action === 'create');
+                ($role->action === 'create');
         });
 
         return $hasCostEstimateUpdatePermission;
@@ -88,15 +99,10 @@ class ProjectPolicy
         // Eager load roles to minimize database queries
         $user->load('roles');
 
-        // Check project access
-        if (!$this->projectAccess($user, $project)) {
-            return false;
-        }
-
         // Check if the user has the required role
         $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
             return $role->feature === 'cost_estimate' &&
-                ($role->action === '*' || $role->action === 'update');
+                ($role->action === 'update');
         });
 
         return $hasCostEstimateUpdatePermission;
@@ -118,7 +124,7 @@ class ProjectPolicy
         // Check if the user has the required role
         $hasCostEstimateUpdatePermission = $user->roles->contains(function ($role) {
             return $role->feature === 'cost_estimate' &&
-                ($role->action === '*' || $role->action === 'delete');
+                ($role->action === 'delete');
         });
 
         return $hasCostEstimateUpdatePermission;
@@ -150,27 +156,5 @@ class ProjectPolicy
 
     public function review(User $user, Project $project){
         $userRoles = $user->roles;
-    }
-
-    public function projectAccess(User $user, Project $project){
-        $position = $user->profiles?->position;
-        $access = ['project_manager','super_administrator','administrator'];
-        if($position == 'design_civil_engineer'){
-            return $user->id == $project->design_engineer_civil;
-        }
-        if($position == 'design_mechanical_engineer'){
-            return $user->id == $project->design_engineer_mechanical;
-        }
-        if($position == 'design_electrical_engineer'){
-            return $user->id == $project->design_engineer_electrical;
-        }
-        if($position == 'design_instrument_engineer'){
-            return $user->id == $project->design_engineer_instrument;
-        }
-        if(in_array($position,$access)){
-            return true;
-        }
-
-        return false;
     }
 }

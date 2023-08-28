@@ -23,7 +23,7 @@ class ManPowerPolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'man_power' &&
-                ($role->action === '*' || $role->action === 'read');
+                ($role->action === 'read');
         });
 
         return $hasPermission;
@@ -44,7 +44,7 @@ class ManPowerPolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'man_power' &&
-                ($role->action === '*' || $role->action === 'read');
+                ($role->action === 'read');
         });
 
         return $hasPermission;
@@ -64,7 +64,7 @@ class ManPowerPolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'man_power' &&
-                ($role->action === '*' || $role->action === 'create');
+                ($role->action === 'create');
         });
 
         return $hasPermission;
@@ -85,7 +85,7 @@ class ManPowerPolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'man_power' &&
-                ($role->action === '*' || $role->action === 'update');
+                ($role->action === 'update');
         });
 
         return $hasPermission;
@@ -106,7 +106,7 @@ class ManPowerPolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'man_power' &&
-                ($role->action === '*' || $role->action === 'delete');
+                ($role->action === 'delete');
         });
 
         return $hasPermission;

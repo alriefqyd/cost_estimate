@@ -95,6 +95,7 @@ class UserController extends Controller
                 'full_name' => $request->full_name,
                 'email' => $request->email,
                 'position' => $request->position,
+                'other_position' => $request->other_position,
             ]);
 
             $user->profiles()->save($profile);
@@ -144,6 +145,7 @@ class UserController extends Controller
             $profile->full_name = $request->full_name;
             $profile->email = $request->email;
             $profile->position = $request->position;
+            $profile->other_position = $request->other_position;
             $profile->save();
 
             $roles = $request->role;
