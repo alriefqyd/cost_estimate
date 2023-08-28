@@ -21,16 +21,20 @@ class WorkItemController extends Controller
         $order = $request->order;
         $sort =  $request->sort;
 
-        $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter(request(['q','category']))
-            ->when(isset($request->sort), function($query) use ($request,$order,$sort){
-                return $query->when($request->order == 'work_items.volume', function($q) use ($request, $order, $sort){
+        $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter(request(['q','category','status']))
+            ->when(isset($request->sort), function($query) use ($request,$order,$sort) {
+                return $query->when($request->order == 'work_items.volume', function ($q) use ($request, $order, $sort) {
                     return $q->orderByRaw('CONVERT(work_items.volume, SIGNED)' . $sort);
-                })->when($request->sort != 'work_items.volume',function($q) use ($request, $order, $sort){
-                    return $q->orderBy($order,$sort);
+                })->when($request->sort != 'work_items.volume', function ($q) use ($request, $order, $sort) {
+                    return $q->orderBy($order, $sort);
+                });
+            })->when(!auth()->user()->isReviewer(), function($query) {
+                return $query->where(function($q){
+                    return $q->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id);
                 });
             })->when(!isset($request->sort), function($query) use ($request,$order){
                 return $query->orderBy('work_items.code','ASC');
-            })->select('work_items.code','work_items.description','work_items.id','work_item_types.title as category','work_items.volume','work_items.unit')->paginate(20)->withQueryString();
+            })->select('work_items.code','work_items.description','work_items.id','work_item_types.title as category','work_items.volume','work_items.unit','work_items.status')->paginate(20)->withQueryString();
         $workItemCategory = WorkItemType::select('id','title')->get();
 
         return view('work_item.index',[
@@ -40,9 +44,11 @@ class WorkItemController extends Controller
     }
 
     public function show(WorkItem $workItem){
-        if(!auth()->user()->can('viewAny',WorkItem::class)){
+        if(!auth()->user()->can('viewAny',WorkItem::class)
+            || !$workItem->isAuthorized()){
             return view('not_authorized');
         }
+
         return view('work_item.show',[
             'work_item' => $workItem
         ]);
@@ -93,7 +99,8 @@ class WorkItemController extends Controller
                 'description' => $request->description,
                 'volume' => $request->volume,
                 'unit' => $request->unit,
-                'status' => WorkItem::DRAFT
+                'status' => WorkItem::DRAFT,
+                'created_by' => auth()->user()->id
             ]);
             $workItem->save();
             DB::commit();
@@ -368,8 +375,14 @@ class WorkItemController extends Controller
             $item = WorkItem::with(['manPowers','workItemTypes','equipmentTools','materials'])
                 ->when(isset($request->q), function($query) use ($request){
                     $query->whereHas('workItemTypes',function ($query) use ($request){
-                        return $query->Where('title','like','%'.$request->q.'%');
-                    })->orWhere('description','like','%'."$request->q".'%');
+                        return $query->where(function ($q) use ($request) {
+                            return $q->Where('title','like','%'.$request->q.'%');
+                        })->orWhere('description','like','%'."$request->q".'%');
+                    });
+                })->when(!auth()->user()->isReviewer(), function($query) {
+                    return $query->where(function($q){
+                      return $q->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id);
+                    });
                 })->when(isset($request->category), function($query) use ($request){
                     return $query->where('work_item_type_id', $request->category);
                 })->when(isset($request->term), function($query) use ($request){
@@ -387,74 +400,84 @@ class WorkItemController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function setWorkItems(Request $request){
-        $workItem = $this->getWorkItems($request);
-        foreach ($workItem as $k => $v){
-            $children = array();
-            foreach ($v as $subItems){
-                $manPowersArr = array();
-                $equipmentToolsArr = array();
-                $materialsArr = array();
-                $manPowers = $subItems?->manPowers;
-                $equipmentTools = $subItems?->equipmentTools;
-                $materials = $subItems?->materials;
-                if($manPowers){
-                    foreach ($manPowers as $manPower){
-                        $manPowersArr[] = array(
-                            "title" => $manPower->title,
-                            "pivot" => $manPower?->pivot,
-                            "overall_rate_hourly" => $manPower?->overall_rate_hourly
-                        );
+        try{
+            $workItem = $this->getWorkItems($request);
+            foreach ($workItem as $k => $v){
+                $children = array();
+                foreach ($v as $subItems){
+                    $manPowersArr = array();
+                    $equipmentToolsArr = array();
+                    $materialsArr = array();
+                    $manPowers = $subItems?->manPowers;
+                    $equipmentTools = $subItems?->equipmentTools;
+                    $materials = $subItems?->materials;
+                    if($manPowers){
+                        foreach ($manPowers as $manPower){
+                            $manPowersArr[] = array(
+                                "title" => $manPower->title,
+                                "pivot" => $manPower?->pivot,
+                                "overall_rate_hourly" => $manPower?->overall_rate_hourly
+                            );
+                        }
                     }
-                }
-                if($equipmentTools){
-                    foreach ($equipmentTools as $equipment){
-                        $equipmentToolsArr[] = array(
-                            "description" => $equipment->description,
-                            "quantity" => number_format($equipment?->pivot?->quantity,2),
-                            "unit" => $equipment?->pivot?->unit,
-                            "unitPrice" => $this->toCurrency($equipment?->pivot?->unit_price),
-                            "amount" => $this->toCurrency($equipment?->pivot?->amount),
-                            "remark" => $equipment->remark
-                        );
+                    if($equipmentTools){
+                        foreach ($equipmentTools as $equipment){
+                            $equipmentToolsArr[] = array(
+                                "description" => $equipment->description,
+                                "quantity" => number_format($equipment?->pivot?->quantity,2),
+                                "unit" => $equipment?->pivot?->unit,
+                                "unitPrice" => $this->toCurrency($equipment?->pivot?->unit_price),
+                                "amount" => $this->toCurrency($equipment?->pivot?->amount),
+                                "remark" => $equipment->remark
+                            );
+                        }
                     }
-                }
-                if($materials){
-                    foreach ($materials as $material){
-                        $materialsArr[] = array(
-                            "tool_equipment_description" => $material->tool_equipment_description,
-                            "unit" => $material?->pivot?->unit,
-                            "pivot" => $material?->pivot,
-                            "rate" => $material?->pivot?->rate,
-                        );
+                    if($materials){
+                        foreach ($materials as $material){
+                            $materialsArr[] = array(
+                                "tool_equipment_description" => $material->tool_equipment_description,
+                                "unit" => $material?->pivot?->unit,
+                                "pivot" => $material?->pivot,
+                                "rate" => $material?->pivot?->rate,
+                            );
+                        }
                     }
+
+                    $totalRateManPowers = $this->getTotalRateManPowers($manPowers);
+                    $totalRateEquipments = $this->getTotalRateEquipments($equipmentTools);
+                    $totalRateMaterials = $this->getTotalRateMaterials($materials);
+                    $totalRateWorkItem = (float) $totalRateManPowers + (float) $totalRateEquipments + (float) $totalRateMaterials;
+
+                    $children[] = array(
+                        "id" => $subItems->id,
+                        "code" => $subItems->code,
+                        "totalChild" => $subItems->countChildren(),
+                        "text" => $subItems->description,
+                        "vol" => $subItems->unit,
+                        "manPowers" => $manPowersArr,
+                        "manPowersTotalRate" => $this->toCurrency($totalRateManPowers),
+                        "manPowersTotalRateInt" => $totalRateManPowers,
+                        "equipmentTools" => $equipmentToolsArr,
+                        "equipmentToolsRate" => $this->toCurrency($totalRateEquipments),
+                        "equipmentToolsRateInt" => $totalRateEquipments,
+                        "materials" => $materialsArr,
+                        "materialsRate" => $this->toCurrency($totalRateMaterials),
+                        "materialsRateInt" => $totalRateMaterials,
+                        "totalWorkItemRate" => $totalRateWorkItem,
+                        "totalWorkItemRateStr" => number_format($totalRateWorkItem,2)
+                    );
                 }
 
-                $totalRateManPowers = $this->getTotalRateManPowers($manPowers);
-                $totalRateEquipments = $this->getTotalRateEquipments($equipmentTools);
-                $totalRateMaterials = $this->getTotalRateMaterials($materials);
-
-                $children[] = array(
-                    "id" => $subItems->id,
-                    "code" => $subItems->code,
-                    "totalChild" => $subItems->countChildren(),
-                    "text" => $subItems->description,
-                    "vol" => $subItems->unit,
-                    "manPowers" => $manPowersArr,
-                    "manPowersTotalRate" => $totalRateManPowers,
-                    "equipmentTools" => $equipmentToolsArr,
-                    "equipmentToolsRate" => $totalRateEquipments,
-                    "materials" => $materialsArr,
-                    "materialsRate" => $totalRateMaterials,
-
+                $response[] = array(
+                    "text" => $v[0]?->workItemTypes()?->get()[0]?->title,
+                    "children" => $children
                 );
             }
-
-            $response[] = array(
-                "text" => $v[0]?->workItemTypes()?->get()[0]?->title,
-                "children" => $children
-            );
+            return response()->json($response);
+        } catch (Exception $e){
+            return response()->json([]);
         }
-        return response()->json($response);
+
     }
 
     public function getWorkItemRelated(Request $request){
@@ -539,7 +562,7 @@ class WorkItemController extends Controller
             return $tot;
         })->all();
 
-        return $this->toCurrency(array_sum($data));
+        return array_sum($data);
     }
 
     public function getTotalRateEquipments($value){
@@ -550,7 +573,7 @@ class WorkItemController extends Controller
             return $tot;
         })->all();
 
-        return $this->toCurrency(array_sum($data));
+        return array_sum($data);
     }
 
     public function getTotalRateMaterials($value){
@@ -561,10 +584,10 @@ class WorkItemController extends Controller
             return $tot;
         })->all();
 
-        return $this->toCurrency(array_sum($data));
+        return array_sum($data);
     }
 
-    public function removeCommaCurrencyFormat($val){
+        public function removeCommaCurrencyFormat($val){
         if(!$val) return 0;
         return str_replace(',','',$val);
     }
@@ -591,8 +614,109 @@ class WorkItemController extends Controller
         ]);
     }
 
-    public function sumTotalByDiscipline(){
+    public function getDetail(Request $request){
+        $data = WorkItem::with(['equipmentTools:id,description,unit,quantity,local_rate',
+            'materials:id,tool_equipment_description,unit,quantity,rate',
+            'manPowers:id,title,basic_rate_month,overall_rate_hourly'])
+            ->select('work_items.id')
+            ->where('id', $request->id)
+            ->first();
 
+
+        if(isset($data)){
+            $manPower = $data->manPowers?->map(function($mp){
+                return [
+                    'id' => $mp->id,
+                    'title' => $mp->title,
+                    'basic_rate_month' => $mp->basic_rate_month,
+                    'overall_rate_hourly' => number_format($mp->overall_rate_hourly,2,',','.'),
+                    'labor_unit' => $mp->pivot->labor_unit,
+                    'labor_coefisient' => number_format((float) $mp->pivot->labor_coefisient,2),
+                    'amount' => number_format($mp->pivot->amount,2,'.',',')
+                ];
+            });
+
+            $equipment = $data->equipmentTools?->map(function($mp){
+                return [
+                    'id' => $mp->id,
+                    'description' => $mp->description,
+                    'unit' => $mp->unit,
+                    'quantity' => number_format($mp->pivot->quantity,2),
+                    'local_rate' => number_format($mp->local_rate,2),
+                    'amount' => number_format($mp->pivot->amount,2,'.',',')
+                ];
+            });
+
+            $material = $data->materials?->map(function($mp){
+               return [
+                   'id' => $mp->id,
+                   'description' => $mp->tool_equipment_description,
+                   'unit' => $mp->unit,
+                   'quantity' => number_format($mp->pivot->quantity,2),
+                   'rate' => number_format($mp->rate,2),
+                   'amount' => number_format($mp->pivot->amount,2,'.',',')
+               ];
+            });
+
+
+
+            return response()->json([
+                'data' => [
+                    'manPower' => $manPower,
+                    'equipment' => $equipment,
+                    'material' => $material
+                ],
+
+                'status' => 200
+            ]);
+        } else {
+            return response()->json([
+                'status' => 500
+            ]);
+        }
     }
 
+    public function updateStatusWorkItem(Request $request){
+        DB::beginTransaction();
+        try{
+            $data = WorkItem::where('id',$request->id)->first();
+            $data->status = $request->status;
+            $data->save();
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Data successfully update'
+            ]);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function updateList(Request $request){
+        $ids = (string) $request->ids;
+        DB::beginTransaction();
+        $ids = explode(',',$ids);
+        try {
+            $items = WorkItem::whereIn('id',$ids)->get();
+
+            $items->each(function ($item){
+                $item->update(['status' => WorkItem::REVIEWED]);
+            });
+            DB::commit();
+            return response()->json([
+                'message' => 'Data successfully update',
+                'status' => 200
+            ]);
+        } catch (Exception $e){
+            DB::rollback();
+            return response()->json([
+                'message' => $e->getMessage(),
+                'status' => 500
+            ]);
+        }
+    }
 }

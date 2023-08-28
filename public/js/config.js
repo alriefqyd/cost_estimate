@@ -13,6 +13,12 @@ $(function (){
         });
     });
 
+    $(document).on('select2:open', () => {
+        var searchField = document.querySelector('.select2-search__field');
+        if (searchField) {
+            searchField.focus();
+        }
+    });
 
     $('.select2-ajax').select2({
         allowClear:$(this).data('allowClear'),
@@ -32,5 +38,5 @@ $(function (){
                 }
             }
         }
-    })
+    });
 })

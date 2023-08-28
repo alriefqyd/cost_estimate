@@ -18,37 +18,36 @@ class EstimateAllDisciplinePolicy
      */
     public function viewAny(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'estimate_discipline'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'estimate_discipline' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\estimateAllDiscipline  $estimateAllDiscipline
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, estimateAllDiscipline $estimateAllDiscipline)
+    public function view(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'estimate_discipline'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'estimate_discipline' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -59,16 +58,16 @@ class EstimateAllDisciplinePolicy
      */
     public function create(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'estimate_discipline'){
-                if($role->action == '*' || $role->action == 'create'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'estimate_discipline' &&
+                ($role->action === '*' || $role->action === 'create');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -80,37 +79,36 @@ class EstimateAllDisciplinePolicy
      */
     public function update(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'estimate_discipline'){
-                if($role->action == '*' || $role->action == 'update'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'estimate_discipline' &&
+                ($role->action === '*' || $role->action === 'update');
+        });
+
+        return $hasPermission;
     }
 
     /**
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\estimateAllDiscipline  $estimateAllDiscipline
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, estimateAllDiscipline $estimateAllDiscipline)
+    public function delete(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'estimate_discipline'){
-                if($role->action == '*' || $role->action == 'delete'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'estimate_discipline' &&
+                ($role->action === '*' || $role->action === 'delete');
+        });
+
+        return $hasPermission;
     }
 
     /**

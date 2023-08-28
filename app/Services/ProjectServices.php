@@ -6,11 +6,34 @@ use App\Class\ProjectClass;
 use App\Class\ProjectTotalCostClass;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 
 class ProjectServices
 {
+    public function getProjectsData(Request $request){
+        $order = $request->order;
+        $sort =  $request->sort;
+
+        $requestFilter = request(['q','status','civil','mechanical','electrical','instrument']);
+
+        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
+            ->access();
+
+        $countDraft = clone $projects;
+        $countApprove = clone $projects;
+
+        $projectList = $projects->filter($requestFilter, true)->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
+        $countDraft = $countDraft->filter($requestFilter,false)->where('status',Project::DRAFT)->count();
+        $countApprove = $countApprove->filter($requestFilter,false)->where('status',Project::APPROVE)->count();
+
+        return [
+            'projectList' => $projectList,
+            'draft' => $countDraft,
+            'approve' => $countApprove
+        ];
+    }
     /**
      * Get all data estimate discipline by project id
      * @param Project $project
@@ -19,14 +42,14 @@ class ProjectServices
      */
     public function getEstimateDisciplineByProject(Project $project, Request $request){
         $data = $this->getDataEstimateDiscipline($project,$request);
-//        ['2537','2538','2539','2540','2541'];
         $result = $data->mapToGroups(function ($location) use ($data) {
             $projectClass = new ProjectClass();
             $projectClass->estimateVolume = $location->volume;
             $projectClass->disciplineTitle = $location?->wbss?->wbsDiscipline?->title;
             $projectClass->workItemIdentifier = $location?->wbss?->identifier;
-            $projectClass->workElementTitle = $location?->wbss?->workElements?->title;
+            $projectClass->workElementTitle = $location?->wbss?->work_element;
             $projectClass->workItemDescription = $location?->workItems?->description;
+            $projectClass->workItemId = $location?->workItems?->id;
             $projectClass->workItemUnit = $location?->workItems?->unit;
             $projectClass->workItemUnitRateLaborCost = $this->getResultCount($location?->labor_unit_rate, $location?->labour_factorial);
             $projectClass->workItemTotalLaborCost = (float) $location?->labor_cost_total_rate;
@@ -37,9 +60,11 @@ class ProjectServices
             $projectClass->workItemLaborFactorial = $location?->labour_factorial;
             $projectClass->workItemEquipmentFactorial = $location?->equipment_factorial;
             $projectClass->workItemMaterialFactorial = $location?->material_factorial;
+            $projectClass->workItemTotalCostStr = number_format($this->getTotalCostWorkItem($location),2);
+            $projectClass->workItemTotalCost = $this->getTotalCostWorkItem($location);
 
             return [
-                $location->wbss->title => $projectClass,
+                $location->wbss?->title => $projectClass,
             ];
         });
 
@@ -144,8 +169,26 @@ class ProjectServices
     }
 
 
+    public function getTotalCostWorkItem($location){
+        $labor_factorial = $location?->labour_factorial ?: 1;
+        $tool_factorial = $location?->tool_factorial ?: 1;
+        $material_factorial = $location?->material_factorial ?: 1;
+        $man_power_cost = (float) $location?->labor_unit_rate * $labor_factorial;
+        $tool_cost = (float) $location?->tool_unit_rate * $tool_factorial;
+        $material_cost = (float) $location?->material_unit_rate * $material_factorial;
+        $totalWorkItemCost = $man_power_cost +  $tool_cost + $material_cost;
+        $totalWorkItemCost = $totalWorkItemCost * $location->volume;
+
+        return $totalWorkItemCost;
+    }
+
+    public function getDataEngineer($subject){
+        return User::with('profiles')->whereHas('profiles', function ($q) use ($subject) {
+            return $q->where('position', $subject);
+        })->get();
+    }
     public function toCurrency($val){
-        if(!$val) return '';
+        if(!$val) return 0.00;
         return number_format($val, 2);
     }
 

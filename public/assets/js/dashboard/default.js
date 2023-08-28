@@ -194,7 +194,7 @@ var options = {
           [1353366000000, 48.64],
           [1353452400000, 48.84],
           [1353625200000, 48.40],
-          [1353884400000, 48.30],         
+          [1353884400000, 48.30],
           [1355353200000, 55.53],
           [1355439600000, 55.56],
           [1355698800000, 55.42],
@@ -275,7 +275,7 @@ var options = {
       xaxis: [{
           x: new Date('15 Nov 2012').getTime(),
           borderColor: vihoAdminConfig.primary,
-          yAxisIndex: 50,          
+          yAxisIndex: 50,
           label: {
               show: false,
               text: '$859,432',
@@ -330,12 +330,12 @@ var options = {
       breakpoint: 1238,
       options: {
           chart: {
-              height:300              
+              height:300
           },
           grid: {
-            padding: {              
-              bottom: 5,              
-           },  
+            padding: {
+              bottom: 5,
+           },
           }
       }
   },
@@ -343,17 +343,17 @@ var options = {
     breakpoint: 992,
     options: {
         chart: {
-            height: 300              
+            height: 300
         }
     }
 },
 {
       breakpoint: 551,
-      options: {          
+      options: {
           grid: {
-            padding: {              
-              bottom:10,              
-           },  
+            padding: {
+              bottom:10,
+           },
           }
       }
   },
@@ -366,11 +366,11 @@ var options = {
 
     }
 }],
-  
+
   colors: [vihoAdminConfig.primary],
 };
-var charttimeline = new ApexCharts(document.querySelector("#chart-timeline-dashbord"), options);
-charttimeline.render();
+// var charttimeline = new ApexCharts(document.querySelector("#chart-timeline-dashbord"), options);
+// charttimeline.render();
 // second chart dashbord dafault
 var options17 = {
   series: [76, 67, 61, 90],
@@ -438,8 +438,8 @@ var options17 = {
       }
   }]
 };
-var chart17 = new ApexCharts(document.querySelector("#chart-dashbord"), options17);
-chart17.render();
+// var chart17 = new ApexCharts(document.querySelector("#chart-dashbord"), options17);
+// chart17.render();
 // chart-4 dashbord
 var options21 = {
   series: [{
@@ -509,8 +509,8 @@ var options21 = {
       },
   }],
 };
-var chart21 = new ApexCharts(document.querySelector("#chart-3dash"), options21);
-chart21.render();
+// var chart21 = new ApexCharts(document.querySelector("#chart-3dash"), options21);
+// chart21.render();
 //column chart
 var options54 = {
   series: [{
@@ -584,8 +584,8 @@ var options54 = {
       show: false
   }
 };
-var chart54 = new ApexCharts(document.querySelector("#chart-unique-2"), options54);
-chart54.render();
+// var chart54 = new ApexCharts(document.querySelector("#chart-unique-2"), options54);
+// chart54.render();
 //new column charts
 var options55 = {
   series: [{
@@ -669,5 +669,5 @@ var options55 = {
   },
   colors: [vihoAdminConfig.primary]
 };
-var chart55 = new ApexCharts(document.querySelector("#user-activation-dash-2"), options55);
-chart55.render();
+// var chart55 = new ApexCharts(document.querySelector("#user-activation-dash-2"), options55);
+// chart55.render();

@@ -26,4 +26,24 @@ $(function(){
             }
         });
     });
+
+    $('.js-btn-approve-cost-estimate').on('click',function(){
+        var _this = $(this)
+        var segment = window.location.pathname.split('/')[2];
+        $.ajax({
+            'url' : '/project/update-status/' + segment,
+            'method' : 'post',
+            success : function(result){
+                if(result.status === 200){
+                    $('#approveModal').hide();
+                    $('.modal-backdrop').remove();
+                    $('.js-detail-status').text(result.data);
+                    $('.js-btn-approve-modal').remove();
+                    notification('success', result.message, 'fa fa-check', 'success');
+                } else {
+                    notification('danger', result.message, 'fa fa-light', 'Error');
+                }
+            }
+        });
+    });
 });

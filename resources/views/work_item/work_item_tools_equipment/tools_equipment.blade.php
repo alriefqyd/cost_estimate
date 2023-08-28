@@ -1,6 +1,6 @@
 <tr class="js-row-work-item-tools-equipment js-row-column">
     <td class="min-w-160">
-        <select class="select2 js-select-tools-equipment js-select-item"
+        <select class="select2 js-select-tools-equipment js-select-item js-confirm-form"
                 data-url="/getToolsEquipment"
                 name="tools_equipment[]"
                 data-placeholder="Select Tools Equipment"
@@ -11,7 +11,7 @@
         </select>
     </td>
     <td class="js-work-item-unit min-w-50">
-        <input type="text" name="unit[]" class="form-control
+        <input type="text" name="unit[]" class="form-control js-confirm-form
             js-item-unit height-40"
                value="{{ $isEdit ? $exEquipmentTools->pivot->unit : ''}}"
             {{!$isEdit ? 'disabled' : ''}}>
@@ -21,6 +21,7 @@
                {{!$isEdit ? 'disabled' : ''}}
                value="{{$isEdit ? number_format($exEquipmentTools->pivot->quantity,2,'.') : ''}}"
                class="form-control js-coef-work-item-tools-equipment
+               js-confirm-form
                js-item-coef
                height-40">
     </td>
@@ -32,6 +33,6 @@
         {{$isEdit ? number_format($exEquipmentTools->pivot->amount,2,'.',',') : ''}}
     </td>
     <td>
-        <i class="fa fa-trash-o js-delete-item js-delete-work-item-tools-equipment text-danger text-20"></i>
+        <i class="fa fa-trash-o js-delete-item js-delete-work-item-tools-equipment text-danger js-confirm-form text-20"></i>
     </td>
 </tr>

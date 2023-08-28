@@ -208,5 +208,205 @@
     @include('work_item.work_item_material.material',['isEdit' => false])
 </script>
 
+<script id="js-template-table-work_item_column" type="x-tmpl-mustache">
+    @include('estimate_all_discipline.work_item_row')
+</script>
+
+<script id="js-template-nestable-wbs" type="x-tmpl-mustache">
+    @include('work_breakdown_structure.nestable_form')
+</script>
+
+<script id="js-template-location-nestable-wbs" type="x-tmpl-mustache">
+         <li class="dd-item" data-id="@{{ text }}">
+             <div class="dd-handle">
+                <div class="float-start col-md-10">
+                    @{{ text }}
+                </div>
+                <div class="float-end">
+                    <span class="js-add-new-nestable-wbs" data-is-element="false">
+                       <i data-feather="plus-circle"></i>
+                    </span>
+                    <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                        <i data-feather="x"></i>
+                    </span>
+                </div>
+             </div>
+
+            @{{#dataList}}
+             <ol class="dd-list js-get-idx" data-idx="2">
+                <li class="dd-item" data-id="@{{id}}">
+                    <div class="dd-handle">
+                        <div class="float-start col-md-10 js-dd-handle-edit">
+                            <span class="js-dd-title">@{{title}}</span>
+                        </div>
+                        <div class="float-end">
+                            <span class="js-add-new-nestable-wbs" data-is-element="true">
+                                <i data-feather="plus-circle"></i>
+                            </span>
+
+                            <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                                <i data-feather="x"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <span class="js-dd-select d-none">
+                        <select class="select2 js-select-update-discipline">
+                        @{{#dataList}}
+                          <option value="@{{ id }}">@{{ title }}</option>
+                        @{{ /dataList }}
+                        </select>
+                    </span>
+                </li>
+            </ol>
+            @{{/dataList}}
+         </li>
+
+</script>
+
+<script id="js-template-sub-nestable" type="x-templ-mustache">
+   <ol class="dd-list js-get-idx" data-idx="2">
+        <li class="dd-item" data-id="@{{id}}" data-old-element="@{{ id }}">
+            <div class="dd-handle">
+                <div class="float-start col-md-10 js-dd-handle-edit">
+                @{{ #isSelect }}
+                    <span class="js-dd-title">@{{ text }}</span>
+                @{{ /isSelect }}
+                @{{ ^isSelect }}
+                    <span class="text-strong js-dd-title-text" contenteditable="true">Work Element</span>
+                @{{ /isSelect }}
+
+                </div>
+                <div class="float-end">
+                    @{{ #showButton }}
+                        <span class="js-add-new-nestable-wbs" data-is-element="true">
+                            <i data-feather="plus-circle"></i>
+                        </span>
+                    @{{ /showButton }}
+
+                    <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                        <i data-feather="x"></i>
+                    </span>
+                </div>
+            </div>
+             @{{ #isSelect }}
+                <span class="js-dd-select d-none">
+                    <select class="select2 js-select-update-discipline">
+                        @{{#dataList}}
+                          <option value="@{{ id }}">@{{ title }}</option>
+                        @{{ /dataList }}
+                    </select>
+                </span>
+            @{{ /isSelect }}
+        </li>
+   </ol>
+</script>
+
+<script id="js-template-modal-detail-estimate" type="x-templ-mustache">
+    <div class="modal fade js-modal-detail-estimate" id="workItemDetailModal"
+    data-backdrop="static" data-keyboard="false"
+    tabindex="-1" role="dialog" aria-labelledby="materialsModal_Label" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Detail</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                    <div class="col-md-12 mb-5">
+                        <label>Man Power</label>
+                        <table class="table table-striped">
+                            <thead>
+                            <th>Description</th>
+                            <th>Unit</th>
+                            <th>Coef</th>
+                            <th>Rate (Rp)</th>
+                            <th>Amount (Rp)</th>
+                            </thead>
+                            <tbody>
+                            @{{#manPower}}
+                            <tr>
+                                <td>
+                                    @{{ title }}
+                                </td>
+                                <td>
+                                    @{{ labor_unit }}
+                                </td>
+                                <td>
+                                    @{{ labor_coefisient }}
+                                </td>
+                                <td>
+                                    @{{ overall_rate_hourly }}
+                                </td>
+                                <td>
+                                    @{{ amount }}
+                                </td>
+                            </tr>
+                            @{{/manPower}}
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="col-md-12 mb-5">
+                        <label>Tool and Equipment</label>
+                        <table class="table table-striped">
+                            <thead>
+                            <th>Description</th>
+                            <th>Unit</th>
+                            <th>Quantity</th>
+                            <th>Local Rate (Rp)</th>
+                            <th>Amount (Rp)</th>
+                            </thead>
+                            <tbody>
+                            @{{ #equipment }}
+                            <tr>
+                                <td>
+                                    @{{ description }}
+                                </td>
+                                <td>
+                                     @{{ unit }}
+                                </td>
+                                <td> @{{ quantity }}</td>
+                                <td> @{{ local_rate }}</td>
+                                <td> @{{ amount }}</td>
+                            </tr>
+                            @{{ /equipment }}
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr>
+                    <div class="col-md-12 mb-3">
+                        <label>Material</label>
+                        <table class="table table-striped">
+                            <thead>
+                            <th>Description</th>
+                            <th>Unit</th>
+                            <th>Quantity</th>
+                            <th>Unit Price (Rp)</th>
+                            <th>Amount (Rp)</th>
+                            </thead>
+                            <tbody>
+                            @{{ #material }}
+                            <tr>
+                                <td>
+                                    @{{ description }}
+                                </td>
+                                <td>@{{ unit }}</td>
+                                <td>@{{ quantity }}</td>
+                                <td>@{{ rate }}</td>
+                                <td>@{{ amount }}</td>
+                            </tr>
+                            @{{/material}}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 
 

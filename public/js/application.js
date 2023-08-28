@@ -52,7 +52,7 @@ $(function(){
 
     $('.js-design-engineer').each(function (){
         designEngineerInit(this);
-    })
+    });
 
     /**
      * Project List
@@ -82,9 +82,6 @@ $(function(){
 
         _this.val(_val)
         if(e.which === 44 || e.which === 45) return true
-        // if(!_val.match(/[\d,]+\.\d+/)){
-        //     console.log('false')
-        // }
     })
 
     function currencyFormat(_value){
@@ -154,7 +151,107 @@ $(function(){
     });
 
     $('.dual-list').bootstrapDualListbox({
-
+        nonSelectedListLabel: 'Available Roles',
+        selectedListLabel: 'Selected Roles',
+        preserveSelectionOnMove: 'moved',
+        moveAllLabel: 'Move all',
+        removeAllLabel: 'Remove all'
     });
 
+    $('.js-search-form').on('change',function(){
+        var _this = $(this);
+        var _form = _this.closest('form');
+
+        _form.submit();
+    });
+
+    $('.js-btn-status').on('click',function(){
+       var _this = $(this);
+       var _data_value = _this.data('value');
+        _this.siblings('.js-status-filter').val(_data_value);
+        _this.closest('form').submit();
+    });
+
+    var _count = 0;
+    $('.js-select-project-to-review').each(function(){
+        var _this = $(this);
+        var arrId = [];
+        _this.on('change',function(){
+            if($(this).is(':checked')){
+                _count+=1;
+            } else {
+                _count-=1;
+            }
+
+            $('.js-select-to-reviewed').text(_count);
+
+            if(_count > 0) {
+                $('.js-btn-to-review').removeAttr('disabled');
+            } else {
+                $('.js-btn-to-review').attr('disabled','disabled');
+            }
+        });
+    });
+
+    $('.js-select-all-project-to-review').on('change',function(){
+        var _this = $(this);
+        var _checkbox =  $('.js-select-project-to-review');
+        if(_this.is(':checked')){
+            $('.js-btn-to-review').removeAttr('disabled');
+            _checkbox.prop('checked', true);
+            var _countAll =_checkbox.length;
+            $('.js-select-to-reviewed').text(_countAll);
+        } else {
+            $('.js-select-to-reviewed').text('0');
+            _checkbox.prop('checked', false);
+            $('.js-btn-to-review').attr('disabled','disabled');
+        }
+    });
+
+    $('.dd .js-add-new-nestable-wbs').on('mousedown', function (event){
+        event.preventDefault();
+        return false;
+    });
+
+    $('.dd .js-delete-wbs-discipline').on('mousedown', function (event){
+        event.preventDefault();
+        return false;
+    });
+
+    $(document).on('click', '.js-check-review', function() {
+        var _url = $(this).data('url') + '/update-list?ids=';
+
+        // Get the collection of checked checkboxes
+        var $checkedCheckboxes = $('.js-check-review').filter(':checked');
+        var _length_check = $checkedCheckboxes.length;
+
+        var ids = $checkedCheckboxes.map(function() {
+            return $(this).val();
+        }).get().join(',');
+
+        _url += ids;
+        $('.js-btn-to-review').attr('data-url',_url);
+    });
+
+    $(document).on('click','.js-check-review-all',function(){
+        var _url = $(this).data('url') + '/update-list?ids=';
+        setTimeout(function(){
+            var $checkedCheckboxes = $('.js-check-review').filter(':checked');
+            var ids = $checkedCheckboxes.map(function() {
+                return $(this).val();
+            }).get().join(',');
+            _url += ids;
+            $('.js-btn-to-review').attr('data-url',_url);
+        },500);
+    });
+
+    $(document).on('change click keyup','.js-confirm-form',function(){
+        bindBeforeUnloadEvent();
+    });
+
+    $(document).on('click','.js-save-confirm-form', function(e){
+        e.preventDefault();
+        $(window).off('beforeunload');
+        $(this).closest('form').submit();
+    });
 });

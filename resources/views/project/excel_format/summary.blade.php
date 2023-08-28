@@ -49,18 +49,18 @@
     </tr>
 
     <thead>
-        <tr>
-            <th rowspan="2" style="background-color: #FFC000">LOC/<br>EQUIP</th>
-            <th rowspan="2" style="background-color: #FFC000">DISCI<br>PLINE</th>
-            <th rowspan="2" style="background-color: #FFC000">WORK<br>ELEMENT</th>
-            <th rowspan="2" style="background-color: #FFC000">DESCRIPTION</th>
-            {{-- <th rowspan="2" style="background-color: #FFC000">WORK ITEM</th>--}}
-            <th rowspan="2" style="background-color: #FFC000">LABOR COST (IDR)</th>
-            <th rowspan="2" style="background-color: #FFC000">TOOL AND <br>EQUIPMENT COST (IDR)</th>
-            <th rowspan="2" style="background-color: #FFC000">MATERIAL COST (IDR)</th>
-            <th rowspan="2" style="background-color: #FFC000">TOTAL WORK COST (IDR)</th>
-        </tr>
-        <tr></tr>
+    <tr>
+        <th rowspan="2" style="background-color: #FFC000">LOC/<br>EQUIP</th>
+        <th rowspan="2" style="background-color: #FFC000">DISCI<br>PLINE</th>
+        <th rowspan="2" style="background-color: #FFC000">WORK<br>ELEMENT</th>
+        <th rowspan="2" style="background-color: #FFC000">DESCRIPTION</th>
+        {{-- <th rowspan="2" style="background-color: #FFC000">WORK ITEM</th>--}}
+        <th rowspan="2" style="background-color: #FFC000">LABOR COST (IDR)</th>
+        <th rowspan="2" style="background-color: #FFC000">TOOL AND <br>EQUIPMENT COST (IDR)</th>
+        <th rowspan="2" style="background-color: #FFC000">MATERIAL COST (IDR)</th>
+        <th rowspan="2" style="background-color: #FFC000">TOTAL WORK COST (IDR)</th>
+    </tr>
+    <tr></tr>
     </thead>
     <tbody>
     @php($totalCost = 0)
@@ -105,13 +105,13 @@
             @if($item->workElementTitle !== $previousElement || $key !== $previousLocation)
                 {{$idElement = $idNum - 1}}
                 <tr>
-                    <td></td>
-                    <td></td>
-                    <td>{{$alpha}}.{{$idElement}}.{{$idElement2++}}</td>
-                    <td colspan="">{{$item?->workElementTitle}}</td>
-                    <td>{{$costProject[$key]->elementLaborCost[$item->workElementTitle]}}</td>
-                    <td>{{$costProject[$key]->elementToolCost[$item->workElementTitle]}}</td>
-                    <td>{{$costProject[$key]->elementMaterialCost[$item->workElementTitle]}}</td>
+                    <td style="background-color: #eceae0"></td>
+                    <td style="background-color: #eceae0"></td>
+                    <td style="background-color: #eceae0">{{$alpha}}.{{$idElement}}.{{$idElement2++}}</td>
+                    <td style="background-color: #eceae0">{{$item?->workElementTitle}}</td>
+                    <td style="background-color: #eceae0">{{$costProject[$key]->elementLaborCost[$item->workElementTitle]}}</td>
+                    <td style="background-color: #eceae0">{{$costProject[$key]->elementToolCost[$item->workElementTitle]}}</td>
+                    <td style="background-color: #eceae0">{{$costProject[$key]->elementMaterialCost[$item->workElementTitle]}}</td>
                 </tr>
             @endif
             {{--
@@ -133,25 +133,25 @@
         @endforeach
     @endforeach
     @php($contigency = $totalCost * (15/100))
-        <tr>
-            <td style="background-color: #C4BD97">{{chr(64 + sizeof($estimateAllDisciplines) + 1)}}</td>
-            <td style="background-color: #C4BD97"></td>-
-            <td style="background-color: #C4BD97"></td>
-            <td style="background-color: #C4BD97">CONTINGENCY</td>
-            <td style="background-color: #C4BD97"></td>
-            <td style="background-color: #C4BD97"></td>
-            <td style="background-color: #C4BD97"></td>
-            <td style="background-color: #C4BD97">{{$project->getContingencyCost()}}</td>
-        </tr>
-        <tr>
-            <td style="background-color: #FFC000">{{chr(64 + sizeof($estimateAllDisciplines) + 2)}}</td>
-            <td style="background-color: #FFC000"></td>
-            <td style="background-color: #FFC000"></td>
-            <td style="background-color: #FFC000">TOTAL PROJECT COST</td>
-            <td style="background-color: #FFC000"></td>
-            <td style="background-color: #FFC000"></td>
-            <td style="background-color: #FFC000"></td>
-            <td style="background-color: #FFC000">{{$project->getTotalCostWithContingency()}}</td>
-        </tr>
+    <tr>
+        <td style="background-color: #C4BD97">{{chr(64 + sizeof($estimateAllDisciplines) + 1)}}</td>
+        <td style="background-color: #C4BD97"></td>-
+        <td style="background-color: #C4BD97"></td>
+        <td style="background-color: #C4BD97">CONTINGENCY</td>
+        <td style="background-color: #C4BD97"></td>
+        <td style="background-color: #C4BD97"></td>
+        <td style="background-color: #C4BD97"></td>
+        <td style="background-color: #C4BD97">{{$project->getContingencyCost()}}</td>
+    </tr>
+    <tr>
+        <td style="background-color: #FFC000">{{chr(64 + sizeof($estimateAllDisciplines) + 2)}}</td>
+        <td style="background-color: #FFC000"></td>
+        <td style="background-color: #FFC000"></td>
+        <td style="background-color: #FFC000">TOTAL PROJECT COST</td>
+        <td style="background-color: #FFC000"></td>
+        <td style="background-color: #FFC000"></td>
+        <td style="background-color: #FFC000"></td>
+        <td style="background-color: #FFC000">{{$project->getTotalCostWithContingency()}}</td>
+    </tr>
     </tbody>
 </table>

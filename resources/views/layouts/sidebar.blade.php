@@ -1,13 +1,7 @@
 <!-- Page Sidebar Start-->
 <header class="main-nav">
-    <div class="sidebar-user text-center">
-        @customDirective()
-        <a href="">
-            <h6 class="mt-3 f-14 f-w-600">{{auth()->user()->profiles?->full_name}}</h6></a>
-        <p class="mb-0 font-roboto">{{auth()->user()->profiles?->getPosition()}}</p>
-    </div>
     <nav>
-        <div class="main-navbar">
+        <div class="main-navbar mt-1">
             <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
             <div id="mainnav">
                 <ul class="nav-menu custom-scrollbar">
@@ -18,37 +12,67 @@
 
                     </li>
                     @canAny(['viewAny','update','create','delete','view'], App\Models\Project::class)
-                        <li><a class="nav-link menu-title" href="/project"><i data-feather=""></i><span>Cost Estimate Project</span></a></li>
+                        <li class="margin-sm">
+                            <a class="nav-link menu-title" data-bs-toggle="tooltip" data-bs-placement="right" title="Project Cost Estimate" href="/project">
+                                <i data-feather="layers"></i>
+                                <label class="text-small">Cost Estimate</label>
+                            </a>
+                        </li>
                     @endCan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\WorkItem::class)
-                        <li><a class="nav-link menu-title" href="/work-item"><i data-feather=""></i><span>Work Item</span></a></li>
+                        <li class="margin-sm">
+                            <a class="nav-link menu-title" href="/work-item"><i data-feather="briefcase"></i>
+                                <label class="text-small">Work Item</label>
+                            </a>
+                        </li>
                     @endcan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\ManPower::class)
-                        <li><a class="nav-link menu-title" href="/man-power"><i data-feather=""></i><span>Man Power List</span></a></li>
+                        <li class="margin-sm">
+                            <a class="nav-link menu-title" href="/man-power">
+                                <img class="text-center" src="{{'/assets/icons/helmet-safety-solid.svg'}}" style="width: 25%" alt="Custom Icon"></i>
+                                <label class="text-small">Man Power</label>
+                            </a>
+                        </li>
                     @endCan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\EquipmentTools::class)
-                        <li class="dropdown">
-                            <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather=""></i><span>Tool Equipment </span></a>
+                        <li class="dropdown margin-sm">
+                            <a class="nav-link menu-title" href="javascript:void(0)"><i class="fa fa-wrench"></i>
+                                <label class="text-small">Tools & Equipments</label>
+                            </a>
                             <ul class="nav-submenu menu-content">
-                                <li><a href="/tool-equipment">Tool Equipment List</a></li>
-                                <li><a href="/tool-equipment-category">Tool Equipment Category </a></li>
+                                <li class="p-0 m-0"><a class="cursor-pointer" href="/tool-equipment"><label class="text-small">
+                                            Tools Equipment List <i class="fa fa-chevron-right"></i>
+                                        </label></a></li>
+                                <li class="p-0 m-0"><a class="cursor-pointer" href="/tool-equipment-category"><label class="text-small">Tool Equipment Category
+                                            <i class="fa fa-chevron-right"></i> </label></a></li>
                             </ul>
                         </li>
                     @endcan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\Material::class)
-                        <li class="dropdown">
-                            <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather=""></i><span>Material </span></a>
+                        <li class="dropdown margin-sm">
+                            <a class="nav-link menu-title" href="javascript:void(0)">
+                                <i data-feather="truck"></i>
+                                <label class="text-small">Materials</label>
+                            </a>
                             <ul class="nav-submenu menu-content">
-                                <li><a href="/material">Material</a></li>
-                                <li><a href="/material-category">Material Category </a></li>
+                                <li class="p-0 m-0"><a href="/material"><label class="text-small">Material List</label></a></li>
+                                <li><a href="/material-category"><label class="text-small">Material Category</label></a></li>
                             </ul>
                         </li>
                     @endcan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\WorkBreakdownStructure::class)
-                        <li><a class="nav-link menu-title" href="/work-breakdown-structure"><i data-feather=""></i><span>WBS</span></a></li>
+                        <li class="margin-sm">
+                            <a class="nav-link menu-title" href="/work-breakdown-structure">
+                                <i data-feather="align-right"></i>
+                                <label class="text-small">WBS Setting</label>
+                            </a>
+                        </li>
                     @endcan
                     @can('viewAny', App\Models\User::class)
-                        <li><a class="nav-link menu-title" href="/user"><i data-feather=""></i><span>User</span></a></li>
+                        <li class="margin-sm"><a class="nav-link menu-title" href="/user">
+                                <i data-feather="users"></i>
+                            <label class="text-small">User Setting</label></a>
+                        </li>
                     @endcan
                 </ul>
             </div>

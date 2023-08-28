@@ -99,56 +99,37 @@ $(function(){
     }
 
     $(document).on('click','.js-form-list-location-submit',function (e){
-        e.preventDefault()
-        var _this = $(this)
-        var _item_parent = $('.js-card-items-wbs-level-3')
-        var jsonObj = [];
-        var url = $('.js-form-wbs-estimate-discipline').data('url')
-        var id = $('.js-form-wbs-estimate-discipline').data('id')
-
-        _this.find('.loader-34').removeClass('d-none');
-        _this.attr('disabled','disabled')
-        $.each(_item_parent,function (index,value){
-            var __this = $(this);
-            var __type = __this.find('.js-wbs-l3-type')
-            var __title = __this.find('.js-wbs-l3-location_equipment-title')
-            var __identifier = __this.find('.js-wbs-l3-identifier')
-            var __discipline = __this.find('.js-wbs-l3-discipline')
-            var arrDiscipline = []
-            var arrWorkElement = []
-
-            $.each(__discipline,function (index,value){
-                var ___this = $(this)
-                var ___work_element = ___this.closest('.js-form-row-discipline').find('.js-wbs-l3-work_element')
-                var itemDiscipline = {}
-                itemDiscipline['id'] = ___this.val();
-                itemDiscipline['work_element'] = ___work_element.val().length > 0 ? ___work_element.val() : ['null'];
-                arrDiscipline.push(itemDiscipline)
-            })
-
-            var item = {}
-            item['title'] = __title.val();
-            item['identifier'] = __identifier.val();
-            item['type'] = __type.val();
-            item['discipline'] = arrDiscipline
-
-            jsonObj.push(item)
-
-        })
+        $('.js-modal-loading-wbs').modal('show');
+        e.preventDefault();
+        var _nestable = $('.dd');
+        _nestable.nestable({
+            data: function (item, source){
+                var additionalData = {
+                    identifier:source.data('identifier')
+                };
+                return additionalData;
+            }
+        });
+        var _data = _nestable.nestable('serialize');
+        var url = $('.js-form-wbs-estimate-discipline').data('url');
+        var id = $('.js-form-wbs-estimate-discipline').data('id');
 
         $.ajax({
             type:'post',
             url: url,
-            data : {wbs:jsonObj},
+            data : {wbs:_data},
             success:function(result){
                 if(result.status === 200){
-                    notification('success',result.message)
+                    $('.js-modal-loading-wbs').modal('hide');
+                    notification('success',result.message);
                     // return false
+                    $(window).off('beforeunload');
                     setTimeout(function (){
-                        window.location.href = '/project/' + id
-                    },2000)
+                        window.location.href = '/project/' + id;
+                    },2000);
                 } else {
-                    notification('danger',result.message,'fa fa-cross','Error')
+                    $('.js-modal-loading-wbs').modal('hide');
+                    notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error')
                 }
             }
         })
@@ -165,149 +146,6 @@ $(function(){
         $(this).siblings('.js-chev-hide-content').removeClass('d-none');
         $(this).closest('.card').find('.card-body').removeClass('d-none');
     })
-
-    var level2DisciplineByProject = function (el) {
-        var _this = $(el);
-        var _level1 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level1');
-        if (_this.data("select2")) _this.select2("destroy");
-
-        _this.select2({
-            placeholder:_this.data('placeholder'),
-            allowClear:true,
-            ajax:{
-                url:'/getWbsLevel2',
-                dataType: 'json',
-                data:function(params){
-                    return {'project_id':_level1.data('id'),'level1':_level1.val()}
-                },
-                processResults:function (resp) {
-                    if(resp.status === 200){
-                        return {
-                            results: resp.data
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    var level3DisciplineByProject = function (el) {
-        var _this = $(el);
-        var _level2 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level2');
-        var _level1 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level1');
-        if (_this.data("select2")) _this.select2("destroy");
-
-        _this.select2({
-            placeholder:_this.data('placeholder'),
-            allowClear:true,
-            ajax:{
-                url:'/getWbsLevel3',
-                dataType: 'json',
-                data:function(params){
-                    return {'project_id':_level2.data('id'),'level2':_level2.val(),'level1':_level1.val()}
-                },
-                processResults:function (resp) {
-                    if(resp.status === 200){
-                        return {
-                            results: resp.data
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    var _selectLevel1 = $('.js-select-level1');
-    var _selectLevel2 = $('.js-select-level2');
-    _selectLevel2.each(function(){
-        level2DisciplineByProject($(this))
-    })
-
-    var _selectLevel3 = $('.js-select-level3');
-    _selectLevel3.each(function(){
-        level3DisciplineByProject($(this));
-    })
-
-    _selectLevel2.on('change',function(){
-        if(_selectLevel3.val() !== "") _selectLevel3.val(null).trigger('change');
-    })
-
-    _selectLevel1.on('change',function(){
-        if(_selectLevel3.val() !== "") _selectLevel3.val(null).trigger('change');
-        _selectLevel2.val(null).trigger('change');
-    })
-
-    $(document).on('change','.js-select-level3',function(){
-        var _this = $(this)
-        var _level2 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level2');
-        var _level1 = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level1');
-        var _identifier = _this.closest('.js-row-work-breakdown-work-item').find('.js-select-level1');
-
-        if(_this.val() !== null){
-            $.ajax({
-                url:'/getExistingWorkItemByWbs',
-                data:{
-                    'project_id':_this.data('id'),
-                    'level3':_this.val(),
-                    'level2':_level2.val(),
-                    'level1':_level1.val()},
-                success:function(resp){
-                    if(resp.status === 200){
-                        $('.js-card-section-work-item').removeClass('d-none')
-                        if(resp.data.length > 0) $('.js-work-item-table').removeClass('d-none')
-                        else $('.js-work-item-table').addClass('d-none')
-                        renderExistingWorkItem(resp.data)
-                    }
-                }
-            })
-            showButtonSubmit()
-        }
-    })
-
-    function renderExistingWorkItem(value){
-        var _existing_work_item_table = $('.js-body-work-item-table');
-        var _existing_work_item_table_row = _existing_work_item_table.find('.js-work-item-input-column')
-        var _template = $('#js-template-work-item').html();
-        var templateModal = $('#js-template-modal-work-item').html();
-
-        if(_existing_work_item_table_row.length > 0){
-            _existing_work_item_table_row.remove();
-        }
-
-        _array_estimate_discipline = [];
-        $.each(value,function(){
-            var _data = {
-                "idx": generateId(),
-                "workItem":this.work_item_id,
-                "project_id" : this.project_id,
-                'equipment_location_id': this.equipment_location_id,
-                "workItemText":this.work_items.description,
-                "vol":this.volume,
-                "unit":this.work_items.unit,
-                "totalRateManPowers": toCurrency(this.labor_cost_total_rate),
-                "equipmentTools": this.work_items.equipment_tools,
-                "totalRateEquipments":toCurrency(this.tool_unit_rate_total),
-                "materials":this.work_items.materials,
-                "totalRateMaterials":toCurrency(this.material_unit_rate_total),
-                "workItemId":this.work_item_id,
-                "manPowers" : this.work_items.man_powers,
-                "labourFactorial":this.labour_factorial,
-                "equipmentFactorial":this.equipment_factorial,
-                "materialFactorial":this.material_factorial,
-                "labourUnitRate":this.labor_unit_rate,
-                "equipmentUnitRate":this.tool_unit_rate,
-                "materialUnitRate":this.material_unit_rate
-            }
-
-            var _temp = Mustache.render(_template, _data);
-            var _modalTemp = Mustache.render(templateModal, _data);
-            $('.js-work-item-table').find('.js-body-work-item-table').append(_temp);
-            $('.modal-detail').append(_modalTemp);
-            _array_estimate_discipline.push(_data)
-        })
-
-    }
-
 
     //add work item
     var _table_item = 0;
@@ -359,10 +197,10 @@ $(function(){
             return false;
         }
 
-       if(_labour_factorial !== '' && _labour_factorial != null && _labour_factorial != 0){
+        if(_labour_factorial !== '' && _labour_factorial != null && _labour_factorial != 0){
            _totalRateManPower = parseFloat(removeCurrency(_totalRateManPower)) * _labour_factorial
            _totalRateManPower = toCurrency(_totalRateManPower)
-       }
+        }
 
         if(_equipment_factorial !== '' && _equipment_factorial != null && _equipment_factorial != 0){
             _totalRateEquipment = parseFloat(removeCurrency(_totalRateEquipment)) * _equipment_factorial
@@ -437,120 +275,6 @@ $(function(){
         _array_estimate_discipline.splice(_array_estimate_discipline.findIndex(({idx}) => idx == _idx), 1);
     });
 
-    var workItemSelectInit = function (el) {
-        var _this = $(el);
-        if (_this.data("select2")) _this.select2("destroy");
-        _this.select2({
-            minimumInputLength: 3,
-            placeholder: "Please Select Work Item",
-            allowClear: true,
-            width: '100%',
-            ajax: {
-                url: _this.data('url'),
-                data: function (params) {
-                    return {
-                        q: params.term
-                    }
-                },
-                processResults: function (resp) {
-                    // _dataAdvanceWorkItem = resp;
-                    return {
-                        results: resp
-                    }
-                },
-            }
-        })
-    }
-
-    var _selectWorkItems = $('.js-select-work-items');
-    _selectWorkItems.each(function () {
-        workItemSelectInit(this);
-    });
-
-    $(document).on('change keyup','.js-input-labor_factorial',function(){
-        var _val = $(this).val();
-        if(_val == '' || _val == null) _val = 0;
-        var _labour_unit_price = _selectWorkItems.select2('data')[0]?.manPowersTotalRate;
-        var _new_labour_unit_price = parseFloat(removeCurrency(_labour_unit_price)) * parseInt(_val)
-        $('.js-labour-unit-price-preview').val(toCurrency(_new_labour_unit_price))
-    });
-
-    $(document).on('change keyup','.js-input-equipment_factorial',function(){
-        var _val = $(this).val();
-        if(_val == '' || _val == null) _val = 0;
-        var _equipment_unit_price = _selectWorkItems.select2('data')[0]?.equipmentToolsRate;
-        var _new_equipment_unit_price = parseFloat(removeCurrency(_equipment_unit_price)) * parseInt(_val)
-        $('.js-equipment-unit-price-preview').val(toCurrency(_new_equipment_unit_price))
-    });
-
-    $(document).on('change keyup','.js-input-material_factorial',function(){
-        var _val = $(this).val();
-        if(_val == '' || _val == null) _val = 0;
-        var _material_unit_price = _selectWorkItems.select2('data')[0]?.materialsRate;
-
-        var _new_material_unit_price = parseFloat(removeCurrency(_material_unit_price)) * parseInt(_val)
-        $('.js-material-unit-price-preview').val(toCurrency(_new_material_unit_price))
-    });
-
-    _selectWorkItems.on("change", function () {
-        var _this = $(this);
-        var _vol = _this.select2('data')[0]?.vol;
-        _array_manPowers = _this.select2('data')[0]?.manPowers;
-        _array_equipments = _this.select2('data')[0]?.equipmentTools;
-        _array_materials = _this.select2('data')[0]?.materials;
-        _totalRateManPower = _this.select2('data')[0]?.manPowersTotalRate;
-        _totalRateEquipment = _this.select2('data')[0]?.equipmentToolsRate;
-        _totalRateMaterial = _this.select2('data')[0]?.materialsRate;
-        _workItemId = _this.val();
-        $('.js-labour-unit-price-preview').val(_totalRateManPower)
-        $('.js-equipment-unit-price-preview').val(_totalRateEquipment)
-        $('.js-material-unit-price-preview').val(_totalRateMaterial)
-        _this.closest('.row').find('.js-vol-result-ajax').text(_vol);
-    });
-
-    /**
-     * Work Items
-     */
-    $('.js-save-estimate-discipline').on('click',function (e){
-        e.preventDefault();
-        var _this = $(this);
-        var _body_work_item = $('.js-body-work-item-table');
-
-        if(_body_work_item.length < 1) notification('error','Empty Value Work Item')
-        var _id = $('.js-card-section-work-item').data('id');
-        var _work_element =  $('.js-select-level3').val();
-
-        var _url = '/project/'+_id+'/estimate-discipline/store'
-        if(_this.data('update') == true){
-            _url = '/project/'+_id+'/estimate-discipline/update'
-        }
-
-        var _level2 = $('.js-select-level2').val();
-        var _level1 = $('.js-select-level1').val();
-
-        var _data = {
-            'work_items' : _array_estimate_discipline,
-            'project_id' : _id,
-            'work_element' : _work_element,
-            'level3' : _work_element,
-            'level2' : _level2,
-            'level1' : _level1
-        }
-
-        $.ajax({
-            url: _url,
-            data : _data,
-            type : 'POST',
-            success : function(data){
-                if(data.status === 200){
-                    notification('success',data.message)
-                } else {
-                    notification('danger',data.message,'fa fa-frown-o','Error')
-                }
-            }
-        })
-    })
-
     var _rateManPower = 0;
     $(document).on('change','.js-select-item-additional',function (){
         var _originalValue = $(this).select2('data')[0]?.rate
@@ -566,6 +290,208 @@ $(function(){
         var _totalAmount = _rate * _coef
         _amount.text(toCurrency(_totalAmount));
     })
+
+    $('.js-add-btn-wbs').on('click', function(){
+        var _modal_loading = $('.js-modal-loading-wbs');
+        var _data_discipline = ''
+        var _template_discipline = $('#js-template-nestable-wbs').html();
+        var _template_location = $('#js-template-location-nestable-wbs').html();
+        var _location_form = $('.js-form-location');
+
+        _modal_loading.modal('show');
+        bindBeforeUnloadEvent();
+
+        Mustache.parse(_template_location);
+
+        $.ajax({
+            url : '/getDisciplineList',
+            type : 'GET',
+            data : {'isMustache':true},
+            success : function(result){
+                if(result.status === 200){
+                    _data_discipline = result.data
+                    var _data = {
+                        'text' : _location_form.val(),
+                        'child' : 'js-add-discipline',
+                        'dataList':_data_discipline
+                    }
+                    $('.dd-empty').remove();
+                    var _temp_location = Mustache.render(_template_location,_data)
+                    $('.js-nestable-wbs').append(_temp_location)
+
+
+                    feather.replace()
+                    $('.select2').select2()
+                    _location_form.val('')
+                } else {
+                    notification('danger','cannot get data discipline','fa fa-exclamation','Error')
+                }
+            },
+            complete: function() {
+                // Hide loading modal after AJAX request is complete
+                $('#modal-loading').modal('hide');
+            }
+        })
+    })
+
+    $(document).on('click','.js-add-new-nestable-wbs',function(){
+        var _this = $(this);
+        var _template = $('#js-template-sub-nestable').html();
+        var _parent = _this.closest('.dd-item');
+        var _url = '/getDisciplineList';
+        var _text = 'Select Discipline'
+        var _discipline = '';
+        var _showButton = true
+        var _modal_loading = $('.js-modal-loading-wbs');
+        var _isSelect = true;
+
+        _modal_loading.modal('show');
+
+        if(_this.attr('data-is-element') === 'true'){
+            _discipline = _parent.attr('data-id');
+            _showButton = false;
+            _isSelect = false;
+        }
+
+        Mustache.parse(_template);
+        $.ajax({
+            url : _url,
+            type : 'GET',
+            data : {
+                'isMustache':true,
+                'discipline': _discipline
+            },
+            success : function(result){
+                if(result.status === 200){
+                    var _data = {
+                        'dataList':result.data,
+                        'text' : _text,
+                        'showButton':_showButton,
+                        'isSelect':_isSelect
+                    }
+                    var _temp = Mustache.render(_template,_data)
+                    _parent.append(_temp)
+                    bindBeforeUnloadEvent();
+                    $('.select2').select2();
+                    feather.replace()
+                } else {
+                    notification('danger','cannot get data discipline','fa fa-exclamation','Error')
+                }
+            },
+            complete: function() {
+                // Hide loading modal after AJAX request is complete
+                $('.js-modal-loading-wbs').modal('hide');
+            }
+        })
+    });
+
+    $(document).on('click','.js-add-discipline', function(){
+        var _this = $(this)
+        var _el = $(this).closest('.js-nestable-wbs')
+
+
+        var _template_location = $('#js-template-location-nestable-wbs').html();
+        Mustache.parse(_template_location);
+
+
+        var _data = {
+            'text' : 'New',
+            'child' : 'js-add-discipline',
+            'disciplines' : _data_discipline,
+        }
+
+        var _temp_location = Mustache.render(_template_location,_data)
+        _el.append(_temp_location)
+
+        feather.replace()
+
+    });
+
+    $(document).on('click','.js-delete-wbs-discipline',function(){
+        var _this = $(this);
+        var _parent = _this.closest('li')
+        _parent.remove();
+        bindBeforeUnloadEvent();
+    });
+
+    $(document).on('change','.js-select-update-wbs',function(){
+        var _this = $(this);
+    })
+
+    $(document).on('click','.js-dd-title',function(){
+        var _this = $(this);
+        var _parent = _this.closest('.dd-item');
+        _parent.find('.dd-handle').first().addClass('d-none');
+        _parent.find('.js-dd-select').first().removeClass('d-none')
+    })
+
+    $(document).on('focusout','.js-dd-title-text',function(){
+       var _this = $(this);
+       if(_this.text().length < 1) _this.text('Work Element');
+    });
+
+    $(document).on('keyup keydown change','.js-dd-title-text', function(){
+        var _this = $(this);
+        _this.closest('.dd-item').attr('data-id',_this.text());
+    })
+
+    $(document).on('click','.js-dd-title-element',function(e){
+        var _this = $(this);
+        var _select2 = _this.closest('li').find('.js-select-element')
+        var _val = _this.closest('.js-get-idx').find('.js-select-update-element').val()
+        bindBeforeUnloadEvent();
+        _select2.select2({
+            placeholder: "Please Select Work Element",
+            allowClear: true,
+            width: '100%',
+            ajax: {
+                url: '/getWorkElement',
+                data: {discipline:_val},
+                processResults: function (resp) {
+                    return {
+                        results: resp
+                    }
+                }
+            }
+        });
+    });
+
+    $(document).on('keyup keydown','.js-dd-title-text', function(e){
+        if((e.which != 8 && $(this).text().length > 80) || (e.which == 13))
+        {
+            // $('#'+content_id).text($('#'+content_id).text().substring(0, max));
+            e.preventDefault();
+        }
+    })
+
+    $(document).on('select2:select','.js-select-update-discipline', function(e){
+        var _this = $(this);
+        var _parent = _this.closest('.dd-item');
+        var _val = _this.val();
+        var selectedData = e.params.data;
+        var selectedText = selectedData.text;
+        var _child = _parent.find('ol')
+
+        bindBeforeUnloadEvent();
+        _parent.find('.dd-handle').removeClass('d-none');
+        _parent.find('.js-dd-select').addClass('d-none');
+        _parent.find('.js-dd-title').text(selectedText);
+        _parent.attr('data-id',_val);
+        if(_child.length > 0){
+            _child.remove();
+        }
+    });
+
+    function bindBeforeUnloadEvent(){
+        var _confirm_page = $('.js-confirm-row')
+        if(_confirm_page.length > 0){
+            $(window).on('beforeunload', function(e) {
+                e.preventDefault()
+                // Return a confirmation message to prompt the user
+                return 'Are you sure you want to leave this page?';
+            });
+        }
+    }
 
     function showButtonSubmit(){
         $('.js-save-estimate-discipline').removeClass('d-none')

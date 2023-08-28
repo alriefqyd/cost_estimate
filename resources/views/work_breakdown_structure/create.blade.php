@@ -1,10 +1,10 @@
 @extends('layouts.main')
 @section('main')
-    <div class="container-fluid">
+    <div class="container-fluid js-confirm-load-page js-confirm-row">
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-12">
-                    <h3>Estimate Discipline</h3>
+                    <h4>Estimate Discipline</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                         <li class="breadcrumb-item">dashboard</li>

@@ -35,7 +35,7 @@ class CustomDirectiveServiceProvider extends ServiceProvider
             }
 
             $urlImage = asset("storage/avatar-$user.png");
-            return '<img class="img-90 rounded-circle" src="'.$urlImage.'">';
+            return '<img class="img-90 rounded-circle" src="'.$urlImage.'" style="width:80% !important">';
         });
     }
 }

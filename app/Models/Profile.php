@@ -20,6 +20,8 @@ class Profile extends Model
         'full_name',
     ];
 
+    public const REVIEWER = ['project_manager','project_engineer'];
+
     public const POSITION = [
         'project_engineer' => 'Project Engineer',
         'project_manager' => 'Project Manager',
@@ -35,7 +37,8 @@ class Profile extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function getPosition(){
+    public function getPosition(): string
+    {
         return Profile::POSITION[$this->position];
     }
 

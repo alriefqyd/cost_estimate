@@ -45,7 +45,6 @@
 </div>
 <div class="row mb-1">
     <div class="col-md-12">
-        <label class="form-label form-label-black m-0" for="validationCustom01">User Role</label>
         <select class="dual-list form-control" multiple="multiple" name="role[]" title="roles[]">
             @foreach($roles as $role)
                 <option {{isset($existingRole) && collect($existingRole)->contains($role->id) ? 'selected="selected"':'' }} value="{{$role->id}}">{{$role->name}}</option>

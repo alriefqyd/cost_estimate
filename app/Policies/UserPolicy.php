@@ -17,16 +17,16 @@ class UserPolicy
      */
     public function viewAny(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'user'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'user' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -38,16 +38,16 @@ class UserPolicy
      */
     public function view(User $user, User $model)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'user'){
-                if($role->action == '*' || $role->action == 'read'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'user' &&
+                ($role->action === '*' || $role->action === 'read');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -58,16 +58,16 @@ class UserPolicy
      */
     public function create(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'user'){
-                if($role->action == '*' || $role->action == 'create'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'user' &&
+                ($role->action === '*' || $role->action === 'create');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -78,16 +78,16 @@ class UserPolicy
      */
     public function update(User $user)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'user'){
-                if($role->action == '*' || $role->action == 'update'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'user' &&
+                ($role->action === '*' || $role->action === 'update');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -99,16 +99,16 @@ class UserPolicy
      */
     public function delete(User $user, User $model)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'user'){
-                if($role->action == '*' || $role->action == 'delete'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'user' &&
+                ($role->action === '*' || $role->action === 'delete');
+        });
+
+        return $hasPermission;
     }
 
     /**
@@ -132,15 +132,15 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model)
     {
-        $userRoles = $user->roles;
-        foreach($userRoles as $role){
-            if($role->feature == 'user'){
-                if($role->action == '*' || $role->action == 'delete'){
-                    return true;
-                }
-            }
-        }
+        // Eager load roles to minimize database queries
+        $user->load('roles');
 
-        return false;
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'user' &&
+                ($role->action === '*' || $role->action === 'delete');
+        });
+
+        return $hasPermission;
     }
 }
