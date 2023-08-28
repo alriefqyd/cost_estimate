@@ -1,3 +1,4 @@
+@inject('projectModel', App\Models\Project::class)
 @extends('layouts.main')
 @section('main')
 
@@ -5,7 +6,7 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3>Project Detail</h3>
+                    <h4>Project Detail</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="/">Project</a></li>
                         <li class="breadcrumb-item active">Project Detail</li>
@@ -40,7 +41,7 @@
                         </div>
                     </div>
                     <div class="card-body card-body-custom">
-                        <div class="col-sm-10 float-start">
+                        <div class="col-sm-10 float-start" style="margin-left: 20px!important">
                             <p class="font-weight-600-height-7">Date : {{$project_date}} </p>
                             <p class="font-weight-600-height-7">Project No : {{$project->project_no}} </p>
                             <p class="font-weight-600-height-7">Project Title : {{$project->project_title}} </p>
@@ -53,6 +54,27 @@
                             <p class="font-weight-600-height-7">Design Engineer - Mechanical : {{$project?->designEngineerMechanical?->profiles?->full_name}}</p>
                             <p class="font-weight-600-height-7">Design Engineer - Electrical : {{$project?->designEngineerElectrical?->profiles?->full_name}} </p>
                             <p class="font-weight-600-height-7">Design Engineer - Instrument : {{$project?->designEngineerInstrument?->profiles?->full_name}}</p>
+                            <div class="linebreak"></div>
+                            <p class="font-weight-600-height-7">Status : <span class="js-detail-status">{{$project->status}}</span></p>
+                            @if($project->status !== $projectModel::APPROVE && $project->isReviewer())
+                                <button class="btn btn-outline-success js-btn-approve-modal" data-bs-toggle="modal" data-original-title="test" data-bs-target="#approveModal"><i class="fa fa-check"></i> Approve</button>
+
+                                <div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="exampleModalLabel">Approve Cost Estimate</h5>
+                                                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">Are you sure you want to approve this cost estimate?</div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+                                                <button class="btn btn-success js-btn-approve-cost-estimate" type="button">Approve</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -121,7 +143,7 @@
                                                 <td>
                                                     {{$wbs->wbsDiscipline?->title}}
                                                 </td>
-                                                <td>{{$wbs->workElements?->title}}</td>
+                                                <td>{{$wbs->work_element}}</td>
                                             </tr>
                                         @endforeach
                                     @endforeach
@@ -148,7 +170,7 @@
                             </div>
                             <div class="col-md-6">
                                 @canAny(['create','update'], App\Models\EstimateAllDiscipline::class)
-                                    <a href="/project/{{$project->id}}/work-item/create">
+                                    <a href="/project/{{$project->id}}/estimate-discipline/create">
                                         <button class="btn btn-outline-primary float-end m-r-10" type="button">
                                             {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
                                         </button>
@@ -172,9 +194,7 @@
                                     </button>
                                 </a>
                             @endif
-                            <div class="table-responsive table-striped">
-                                @include('project.detail_table')
-                            </div>
+                            @include('project.detail_table')
                         </div>
                     </div>
                 </div>

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
-use App\Models\Setting;
 use App\Models\WbsLevel3;
 use App\Models\WorkBreakdownStructure;
 use App\Models\WorkElement;
@@ -31,8 +30,7 @@ class WorkBreakdownStructureController extends Controller
 
         $disciplines = WorkBreakdownStructure::where('level',2)->get();
         $workElement = WorkElement::where('project_id',$project->id)->where('work_scope',$request->discipline)->get();
-        $discipline = WorkBreakdownStructure::select('code')->with('wbsDiscipline')->where('level',2)->get();
-
+        $discipline = $this->getDisciplineList($request);
         if(isset($request->discipline)
             && !array_key_exists($request->discipline,$discipline)){
             abort(404);
@@ -90,38 +88,45 @@ class WorkBreakdownStructureController extends Controller
         }
 
         try {
-              $data = $this->processData($request);
+              DB::beginTransaction();
               $arrIdNotDelete = [];
-              foreach($data as $item){
-                  $existing = WbsLevel3::where('identifier',$item->identifier)->where('type',$item->type)->where('discipline',$item->discipline)
-                      ->where('work_element',$item->work_element)->where('project_id',$project->id)->first();
-                  if(!$existing){ // add new if there's a wbs to add
-                      $wbsLevel3 = new WbsLevel3();
-                      $wbsLevel3->type = $item->type;
-                      $wbsLevel3->title = $item->title;
-                      $wbsLevel3->discipline = $item->discipline;
-                      $wbsLevel3->work_element = $item->work_element;
-                      $wbsLevel3->project_id = $project->id;
-                      $wbsLevel3->identifier = $item->identifier;
-                      $wbsLevel3->save();
-                      $arrIdNotDelete[] = $wbsLevel3->id;
-                  } else {
-                      $existing->type = $item->type;
-                      $existing->title = $item->title;
-                      $existing->save();
-                      $arrIdNotDelete[] = $existing->id;
-                  }
-              }
+                foreach($request->wbs as $loc){
+                    foreach($loc['children'] as $disc){
+                        foreach($disc['children'] as $el){
+                            $uniqId = uniqid();
+                            if($loc['id']) $uniqId = $loc['id'];
+                            $existing = WbsLevel3::where('identifier',$uniqId)->where('discipline',$disc['id'])
+                                ->where('work_element',$el['oldElement'])->where('project_id',$project->id)->first();
+                            if(!$existing){ // add new if there's a wbs to add
+                                $wbsLevel3 = new WbsLevel3();
+                                $wbsLevel3->title = $loc['id'];
+                                $wbsLevel3->discipline = $disc['id'];
+                                $wbsLevel3->work_element = $el['id'];
+                                $wbsLevel3->project_id = $project['id'];
+                                $wbsLevel3->identifier = $uniqId;
+                                $wbsLevel3->save();
+                                $arrIdNotDelete[] = $wbsLevel3->id;
+                            } else {
+                                $existing->title = $loc['id'];
+                                $existing->work_element = $el['id'];
+                                $existing->save();
+                                $arrIdNotDelete[] = $existing->id;
+                            }
+                        }
+                    }
+                }
 
               WbsLevel3::whereNotIn('id',$arrIdNotDelete)->where('project_id',$project->id)->delete(); //delete wbsLevel3 that not exist anymore
               EstimateAllDiscipline::whereNotIn('wbs_level3_id',$arrIdNotDelete)->where('project_id',$project->id)->delete();
 
+            DB::commit();
             $response = [
                 'status' => 200,
                 'message' => 'Success, Your data was update successfully'
             ];
             return response()->json($response);
         } catch (\Exception $e) {
+            DB::rollback();
             return response()->json([
                 'status' => 500,
                 'message' => $e->getMessage()
@@ -130,17 +135,21 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function storeWbs(Project $project, Request $request){
-       $data = $this->processData($request);
-       foreach($data as $item){
-           $wbsLevel3 = new WbsLevel3();
-           $wbsLevel3->type = $item->type;
-           $wbsLevel3->title = $item->title;
-           $wbsLevel3->discipline = $item->discipline;
-           $wbsLevel3->work_element = $item->work_element;
-           $wbsLevel3->project_id = $project->id;
-           $wbsLevel3->identifier = $item->identifier;
-           $wbsLevel3->save();
-       }
+        foreach($request->wbs as $loc){
+            $uniqId = uniqid();
+            foreach($loc['children'] as $disc){
+                foreach($disc['children'] as $el){
+                    $wbs = new WbsLevel3();
+                    $wbs->type = 'location';
+                    $wbs->title = $loc['id'];
+                    $wbs->discipline = $disc['id'];
+                    $wbs->work_element = $el['id'];
+                    $wbs->project_id = $project->id;
+                    $wbs->identifier = $loc['id'];
+                    $wbs->save();
+                }
+            }
+        }
     }
 
     public function processData(Request $request){
@@ -205,7 +214,20 @@ class WorkBreakdownStructureController extends Controller
     }
 
     public function generateWorkBreakdown(Project $project){
-        $data = WbsLevel3::with(['workElements'])->where('project_id',$project->id)->get()->groupBy('title');
+        $data = WbsLevel3::with(['wbsDiscipline','workElements.parent'])->where('project_id',$project->id)->get()->groupBy('identifier');
+        $data = $data->map(function($discipline){
+            return $discipline->mapToGroups(function($d) use ($discipline) {
+                return [
+                    $d->wbsDiscipline?->title => [
+                        'id' => $d->id,
+                        'title' => $d->work_element,
+                        'identifier' => $discipline->first()->identifier,
+                        'disciplineId' => $d->discipline,
+                        'elementId' => $d->workElements?->id
+                    ]
+                ];
+            });
+        });
         return $data;
     }
 
@@ -214,9 +236,9 @@ class WorkBreakdownStructureController extends Controller
         foreach($data as $item){
             $item->delete();
         }
-
     }
 
+    /** Deprecated */
     public function getWbsLevel2(Request $request){
         try{
             $data = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$request->project_id)
@@ -263,6 +285,34 @@ class WorkBreakdownStructureController extends Controller
         return response()->json([
             'status' => 200,
             'data' => $arrayObj
+        ]);
+    }
+
+    public function getDisciplineList(Request $request){
+        $data = WorkBreakdownStructure::select('code','title','id')->with('wbsDiscipline')->where('level', 2)->get();
+        if($request->isMustache) {
+            try{
+                return response()->json([
+                    'status' => 200,
+                    'data' => $data
+                ]);
+            } catch (Exception $e){
+                return response()->json([
+                    'status' => 500,
+                    'message' => $e->getMessage()
+                ]);
+            }
+        }
+        return $data;
+    }
+
+    public function getWorkElementList(Request $request){
+        $workElementController = new WorkElementController();
+        $data = $workElementController->getDataWorkElements($request);
+
+        return response()->json([
+            'status' => 200,
+            'data' => $data
         ]);
     }
 }

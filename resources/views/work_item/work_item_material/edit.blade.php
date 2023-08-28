@@ -4,7 +4,7 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3>Man Power</h3>
+                    <h4>Man Power</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                         <li class="breadcrumb-item">Work Item List</li>
@@ -25,7 +25,7 @@
                     </div>
                 @endif
             </div>
-            <div class="row">
+            <div class="row js-confirm-row">
                 <div class="card">
                     <div class="card-header-costume">
                         <div class="float-start">
@@ -71,7 +71,7 @@
                                                     <th scope="col" class="text-center min-w-100 js-item-total"></th>
                                                 </tr>
                                             </table>
-                                            <div class="float-end mt-2 cursor-pointer js-add-new-item"
+                                            <div class="float-end mt-2 cursor-pointer js-add-new-item js-confirm-form"
                                                  data-template="#js-template-table-work_item_material">
                                                 <i class="fa fa-plus-circle"></i> Add New Material</div>
                                         </div>

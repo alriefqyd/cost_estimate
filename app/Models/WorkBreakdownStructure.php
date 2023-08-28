@@ -21,6 +21,15 @@ class WorkBreakdownStructure extends Model
         return $this->hasOne(WbsLevel3::class,'work_element');
     }
 
+    public function wbsLevel3Discipline(){
+        return $this->hasOne(WbsLevel3::class,'discipline');
+    }
+
+    public function wbsDisciplineWorkElements(){
+        return $this->hasMany(WorkBreakdownStructure::class,'work_element');
+    }
+
+
     public function parent(){
         return $this->belongsTo(WorkBreakdownStructure::class,'parent_id');
     }

@@ -10,7 +10,7 @@
 <title>Cost Estimate Management</title>
 <!-- Google font-->
 <link rel="preconnect" href="https://fonts.gstatic.com">
-<link rel="icon" href="{{asset('assets/images/image_ico.png')}}" type="image/x-icon">
+<link rel="icon" href="{{asset('assets/images/vale-sa.svg')}}" type="image/x-icon">
 <link
     href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
     rel="stylesheet">
@@ -48,5 +48,8 @@
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/responsive.css')}}">
 <!-- Responsive css-->
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/custom.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/css/nestable.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/select2.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/bootstrap-duallistbox/dist/bootstrap-duallistbox.min.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/datatable/datatables.min.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/datatable/FixedHeader-3.4.0/css/fixedHeader.dataTables.min.css')}}">

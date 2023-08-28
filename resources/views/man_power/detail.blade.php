@@ -4,7 +4,7 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3>Man Powers</h3>
+                    <h4>Man Powers</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="">Home</a></li>
                         <li class="breadcrumb-item">Man Power Detail</li>
@@ -16,7 +16,7 @@
     </div>
     <div class="container-fluid product-wrapper">
         <div class="col-sm-12">
-            <div class="row">
+            <div class="row js-confirm-row">
                 @if($errors->any())
                     <div class="col-md-12 alert alert-danger">
                         @foreach ($errors->all() as $error)

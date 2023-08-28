@@ -15,7 +15,12 @@ class Role extends Model
         'create' => 'Create',
         'read' => 'Read',
         'update' => 'Update',
-        'delete' => 'Delete'
+        'delete' => 'Delete',
+        'civil_reviewer' => 'Civil Reviewer',
+        'mechanical_reviewer' => 'Mechanical Reviewer',
+        'electrical_reviewer' => 'Electrical Reviewer',
+        'instrument_reviewer' => 'Instrument Reviewer',
+        'master_reviewer' => 'Master Reviewer'
     ];
 
     public const FEATURE = [

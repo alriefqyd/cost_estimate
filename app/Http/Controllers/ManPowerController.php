@@ -19,12 +19,17 @@ class ManPowerController extends Controller
         $order = $request->order;
         $sort =  $request->sort;
 
-        $man_power = ManPower::filter(request(['q','skill_level']))
+        $man_power = ManPower::filter(request(['q','skill_level','status']))
             ->when(isset($request->sort), function($query) use ($request,$order,$sort){
                 return $query->orderBy($order,$sort);
             })->when(!isset($request->sort), function($query) use ($request,$order) {
                 return $query->orderBy('code', 'ASC');
-            })->orderBy('code', 'ASC')->paginate(20)->withQueryString();
+            })->when(!auth()->user()->isReviewer(), function($query){
+                return $query->where(function($q){
+                    return $q->where('status',ManPower::REVIEWED)->orWhere('created_by', auth()->user()->id);
+                });
+            })
+            ->orderBy('code', 'ASC')->paginate(20)->withQueryString();
         return view('man_power.index',[
             'man_power' => $man_power
         ]);
@@ -105,6 +110,8 @@ class ManPowerController extends Controller
                 'total_benefit_hourly' => $this->convertToDecimal($request->total_benefit_hourly),
                 'overall_rate_hourly' => $this->convertToDecimal($request->overall_rate_hourly),
                 'factor_hourly' => $this->convertToDecimal($request->factor_hourly),
+                'created_by' => auth()->user()->id,
+                'status' => ManPower::DRAFT
             ]);
             $manPower->save();
             DB::commit();
@@ -148,6 +155,8 @@ class ManPowerController extends Controller
             $manPower->total_benefit_hourly = $this->convertToDecimal($request->total_benefit_hourly);
             $manPower->overall_rate_hourly = $this->convertToDecimal($request->overall_rate_hourly);
             $manPower->factor_hourly = $this->convertToDecimal($request->factor_hourly);
+            $manPower->factor_hourly = $this->convertToDecimal($request->factor_hourly);
+            $manPower->updatedBy = auth()->user()->id;
 
             $manPower->save();
             DB::commit();
@@ -191,8 +200,16 @@ class ManPowerController extends Controller
 
     public function getManPower(Request $request){
         $response = array();
-        $data = ManPower::select('id','title','code','overall_rate_hourly')->where('title','like','%'.$request->q.'%')
-            ->orwhere('code','like','%'.$request->q.'%')->get();
+        $data = ManPower::select('id','title','code','overall_rate_hourly')
+            ->where(function($query) use ($request) {
+                return $query->where('title','like','%'.$request->q.'%')
+                    ->orwhere('code','like','%'.$request->q.'%');
+            })->when(!auth()->user()->isReviewer(), function($query){
+                return $query->where(function($q){
+                   return $q->where('status', ManPower::REVIEWED)
+                       ->orwhere('created_by', auth()->user()->id);
+                });
+            })->get();
         foreach($data as $v){
             $response[] = array(
                 "text" => "[".$v->code . "] - " . $v->title,
@@ -202,6 +219,30 @@ class ManPowerController extends Controller
         }
 
         return response()->json($response);
+    }
+
+    public function updateList(Request $request){
+        $ids = (string) $request->ids;
+        DB::beginTransaction();
+        $ids = explode(',',$ids);
+        try {
+            $items = ManPower::whereIn('id',$ids)->get();
+
+            $items->each(function ($item){
+                $item->update(['status' => ManPower::REVIEWED]);
+            });
+            DB::commit();
+            return response()->json([
+                'message' => 'Data successfully update',
+                'status' => 200
+            ]);
+        } catch (Exception $e){
+            DB::rollback();
+            return response()->json([
+                'message' => $e->getMessage(),
+                'status' => 500
+            ]);
+        }
     }
 
     public function message($message, $type, $icon, $status){

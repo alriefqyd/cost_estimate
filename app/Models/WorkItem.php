@@ -11,7 +11,7 @@ class WorkItem extends Model
     protected $guarded = ['id'];
 
     const DRAFT = 'DRAFT';
-    const PUBLISH = 'PUBLISH';
+    const REVIEWED = 'REVIEWED';
     const ARCHIVE = 'ARCHIVE';
 
     public function estimateAllDisciplines(){
@@ -48,13 +48,15 @@ class WorkItem extends Model
     }
 
     public function scopeFilter($query, array $filters){
-        $query->when($filters['q'] ?? false, fn($query,$q) =>
-            $query->where('code','like','%'.$q.'%')
-                ->orWhere('description','like','%'.$q.'%')
-            );
-
         $query->when($filters['category'] ?? false, fn($query,$q) =>
             $query->where('work_item_type_id', $q)
+        )->when($filters['q'] ?? false, function ($query, $q) {
+            $query->where(function ($query) use ($q) {
+                $query->where('work_items.code', 'like', '%' . $q . '%')
+                    ->orWhere('description', 'like', '%' . $q . '%');
+            });
+        })->when($filters['status'] ?? false, fn($query, $q) =>
+            $query->where('status',$q)
         );
     }
 
@@ -75,5 +77,14 @@ class WorkItem extends Model
 
     public function countChildren(){
         return $this->children->count();
+    }
+
+    public function isAuthorized(){
+        if(auth()->user()->isReviewer()
+            || $this->created_by == auth()->user()->id
+            || $this->status == $this::REVIEWED) {
+            return true;
+        }
+        return false;
     }
 }

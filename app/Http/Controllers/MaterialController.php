@@ -30,13 +30,19 @@ class MaterialController extends Controller
         $sort =  $request->sort;
         $materialCategory = MaterialCategory::select('id','description','code')->get();
 
-        $material = Material::with('materialsCategory')->filter(request(['q','category']))->when(isset($request->sort), function($query) use ($request,$order,$sort){
-            return $query->when($request->order == 'category', function($qq) use ($request,$order,$sort){
-                return $qq->whereHas('materialsCategory',function($relation) use ($sort){
-                    $relation->orderBy('description',$sort);
+        $material = Material::with('materialsCategory')->filter(request(['q','category','status']))
+            ->when(isset($request->sort), function($query) use ($request,$order,$sort) {
+                return $query->when($request->order == 'category', function ($qq) use ($request, $order, $sort) {
+                    return $qq->whereHas('materialsCategory', function ($relation) use ($sort) {
+                        $relation->orderBy('description', $sort);
+                    });
+                })->when($request->order != 'category', function ($qq) use ($request, $order, $sort) {
+                    return $qq->orderBy($order, $sort);
                 });
-            })->when($request->order != 'category', function($qq) use ($request,$order, $sort){
-                return $qq->orderBy($order,$sort);
+        })->when(!auth()->user()->isReviewer(), function($query){
+            return $query->where(function($subQuery){
+                return $subQuery->where('status',Material::REVIEWED)
+                    ->orWhere('created_by', auth()->user()->id);
             });
         })->when(!isset($request->sort), function($query) use ($request,$order) {
             return $query->orderBy('code', 'ASC');
@@ -83,7 +89,9 @@ class MaterialController extends Controller
                 'rate' => $this->convertToDecimal($request->rate),
                 'stock_code' => $request->stock_code,
                 'remark' => $request->remark,
-                'ref_material_number' => $request->ref_material_number
+                'ref_material_number' => $request->ref_material_number,
+                'status' => Material::DRAFT,
+                'created_by' => auth()->user()->id
             ]);
             $material->save();
             DB::commit();
@@ -167,7 +175,13 @@ class MaterialController extends Controller
 
     public function getMaterial(Request $request){
         $response = array();
-        $data = Material::select('id','tool_equipment_description','code','rate')->where('tool_equipment_description','like','%'.$request->q.'%')
+        $data = Material::select('id','tool_equipment_description','code','rate')
+            ->when(!auth()->user()->isReviewer(), function($query){
+                return $query->where(function($subQuery){
+                    return $subQuery->where('status',Material::REVIEWED)
+                        ->orWhere('created_by',auth()->user()->id);
+                });
+            })->where('tool_equipment_description','like','%'.$request->q.'%')
             ->orwhere('code','like','%'.$request->q.'%')->get();
         foreach($data as $v){
             $response[] = array(
@@ -185,6 +199,30 @@ class MaterialController extends Controller
         $value = str_replace('.','',$val);
         $value = str_replace(',','.',$value);
         return $value;
+    }
+
+    public function updateList(Request $request){
+        $ids = (string) $request->ids;
+        DB::beginTransaction();
+        $ids = explode(',',$ids);
+        try {
+            $items = Material::whereIn('id',$ids)->get();
+
+            $items->each(function ($item){
+                $item->update(['status' => Material::REVIEWED]);
+            });
+            DB::commit();
+            return response()->json([
+                'message' => 'Data successfully update',
+                'status' => 200
+            ]);
+        } catch (Exception $e){
+            DB::rollback();
+            return response()->json([
+                'message' => $e->getMessage(),
+                'status' => 500
+            ]);
+        }
     }
 
     public function message($message, $type, $icon, $status){

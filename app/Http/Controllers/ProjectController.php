@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\SummaryExport;
 use App\Models\Project;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\WbsLevel3;
 use App\Services\ProjectServices;
@@ -27,15 +28,21 @@ class ProjectController extends Controller
      */
     public function index(Request $request, Project $project)
     {
-        $order = $request->order;
-        $sort =  $request->sort;
-
+        $projectService = new ProjectServices();
+        $civilEngineerList = $projectService->getDataEngineer('design_civil_engineer');
+        $mechanicalEngineerList = $projectService->getDataEngineer('design_mechanical_engineer');
+        $electricalEngineerList = $projectService->getDataEngineer('design_electrical_engineer');
+        $instrumentEngineerList = $projectService->getDataEngineer('design_instrument_engineer');
         $this->authorize('viewAny', Project::class);
-        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
-            ->access()->filter(request(['q']))->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
-
+        $projectList = $projectService->getProjectsData($request)['projectList'];
         return view('project.index',[
-            'projects' => $projects
+            'projects' => $projectList,
+            'projectDraft' => $projectService->getProjectsData($request)['draft'],
+            'projectApprove' => $projectService->getProjectsData($request)['approve'],
+            'civilEngineerList' => $civilEngineerList,
+            'mechanicalEngineerList' => $mechanicalEngineerList,
+            'electricalEngineerList' => $electricalEngineerList,
+            'instrumentEngineerList' => $instrumentEngineerList,
         ]);
     }
 
@@ -82,6 +89,7 @@ class ProjectController extends Controller
                 'design_engineer_civil' => $request->design_engineer_civil,
                 'design_engineer_electrical' => $request->design_engineer_electrical,
                 'design_engineer_instrument' => $request->design_engineer_instrument,
+                'status' => Project::DRAFT
             ]);
             $project->save();
             DB::commit();
@@ -153,6 +161,7 @@ class ProjectController extends Controller
            $project->design_engineer_civil = $request->design_engineer_civil;
            $project->design_engineer_electrical = $request->design_engineer_electrical;
            $project->design_engineer_instrument = $request->design_engineer_instrument;
+           $project->status = $request->status ?? Project::DRAFT;
 
            $project->save();
            DB::commit();
@@ -182,14 +191,10 @@ class ProjectController extends Controller
         $projectServices = new ProjectServices();
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
-        $wbs = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$project->id)->get()->groupBy('title');
-        //this function is not use temporary
-        //$summary = $this->getSummaryCostEstimate($project, $request);
-
+        $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
 
         return view('project.detail',[
-            //'summary' => $summary,
             'project' => $project,
             'costProject' => $costProjects,
             'wbs' => $wbs,
@@ -244,6 +249,26 @@ class ProjectController extends Controller
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
         return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary-export.xlsx');
+    }
+
+    public function updateStatus(Project $project){
+        try{
+            DB::beginTransaction();
+            $project->status = Project::APPROVE;
+            $project->save();
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Project successfully approved',
+                'data' => Project::APPROVE
+            ]);
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
 }

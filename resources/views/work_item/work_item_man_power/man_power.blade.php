@@ -1,6 +1,6 @@
 <tr class="js-row-work-item-man-power js-row-column">
     <td class="min-w-160">
-        <select class="select2 js-select-man-power js-select-item"
+        <select class="select2 js-select-man-power js-select-item js-confirm-form"
                 data-url="/getManPower"
                 name="man_power[]"
                 data-placeholder="Select Man Power"
@@ -12,7 +12,7 @@
     </td>
     <td class="js-work-item-man-power-unit min-w-50">
         <input type="text" name="unit[]" class="form-control
-            js-item-unit
+            js-item-unit js-confirm-form
             js-unit-work-item-man-power height-40"
             value="{{ $isEdit ? $exManPower->pivot->labor_unit : ''}}"
             {{!$isEdit ? 'disabled' : ''}}>
@@ -22,6 +22,7 @@
                {{!$isEdit ? 'disabled' : ''}}
                value="{{$isEdit ? $exManPower->pivot->labor_coefisient : ''}}"
                class="form-control js-coef-work-item-man-power
+               js-confirm-form
                js-item-coef
                height-40">
     </td>
@@ -33,6 +34,6 @@
         {{$isEdit ? number_format($exManPower->pivot->amount,2,'.',',') : ''}}
     </td>
     <td>
-        <i class="fa fa-trash-o js-delete-item js-delete-work-item-man-power text-danger text-20"></i>
+        <i class="fa fa-trash-o js-delete-item js-delete-work-item-man-power js-confirm-form text-danger text-20"></i>
     </td>
 </tr>

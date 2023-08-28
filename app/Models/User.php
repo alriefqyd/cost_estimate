@@ -94,7 +94,10 @@ class User extends Authenticatable
     }
 
     public function getDecryptPass(){
-//        dd($this->password);
         return Crypt::decryptString($this->password);
+    }
+
+    public function isReviewer(){
+        return (in_array(auth()->user()->profiles?->position, PROFILE::REVIEWER));
     }
 }

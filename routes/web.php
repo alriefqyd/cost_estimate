@@ -36,8 +36,10 @@ Route::get('/project/{project:id}',[\App\Http\Controllers\ProjectController::cla
 Route::get('/project/edit/{project:id}',[\App\Http\Controllers\ProjectController::class,'edit'])->middleware('auth');
 Route::get('/project/{project:id}/discipline/{discipline}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth');
 //Route::get('/cost-estimate/project/detail',[\App\Http\Controllers\CostEstimateController::class,'detail'])->middleware('auth');
-Route::get('/project/{project:id}/work-item/create',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth');
-Route::get('/getExistingWorkItemByWbs',[\App\Http\Controllers\EstimateAllDisciplineController::class,'setExistingWorkItemByWbs'])->middleware('auth');
+/**
+ * Deprecated
+ */
+//Route::get('/getExistingWorkItemByWbs',[\App\Http\Controllers\EstimateAllDisciplineController::class,'setExistingWorkItemByWbs'])->middleware('auth');
 
 Route::get('/project/{project:id}/wbs/create',[\App\Http\Controllers\WorkBreakdownStructureController::class,'create'])->middleware('auth');
 Route::get('/project/{project:id}/wbs/edit',[\App\Http\Controllers\WorkBreakdownStructureController::class,'edit'])->middleware('auth');
@@ -48,12 +50,12 @@ Route::get('/project/{project:id}/estimate-discipline/create',[\App\Http\Control
 Route::get('/project/{project:id}/estimate-discipline/create/{discipline}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth')->can('create',App\Models\EstimateAllDiscipline::class);
 Route::post('/project/{project:id}/estimate-discipline/store',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth');
 Route::post('/project/{project:id}/estimate-discipline/update',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth');
+Route::post('/project/update-status/{project:id}/',[\App\Http\Controllers\ProjectController::class,'updateStatus'])->middleware('auth');
 
 Route::post('/workElement/{project:id}',[\App\Http\Controllers\WorkElementController::class,'store'])->middleware('auth');
 Route::get('/getWorkItems',[\App\Http\Controllers\WorkItemController::class,'setWorkItems'])->name('getWorkItem')->middleware('auth');
 Route::get('/getWorkElement',[\App\Http\Controllers\WorkElementController::class,'setWorkElements'])->name('getWorkElement');
 Route::get('/getItemAdditional/{type}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getItemAdditional'])->name('getItemAdditional');
-Route::get('/getWbsLevel2',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel2'])->middleware('auth');
 Route::get('/getWbsLevel3',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel3'])->middleware('auth');
 
 Route::get('/work-item/',[\App\Http\Controllers\WorkItemController::class,'index'])->middleware('auth');
@@ -117,7 +119,6 @@ Route::get('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsCon
 Route::get('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'editWorkElement'])->middleware('auth');
 Route::put('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'update'])->middleware('auth');
 Route::put('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'updateWorkElement'])->middleware('auth');
-Route::post('/work-breakdown-structure/',[\App\Http\Controllers\settingWbsController::class,'store'])->middleware('auth');
 Route::post('/work-breakdown-structure/work-element',[\App\Http\Controllers\settingWbsController::class,'storeWorkElement'])->middleware('auth');
 Route::post('/work-breakdown-structure/',[\App\Http\Controllers\settingWbsController::class,'store'])->middleware('auth');
 Route::delete('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'delete'])->middleware('auth');
@@ -129,8 +130,9 @@ Route::post('/user',[\App\Http\Controllers\UserController::class,'store'])->midd
 Route::get('/user/{user:id}',[\App\Http\Controllers\UserController::class,'edit'])->middleware('auth')->can('viewAny',User::class);
 Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'update'])->middleware('auth');
 
-Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
-
+/**
+ * Request by AJAX
+ */
 Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
 Route::get('/getNumChild/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChild'])->name('getNumChild')->middleware('auth');
 Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getMaterial'])->name('getMaterial')->middleware('auth');
@@ -138,5 +140,13 @@ Route::get('/getToolsEquipment',[\App\Http\Controllers\EquipmentToolsController:
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');
 Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'checkDuplicateProjectNo'])->name('checkDuplicateProjectNo')->middleware('auth');
 Route::get('/dumpingRole',[\App\Http\Controllers\RoleController::class,'dumpingData'])->name('dumpingData')->middleware('auth');
-
+Route::get('/getDetailWorkItem',[\App\Http\Controllers\WorkItemController::class,'getDetail'])->name('dumpingData')->middleware('auth');
+Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
+Route::get('/getDisciplineList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getDisciplineList'])->middleware('auth');
+Route::get('/getWorkElementList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWorkElementList'])->middleware('auth');
+Route::post('/updateStatusWorkItem',[\App\Http\Controllers\WorkItemController::class,'updateStatusWorkItem'])->middleware('auth');
+Route::post('/workItem/update-list/',[\App\Http\Controllers\WorkItemController::class,'updateList'])->middleware('auth');
+Route::post('/manPower/update-list/',[\App\Http\Controllers\ManPowerController::class,'updateList'])->middleware('auth');
+Route::post('/equipmentTools/update-list/',[\App\Http\Controllers\EquipmentToolsController::class,'updateList'])->middleware('auth');
+Route::post('/material/update-list/',[\App\Http\Controllers\MaterialController::class,'updateList'])->middleware('auth');
 

@@ -42,6 +42,15 @@
     font-size: 14px !important;
 }
 
+.text-12-custom {
+    font-size: 12px !important;
+}
+
+.cursor-text {
+    cursor:text;
+}
+
+
 .table th {
     font-size: 12px;
     vertical-align: top;
@@ -68,16 +77,18 @@
 }
 
 .text-12 {
-    font-size: 12px;
+    font-size: 12px !important;
 }
 
 .text-10 {
-    font-size: 10px;
+    font-size: 10px !important;
 }
 
 .text-20 {
     font-size: 20px;
 }
+
+
 
 .centering {
     margin: auto;
@@ -128,6 +139,11 @@
 .min-w-80 {
     min-width: 80px !important;
     max-width: 80px !important;
+}
+
+.min-w-90 {
+    min-width: 90px !important;
+    max-width: 90px !important;
 }
 
 .min-w-100 {
@@ -232,6 +248,17 @@
     right: 10px;
 }
 
+.card-body-custom {
+    padding-left:0.1rem !important;
+    padding-right:0.1rem !important;
+    padding-top: 0.1rem; !important;
+    padding-bottom: 0.1rem; !important;
+}
+
+.table-small-text tr td {
+    font-size: 12.2px;
+}
+
 .checkbox label {
     margin-top: -20px !important;
 }
@@ -294,8 +321,203 @@
     background-color: #FFC000 !important;
 }
 
-@media only screen and (max-width: 1337px) {
-    .mb-1-responsive {
-        margin-bottom: -12px !important;
+.loading-spinner{
+    width:30px;
+    height:30px;
+    border:2px solid #24685c;
+    border-radius:50%;
+    border-top-color:#0001;
+    display:inline-block;
+    animation:loadingspinner .7s linear infinite;
+}
+
+.text-align-right {
+    text-align: right !important;
+}
+
+.mr-4 {
+    margin-right: 1rem;
+}
+
+.mr-5 {
+    margin-right: 1.25rem;
+}
+
+.mr-6 {
+    margin-right: 1.50rem;
+}
+
+.text-small {
+    font-size: 11px;
+}
+
+.margin-sm {
+    margin-bottom: 0.3rem;
+}
+
+.margin-05 {
+    margin-bottom: 0.5rem;
+}
+
+.tooltip-text {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px;
+    background-color: #000;
+    color: #fff;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.nav-link:hover .tooltip-text {
+    opacity: 1;
+    visibility: visible;
+}
+
+@media screen and (max-width:1199px) {
+    .page-wrapper.compact-wrapper .page-body-wrapper header.main-nav{
+        top : 65px !important;
     }
+}
+
+.page-wrapper .page-main-header .main-header-right .main-header-left .toggle-sidebar {
+    visibility: visible;
+    color: #24695c;
+}
+
+@media screen and (max-width: 976px){
+    .page-wrapper .page-main-header .main-header-right .main-header-left {
+        padding : 5px 30px 5px 10px
+    }
+
+    .page-wrapper .page-main-header .main-header-right .main-header-left .toggle-sidebar {
+        visibility: visible;
+    }
+}
+
+@media screen and (max-width: 972px){
+    .page-wrapper.compact-wrapper .page-main-header.close_icon {
+        height:80px;
+    }
+
+    .page-wrapper .page-main-header .main-header-right .main-header-left {
+        height : 80px;
+    }
+
+    .page-wrapper .page-main-header .main-header-right .main-header-left {
+
+    }
+    .page-wrapper .page-main-header .main-header-right .main-header-left .img-fluid {
+        max-width: 80px !important;
+    }
+}
+
+.custom-checkbox {
+    width: 17px;
+    height: 17px;
+}
+
+/* Optional: Customize appearance */
+custom-checkbox:before {
+    content: "";
+    display: inline-block;
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+custom-checkbox:checked:before {
+    background-color: #007bff;
+}
+
+.dd-handle[contenteditable="true"] {
+    background-color: #f9f9f9;
+    cursor: text;
+}
+
+.dd-handle {
+    cursor: pointer;
+}
+
+.edit-input {
+    width: 100%;
+}
+
+@keyframes loadingspinner{
+    0%{
+        transform:rotate(0deg)
+    }
+    100%{
+        transform:rotate(360deg)
+    }
+}
+
+.table-custom th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table-overflow {
+    overflow: auto;
+    height: 60vh;
+}
+
+.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-custom th, .table-custom td {
+    padding: 8px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+.select2-container.select2-repositioned {
+    position: absolute;
+    top: 100%;
+    left: auto;
+    right: 0;
+}
+
+.notification {
+    position: fixed; /* or absolute, depending on your layout needs */
+    top: 50%; /* adjust the position as needed */
+    left: 50%; /* adjust the position as needed */
+    transform: translate(-50%, -50%);
+    background-color: #f8f8f8;
+    padding: 10px;
+    border: 1px solid #ccc;
+    z-index: 9999;
+}
+
+.moveall,
+.removeall {
+    border: 1px solid #ccc !important;
+
+    &:hover {
+         background: #efefef;
+     }
+}
+
+.moveall::after {
+    content: attr(title);
+
+}
+
+.removeall::after {
+    content: attr(title);
+}
+
+.form-control option {
+   padding: 5px;
+   border-bottom: 1px solid #efefef;
 }

@@ -1,10 +1,11 @@
+@inject('workItem', App\Models\WorkItem::class)
 @extends('layouts.main')
 @section('main')
     <div class="container-fluid">
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <h3>Work Item</h3>
+                    <h4>Work Item</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="">Home</a></li>
                         <li class="breadcrumb-item">Work Item Detail</li>
@@ -63,6 +64,37 @@
                                 <tr>
                                     <td class="min-w-250">Total Work Item Price :</td>
                                     <td> {{number_format($work_item?->getTotalSum(),2,',','.')}}</td>
+                                </tr>
+                                <tr>
+                                    <td class="min-w-250">Status</td>
+                                    <td>
+                                        <label class="js-status-work-item m-1">{{$work_item->status}}</label>
+                                        @if(auth()->user()->profiles?->position == 'project_manager')
+                                        <i class="fa fa-pencil-square-o js-btn-edit-status-work-item cursor-pointer"></i>
+                                            <div class="col-md-3 js-select-status-work-item d-none">
+                                                <select class="select2 js-select-work-item col-md-3">
+                                                    <option value="{{$workItem::DRAFT}}" {{$work_item->status == $workItem::DRAFT ? 'selected' : ''}}>{{$workItem::DRAFT}}</option>
+                                                    <option value="{{$workItem::REVIEWED}}" {{$work_item->status == $workItem::REVIEWED ? 'selected' : ''}}>{{$workItem::REVIEWED}}</option>
+                                                </select>
+                                            </div>
+
+                                            <div class="modal fade" id="approveModalWorkItem" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLabel">Approve work item</h5>
+                                                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">Are you sure you want to approve this work item?</div>
+                                                        <div class="modal-footer">
+                                                            <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+                                                            <button class="btn btn-success js-btn-approve-work-item" type="button">Approve</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    </td>
                                 </tr>
                             </table>
                         </div>
