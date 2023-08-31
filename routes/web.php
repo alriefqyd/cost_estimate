@@ -78,6 +78,8 @@ Route::post('/work-item/{workItem:id}/material/update',[\App\Http\Controllers\Wo
 
 Route::get('/man-power/',[\App\Http\Controllers\ManPowerController::class,'index'])->middleware('auth');
 Route::get('/man-power/create',[\App\Http\Controllers\ManPowerController::class,'create'])->middleware('auth');
+Route::get('/man-power/export',[\App\Http\Controllers\ManPowerController::class,'export'])->middleware('auth');
+Route::post('/man-power/import',[\App\Http\Controllers\ManPowerController::class,'import'])->middleware('auth');
 Route::post('/man-power/',[\App\Http\Controllers\ManPowerController::class,'store'])->middleware('auth');
 Route::put('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController::class,'update'])->middleware('auth');
 Route::get('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController::class,'detail'])->middleware('auth');

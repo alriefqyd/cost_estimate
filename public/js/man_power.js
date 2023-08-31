@@ -182,4 +182,72 @@ $(function() {
             }
         });
     });
+
+    $('.js-btn-export-man-power').on('click',function(){
+        var _this = $(this);
+        var _file_name = 'Man Power.xlsx';
+        _this.attr('disabled','disabled');
+        _this.find('.loader-box').removeClass('d-none');
+        $.ajax({
+            url:'/man-power/export',
+            method:'GET',
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function (data) {
+                var a = document.createElement('a');
+                var url = window.URL.createObjectURL(data);
+                a.href = url;
+                a.download = _file_name;
+                document.body.append(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                _this.find('.loader-box').addClass('d-none');
+                _this.removeAttr('disabled');
+            }
+        })
+    })
+
+    $('.js-form-import-man-power').submit(function(e){
+        e.preventDefault();
+        $('#modalImportManPower').modal('hide');
+        $('.js-modal-loading-import').modal('show');
+        const formData = new FormData(this);
+        const progressBar = $('.progress-bar');
+        const progress = $('.progress');
+        const fileInput = $('input[type="file"]', this);
+
+        // Check the file extension
+        const allowedExtensions = ['xlsx', 'xls'];
+        const fileName = fileInput.val();
+        const fileExtension = fileName.split('.').pop();
+
+        if (!allowedExtensions.includes(fileExtension.toLowerCase())) {
+            $('#modalImportManPower').modal('hide');
+            $('.js-modal-loading-import').modal('hide');
+            notification('danger','Wrong Extension File', 'fa fa-time','Error')
+            return; // Prevent the request if the extension is not allowed
+        }
+
+        $.ajax({
+            url: '/man-power/import',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                progress.addClass('d-none');
+                $('.js-modal-loading-import').modal('hide');
+                notification('success',response.message, 'fa fa-check','Success')
+                setTimeout(function (){
+                    window.location.href='/man-power';
+                },2000)
+            },
+            error: function(xhr) {
+                $('.js-modal-loading-import').modal('hide');
+                notification('danger',xhr.responseJSON.message, 'fa fa-time','Error')
+            }
+        });
+    });
 })

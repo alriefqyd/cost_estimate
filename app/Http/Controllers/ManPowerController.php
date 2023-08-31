@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ManPowerExport;
+use App\Imports\ManPowerImport;
 use App\Models\ManPower;
 use App\Models\Setting;
 use Exception;
@@ -9,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ManPowerController extends Controller
 {
@@ -245,11 +248,25 @@ class ManPowerController extends Controller
         }
     }
 
+    public function export(){
+        $data = ManPower::all();
+        return Excel::download(new ManPowerExport($data),'man-power.xlsx');
+    }
+
+    public function import(Request $request){
+        $file = $request->file('file');
+        if($request->hasFile('file')){
+            Excel::import(new ManPowerImport, $file);
+            return response()->json(['message' => 'Import Successful']);
+        }
+
+        return response()->json(['message' => 'No file uploaded'], 400);
+    }
+
     public function message($message, $type, $icon, $status){
         Session::flash('message', $message);
         Session::flash('type', $type);
         Session::flash('icon', $icon);
         Session::flash('status', $status);
     }
-
 }

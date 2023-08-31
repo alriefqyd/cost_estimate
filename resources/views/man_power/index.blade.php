@@ -31,7 +31,7 @@
                 <div class="card">
                     <div class="mt-5 mb-4">
                         <form method="get" action="/man-power">
-                            <div class="row mb-3">
+                            <div class="row">
                                 <div class="col-md-2">
                                     <select class="select2 col-sm-12 js-search-form"
                                             name="skill_level"
@@ -50,7 +50,7 @@
                                     <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                 </div>
                             </div>
-                            <div class="row mb-4">
+                            <div class="row mb-5">
                                 <div class="col-md-6">
                                     <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                         <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
@@ -60,6 +60,21 @@
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $manPower::REVIEWED ? 'active' : ''}} js-btn-status" data-value="{{$manPower::REVIEWED}}" type="button">
                                             {{$manPower::REVIEWED}}
                                         </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="btn btn-outline-success js-btn-export-man-power float-end m-1">
+                                        Export
+                                        <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
+                                            <div class="loader-34"></div>
+                                        </div>
+                                    </div>
+                                    <div class="btn btn-outline-success float-end m-1 js-btn-import-man-power"
+                                            data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportManPower">
+                                        Import
+                                        <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
+                                            <div class="loader-34"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -171,6 +186,43 @@
                 <div class="modal-footer">
                     <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
                     <button class="btn btn-success js-approve-confirmation-man-power" type="button">Reviewed</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade js-modal-import-man-power" id="modalImportManPower" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form action="/man-power/import" class="js-form-import-man-power" method="post" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Import Man Power</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file" name="file">
+                        <div class="mt-3">
+                            <div class="progress d-none">
+                                <div class="progress-bar progress-bar-animated bg-primary progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success js-import-btn-confirmation-man-power">Import</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="modal js-modal-loading-import" id="modal-loading" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="loading-spinner mb-2"></div>
+                    <div>Import in progress....</div>
                 </div>
             </div>
         </div>
