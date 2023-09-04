@@ -75,13 +75,15 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="btn btn-outline-success float-end m-1 js-btn-import-man-power"
-                                            data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportManPower">
-                                        Import
-                                        <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
-                                            <div class="loader-34"></div>
+                                    @can('create', \App\Models\ManPower::class)
+                                        <div class="btn btn-outline-success float-end m-1 js-btn-import-man-power"
+                                                data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportManPower">
+                                            Import
+                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
+                                                <div class="loader-34"></div>
+                                            </div>
                                         </div>
-                                    </div>
+                                    @endcan
                                 </div>
                             </div>
                             @if(auth()->user()->isManPowerReviewer())
