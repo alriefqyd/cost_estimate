@@ -86,6 +86,8 @@ Route::get('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController:
 Route::delete('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController::class,'delete'])->middleware('auth');
 
 Route::get('/tool-equipment',[\App\Http\Controllers\EquipmentToolsController::class,'index'])->middleware('auth');
+Route::get('/tool-equipment/export',[\App\Http\Controllers\EquipmentToolsController::class,'export'])->middleware('auth');
+Route::post('/tool-equipment/import',[\App\Http\Controllers\EquipmentToolsController::class,'import'])->middleware('auth');
 Route::get('/tool-equipment/create',[\App\Http\Controllers\EquipmentToolsController::class,'create'])->middleware('auth');
 Route::post('/tool-equipment/',[\App\Http\Controllers\EquipmentToolsController::class,'store'])->middleware('auth');
 Route::put('/tool-equipment/{equipmentTools:id}',[\App\Http\Controllers\EquipmentToolsController::class,'update'])->middleware('auth');

@@ -9,6 +9,7 @@ use App\Models\Setting;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
@@ -256,7 +257,9 @@ class ManPowerController extends Controller
     public function import(Request $request){
         $file = $request->file('file');
         if($request->hasFile('file')){
+            Log::info('Starting import man power...');
             Excel::import(new ManPowerImport, $file);
+            Log::info('Import man power successful');
             return response()->json(['message' => 'Import Successful']);
         }
 

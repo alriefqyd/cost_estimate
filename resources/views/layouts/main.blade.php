@@ -20,6 +20,18 @@
         <div class="page-body">
             @yield('main')
         </div>
+
+        <div class="modal js-modal-loading-import" id="modal-loading" data-backdrop="static">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
+                        <div class="loading-spinner mb-2"></div>
+                        <div>Import in progress....</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         @include('layouts.footer')
         @include('mustache')
     </div>

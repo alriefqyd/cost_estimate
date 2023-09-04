@@ -63,10 +63,16 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="btn btn-outline-success js-btn-export-man-power float-end m-1">
-                                        Export
-                                        <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
-                                            <div class="loader-34"></div>
+                                    <div class="btn btn-outline-success js-btn-export float-end m-1"
+                                            data-file-name="Man Power.xlsx"
+                                            data-url="/man-power/export/">
+                                        <div class="float-start">
+                                            Export
+                                        </div>
+                                        <div class="float-end">
+                                            <div class="loader-box m-2 d-none" style="height:0px">
+                                                <div class="loader-3"></div>
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="btn btn-outline-success float-end m-1 js-btn-import-man-power"
@@ -191,8 +197,8 @@
         </div>
     </div>
 
-    <div class="modal fade js-modal-import-man-power" id="modalImportManPower" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <form action="/man-power/import" class="js-form-import-man-power" method="post" enctype="multipart/form-data">
+    <div class="modal fade js-modal-import-man-power js-modal-import" id="modalImportManPower" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form action="/man-power/import" class="js-form-import" data-url="/man-power/import/" data-redirect="man-power" method="post" enctype="multipart/form-data">
             @csrf
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -215,16 +221,5 @@
                 </div>
             </div>
         </form>
-    </div>
-
-    <div class="modal js-modal-loading-import" id="modal-loading" data-backdrop="static">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-                <div class="modal-body text-center">
-                    <div class="loading-spinner mb-2"></div>
-                    <div>Import in progress....</div>
-                </div>
-            </div>
-        </div>
     </div>
 @endsection
