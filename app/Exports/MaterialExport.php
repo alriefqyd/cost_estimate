@@ -2,11 +2,12 @@
 
 namespace App\Exports;
 
-use App\Models\EquipmentToolsCategory;
 use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
@@ -16,38 +17,37 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class EquipmentToolsExport implements FromView, WithColumnFormatting,
-    ShouldAutoSize, WithStyles, WithEvents, WithTitle
-{
-    public function __construct($toolsEquipment){
-        $this->toolsEquipment = $toolsEquipment;
-        $this->size = sizeof($toolsEquipment);
-        $this->category = EquipmentToolsCategory::select('id','description')->get();
-    }
 
-    public function view(): View
+class MaterialExport implements FromView, WithColumnFormatting, WithStyles,
+    WithEvents, WithTitle,WithColumnWidths
+{
+    public function __construct($materials, $materialCategory)
     {
-        $toolsEquipment = $this->toolsEquipment;
-        return view('equipment_tool.excel', [
-            'toolsEquipment' => $toolsEquipment,
-            'category' => $this->category
-        ]);
+        $this->material = $materials;
+        $this->size = sizeof($materials);
+        $this->materialCategory = $materialCategory;
     }
 
     public function columnFormats(): array
     {
-        $columnFormats = [];
-        $columns = range('G', 'R');
+        return [
+            'G' => NumberFormat::FORMAT_CURRENCY_IDR
+        ];
 
-        foreach ($columns as $column) {
-            $columnFormats[$column] = NumberFormat::FORMAT_CURRENCY_IDR;
-        }
+    }
 
-        return $columnFormats;
+    public function view(): View
+    {
+        $material = $this->material;
+        return view('material.excel_list', [
+            'materials' => $material
+        ]);
     }
 
     public function styles(Worksheet $sheet)
     {
+        $sheet->getStyle('C')->getAlignment()->setWrapText(true); // Enable text wrapping for cells A1 to B1
+        $sheet->getStyle('H')->getAlignment()->setWrapText(true); // Enable text wrapping for cells A1 to B1
         $sheet->getStyle('A1:E4')->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -62,7 +62,7 @@ class EquipmentToolsExport implements FromView, WithColumnFormatting,
             ],
         ]);
 
-        $sheet->getStyle('A5:J6')->applyFromArray([
+        $sheet->getStyle('A5:K6')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'italic' => false,
@@ -74,7 +74,7 @@ class EquipmentToolsExport implements FromView, WithColumnFormatting,
         ]);
 
         $column = $this->size + 6;
-        $column = 'A5:J'.$column;
+        $column = 'A5:K'.$column;
         $sheet->getStyle($column)->applyFromArray([
             'borders' => [
                 'allBorders' => [
@@ -92,7 +92,7 @@ class EquipmentToolsExport implements FromView, WithColumnFormatting,
     {
         return [
             AfterSheet::class => function (AfterSheet $event) {
-                $equipmentToolsCategory = $this->category;
+                $equipmentToolsCategory = $this->materialCategory;
                 $data = [];
                 foreach ($equipmentToolsCategory as $ec) {
                     $data[] = $ec->description;
@@ -101,7 +101,7 @@ class EquipmentToolsExport implements FromView, WithColumnFormatting,
                 $drop_column = 'D';
                 $start_row = 7; // Start row for data validation
 
-                    $row_count = count($this->toolsEquipment) + 100;
+                $row_count = count($this->material) + 100;
 
                 // Set data validation
                 $validation = $event->sheet->getCell("{$drop_column}{$start_row}")->getDataValidation();
@@ -116,7 +116,7 @@ class EquipmentToolsExport implements FromView, WithColumnFormatting,
                 $validation->setPromptTitle('Pick from list');
                 $validation->setPrompt('Please pick a value from the drop-down list.');
 
-                $categoryCount = count($this->category);
+                $categoryCount = count($this->materialCategory);
                 $lowerBound = $categoryCount + 6; // 6 for column upper hat use for title and header
                 $range = "C$7:C$".$lowerBound;
 
@@ -132,6 +132,23 @@ class EquipmentToolsExport implements FromView, WithColumnFormatting,
 
     public function title(): string
     {
-       return 'Equipment Tools List';
+        return 'Material List';
+    }
+
+    public function columnWidths(): array
+    {
+        return [
+            'A' => 5,
+            'B' => 15,
+            'C' => 70,
+            'D' => 50,
+            'E' => 10,
+            'F' => 10,
+            'G' => 25,
+            'H' => 60,
+            'I' => 10,
+            'J' => 50,
+            'K' => 30,
+        ];
     }
 }

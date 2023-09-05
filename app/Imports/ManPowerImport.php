@@ -3,22 +3,29 @@
 namespace App\Imports;
 
 use App\Models\ManPower;
-use App\Models\Setting;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Importable;
+use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithProgressBar;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithUpserts;
 use Maatwebsite\Excel\Concerns\RemembersRowNumber;
+use Maatwebsite\Excel\Events\AfterImport;
 
 class ManPowerImport implements ToModel, WithMapping ,WithStartRow,
-    WithBatchInserts, WithUpserts, WithChunkReading, WithProgressBar
+    WithBatchInserts, WithUpserts, WithChunkReading, WithProgressBar,
+    WithEvents
 {
     use RemembersRowNumber;
     use Importable;
+    use RegistersEventListeners;
+
+    private $uniqueIdentifiers = [];
     public function startRow(): int
     {
         return 7; // Start row to read data
@@ -55,7 +62,7 @@ class ManPowerImport implements ToModel, WithMapping ,WithStartRow,
             'factor_hourly' => $row[17] ?? '',
             'created_by' => auth()->user()->id,
             'updated_by' => auth()->user()->id,
-            'status' => ManPower::REVIEWED
+            'status' => ManPower::DRAFT
         ];
     }
 
@@ -69,6 +76,7 @@ class ManPowerImport implements ToModel, WithMapping ,WithStartRow,
     {
         try {
             if (isset($row['code'])) {
+                $uniqueValue = $row['code'];
                 $data = [
                     'code' => $row['code'],
                     'skill_level' => $row['skill_level'] ?? '',
@@ -89,15 +97,22 @@ class ManPowerImport implements ToModel, WithMapping ,WithStartRow,
                     'factor_hourly' => $row['factor_hourly'] ?? '',
                     'created_by' => auth()->user()->id,
                     'updated_by' => auth()->user()->id,
-                    'status' => ManPower::REVIEWED
+                    'status' => $row['status']
                 ];
 
+                $this->uniqueIdentifiers[] = $uniqueValue;
                 return new ManPower($data);
             }
         } catch (\Exception $e) {
             return null;
         }
 
+    }
+
+    public static function afterImport(AfterImport $event){
+        Log::info('AfterImport event fired');
+        $importInstance = $event->getConcernable();
+        ManPower::whereNotIn('code', $importInstance->uniqueIdentifiers)->delete();
     }
 
     public function convertToDecimal($val){

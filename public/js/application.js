@@ -305,7 +305,6 @@ $(function(){
         const fileExtension = fileName.split('.').pop();
 
         var _url = $(this).data('url');
-        console.log(_url);
         var _redirect_url = $(this).data('redirect');
 
         if (!allowedExtensions.includes(fileExtension.toLowerCase())) {

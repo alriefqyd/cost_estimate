@@ -103,6 +103,8 @@ Route::delete('/tool-equipment-category/{equipmentToolsCategory:id}',[\App\Http\
 
 Route::get('/material',[\App\Http\Controllers\MaterialController::class,'index'])->middleware('auth');
 Route::get('/material/create',[\App\Http\Controllers\MaterialController::class,'create'])->middleware('auth');
+Route::get('/material/export',[\App\Http\Controllers\MaterialController::class,'export'])->middleware('auth');
+Route::post('/material/import',[\App\Http\Controllers\MaterialController::class,'import'])->middleware('auth');
 Route::post('/material/',[\App\Http\Controllers\MaterialController::class,'store'])->middleware('auth');
 Route::put('/material/{material:id}',[\App\Http\Controllers\MaterialController::class,'update'])->middleware('auth');
 Route::get('/material/{material:id}',[\App\Http\Controllers\MaterialController::class,'show'])->middleware('auth');

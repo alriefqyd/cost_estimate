@@ -251,7 +251,13 @@ class ManPowerController extends Controller
 
     public function export(){
         $data = ManPower::all();
-        return Excel::download(new ManPowerExport($data),'man-power.xlsx');
+        try {
+            Log::info('Starting Export Man Power');
+            return Excel::download(new ManPowerExport($data), 'man-power.xlsx');
+        } catch (Exception $e) {
+            Log::info($e->getMessage());
+            return response()->json('Import Failed : ' . $e->getMessage());
+        }
     }
 
     public function import(Request $request){

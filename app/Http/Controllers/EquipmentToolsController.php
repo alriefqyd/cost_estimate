@@ -6,6 +6,7 @@ use App\Exports\EquipmentToolsMasterExport;
 use App\Imports\EquipmentToolsImport;
 use App\Models\EquipmentTools;
 use App\Models\EquipmentToolsCategory;
+use App\Models\MaterialCategory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -281,7 +282,13 @@ class EquipmentToolsController extends Controller
     public function export(){
         $data = EquipmentTools::all();
         $dataCategory = EquipmentToolsCategory::all();
-        return Excel::download(new EquipmentToolsMasterExport($data, $dataCategory),'tools-equipment.xlsx');
+        try {
+            Log::info('Starting Export Tools Equipment');
+            return Excel::download(new EquipmentToolsMasterExport($data, $dataCategory), 'tools-equipment.xlsx');
+        } catch (Exception $e) {
+            Log::info($e->getMessage());
+            return response()->json('Import Failed : ' . $e->getMessage());
+        }
     }
 
 
@@ -304,6 +311,8 @@ class EquipmentToolsController extends Controller
                     $data[] = $rowData;
                 }
 
+                $codeToSave = [];
+                DB::beginTransaction();
                 foreach ($data as $row) {
                     $uniqueValue = $row['1'];
                     $user = auth()->user()->id;
@@ -331,13 +340,24 @@ class EquipmentToolsController extends Controller
                             ['code' => $uniqueValue],
                             $dataToUpsert
                         );
+
+                        $codeToSave[] = $row[1];
                     }
 
                 }
 
+                // Delete records that exist in the database but not in the imported data
+                $codesToDelete = EquipmentTools::whereNotIn('code', $codeToSave);
+                $codesToDelete->each(function ($record) {
+                    $record->delete();
+                });
+
+                DB::commit();
+
                 Log::info('Import equipment tools successful');
                 return response()->json(['message' => 'Import Successful']);
             } catch (\Exception $e) {
+                DB::rollback();
                 Log::error('Import error: ' . $e->getMessage());
                 return response()->json(['message' => 'Import failed'], 500);
             }

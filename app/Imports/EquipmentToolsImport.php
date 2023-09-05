@@ -14,6 +14,10 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\WithUpserts;
 
+/*
+ * Deprecated
+ * Actually no need this for import because all handling in controller
+ */
 class EquipmentToolsImport implements ToModel, WithMapping ,WithStartRow,
     WithBatchInserts, WithUpserts, WithChunkReading
 {
