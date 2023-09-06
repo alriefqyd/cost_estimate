@@ -81,10 +81,6 @@ $(function() {
      * Currency Format
      */
 
-    $('.js-currency').each(function(){
-        $(this).attr('disabled','disabled');
-    })
-
     function processFormat(val){
         if(!val) return 0;
         var _val_fixed = val.toFixed(2);
