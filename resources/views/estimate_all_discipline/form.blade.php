@@ -1,6 +1,14 @@
 <div class="row mb-2 js-confirm-load-page js-confirm-row" data-confirm-onload="false">
-    <div class="col-md-12">
+    <div class="col-md-6">
         <div class="btn btn-primary js-fullscreen mb-2">Maximize Table <i data-feather="maximize" style="width: 12px !important; padding-top: 5px !important;"></i></div>
+    </div>
+    <div class="col-md-6">
+        <div class="btn btn-outline-success js-btn-loading-sync d-none float-end">
+            Sync
+            <div class="loader-box float-end d-none js-loading-sync" style="height: 1px; width: 50px; margin-top: 10%">
+                <div class="loader-15"></div>
+            </div>
+        </div>
     </div>
     <span class="js-fullscreen-element">
         <div class="col-md-12">
@@ -12,6 +20,7 @@
                           data-id="{{$project?->id}}"
                           action="">
                             @csrf
+                        <input type="hidden" class="js-version-project-estimate" value="{{$version}}">
                         <div class="table-responsive col-sm-12 col-lg-12 col-xl-12 table-overflow">
                             <div class="table-custom table-container">
                                 <table class="table table-custom">
@@ -34,7 +43,7 @@
                                     <tbody class="js-table-body-work-item-item">
                                     @php($previousWorkElement = null)
                                     @foreach($estimateAllDiscipline as $key => $discipline)
-                                        <tr class="js-column-location" style="background-color: #C5C5C7D0">
+                                        <tr class="js-column-location" style="background-color: #C5C5C7D0" data-key="{{$key}}">
                                             <td class="min-w-100">
                                                 <span class="float-start">
                                                         {{ucwords(strtolower($key))}}
@@ -48,7 +57,8 @@
                                             <td></td>
                                         </tr>
                                         @foreach($discipline as $k => $workElement)
-                                            <tr class="js-column-discipline" style="background-color: #DEDEDED0">
+                                            <tr class="js-column-discipline"
+                                                style="background-color: #DEDEDED0">
                                                 <td></td>
                                                 <td class="min-w-100 js-discipline">
                                                     <span class="float-start">
@@ -66,7 +76,9 @@
                                                 @php ($wbsId = isset($b?->id) ? $b->id : $b[0]->wbs_level3_id)
                                                 @php ($workElement = isset($b?->work_element) ? $b->work_element : $b[0]->work_element_id)
                                                 @if($a !== $previousWorkElement)
-                                                    <tr class="js-column-work-element" style="background-color: #EFEFEFD0">
+                                                    <tr class="js-column-work-element"
+                                                        data-wbs-level3-id="{{$wbsId}}"
+                                                        style="background-color: #EFEFEFD0">
                                                         <td></td>
                                                         <td>
 

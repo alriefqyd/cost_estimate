@@ -53,6 +53,7 @@ $(function(){
         _parent_row.find('.js-input-labor_factorial').val('');
         _parent_row.find('.js-input-equipment_factorial').val('');
         _parent_row.find('.js-input-material_factorial').val('');
+        generateUniqueIdentifier(_parent_row);
 
         if(_totalRateManPower > 0) {
             _parent_row.find('.js-work-item-man-power-cost-modal').removeClass('d-none');
@@ -129,13 +130,49 @@ $(function(){
         e.preventDefault();
         var _this = $(this);
         var _body_work_item = $('.js-body-work-item-table');
-        var _array_estimate_disciplines = []
         var _form = $('.js-form-estimate-discipline');
         var _project_id = _form.data('id');
         var _url = '/project/' + _project_id + '/estimate-discipline/store'
 
 
+        var _version = _form.find('.js-version-project-estimate').val();
+        var _array_estimate_disciplines = getWorkItemList();
+
+        var _data = {
+            'work_items' : _array_estimate_disciplines,
+            'project_id' : _project_id,
+            'version' : _version
+        }
+
+        $.ajax({
+            url: _url,
+            data : _data,
+            type : 'POST',
+            success : function(data){
+                if(data.status === 200){
+                    if (document.fullscreenElement) {
+                        showNotification('.js-fullscreen-element', 'Your data was successfully saved');
+                    } else {
+                        notification('success',data.message)
+                    }
+                    $(window).off('beforeunload');
+                    $('.js-version-project-estimate').val(data.version);
+
+                } else {
+                    notification('danger',data.message,'fa fa-frown-o','Error')
+                    if(data.sync){
+                        $('.js-btn-loading-sync').removeClass('d-none');
+                    }
+                }
+            }
+        })
+
+    });
+
+    function getWorkItemList(){
+        var _form = $('.js-form-estimate-discipline');
         var _work_items = _form.find('.js-select-work-items');
+        var _array_estimate_disciplines = [];
 
         $.each(_work_items, function (){
             var _parent = $(this).closest('tr');
@@ -163,8 +200,10 @@ $(function(){
             _tool_unit_rate_total = removeCurrency(_tool_unit_rate_total)
             _material_unit_rate_total = removeCurrency(_material_unit_rate_total)
 
+            var _idx = _parent.find('.js-unique-identifier').val();
+
             var _data = {
-                "idx": generateId(),
+                "idx": _idx,
                 "workItem":_work_item,
                 "workItemText":_work_item_text,
                 "vol":_vol ? _vol : 1,
@@ -181,37 +220,24 @@ $(function(){
                 "equipmentUnitRate":_tool_unit_rate,
                 "wbs_level3":_wbs_level3_id,
                 "work_element":_work_element_id,
-
-
             }
             _array_estimate_disciplines.push(_data);
         })
 
-        var _data = {
-            'work_items' : _array_estimate_disciplines,
-            'project_id' : _project_id,
+        return _array_estimate_disciplines;
+    }
+
+    function generateUniqueIdentifier(_parent){
+        var _idx;
+        var val = _parent.find('.js-unique-identifier').val();
+        if (val !== "" && val !== null) {
+            _idx = val;
+        } else {
+            _idx = generateId();
         }
 
-        $.ajax({
-            url: _url,
-            data : _data,
-            type : 'POST',
-            success : function(data){
-                if(data.status === 200){
-                    if (document.fullscreenElement) {
-                        showNotification('.js-fullscreen-element', 'Your data was successfully saved');
-                    } else {
-                        notification('success',data.message)
-                    }
-                    $(window).off('beforeunload');
-
-                } else {
-                    notification('danger',data.message,'fa fa-frown-o','Error')
-                }
-            }
-        })
-
-    });
+        _parent.find('.js-unique-identifier').val(_idx)
+    }
 
     function showNotification(element, message) {
         var notificationElement = $('<div data-notify="container" class="col-xs-11 col-sm-4 js-manual-notify alert alert-success notify-alert animated fadeIn" role="alert" data-notify-position="top-right" style="display: inline-block; margin: 0px auto; position: fixed; transition: all 0.5s ease-in-out 0s; z-index: 1031; top: 20px; right: 20px;" data-closing="true">')
@@ -475,4 +501,87 @@ $(function(){
         return str.replace(/\s/g, "")
     }
 
+    $('.js-btn-loading-sync').on('click', function(){
+        var _this = $(this)
+        var _loading = _this.find('.js-loading-sync')
+        var _form = $('.js-form-estimate-discipline');
+        var _project_id = _form.data('id');
+        var _version = $('.js-version-project-estimate').val();
+        var _currentWorkItem = getWorkItemList();
+
+        _loading.removeClass('d-none');
+        console.log(_currentWorkItem);
+        $.ajax({
+            url: '/getEstimateToSync',
+            data:
+                {
+                    project_id:_project_id,
+                    current_version:_version,
+                    estimate_sync:_currentWorkItem
+                },
+            success:function(result){
+                if(result.status == 200){
+                    var _data_sync = result.data
+                    var _existingEstimate = _data_sync['existingEstimate'];
+                    var _conflictEstimate = _data_sync['itemToMerge'];
+                    var groupedByWbsLevel3 = {};
+                    var _version_db = _data_sync['version'];
+                    var _version_form = $('.js-version-project-estimate').val()
+                    var _template = $('#js-template-table-work_item_column').html();
+                    console.log(_version_db, _version_form)
+                    console.log(_version_db != _version_form)
+                    if(_version_db != _version_form){
+                        var _array_join = [..._existingEstimate, ..._conflictEstimate];
+                        console.log(_array_join);
+                        $.each(_array_join, function(index, estimateItem) {
+                            var wbsLevel3 = estimateItem.wbsLevel3Id;
+
+                            if (!groupedByWbsLevel3[wbsLevel3]) {
+                                groupedByWbsLevel3[wbsLevel3] = [];
+                            }
+
+                            groupedByWbsLevel3[wbsLevel3].push(estimateItem);
+                            // Code to be executed for each element in the collection
+                        });
+
+                        $('.js-row-item-estimate').remove();
+
+                        console.log(groupedByWbsLevel3);
+                        $.each(groupedByWbsLevel3, function (index, item){
+                            console.log(item)
+                            $.each(item,function (idx,itm){
+                                var _data = {
+                                    'wbsLevel3' : itm.wbsLevel3Id,
+                                    'workItemDescription' : itm.workItemDescription,
+                                    'workItemVolume': itm.workItemVolume
+                                }
+                                var _temp =  $(Mustache.render(_template,itm));
+                                var _trow = $('.js-column-work-element[data-wbs-level3-id="'+ itm.wbsLevel3Id +'"]')
+                                _temp.insertAfter($(_trow));
+                                setTimeout(function (){
+                                    $('.js-work-item-text').removeClass('d-none');
+                                    var _select2 = $('.js-select-work-items')
+                                    $('.select2-container').addClass('d-none');
+                                    workItemSelectInit(_select2);
+                                    _select2.closest('.js-select2-select-work-item-temp').addClass('d-none');
+                                    // _select2.closest('span').addClass('d-none');
+                                    // $('.js-work-item-text').removeClass('d-none');
+                                },500)
+
+                            });
+
+                        })
+                    }
+
+                    //data groupby wbsLevel3 identifier/id termasuk yang mau di merge
+                    //baru pecah per wbs
+                    // foreach
+                    // console.log(groupedByWbsLevel3);
+
+                } else {
+                    console.log(result.message)
+                }
+            }
+        })
+    })
 });

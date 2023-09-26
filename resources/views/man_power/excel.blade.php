@@ -24,7 +24,7 @@
             <th rowspan="2" style="background-color: #FFC000">Safety</th>
             <th rowspan="2" style="background-color: #FFC000">Total Benefit Hourly</th>
             <th rowspan="2" style="background-color: #FFC000">Overall Rate Hourly</th>
-            <th rowspan="2" style="background-color: #FFC000">Factor 1,75 Hourly</th>
+            <th rowspan="2" style="background-color: #FFC000">Monthly</th>
         </tr>
         <tr>
             <th style="background-color: #FFC000">Monthly</th>
@@ -58,7 +58,7 @@
             <td>{{floatval($mp->safety)}}</td>
             <td>{{floatval($mp->total_benefit_hourly)}}</td>
             <td>{{floatval($mp->overall_rate_hourly)}}</td>
-            <td>{{floatval($mp->factor_hourly)}}</td>
+            <td>{{floatval($mp->monthly)}}</td>
         </tr>
     @endforeach
 </table>

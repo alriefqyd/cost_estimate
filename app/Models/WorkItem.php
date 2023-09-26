@@ -87,4 +87,8 @@ class WorkItem extends Model
         }
         return false;
     }
+
+    public function isHaveManPowers(){
+        return count($this->manPowers) > 0;
+    }
 }

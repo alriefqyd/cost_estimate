@@ -1,6 +1,8 @@
 <tr class="js-row-item-estimate">
     <td></td>
-    <td></td>
+    <td>
+        <input type="hidden" readonly class="js-unique-identifier" value="{{isset($item) ? $item->unique_identifier : ''}}">
+    </td>
     <td>
         @if(isset($item))
             <input type="hidden" name="wbs_level3" class="js-wbs_level3_id" value="{{$item->wbs_level3_id ?? ''}}">
@@ -12,7 +14,7 @@
     </td>
     <td class="min-w-300">
         <div>
-            <span class="{{isset($item) ? 'd-none' : ''}}">
+            <span class="js-select2-select-work-item-temp {{isset($item) ? 'd-none' : ''}}">
                 <select class="select2 js-select-work-items"
                         data-cost-man-power="{{$item->workItemUnitRateLaborCost ?? ''}}"
                         data-cost-tools="{{$item->workItemUnitRateToolCost ?? ''}}"
@@ -29,7 +31,11 @@
                 data-cost-tools="{{$item->workItemUnitRateToolCost ?? ''}}"
                 data-cost-material="{{$item->workItemUnitRateMaterialCost ?? ''}}">
                 <span class="float-start">
-                    {{$item->workItemDescription ?? ''}}
+                    @if(isset($item->workItemDescription))
+                        {{$item->workItemDescription}}
+                    @else
+                        @{{ workItemDescription }}
+                    @endif
                 </span>
             </div>
             <div class="d-inline-block float-end">
@@ -47,10 +53,16 @@
     <td class="min-w-150">
         <div class="input-group">
             <input class="form-control js-input-vol" style="height:40px" type="text" placeholder="Vol"
-                   value="{{$item->estimateVolume ?? ''}}"
+                   @if(isset($item->estimateVolume))
+                       value="{{$item->estimateVolume}}"
+                   @else
+                       value="@{{workItemVolume}}"
+                   @endif
                    {{!isset($item) ? 'disabled="disabled"' : '' }}
                    aria-label="Vol">
-            <span class="input-group-text font js-vol-result-ajax" style="font-size: 10px">{{isset($item) ? $item->workItemUnit : 'Kg'}}</span>
+            <span class="input-group-text font js-vol-result-ajax" style="font-size: 10px">
+                {{isset($item) ? $item->workItemUnit : 'Kg'}}
+            </span>
         </div>
     </td>
     <td class="min-w-140">
@@ -72,11 +84,11 @@
         </span>
         <span class="float-end">
             <span class="float-end">
-            <i class="fa fa-exclamation-circle cursor-pointer
-            {{isset($item) && $item->workItemUnitRateTotalToolCost > 0 ? 'd-block' : 'd-none'}}
-            js-open-modal-detail js-work-item-equipment-cost-modal"
-               data-id="{{$item->workItemId ?? ''}}"></i>
-        </span>
+                <i class="fa fa-exclamation-circle cursor-pointer
+                {{isset($item) && $item->workItemUnitRateTotalToolCost > 0 ? 'd-block' : 'd-none'}}
+                js-open-modal-detail js-work-item-equipment-cost-modal"
+                   data-id="{{$item->workItemId ?? ''}}"></i>
+            </span>
         </span>
     </td>
     <td class="min-w-140">

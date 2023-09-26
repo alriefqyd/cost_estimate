@@ -9,14 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class EstimateAllDiscipline extends Model
 {
-    /**
-     * equipment_location_id tidak bisa jadi patokan karena kalau dia dobel di discipline berbeda tidak bisa di tahu
-     */
     use HasFactory;
 
     protected $fillable = [
         'work_scope'
     ];
+
+    protected $guarded = ['version'];
 
     public function projects(){
         return $this->belongsTo(Project::class,'project_id');
@@ -41,6 +40,12 @@ class EstimateAllDiscipline extends Model
 
     public function wbss(){
         return $this->belongsTo(WbsLevel3::class,'wbs_level3_id','id');
+    }
+
+    public function incrementVersion()
+    {
+        $this->version++;
+        $this->save();
     }
 
 }
