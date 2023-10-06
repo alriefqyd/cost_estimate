@@ -58,6 +58,7 @@ Route::get('/getWorkElement',[\App\Http\Controllers\WorkElementController::class
 Route::get('/getItemAdditional/{type}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getItemAdditional'])->name('getItemAdditional');
 
 Route::get('/work-item/',[\App\Http\Controllers\WorkItemController::class,'index'])->middleware('auth');
+Route::get('/work-item/export',[\App\Http\Controllers\WorkItemController::class,'export'])->middleware('auth');
 Route::get('/work-item/create',[\App\Http\Controllers\WorkItemController::class,'create'])->middleware('auth');
 Route::get('/work-item/edit/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'edit'])->middleware('auth');
 Route::post('/work-item/',[\App\Http\Controllers\WorkItemController::class,'store'])->middleware('auth');
@@ -138,6 +139,7 @@ Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'updat
 /**
  * Request by AJAX
  */
+Route::get('/check',[\App\Http\Controllers\EstimateAllDisciplineController::class,'check'])->name('check')->middleware('auth');
 Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
 Route::get('/getNumChild/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChild'])->name('getNumChild')->middleware('auth');
 Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getMaterial'])->name('getMaterial')->middleware('auth');
@@ -155,4 +157,5 @@ Route::post('/manPower/update-list/',[\App\Http\Controllers\ManPowerController::
 Route::post('/equipmentTools/update-list/',[\App\Http\Controllers\EquipmentToolsController::class,'updateList'])->middleware('auth');
 Route::post('/material/update-list/',[\App\Http\Controllers\MaterialController::class,'updateList'])->middleware('auth');
 Route::post('/project/{project:id}/update-remark',[\App\Http\Controllers\ProjectController::class,'updateRemark'])->middleware('auth');
+Route::get('/getEstimateToSync',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getEstimateToSync'])->middleware('auth');
 

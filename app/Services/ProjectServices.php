@@ -172,9 +172,9 @@ class ProjectServices
 
 
     public function getTotalCostWorkItem($location){
-        $labor_factorial = $location?->labour_factorial ?: 1;
-        $tool_factorial = $location?->tool_factorial ?: 1;
-        $material_factorial = $location?->material_factorial ?: 1;
+        $labor_factorial = $location?->labour_factorial ?? 1;
+        $tool_factorial = $location?->equipment_factorial ?? 1;
+        $material_factorial = $location?->material_factorial ?? 1;
         $man_power_cost = (float) $location?->labor_unit_rate * $labor_factorial;
         $tool_cost = (float) $location?->tool_unit_rate * $tool_factorial;
         $material_cost = (float) $location?->material_unit_rate * $material_factorial;

@@ -120,10 +120,10 @@
 </div>
 <div class="row mb-1">
     <div class="col-md-5">
-        <label class="form-label form-label-black m-0" for="validationCustom01">Factor 1,75</label>
-        <input class="form-control js-validate height-40 js-currency js-factor-hourly" name="factor_hourly" type="text"
+        <label class="form-label form-label-black m-0" for="validationCustom01">Monthly</label>
+        <input class="form-control js-validate height-40 js-currency js-factor-hourly" name="monthly" type="text"
                {{!auth()->user()->isManPowerReviewer() ? 'readonly' : ''}}
-               value="{{isset($man_power?->factor_hourly) ? $man_power->factor_hourly : old('factor_hourly')}}">
+               value="{{isset($man_power?->monthly) ? $man_power->monthly : old('monthly')}}">
     </div>
 </div>
 <div class="row">

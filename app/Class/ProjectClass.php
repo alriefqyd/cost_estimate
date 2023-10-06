@@ -27,6 +27,8 @@ class ProjectClass
     public $workItemTotalCostStr;
     public $wbs_level3_id;
     public $work_element_id;
+    public $unique_identifier;
+    public $version;
 
 
 }

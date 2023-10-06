@@ -5,7 +5,7 @@ values
 
 
 INSERT INTO man_powers
-    (`code`,`skill_level`,`title`,`basic_rate_month`,`basic_rate_hour`,`general_allowance`,`bpjs`,`bpjs_kesehatan`,`thr`,`public_holiday`,`leave`,`pesangon`,`asuransi`,`safety`,`total_benefit_hourly`,`overall_rate_hourly`,`factor_hourly`)
+    (`code`,`skill_level`,`title`,`basic_rate_month`,`basic_rate_hour`,`general_allowance`,`bpjs`,`bpjs_kesehatan`,`thr`,`public_holiday`,`leave`,`pesangon`,`asuransi`,`safety`,`total_benefit_hourly`,`overall_rate_hourly`,`monthly`)
     values
     ('SUPV','Skilled','Supervisor',4420244.43,25550.545838150287,0,1977.612247872832,1022.0218335260115,2128.3604683179187,0,0,4683.4150521329475,0,590.8798972382788,10402.28949908799,35952.83533723828,62917.46184016699),
     ('SFTOF','Skilled','Safety Officer',3788780.94,21900.467861271674,0,1695.0962124624275,876.018714450867,1824.3089728439304,0,0,4014.3557589710977,0,590.8798972382788,9000.659555966602,30901.127417238276,54076.97298016698),

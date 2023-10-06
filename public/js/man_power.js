@@ -11,7 +11,7 @@ $(function() {
         var _multiplier_pesangon = 18.33 / 100;
         var _multiplier_asuransi = 0 / 36/ 173;
         var _multiplier_safety = $(this).data('safety-rate');
-        var _multiplier_factor = 1.75;
+        var _multiplier_monthly = 173;
 
         var _basic_rate_hourly = $('.js-basic-rate-hourly');
         var _general_allowance = $('.js-general-allowance');
@@ -71,9 +71,8 @@ $(function() {
         var _overall_rate_hourly = _total_benefit_hourly + _basic_rate_hourly_total
         $('.js-overall-rate-hourly').val(processFormat(_overall_rate_hourly))
 
-        var _factor = _overall_rate_hourly * _multiplier_factor;
+        var _factor = _overall_rate_hourly * _multiplier_monthly;
         $('.js-factor-hourly').val(processFormat(_factor))
-
     });
 
 

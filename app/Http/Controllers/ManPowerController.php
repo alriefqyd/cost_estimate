@@ -91,7 +91,7 @@ class ManPowerController extends Controller
             'safety' => 'required',
             'total_benefit_hourly' => 'required',
             'overall_rate_hourly' => 'required',
-            'factor_hourly' => 'required',
+            'monthly' => 'required',
         ]);
         try{
             DB::beginTransaction();
@@ -113,7 +113,7 @@ class ManPowerController extends Controller
                 'safety' => $this->convertToDecimal($request->safety),
                 'total_benefit_hourly' => $this->convertToDecimal($request->total_benefit_hourly),
                 'overall_rate_hourly' => $this->convertToDecimal($request->overall_rate_hourly),
-                'factor_hourly' => $this->convertToDecimal($request->factor_hourly),
+                'monthly' => $this->convertToDecimal($request->monthly),
                 'created_by' => auth()->user()->id,
                 'status' => ManPower::DRAFT
             ]);
@@ -158,8 +158,7 @@ class ManPowerController extends Controller
             $manPower->safety = $this->convertToDecimal($request->safety);
             $manPower->total_benefit_hourly = $this->convertToDecimal($request->total_benefit_hourly);
             $manPower->overall_rate_hourly = $this->convertToDecimal($request->overall_rate_hourly);
-            $manPower->factor_hourly = $this->convertToDecimal($request->factor_hourly);
-            $manPower->factor_hourly = $this->convertToDecimal($request->factor_hourly);
+            $manPower->monthly = $this->convertToDecimal($request->monthly);
             $manPower->updatedBy = auth()->user()->id;
 
             $manPower->save();
