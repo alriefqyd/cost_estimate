@@ -19,7 +19,9 @@ class ProjectServices
         $requestFilter = request(['q','status','civil','mechanical','electrical','instrument']);
 
         $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles'])
-            ->access();
+            ->when(!auth()->user()->isViewAllCostEstimateRole(), function ($subQuery){
+                return $subQuery->access();
+            });
 
         $countDraft = clone $projects;
         $countApprove = clone $projects;
@@ -170,9 +172,9 @@ class ProjectServices
 
 
     public function getTotalCostWorkItem($location){
-        $labor_factorial = $location?->labour_factorial ?: 1;
-        $tool_factorial = $location?->tool_factorial ?: 1;
-        $material_factorial = $location?->material_factorial ?: 1;
+        $labor_factorial = $location?->labour_factorial ?? 1;
+        $tool_factorial = $location?->equipment_factorial ?? 1;
+        $material_factorial = $location?->material_factorial ?? 1;
         $man_power_cost = (float) $location?->labor_unit_rate * $labor_factorial;
         $tool_cost = (float) $location?->tool_unit_rate * $tool_factorial;
         $material_cost = (float) $location?->material_unit_rate * $material_factorial;
@@ -180,6 +182,14 @@ class ProjectServices
         $totalWorkItemCost = $totalWorkItemCost * $location->volume;
 
         return $totalWorkItemCost;
+    }
+
+    public function updateStatusProject(Project $project){
+        if($project->getProjectStatusApproval() ==  Project::WAITING_FOR_APPROVAL){
+            $project->status = Project::WAITING_FOR_APPROVAL;
+        } else {
+            $project->status = Project::PENDING_DISCIPLINE_APPROVAL;
+        }
     }
 
     public function getDataEngineer($subject){

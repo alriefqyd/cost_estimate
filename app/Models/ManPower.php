@@ -32,6 +32,6 @@ class ManPower extends Model
     }
 
     public function getSkillLevel(){
-        return Setting::SKILL_LEVEL[$this->skill_level];
+        return Setting::SKILL_LEVEL[$this->skill_level] ?? "";
     }
 }

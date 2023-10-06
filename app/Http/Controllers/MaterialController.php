@@ -2,14 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\MaterialExport;
+use App\Exports\MaterialMasterExport;
 use App\Models\ManPower;
 use App\Models\Material;
 use App\Models\MaterialCategory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class MaterialController extends Controller
 {
@@ -39,7 +44,7 @@ class MaterialController extends Controller
                 })->when($request->order != 'category', function ($qq) use ($request, $order, $sort) {
                     return $qq->orderBy($order, $sort);
                 });
-        })->when(!auth()->user()->isReviewer(), function($query){
+        })->when(!auth()->user()->isMaterialReviewerRole(), function($query){
             return $query->where(function($subQuery){
                 return $subQuery->where('status',Material::REVIEWED)
                     ->orWhere('created_by', auth()->user()->id);
@@ -176,7 +181,7 @@ class MaterialController extends Controller
     public function getMaterial(Request $request){
         $response = array();
         $data = Material::select('id','tool_equipment_description','code','rate')
-            ->when(!auth()->user()->isReviewer(), function($query){
+            ->when(!auth()->user()->isMaterialReviewerRole(), function($query){
                 return $query->where(function($subQuery){
                     return $subQuery->where('status',Material::REVIEWED)
                         ->orWhere('created_by',auth()->user()->id);
@@ -223,6 +228,93 @@ class MaterialController extends Controller
                 'status' => 500
             ]);
         }
+    }
+
+    public function export(){
+        $data = Material::all();
+        $materialCategory = MaterialCategory::all();
+        try{
+            Log::info('Starting Export Material');
+            return Excel::download(new MaterialMasterExport($data, $materialCategory), 'Material List.xlsx');
+        } catch (Exception $e) {
+            Log::info($e->getMessage());
+            return response()->json('Import Failed : ' . $e->getMessage());
+        }
+
+    }
+
+    public function import(Request $request){
+        if ($request->hasFile('file')) {
+            Log::info('Starting import Materials...');
+
+            try {
+                $file = $request->file('file');
+                $spreadsheet = IOFactory::load($file);
+                $sheetName = 'Material List';
+                $worksheet = $spreadsheet->getSheetByName($sheetName);
+
+                $data = [];
+                foreach ($worksheet->getRowIterator() as $row) {
+                    $rowData = [];
+                    foreach ($row->getCellIterator() as $cell) {
+                        $rowData[] = $cell->getValue();
+                    }
+                    $data[] = $rowData;
+                }
+
+                $codeToSave = [];
+                DB::beginTransaction();
+                foreach ($data as $row) {
+                    $uniqueValue = $row[1];
+                    $user = auth()->user()->id;
+                    $category = MaterialCategory::where('description', $row[3])->first();
+                    if(isset($category))
+                    {
+                        $dataToUpsert = [
+                            'code' => $row[1],
+                            'tool_equipment_description' => $row[2] ?? '',
+                            'category_id' => $category?->id,
+                            'quantity' => $row[4] ?? '',
+                            'unit' => $row[5] ?? '',
+                            'rate' => $row[6] ?? '',
+                            'ref_material_number' => $row[7] ?? '',
+                            'remark' => $row[9] ?? '',
+                            'status' => 'DRAFT',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                            'created_by' => $user,
+                            'updated_by' => $user,
+                            'stock_code' => $row[10] ?? ''
+                        ];
+
+                        $codeToSave[] = $row[1];
+
+                        Material::updateOrInsert(
+                            ['code' => $uniqueValue],
+                            $dataToUpsert
+                        );
+                    }
+                }
+
+                // Delete records that exist in the database but not in the imported data
+                $codesToDelete = Material::whereNotIn('code', $codeToSave);
+                $codesToDelete->each(function ($record) {
+                    $record->delete();
+                });
+
+                DB::commit();
+
+                Log::info('Import material successful');
+                return response()->json(['message' => 'Import Successful']);
+            } catch (\Exception $e) {
+                DB::rollback();
+                Log::error('Import error: ' . $e->getMessage());
+                return response()->json(['message' => 'Import failed'], 500);
+            }
+        }
+
+        Log::info('No file uploaded');
+        return response()->json(['message' => 'No file uploaded'], 400);
     }
 
     public function message($message, $type, $icon, $status){

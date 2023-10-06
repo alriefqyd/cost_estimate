@@ -63,8 +63,31 @@
                                         </button>
                                     </div>
                                 </div>
+                                <div class="col-md-6">
+                                    <div class="btn btn-outline-success js-btn-export float-end m-1"
+                                         data-file-name="Material.xlsx"
+                                         data-url="/material/export/">
+                                        <div class="float-start">
+                                            Export
+                                        </div>
+                                        <div class="float-end">
+                                            <div class="loader-box m-2 d-none" style="height:0px">
+                                                <div class="loader-3"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @can('create', \App\Models\Material::class)
+                                        <div class="btn btn-outline-success float-end m-1 js-btn-import-material"
+                                             data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportMaterial">
+                                            Import
+                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
+                                                <div class="loader-34"></div>
+                                            </div>
+                                        </div>
+                                    @endcan
+                                </div>
                             </div>
-                            @if(auth()->user()->isReviewer())
+                            @if(auth()->user()->isMaterialReviewerRole())
                                 <div class="row">
                                     <div class="col-md-6">
 
@@ -84,7 +107,7 @@
                             <table class="table table-striped">
                                 <thead>
                                     <tr>
-                                        @if(auth()->user()->isReviewer())
+                                        @if(auth()->user()->isMaterialReviewerRole())
                                             <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="material"></th>
                                         @endif
                                         <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="code"></i></th>
@@ -104,7 +127,7 @@
                                 <tbody>
                                 @foreach($material as $item)
                                     <tr>
-                                        @if(auth()->user()->isReviewer())
+                                        @if(auth()->user()->isMaterialReviewerRole())
                                             <td class="text-center">
                                                 <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox" data-url="material" value="{{$item->id}}">
                                             </td>
@@ -179,5 +202,31 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="modal fade js-modal-import js-modal-import-equipment" id="modalImportMaterial" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <form action="/material/import" class="js-form-import" data-url="/material/import" data-redirect="material" method="post" enctype="multipart/form-data">
+            @csrf
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Import Material</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="file" name="file">
+                        <div class="mt-3">
+                            <div class="progress d-none">
+                                <div class="progress-bar progress-bar-animated bg-primary progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-success js-import-btn-confirmation-material">Import</button>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 @endsection

@@ -20,6 +20,18 @@
         <div class="page-body">
             @yield('main')
         </div>
+
+        <div class="modal js-modal-loading-import" id="modal-loading" data-backdrop="static">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <div class="modal-body text-center">
+                        <div class="loading-spinner mb-2"></div>
+                        <div>Import in progress....</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         @include('layouts.footer')
         @include('mustache')
     </div>
@@ -82,6 +94,8 @@
 <script src="{{'/assets/js/jquery-validation/dist/jquery.validate.min.js'}}"></script>
 <script src="{{'/assets/js/form-wizard/form-wizard-three.js'}}"></script>
 <script src="{{'/assets/js/form-wizard/jquery.backstretch.min.js'}}"></script>
+
+<script src="{{'/assets/js/quill/quill.js'}}"></script>
 
 <script src="{{'/js/config.js'}}"></script>
 <script src="{{'/assets/select2/dist/js/select2.min.js'}}"></script>

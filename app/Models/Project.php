@@ -14,6 +14,23 @@ class Project extends Model
 
     const APPROVE = 'APPROVE';
     const DRAFT = 'DRAFT';
+    const PENDING = 'PENDING';
+    const PENDING_DISCIPLINE_APPROVAL = 'PENDING DISCIPLINE APPROVAL';
+    const WAITING_FOR_APPROVAL = 'WAITING FOR APPROVAL';
+    const APPROVE_BY_DISCIPLINE_REVIEWER = 'APPROVE BY DISCIPLINE REVIEWER';
+
+    const APPROVAL_DISCIPLINE_LIST = [
+        'mechanical_approval_status' => 'design_engineer_mechanical',
+        'civil_approval_status' => 'design_engineer_civil',
+        'electrical_approval_status' => 'design_engineer_electrical',
+        'instrument_approval_status' => 'design_engineer_instrument'
+    ];
+    public const DESIGN_ENGINEER_KEY_LIST = [
+        'design_engineer_civil' => 'Design Engineer Civil',
+        'design_engineer_mechanical' => 'Design Engineer Mechanical',
+        'design_engineer_electrical' => 'Design Engineer Electrical',
+        'design_engineer_instrument' => 'Design Engineer Instrument'
+    ];
 
     protected static function boot()
     {
@@ -86,25 +103,32 @@ class Project extends Model
         return $this->hasMany(WbsLevel3::class,'project_id');
     }
 
+
     public function scopeAccess($query){
-        $position = auth()->user()->profiles?->position;
-        return $query->when($position == 'design_civil_engineer', function($q){
-            return $q->whereHas('designEngineerCivil.profiles',function($qq){
-                return $qq->where('design_engineer_civil',auth()->user()->id);
-            });
-        })->when($position == 'design_mechanical_engineer', function($q) {
-            return $q->whereHas('designEngineerMechanical.profiles', function ($qq) {
-                return $qq->where('design_engineer_mechanical', auth()->user()->id);
-            });
-        })->when($position == 'design_electrical_engineer', function($q) {
-            return $q->whereHas('designEngineerElectrical.profiles', function ($qq) {
-                return $qq->where('design_engineer_electrical', auth()->user()->id);
-            });
-        })->when($position == 'design_instrument_engineer', function($q) {
-            return $q->whereHas('designEngineerInstrument.profiles', function ($qq) {
-                return $qq->where('design_engineer_instrument', auth()->user()->id);
+        $user = auth()->user();
+        $isAssignee = $user->isAssigneeCostEstimateRole();
+        $isViewAll = $user->isViewAllCostEstimateRole();
+        return $query->when(!$isViewAll, function ($subQuery) use ($user,$isAssignee) {
+            return $subQuery->when($isAssignee, function ($q) use ($user) {
+                return $q->where('design_engineer_mechanical', $user->id)
+                    ->orWhere('design_engineer_civil', $user->id)
+                    ->orWhere('design_engineer_mechanical', $user->id)
+                    ->orWhere('design_engineer_electrical', $user->id)
+                    ->orWhere('design_engineer_instrument', $user->id);
+            })->when($user->isAllElectricalCostEstimateRole(), function ($q) use ($user) {
+                return $q->orwhereNotNull('design_engineer_electrical');
+            })->when($user->isAllInstrumentCostEstimateRole(), function ($q) use ($user) {
+                return $q->orwhereNotNull('design_engineer_instrument');
+            })->when($user->isAllMechanicalCostEstimateRole(), function ($q) use ($user) {
+                return $q->orwhereNotNull('design_engineer_mechanical');
+            })->when($user->isAllCivilCostEstimateRole(), function ($q) use ($user) {
+                return $q->orwhereNotNull('design_engineer_civil');
             });
         });
+    }
+
+    public function scopeReviewerAccess($query){
+        return $query;
     }
 
     public function getTotalCost(){
@@ -160,4 +184,21 @@ class Project extends Model
         return $this->designEngineerInstrument?->profiles?->full_name;
     }
 
+    public function getProjectDisciplineStatusApproval(){
+        $list = [];
+        foreach (self::APPROVAL_DISCIPLINE_LIST as $approval => $designEngineer){
+            if(isset($this->$designEngineer)
+                && $this->$approval != self::APPROVE_BY_DISCIPLINE_REVIEWER){
+                array_push($list, self::DESIGN_ENGINEER_KEY_LIST[$designEngineer]);
+            }
+        }
+
+        return $list;
+    }
+
+    public function getProjectStatusApproval(){
+        if(sizeof($this->getProjectDisciplineStatusApproval()) < 1)
+            return self::WAITING_FOR_APPROVAL;
+        return self::PENDING_DISCIPLINE_APPROVAL;
+    }
 }

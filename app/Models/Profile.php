@@ -29,8 +29,14 @@ class Profile extends Model
         'design_mechanical_engineer' => 'Design Mechanical Engineer',
         'design_electrical_engineer' => 'Design Electrical Engineer',
         'design_instrument_engineer' => 'Design Instrument Engineer',
-        'super_administrator' => 'Super Administrator',
-        'administrator' => 'Administrator'
+        'administrator' => 'Administrator',
+        'reviewer_cost_estimate' => 'Reviewer Cost Estimate',
+        'reviewer_all_discipline_cost_estimate' => 'Reviewer All Discipline Cost Estimate',
+        'reviewer_electrical_discipline_cost_estimate' => 'Reviewer Electrical Discipline Cost Estimate',
+        'reviewer_instrument_discipline_cost_estimate' => 'Reviewer Instrument Discipline Cost Estimate',
+        'reviewer_civil_discipline_cost_estimate' => 'Reviewer Civil Discipline Cost Estimate',
+        'reviewer_mechanical_discipline_cost_estimate' => 'Reviewer Mechanical Discipline Cost Estimate',
+        'others' => 'Others'
     ];
 
     public function users(){
@@ -39,7 +45,10 @@ class Profile extends Model
 
     public function getPosition(): string
     {
-        return Profile::POSITION[$this->position];
+        if($this->position == 'others'){
+            return $this->other_position ?? '';
+        }
+        return Profile::POSITION[$this?->position];
     }
 
     public function getCivilEngineer(){

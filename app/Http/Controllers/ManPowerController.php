@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ManPowerExport;
+use App\Imports\ManPowerImport;
 use App\Models\ManPower;
 use App\Models\Setting;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ManPowerController extends Controller
 {
@@ -24,7 +28,7 @@ class ManPowerController extends Controller
                 return $query->orderBy($order,$sort);
             })->when(!isset($request->sort), function($query) use ($request,$order) {
                 return $query->orderBy('code', 'ASC');
-            })->when(!auth()->user()->isReviewer(), function($query){
+            })->when(!auth()->user()->isManPowerReviewer(), function($query){
                 return $query->where(function($q){
                     return $q->where('status',ManPower::REVIEWED)->orWhere('created_by', auth()->user()->id);
                 });
@@ -87,7 +91,7 @@ class ManPowerController extends Controller
             'safety' => 'required',
             'total_benefit_hourly' => 'required',
             'overall_rate_hourly' => 'required',
-            'factor_hourly' => 'required',
+            'monthly' => 'required',
         ]);
         try{
             DB::beginTransaction();
@@ -109,7 +113,7 @@ class ManPowerController extends Controller
                 'safety' => $this->convertToDecimal($request->safety),
                 'total_benefit_hourly' => $this->convertToDecimal($request->total_benefit_hourly),
                 'overall_rate_hourly' => $this->convertToDecimal($request->overall_rate_hourly),
-                'factor_hourly' => $this->convertToDecimal($request->factor_hourly),
+                'monthly' => $this->convertToDecimal($request->monthly),
                 'created_by' => auth()->user()->id,
                 'status' => ManPower::DRAFT
             ]);
@@ -154,8 +158,7 @@ class ManPowerController extends Controller
             $manPower->safety = $this->convertToDecimal($request->safety);
             $manPower->total_benefit_hourly = $this->convertToDecimal($request->total_benefit_hourly);
             $manPower->overall_rate_hourly = $this->convertToDecimal($request->overall_rate_hourly);
-            $manPower->factor_hourly = $this->convertToDecimal($request->factor_hourly);
-            $manPower->factor_hourly = $this->convertToDecimal($request->factor_hourly);
+            $manPower->monthly = $this->convertToDecimal($request->monthly);
             $manPower->updatedBy = auth()->user()->id;
 
             $manPower->save();
@@ -204,7 +207,7 @@ class ManPowerController extends Controller
             ->where(function($query) use ($request) {
                 return $query->where('title','like','%'.$request->q.'%')
                     ->orwhere('code','like','%'.$request->q.'%');
-            })->when(!auth()->user()->isReviewer(), function($query){
+            })->when(!auth()->user()->isManPowerReviewer(), function($query){
                 return $query->where(function($q){
                    return $q->where('status', ManPower::REVIEWED)
                        ->orwhere('created_by', auth()->user()->id);
@@ -245,11 +248,33 @@ class ManPowerController extends Controller
         }
     }
 
+    public function export(){
+        $data = ManPower::all();
+        try {
+            Log::info('Starting Export Man Power');
+            return Excel::download(new ManPowerExport($data), 'man-power.xlsx');
+        } catch (Exception $e) {
+            Log::info($e->getMessage());
+            return response()->json('Import Failed : ' . $e->getMessage());
+        }
+    }
+
+    public function import(Request $request){
+        $file = $request->file('file');
+        if($request->hasFile('file')){
+            Log::info('Starting import man power...');
+            Excel::import(new ManPowerImport, $file);
+            Log::info('Import man power successful');
+            return response()->json(['message' => 'Import Successful']);
+        }
+
+        return response()->json(['message' => 'No file uploaded'], 400);
+    }
+
     public function message($message, $type, $icon, $status){
         Session::flash('message', $message);
         Session::flash('type', $type);
         Session::flash('icon', $icon);
         Session::flash('status', $status);
     }
-
 }

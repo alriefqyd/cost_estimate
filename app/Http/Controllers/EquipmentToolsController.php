@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\EquipmentToolsMasterExport;
+use App\Imports\EquipmentToolsImport;
 use App\Models\EquipmentTools;
 use App\Models\EquipmentToolsCategory;
-use App\Models\Tools;
+use App\Models\MaterialCategory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class EquipmentToolsController extends Controller
 {
@@ -35,7 +41,7 @@ class EquipmentToolsController extends Controller
                 })->when($request->order != 'category', function($qq) use ($request,$order, $sort){
                     return $qq->orderBy($order,$sort);
                 });
-            })->when(!auth()->user()->isReviewer(), function($query){
+            })->when(!auth()->user()->isToolsEquipmentReviewerRole(), function($query){
                 return $query->where(function($q){
                    return $q->where('status',EquipmentTools::REVIEWED)->orWhere('created_by', auth()->user()->id);
                 });
@@ -231,7 +237,7 @@ class EquipmentToolsController extends Controller
     public function getToolsEquipment(Request $request){
         $response = array();
         $data = EquipmentTools::select('id','description','code','local_rate')
-            ->when(!auth()->user()->isReviewer(), function($query){
+            ->when(!auth()->user()->isToolsEquipmentReviewerRole(), function($query){
                 return $query->where(function($q){
                     return $q->where('status', EquipmentTools::REVIEWED)
                         ->orWhere('created_by', auth()->user()->id);
@@ -271,6 +277,94 @@ class EquipmentToolsController extends Controller
                 'status' => 500
             ]);
         }
+    }
+
+    public function export(){
+        $data = EquipmentTools::all();
+        $dataCategory = EquipmentToolsCategory::all();
+        try {
+            Log::info('Starting Export Tools Equipment');
+            return Excel::download(new EquipmentToolsMasterExport($data, $dataCategory), 'tools-equipment.xlsx');
+        } catch (Exception $e) {
+            Log::info($e->getMessage());
+            return response()->json('Import Failed : ' . $e->getMessage());
+        }
+    }
+
+
+    public function import(Request $request){
+        if ($request->hasFile('file')) {
+            Log::info('Starting import equipment tools...');
+
+            try {
+                $file = $request->file('file');
+                $spreadsheet = IOFactory::load($file);
+                $sheetName = 'Equipment Tools List';
+                $worksheet = $spreadsheet->getSheetByName($sheetName);
+
+                $data = [];
+                foreach ($worksheet->getRowIterator() as $row) {
+                    $rowData = [];
+                    foreach ($row->getCellIterator() as $cell) {
+                        $rowData[] = $cell->getValue();
+                    }
+                    $data[] = $rowData;
+                }
+
+                $codeToSave = [];
+                DB::beginTransaction();
+                foreach ($data as $row) {
+                    $uniqueValue = $row['1'];
+                    $user = auth()->user()->id;
+                    $category = EquipmentToolsCategory::where('description', $row[3])->first();
+                    if(isset($category))
+                    {
+                        $dataToUpsert = [
+                            'code' => $row['1'],
+                            'description' => $row['2'],
+                            'category_id' => $category->id,
+                            'quantity' => $row['4'],
+                            'unit' => $row['5'],
+                            'local_rate' => $row['6'],
+                            'national_rate' => $row['7'],
+                            'remark' => $row['9'],
+                            'status' => 'DRAFT',
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                            'created_by' => $user,
+                            'updated_by' => $user
+                            // Add more columns as needed
+                        ];
+
+                        EquipmentTools::updateOrInsert(
+                            ['code' => $uniqueValue],
+                            $dataToUpsert
+                        );
+
+                        $codeToSave[] = $row[1];
+                    }
+
+                }
+
+                // Delete records that exist in the database but not in the imported data
+                $codesToDelete = EquipmentTools::whereNotIn('code', $codeToSave);
+                $codesToDelete->each(function ($record) {
+                    $record->delete();
+                });
+
+                DB::commit();
+
+                Log::info('Import equipment tools successful');
+                return response()->json(['message' => 'Import Successful']);
+            } catch (\Exception $e) {
+                DB::rollback();
+                Log::error('Import error: ' . $e->getMessage());
+                return response()->json(['message' => 'Import failed'], 500);
+            }
+        }
+
+        Log::info('No file uploaded');
+        return response()->json(['message' => 'No file uploaded'], 400);
     }
 
     public function message($message, $type, $icon, $status){

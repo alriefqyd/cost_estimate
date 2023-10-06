@@ -34,13 +34,17 @@
 <div class="row mb-1">
     <div class="col-md-6">
         <label class="form-label form-label-black m-0" for="validationCustom01">Position</label>
-        <select class="select2 form-control" name="position">
+        <select class="select2 form-control js-select-user-position" name="position">
             <option value="" disabled selected>Select Position</option>
             @foreach($position as $key => $value)
                 <option {{isset($user->profiles->position)
                 && $user->profiles->position == $key ? 'selected="selected"' : ''}} value="{{$key}}">{{$value}}</option>
             @endforeach
         </select>
+    </div>
+    <div class="col-md-6 js-other-position-form {{isset($user) && $user->profiles->position == 'others' ? '' : 'd-none'}}">
+        <label class="form-label form-label-black m-0">Others Position</label>
+        <input type="text" class="form-control height-40" name="other_position" value="{{isset($user) ? $user?->profiles->other_position : old('other_position')}}">
     </div>
 </div>
 <div class="row mb-1">

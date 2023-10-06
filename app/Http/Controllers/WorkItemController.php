@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\WorkItemExport;
 use App\Models\ManPowersWorkItems;
 use App\Models\Setting;
 use App\Models\WorkItem;
@@ -10,7 +11,9 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
 
 class WorkItemController extends Controller
 {
@@ -28,7 +31,7 @@ class WorkItemController extends Controller
                 })->when($request->sort != 'work_items.volume', function ($q) use ($request, $order, $sort) {
                     return $q->orderBy($order, $sort);
                 });
-            })->when(!auth()->user()->isReviewer(), function($query) {
+            })->when(!auth()->user()->isWorkItemReviewer(), function($query) {
                 return $query->where(function($q){
                     return $q->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id);
                 });
@@ -379,7 +382,7 @@ class WorkItemController extends Controller
                             return $q->Where('title','like','%'.$request->q.'%');
                         })->orWhere('description','like','%'."$request->q".'%');
                     });
-                })->when(!auth()->user()->isReviewer(), function($query) {
+                })->when(!auth()->user()->isWorkItemReviewer(), function($query) {
                     return $query->where(function($q){
                       return $q->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id);
                     });
@@ -717,6 +720,16 @@ class WorkItemController extends Controller
                 'message' => $e->getMessage(),
                 'status' => 500
             ]);
+        }
+    }
+
+    public function export(){
+        try {
+            Log::info('Starting Export Work Items');
+            return Excel::download(new WorkItemExport(), 'Std_Work_Item.xlsx');
+        } catch (Exception $e) {
+            Log::info($e->getMessage());
+            return response()->json('Import Failed : ' . $e->getMessage());
         }
     }
 }

@@ -23,7 +23,7 @@ class WorkBreakdownStructurePolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'wbss' &&
-                ($role->action === '*' || $role->action === 'read');
+                ($role->action === 'read');
         });
 
         return $hasPermission;
@@ -43,7 +43,7 @@ class WorkBreakdownStructurePolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'wbss' &&
-                ($role->action === '*' || $role->action === 'read');
+                ($role->action === 'read');
         });
 
         return $hasPermission;
@@ -63,7 +63,7 @@ class WorkBreakdownStructurePolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'wbss' &&
-                ($role->action === '*' || $role->action === 'create');
+                ($role->action === 'create');
         });
 
         return $hasPermission;
@@ -83,7 +83,7 @@ class WorkBreakdownStructurePolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'wbss' &&
-                ($role->action === '*' || $role->action === 'update');
+                ($role->action === 'update');
         });
 
         return $hasPermission;
@@ -103,7 +103,7 @@ class WorkBreakdownStructurePolicy
         // Check if the user has the required role
         $hasPermission = $user->roles->contains(function ($role) {
             return $role->feature === 'wbss' &&
-                ($role->action === '*' || $role->action === 'delete');
+                ($role->action === 'delete');
         });
 
         return $hasPermission;

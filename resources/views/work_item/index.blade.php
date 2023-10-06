@@ -59,7 +59,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if(auth()->user()->isReviewer())
+                            @if(auth()->user()->isWorkItemReviewer())
                                 <div class="row">
                                     <div class="col-md-6">
 
@@ -78,7 +78,7 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    @if(auth()->user()->isReviewer())
+                                    @if(auth()->user()->isWorkItemReviewer())
                                         <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="workItem"></th>
                                     @endif
                                     <th class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.code"></i>
@@ -106,7 +106,7 @@
                                 <tbody>
                                 @foreach($work_item as $item)
                                     <tr>
-                                        @if(auth()->user()->isReviewer())
+                                        @if(auth()->user()->isWorkItemReviewer())
                                             <td class="text-center">
                                                 <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox"
                                                        data-url="workItem"

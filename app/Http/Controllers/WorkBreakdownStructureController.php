@@ -186,33 +186,6 @@ class WorkBreakdownStructureController extends Controller
         return $arrData;
     }
 
-    /**
-     * Deprecated
-     * @param Project $project
-     * @param Request $request
-     * @return void
-     */
-    public function updateEstimateWbs(Project $project, Request $request){
-        $data = $this->processData($request);
-        $arrayIdEstimate = array();
-        foreach($data as $item){
-            $newWbs = WbsLevel3::where('project_id',$project->id)->where('discipline',$item->discipline)
-                ->where('work_element',$item->work_element)->where('identifier',$item->identifier)
-                ->first();
-            $estimateDiscipline = EstimateAllDiscipline::where('wbs_level3_id',$item?->oldWbsId)->where('project_id',$project->id)->first();
-            if($newWbs && $estimateDiscipline){
-                $estimateDiscipline->wbs_level3_id = $newWbs->id;
-                array_push($arrayIdEstimate,  $estimateDiscipline->wbs_level3_id);
-                $estimateDiscipline->save();
-            }
-        }
-
-        $toDelete = EstimateAllDIscipline::where('project_id',$project->id)->whereNotIn('wbs_level3_id',$arrayIdEstimate)->get();
-        foreach($toDelete as $v){
-            $v->delete();
-        }
-    }
-
     public function generateWorkBreakdown(Project $project){
         $data = WbsLevel3::with(['wbsDiscipline','workElements.parent'])->where('project_id',$project->id)->get()->groupBy('identifier');
         $data = $data->map(function($discipline){
@@ -236,56 +209,6 @@ class WorkBreakdownStructureController extends Controller
         foreach($data as $item){
             $item->delete();
         }
-    }
-
-    /** Deprecated */
-    public function getWbsLevel2(Request $request){
-        try{
-            $data = WbsLevel3::with(['wbsDiscipline','workElements'])->where('project_id',$request->project_id)
-                ->where('identifier', $request->level1)
-                ->get()->groupBy('wbsDiscipline.title');
-            $arrayObj = array();
-
-            foreach($data as $key => $value){
-                $dataCollect = new Collection([
-                    "text" => $key,
-                    "id" => $value->first()->wbsDiscipline->id
-                ]);
-
-                array_push($arrayObj,$dataCollect);
-            }
-
-            return response()->json([
-                'status' => 200,
-                'data' => $arrayObj,
-            ]);
-        }catch(Exception $e){
-            return response()->json([
-                'status' => 500,
-                'data' => $e->getMessage()
-            ]);
-        }
-
-    }
-
-    public function getWbsLevel3(Request $request){
-        $data = WbsLevel3::with('workElements')->where('project_id',$request->project_id)->where('discipline',$request->level2)
-            ->where('identifier',$request->level1)->get();
-
-        $arrayObj = array();
-        foreach($data as $key => $value){
-            $data = new Collection([
-                "id" => $value->workElements?->id,
-                "text" => $value->workElements?->title
-            ]);
-
-            array_push($arrayObj,$data);
-        }
-
-        return response()->json([
-            'status' => 200,
-            'data' => $arrayObj
-        ]);
     }
 
     public function getDisciplineList(Request $request){

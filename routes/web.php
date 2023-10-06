@@ -56,9 +56,9 @@ Route::post('/workElement/{project:id}',[\App\Http\Controllers\WorkElementContro
 Route::get('/getWorkItems',[\App\Http\Controllers\WorkItemController::class,'setWorkItems'])->name('getWorkItem')->middleware('auth');
 Route::get('/getWorkElement',[\App\Http\Controllers\WorkElementController::class,'setWorkElements'])->name('getWorkElement');
 Route::get('/getItemAdditional/{type}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getItemAdditional'])->name('getItemAdditional');
-Route::get('/getWbsLevel3',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWbsLevel3'])->middleware('auth');
 
 Route::get('/work-item/',[\App\Http\Controllers\WorkItemController::class,'index'])->middleware('auth');
+Route::get('/work-item/export',[\App\Http\Controllers\WorkItemController::class,'export'])->middleware('auth');
 Route::get('/work-item/create',[\App\Http\Controllers\WorkItemController::class,'create'])->middleware('auth');
 Route::get('/work-item/edit/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'edit'])->middleware('auth');
 Route::post('/work-item/',[\App\Http\Controllers\WorkItemController::class,'store'])->middleware('auth');
@@ -79,12 +79,16 @@ Route::post('/work-item/{workItem:id}/material/update',[\App\Http\Controllers\Wo
 
 Route::get('/man-power/',[\App\Http\Controllers\ManPowerController::class,'index'])->middleware('auth');
 Route::get('/man-power/create',[\App\Http\Controllers\ManPowerController::class,'create'])->middleware('auth');
+Route::get('/man-power/export',[\App\Http\Controllers\ManPowerController::class,'export'])->middleware('auth');
+Route::post('/man-power/import',[\App\Http\Controllers\ManPowerController::class,'import'])->middleware('auth');
 Route::post('/man-power/',[\App\Http\Controllers\ManPowerController::class,'store'])->middleware('auth');
 Route::put('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController::class,'update'])->middleware('auth');
 Route::get('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController::class,'detail'])->middleware('auth');
 Route::delete('/man-power/{manPower:id}',[\App\Http\Controllers\ManPowerController::class,'delete'])->middleware('auth');
 
 Route::get('/tool-equipment',[\App\Http\Controllers\EquipmentToolsController::class,'index'])->middleware('auth');
+Route::get('/tool-equipment/export',[\App\Http\Controllers\EquipmentToolsController::class,'export'])->middleware('auth');
+Route::post('/tool-equipment/import',[\App\Http\Controllers\EquipmentToolsController::class,'import'])->middleware('auth');
 Route::get('/tool-equipment/create',[\App\Http\Controllers\EquipmentToolsController::class,'create'])->middleware('auth');
 Route::post('/tool-equipment/',[\App\Http\Controllers\EquipmentToolsController::class,'store'])->middleware('auth');
 Route::put('/tool-equipment/{equipmentTools:id}',[\App\Http\Controllers\EquipmentToolsController::class,'update'])->middleware('auth');
@@ -100,6 +104,8 @@ Route::delete('/tool-equipment-category/{equipmentToolsCategory:id}',[\App\Http\
 
 Route::get('/material',[\App\Http\Controllers\MaterialController::class,'index'])->middleware('auth');
 Route::get('/material/create',[\App\Http\Controllers\MaterialController::class,'create'])->middleware('auth');
+Route::get('/material/export',[\App\Http\Controllers\MaterialController::class,'export'])->middleware('auth');
+Route::post('/material/import',[\App\Http\Controllers\MaterialController::class,'import'])->middleware('auth');
 Route::post('/material/',[\App\Http\Controllers\MaterialController::class,'store'])->middleware('auth');
 Route::put('/material/{material:id}',[\App\Http\Controllers\MaterialController::class,'update'])->middleware('auth');
 Route::get('/material/{material:id}',[\App\Http\Controllers\MaterialController::class,'show'])->middleware('auth');
@@ -133,6 +139,7 @@ Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'updat
 /**
  * Request by AJAX
  */
+Route::get('/check',[\App\Http\Controllers\EstimateAllDisciplineController::class,'check'])->name('check')->middleware('auth');
 Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
 Route::get('/getNumChild/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChild'])->name('getNumChild')->middleware('auth');
 Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getMaterial'])->name('getMaterial')->middleware('auth');
@@ -149,4 +156,6 @@ Route::post('/workItem/update-list/',[\App\Http\Controllers\WorkItemController::
 Route::post('/manPower/update-list/',[\App\Http\Controllers\ManPowerController::class,'updateList'])->middleware('auth');
 Route::post('/equipmentTools/update-list/',[\App\Http\Controllers\EquipmentToolsController::class,'updateList'])->middleware('auth');
 Route::post('/material/update-list/',[\App\Http\Controllers\MaterialController::class,'updateList'])->middleware('auth');
+Route::post('/project/{project:id}/update-remark',[\App\Http\Controllers\ProjectController::class,'updateRemark'])->middleware('auth');
+Route::get('/getEstimateToSync',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getEstimateToSync'])->middleware('auth');
 

@@ -1,3 +1,4 @@
+
 $(function(){
     /**
      * Project Form
@@ -253,5 +254,84 @@ $(function(){
         e.preventDefault();
         $(window).off('beforeunload');
         $(this).closest('form').submit();
+    });
+
+    var quill = new Quill('.js-quill',{
+        theme:'snow',
+    });
+
+    /*
+    Export
+     */
+    $('.js-btn-export').on('click',function(){
+        var _this = $(this);
+        var _file_name = _this.data('file-name');
+        var _url = _this.data('url');
+        _this.addClass('disabled-div');
+        _this.find('.loader-box').removeClass('d-none');
+        $.ajax({
+            url:_url,
+            method:'GET',
+            xhrFields: {
+                responseType: 'blob'
+            },
+            success: function (data) {
+                var a = document.createElement('a');
+                var url = window.URL.createObjectURL(data);
+                a.href = url;
+                a.download = _file_name;
+                document.body.append(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                _this.find('.loader-box').addClass('d-none');
+                _this.removeClass('disabled-div');
+            }
+        })
+    })
+
+    $('.js-form-import').submit(function(e){
+        e.preventDefault();
+        $('.js-modal-import').modal('hide');
+        $('.js-modal-loading-import').modal('show');
+        const formData = new FormData(this);
+        const progressBar = $('.progress-bar');
+        const progress = $('.progress');
+        const fileInput = $('input[type="file"]', this);
+
+        // Check the file extension
+        const allowedExtensions = ['xlsx', 'xls'];
+        const fileName = fileInput.val();
+        const fileExtension = fileName.split('.').pop();
+
+        var _url = $(this).data('url');
+        var _redirect_url = $(this).data('redirect');
+
+        if (!allowedExtensions.includes(fileExtension.toLowerCase())) {
+            $('.js-modal-import').modal('hide');
+            $('.js-modal-loading-import').modal('hide');
+            notification('danger','Wrong Extension File', 'fa fa-time','Error')
+            return; // Prevent the request if the extension is not allowed
+        }
+
+        $.ajax({
+            url: _url,
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                progress.addClass('d-none');
+                $('.js-modal-loading-import').modal('hide');
+                notification('success',response.message, 'fa fa-check','Success')
+                setTimeout(function (){
+                    window.location.href=_redirect_url;
+                },2000)
+            },
+            error: function(xhr) {
+                $('.js-modal-loading-import').modal('hide');
+                notification('danger',xhr.responseJSON.message, 'fa fa-time','Error')
+            }
+        });
     });
 });

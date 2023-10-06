@@ -80,11 +80,15 @@ class WorkItem extends Model
     }
 
     public function isAuthorized(){
-        if(auth()->user()->isReviewer()
+        if(auth()->user()->isWorkItemReviewer()
             || $this->created_by == auth()->user()->id
             || $this->status == $this::REVIEWED) {
             return true;
         }
         return false;
+    }
+
+    public function isHaveManPowers(){
+        return count($this->manPowers) > 0;
     }
 }

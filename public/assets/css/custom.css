@@ -521,3 +521,59 @@ custom-checkbox:checked:before {
    padding: 5px;
    border-bottom: 1px solid #efefef;
 }
+
+.radio .label-radio {
+    font-size: 13px !important;
+    font-weight: 400 !important;
+}
+
+.disabled-div {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.loader-box .loader-3 {
+    display: inline-block;
+    width: 12px !important;
+    height: 12px !important;
+    color: inherit;
+    vertical-align: middle;
+}
+
+
+.notification-ring {
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    /*margin-left: 1px; !* Add some margin for spacing *!*/
+    animation: pulse 1s infinite;
+}
+
+.notification-content {
+    /*padding: 10px;*/
+}
+
+@keyframes ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    50% {
+        transform: rotate(5deg);
+    }
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
