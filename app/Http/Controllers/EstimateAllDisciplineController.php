@@ -71,6 +71,7 @@ class EstimateAllDisciplineController extends Controller
                         $projectClass->wbs_level3_id = $ed->wbs_level3_id;
                         $projectClass->work_element_id = $ed->wbss?->work_element;
                         $projectClass->unique_identifier = $ed->unique_identifier;
+                        $projectClass->version = $ed->version;
                         $map->push($projectClass); // Push the $projectClass object directly
                     }
 
@@ -155,7 +156,8 @@ class EstimateAllDisciplineController extends Controller
             } else {
                 $response = [
                     'status' => 500,
-                    'message' => 'Conflict: Someone else has updated this record.',
+                    'message' => 'Conflict: This record has been modified by another user.
+                                  Please synchronize with the latest changes before saving your data',
                     'sync' => true
                 ];
 
@@ -197,11 +199,10 @@ class EstimateAllDisciplineController extends Controller
         return $arrayResult;
     }
 
-    public function getExistingWorkItemByWbs($request){
+    public function getExistingWorkItemByWbs(Request $request){
         $data = EstimateAllDiscipline::with(['wbss.workElements.wbsDiscipline','workItems.materials',
             'workItems.manPowers','workItems.equipmentTools'])
             ->where('project_id',$request->project_id)->get();
-
         return $data;
     }
 
@@ -211,27 +212,37 @@ class EstimateAllDisciplineController extends Controller
                 ->orderBy('id','DESC')
                 ->get();
 
-            $estimateConflict = [];
+            $projectServices = new ProjectServices();
 
+            $estimateConflict = [];
             foreach($request->estimate_sync as $idx => $cv){
+                $version = $cv['version'] ?? null;
                 $estimateToSync = new EstimateDisciplineClass();
                 $estimateToSync->workItemId = $cv['workItem'];
                 $estimateToSync->workItemDescription = $cv['workItemText'];
-                $estimateToSync->workItemVolume = $cv['vol'] > 0 ? $cv['vol'] : 1;;
+                $estimateToSync->workItemVolume = $cv['vol'] > 0 ? $cv['vol'] : 1;
                 $estimateToSync->workItemManPowerCost = $cv['totalRateManPowers'];
                 $estimateToSync->workItemEquipmentCost = $cv['totalRateEquipments'];
                 $estimateToSync->workItemMaterialCost = $cv['totalRateMaterials'];
+                $estimateToSync->workItemManPowerCostRate = $cv['labourUnitRate'];
+                $estimateToSync->workItemEquipmentCostRate = $cv['equipmentUnitRate'];
+                $estimateToSync->workItemMaterialCostRate = $cv['materialUnitRate'];
                 $estimateToSync->laborFactorial = $cv['labourFactorial'];
                 $estimateToSync->equipmentFactorial = $cv['equipmentFactorial'];
                 $estimateToSync->materialFactorial = $cv['materialFactorial'];
                 $estimateToSync->wbsLevel3Id = $cv['wbs_level3'];
                 $estimateToSync->uniqueIdentifier = $cv['idx'];
-                $estimateToSync->version = $request->current_version;
+                $estimateToSync->version = $version;
+
+                $total = number_format($this->countTotalCostWorkItem($estimateToSync));
+                $estimateToSync->total = $total;
+
 
                 array_push($estimateConflict, $estimateToSync);
             }
-//
-            $estimateAlreadySave = $data->map(function($item) use ($estimateConflict){
+
+            $uniqueIdentifierArr = [];
+            $estimateAlreadySave = $data->map(function($item) use ($estimateConflict, &$uniqueIdentifierArr, $projectServices){
                 $estimateToSync = new EstimateDisciplineClass();
                 $estimateToSync->workItemId = $item->work_item_id;
                 $estimateToSync->workItemDescription = $item->workItems?->description;
@@ -239,89 +250,42 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->workItemManPowerCost = $item->labor_cost_total_rate;
                 $estimateToSync->workItemEquipmentCost = $item->tool_unit_rate_total;
                 $estimateToSync->workItemMaterialCost = $item->material_unit_rate_total;
+                $estimateToSync->workItemManPowerCostRate = $item->labor_unit_rate;
+                $estimateToSync->workItemEquipmentCostRate = $item->tool_unit_rate;
+                $estimateToSync->workItemMaterialCostRate = $item->material_unit_rate;
                 $estimateToSync->laborFactorial = $item->labour_factorial;
                 $estimateToSync->equipmentFactorial = $item->equipment_factorial;
                 $estimateToSync->materialFactorial = $item->material_factorial;
                 $estimateToSync->wbsLevel3Id = $item->wbs_level3_id;
                 $estimateToSync->version = $item->version;
                 $estimateToSync->uniqueIdentifier = $item->unique_identifier;
+                $estimateToSync->total = number_format($projectServices->getTotalCostWorkItem($item));
+                $uniqueIdentifierArr[] = $item->unique_identifier;
+                $estimateToSync->unit = $item->workItems?->unit;
                 return $estimateToSync;
             });
 
-            //            $inEstimateConflict = $estimateConflictCollection->pluck('uniqueIdentifier')->toArray();
-//            $itemToAdd = $estimateAlreadySave->filter(function ($item) use ($inEstimateConflict){
-//                if(!in_array($item->uniqueIdentifier, $inEstimateConflict)){
-//                    return true;
-//                }
-//                return false;
-//            });
-            $newWorkItemToAdd = [];
-            $itemToDelete = [];
-            $itemToMerge = [];
+            $arrConflict = [];
+            foreach($estimateConflict as $ec){
+                if(!in_array($ec->uniqueIdentifier, $uniqueIdentifierArr)){
+                    if(!isset($ec->version)){
+                        $arrConflict[] = $ec;
+                    }
+                };
+            }
+
             $version = $estimateAlreadySave[0]->version;
-
-            $estimateConflictCollection = new Collection($estimateConflict);
-
-             $estimateAlreadySave->each(function ($item) use (&$newWorkItemToAdd, $estimateConflictCollection) {
-                // Use the push method to add items to the collection
-                $matchingItem = $estimateConflictCollection->firstWhere('uniqueIdentifier', $item->uniqueIdentifier);
-                if(!$matchingItem){
-                    $newWorkItemToAdd[] = $item;
-                }
-             });
-
-            $cek = [];
-            $estimateConflictCollection->each(function ($item) use (&$itemToDelete, $estimateAlreadySave, &$newWorkItemToAdd) {
-                // Use the push method to add items to the collection
-                $matchingItem = $estimateAlreadySave->firstWhere('uniqueIdentifier', $item->uniqueIdentifier);
-                if (!$matchingItem && !in_array($item, $newWorkItemToAdd)) {
-                    $itemToMerge[] = $item;
-                }
-            });
 
              $data = [
                  'existingEstimate' => $estimateAlreadySave,
-                 'itemToMerge' => $newWorkItemToAdd,
+                 'itemToMerge' => $arrConflict,
                  'version' => $version,
+                 'current_version' => $request->current_version
              ];
 
             return response()->json([
                 'status' => 200,
-                'data' => $data
-            ]);
-
-
-
-            // cari dalam estimateAlreadySave
-
-            // draft simpan di variable temp terus load data yang sudah di save
-            // setelah save terload masukkan dan gabungkan dari temp yang di load dari save
-                //kalau identifier match dengan array dari data save sama maka skip untuk append
-                // kalau identifier tidak match dari array maka append all data based on wbs_level3_id
-
-
-            // intinya semua save work item masukkan ke draft work item
-                //kalau identifiernya sama draft dan save maka ambil save
-                //kalau ada identifier dari save nda terdeteksi di identifier draft maka tambahkan item save ke item draft
-                //kalau ada
-//
-//            $estimateConflictCollection = new Collection($estimateConflict);
-//            $inEstimateConflict = $estimateConflictCollection->pluck('uniqueIdentifier')->toArray();
-//            $inEstimateConflictVersion = $estimateConflictCollection->pluck('version')->toArray();
-//
-//// Filter $estimateAlreadySave based on workItemIds that are not in $inEstimateConflict
-//            $itemsToRemove = $estimateAlreadySave->filter(function ($item) use ($inEstimateConflict) {
-//                if(!in_array($item->uniqueIdentifier, $inEstimateConflict)){
-//                    return true;
-//                }
-//                return false;
-////                return !in_array($item->workItemId, $inEstimateConflict) && !in_array($item->wbsLevel3Id, $inEstimateConflictWbs);
-//            })->all();
-
-
-            return response()->json([
-                'status' => 200,
-                'data' => $itemToAdd,
+                'data' => $data,
                 'message' => 'Success Synchronize Data'
             ]);
 
@@ -331,5 +295,21 @@ class EstimateAllDisciplineController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    /*
+     * This function is redundant with getTotalCostWorkItem
+     */
+    public function countTotalCostWorkItem($location){
+        $labor_factorial = $location?->labourFactorial ?? 1;
+        $tool_factorial = $location?->equipmentFactorial ?? 1;
+        $material_factorial = $location?->materialFactorial ?? 1;
+        $man_power_cost = (float) $location?->workItemManPowerCostRate * $labor_factorial;
+        $tool_cost = (float) $location?->workItemEquipmentCostRate * $tool_factorial;
+        $material_cost = (float) $location?->workItemMaterialCostRate * $material_factorial;
+        $totalWorkItemCost = $man_power_cost +  $tool_cost + $material_cost;
+        $totalWorkItemCost = $totalWorkItemCost * $location->workItemVolume;
+
+        return $totalWorkItemCost;
     }
 }

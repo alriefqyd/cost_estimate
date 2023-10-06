@@ -138,6 +138,9 @@ $(function(){
         var _version = _form.find('.js-version-project-estimate').val();
         var _array_estimate_disciplines = getWorkItemList();
 
+        _this.attr('disabled','disabled');
+        _this.find('.js-loading-save').removeClass('d-none')
+
         var _data = {
             'work_items' : _array_estimate_disciplines,
             'project_id' : _project_id,
@@ -157,11 +160,14 @@ $(function(){
                     }
                     $(window).off('beforeunload');
                     $('.js-version-project-estimate').val(data.version);
-
+                    _this.find('.js-loading-save').addClass('d-none')
+                    _this.removeAttr('disabled','disabled');
                 } else {
                     notification('danger',data.message,'fa fa-frown-o','Error')
                     if(data.sync){
                         $('.js-btn-loading-sync').removeClass('d-none');
+                        _this.find('.js-loading-save').addClass('d-none');
+
                     }
                 }
             }
@@ -201,6 +207,7 @@ $(function(){
             _material_unit_rate_total = removeCurrency(_material_unit_rate_total)
 
             var _idx = _parent.find('.js-unique-identifier').val();
+            var _version = _parent.find('.js-item-version').val();
 
             var _data = {
                 "idx": _idx,
@@ -220,6 +227,7 @@ $(function(){
                 "equipmentUnitRate":_tool_unit_rate,
                 "wbs_level3":_wbs_level3_id,
                 "work_element":_work_element_id,
+                "version" : _version
             }
             _array_estimate_disciplines.push(_data);
         })
@@ -265,7 +273,8 @@ $(function(){
         var _template = $('#js-template-table-work_item_column').html()
         var _data = {
             'wbsLevel3' : _this.data('id'),
-            'workElement' : _this.data('work-element')
+            'workElement' : _this.data('work-element'),
+            'uniqueIdentifier' : generateId(),
         }
         var _temp =  $(Mustache.render(_template,_data));
         if(_this.hasClass('.js-button-work-element')){
@@ -509,8 +518,7 @@ $(function(){
         var _version = $('.js-version-project-estimate').val();
         var _currentWorkItem = getWorkItemList();
 
-        _loading.removeClass('d-none');
-        console.log(_currentWorkItem);
+        $('#modal-loading').modal('show');
         $.ajax({
             url: '/getEstimateToSync',
             data:
@@ -521,18 +529,18 @@ $(function(){
                 },
             success:function(result){
                 if(result.status == 200){
-                    var _data_sync = result.data
+                    var _data_sync = result.data;
+
                     var _existingEstimate = _data_sync['existingEstimate'];
                     var _conflictEstimate = _data_sync['itemToMerge'];
+
                     var groupedByWbsLevel3 = {};
                     var _version_db = _data_sync['version'];
                     var _version_form = $('.js-version-project-estimate').val()
                     var _template = $('#js-template-table-work_item_column').html();
-                    console.log(_version_db, _version_form)
-                    console.log(_version_db != _version_form)
+
                     if(_version_db != _version_form){
                         var _array_join = [..._existingEstimate, ..._conflictEstimate];
-                        console.log(_array_join);
                         $.each(_array_join, function(index, estimateItem) {
                             var wbsLevel3 = estimateItem.wbsLevel3Id;
 
@@ -546,16 +554,44 @@ $(function(){
 
                         $('.js-row-item-estimate').remove();
 
-                        console.log(groupedByWbsLevel3);
                         $.each(groupedByWbsLevel3, function (index, item){
-                            console.log(item)
                             $.each(item,function (idx,itm){
+                                var _labor_factorial = parseInt(itm.laborFactorial ?? 1)
+                                var _equipment_factorial = parseInt(itm.equipmentFactorial ?? 1)
+                                var _material_factorial = parseInt(itm.materialFactorial ?? 1)
+
+                                var _man_power_cost_rate = itm.workItemManPowerCostRate
+                                var _equipment_cost_rate = itm.workItemEquipmentCostRate
+                                var _material_cost_rate = itm.workItemMaterialCostRate
+
+                                var _man_power_cost = _man_power_cost_rate * _labor_factorial
+                                var _equipment_cost = _equipment_cost_rate * _equipment_factorial
+                                var _material_cost = _material_cost_rate * _material_factorial
+
                                 var _data = {
                                     'wbsLevel3' : itm.wbsLevel3Id,
                                     'workItemDescription' : itm.workItemDescription,
-                                    'workItemVolume': itm.workItemVolume
+                                    'workItemVolume': itm.workItemVolume,
+                                    'uniqueIdentifier' : itm.uniqueIdentifier,
+                                    'workItemId' : itm.workItemId,
+                                    'manPowerCost' : _man_power_cost,
+                                    'equipmentCost': _equipment_cost,
+                                    'materialCost': _material_cost,
+                                    'manPowerCostRate' : _man_power_cost_rate,
+                                    'equipmentCostRate': _equipment_cost_rate,
+                                    'materialCostRate': _material_cost_rate,
+                                    'manPowerCostStr' : toCurrency(_man_power_cost),
+                                    'equipmentCostStr': toCurrency(_equipment_cost),
+                                    'materialCostStr': toCurrency(_material_cost),
+                                    'total' : itm.total,
+                                    'unit' : itm.unit,
+                                    'equipmentFactorial' : _equipment_factorial,
+                                    'laborFactorial' : _labor_factorial,
+                                    'materialFactorial': _material_factorial,
+                                    'itemVersion' : itm.version
                                 }
-                                var _temp =  $(Mustache.render(_template,itm));
+
+                                var _temp =  $(Mustache.render(_template,_data));
                                 var _trow = $('.js-column-work-element[data-wbs-level3-id="'+ itm.wbsLevel3Id +'"]')
                                 _temp.insertAfter($(_trow));
                                 setTimeout(function (){
@@ -564,19 +600,16 @@ $(function(){
                                     $('.select2-container').addClass('d-none');
                                     workItemSelectInit(_select2);
                                     _select2.closest('.js-select2-select-work-item-temp').addClass('d-none');
-                                    // _select2.closest('span').addClass('d-none');
-                                    // $('.js-work-item-text').removeClass('d-none');
+                                    $('.js-input-vol').removeAttr('disabled');
                                 },500)
-
                             });
 
                         })
+                        $('.js-version-project-estimate').val(_version_db);
                     }
 
-                    //data groupby wbsLevel3 identifier/id termasuk yang mau di merge
-                    //baru pecah per wbs
-                    // foreach
-                    // console.log(groupedByWbsLevel3);
+                    $('#modal-loading').modal('hide');
+                    $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
 
                 } else {
                     console.log(result.message)

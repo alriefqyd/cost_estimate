@@ -3,11 +3,9 @@
         <div class="btn btn-primary js-fullscreen mb-2">Maximize Table <i data-feather="maximize" style="width: 12px !important; padding-top: 5px !important;"></i></div>
     </div>
     <div class="col-md-6">
-        <div class="btn btn-outline-success js-btn-loading-sync d-none float-end">
+        <div class="btn btn-outline-success js-btn-loading-sync float-end">
             Sync
-            <div class="loader-box float-end d-none js-loading-sync" style="height: 1px; width: 50px; margin-top: 10%">
-                <div class="loader-15"></div>
-            </div>
+            <div class="notification-ring d-none"></div>
         </div>
     </div>
     <span class="js-fullscreen-element">
@@ -128,8 +126,12 @@
         </div>
         <div class="col-md-12">
             <div class="float-end">
-                <a href="/project/{{$project->id}}"><button class="btn btn-danger js-btn-cancel-estimate-form cancel mb-4" >Cancel</button></a>
-                <button class="btn btn-primary js-save-estimate-discipline mb-4">Save As Draft</button>
+                <a href="/project/{{$project->id}}"><button class="btn btn-danger js-btn-cancel-estimate-form cancel mb-4" >Back</button></a>
+                <button class="btn btn-primary js-save-estimate-discipline mb-4">Save As Draft
+                <div class="loader-box float-end d-none js-loading-save" style="height: 1px; width: 50px; margin-top: 7%">
+                    <div class="loader-15"></div>
+                </div>
+                </button>
             </div>
         </div>
     </span>

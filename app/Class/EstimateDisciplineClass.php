@@ -10,6 +10,9 @@ class EstimateDisciplineClass
     public $workItemManPowerCost;
     public $workItemEquipmentCost;
     public $workItemMaterialCost;
+    public $workItemManPowerRate;
+    public $workItemEquipmentRate;
+    public $workItemMaterailRate;
     public $laborFactorial;
     public $equipmentFactorial;
     public $materialFactorial;
@@ -17,4 +20,5 @@ class EstimateDisciplineClass
     public $version;
     public $total;
     public $uniqueIdentifier;
+    public $unit;
 }
