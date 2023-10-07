@@ -264,7 +264,7 @@
 </script>
 
 <script id="js-template-sub-nestable" type="x-templ-mustache">
-   <ol class="dd-list js-get-idx" data-idx="2">
+   <ol class="dd-list js-get-idx @{{ #showButton }}js-mustache-wbs-element@{{ /showButton }}" data-idx="2">
         <li class="dd-item" data-id="@{{id}}" data-old-element="@{{ id }}">
             <div class="dd-handle">
                 <div class="float-start col-md-10 js-dd-handle-edit">
