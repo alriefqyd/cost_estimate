@@ -286,6 +286,7 @@ $(function(){
         workItemSelectInit(_select2)
         setWhiteBackground(document.querySelector('.table-overflow'));
         bindBeforeUnloadEvent()
+        checkInputVol()
     });
 
     $(document).on('change keyup','.js-input-vol', function(){
@@ -293,7 +294,20 @@ $(function(){
         var _parent_row = _this.closest('tr');
         countTotalWorkItem(_this, workItemSelected);
         bindBeforeUnloadEvent();
+        checkInputVol()
     });
+
+    function checkInputVol(){
+        var _input_vol = $('.js-input-vol')
+        $.each(_input_vol, function (index, item){
+            var _this = $(this);
+            if(_this.val() == ''){
+                _this.css('background-color', '#f3ca63');
+            } else {
+                _this.css('background-color','transparent');
+            }
+        })
+    }
 
     $(document).on('change keyup','.js-input-labor_factorial, .js-input-equipment_factorial, .js-input-material_factorial', function(){
         var _this = $(this);

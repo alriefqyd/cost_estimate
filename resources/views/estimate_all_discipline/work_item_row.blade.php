@@ -83,7 +83,7 @@
                         "@{{ materialCost }}"
                     @endif
                 ">
-                <span class="float-start">
+                <span class="float-start f-w-550 f-15">
                     @if(isset($item->workItemDescription))
                         {{$item->workItemDescription}}
                     @else
@@ -113,7 +113,7 @@
                    @endif
                    {{!isset($item) ? 'disabled="disabled"' : '' }}
                    aria-label="Vol">
-            <span class="input-group-text font js-vol-result-ajax" style="font-size: 10px">
+            <span class="input-group-text font js-vol-result-ajax f-w-550 f-15" style="font-size: 10px">
                 @if(isset($item))
                     {{$item->workItemUnit}}
                 @else
@@ -123,15 +123,14 @@
         </div>
     </td>
     <td class="min-w-140">
-        <span class="float-start js-work-item-man-power-cost">
+        <span class="float-start js-work-item-man-power-cost f-w-550 f-15">
             @if(isset($item->workItemUnitRateTotalLaborCost))
                 {{$item->workItemUnitRateTotalLaborCost}}
             @else
                 @{{ manPowerCostStr }}
             @endif
         </span>
-        <span class="float-end">
-            <span class="float-end">
+        <span class="float-end f-w-550 f-15">
             <i class="fa fa-exclamation-circle cursor-pointer
             {{isset($item->workItemUnitRateTotalLaborCost) && $item->workItemUnitRateTotalLaborCost > 0 ? 'd-block' : 'd-none'}}
             js-open-modal-detail js-work-item-man-power-cost-modal"
@@ -142,41 +141,38 @@
                         @{{ workItemId }}
                    @endif
                "></i>
-            </span>
         </span>
     </td>
     <td class="min-w-140">
-        <span class="float-start js-work-item-equipment-cost">
+        <span class="float-start js-work-item-equipment-cost f-w-550 f-15">
             @if(isset($item->workItemUnitRateTotalToolCost))
                 {{$item->workItemUnitRateTotalToolCost}}
             @else
                 @{{ equipmentCostStr }}
             @endif
         </span>
-        <span class="float-end">
-            <span class="float-end">
-                <i class="fa fa-exclamation-circle cursor-pointer
-                {{isset($item) && $item->workItemUnitRateTotalToolCost > 0 ? 'd-block' : 'd-none'}}
-                js-open-modal-detail js-work-item-equipment-cost-modal"
-                   data-id="
-                   @if(isset($item->workItemId))
-                        {{$item->workItemId}}
-                   @else
-                        @{{ workItemId }}
-                   @endif
-               "></i>
-            </span>
+        <span class="float-end f-w-550 f-15">
+            <i class="fa fa-exclamation-circle cursor-pointer
+            {{isset($item) && $item->workItemUnitRateTotalToolCost > 0 ? 'd-block' : 'd-none'}}
+            js-open-modal-detail js-work-item-equipment-cost-modal"
+               data-id="
+               @if(isset($item->workItemId))
+                    {{$item->workItemId}}
+               @else
+                    @{{ workItemId }}
+               @endif
+           "></i>
         </span>
     </td>
     <td class="min-w-140">
-        <span class="float-start js-work-item-material-cost">
+        <span class="float-start js-work-item-material-cost f-w-550 f-15">
              @if(isset($item->workItemUnitRateTotalMaterialCost))
                 {{$item->workItemUnitRateTotalMaterialCost}}
             @else
                 @{{ materialCostStr }}
             @endif
         </span>
-        <span class="float-end">
+        <span class="float-end f-w-550 f-15">
             <i class="fa fa-exclamation-circle cursor-pointer
             {{isset($item) && $item->workItemUnitRateTotalMaterialCost > 0 ? 'd-block' : 'd-none'}}
             js-open-modal-detail js-work-item-material-cost-modal"
@@ -220,7 +216,7 @@
                placeholder="Material Factorial" type="number" >
     </td>
     <td class="min-w-150 js-total-work-item-rate">
-        <span>
+        <span class="f-w-550 f-15">
             @if(isset($item->workItemTotalCostStr))
                 {{$item->workItemTotalCostStr}}
             @else

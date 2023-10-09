@@ -165,22 +165,22 @@ class Project extends Model
     }
 
     public function getMechanicalEngineer(){
-        if(!$this->designEngineerMechanical) return '-';
+        if(!$this->designEngineerMechanical) return '';
         return $this->designEngineerMechanical?->profiles?->full_name;
     }
 
     public function getCivilEngineer(){
-        if(!$this->designEngineerCivil) return '-';
+        if(!$this->designEngineerCivil) return '';
         return $this->designEngineerCivil?->profiles?->full_name;
     }
 
     public function getElectricalEngineer(){
-        if(!$this->designEngineerElectrical) return '-';
+        if(!$this->designEngineerElectrical) return '';
         return $this->designEngineerElectrical?->profiles?->full_name;
     }
 
     public function getInstrumentEngineer(){
-        if(!$this->designEngineerInstrument) return '-';
+        if(!$this->designEngineerInstrument) return '';
         return $this->designEngineerInstrument?->profiles?->full_name;
     }
 
@@ -200,5 +200,24 @@ class Project extends Model
         if(sizeof($this->getProjectDisciplineStatusApproval()) < 1)
             return self::WAITING_FOR_APPROVAL;
         return self::PENDING_DISCIPLINE_APPROVAL;
+    }
+
+    public function getAllEngineerExcel(){
+        $arr = [];
+        if($this->getMechanicalEngineer()){
+            array_push($arr,$this->getMechanicalEngineer());
+        }
+        if($this->getCivilEngineer()){
+            array_push($arr,$this->getCivilEngineer());
+        }
+        if($this->getElectricalEngineer()){
+            array_push($arr,$this->getElectricalEngineer());
+        }
+        if($this->getInstrumentEngineer()){
+            array_push($arr,$this->getInstrumentEngineer());
+        }
+
+        $str = implode(", ", $arr);
+        return $str;
     }
 }

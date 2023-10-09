@@ -1,4 +1,4 @@
-<div class="row mb-2 js-confirm-load-page js-confirm-row" data-confirm-onload="false">
+<div class="row mb-2 js-confirm-load-page js-confirm-row font-arial" data-confirm-onload="false">
     <div class="col-md-6">
         <div class="btn btn-primary js-fullscreen mb-2">Maximize Table <i data-feather="maximize" style="width: 12px !important; padding-top: 5px !important;"></i></div>
     </div>
@@ -43,7 +43,7 @@
                                     @foreach($estimateAllDiscipline as $key => $discipline)
                                         <tr class="js-column-location" style="background-color: #C5C5C7D0" data-key="{{$key}}">
                                             <td class="min-w-100">
-                                                <span class="float-start">
+                                                <span class="float-start f-w-700 f-14">
                                                         {{ucwords(strtolower($key))}}
                                                     </span>
                                                 <div class="d-inline-block float-end">
@@ -59,7 +59,7 @@
                                                 style="background-color: #DEDEDED0">
                                                 <td></td>
                                                 <td class="min-w-100 js-discipline">
-                                                    <span class="float-start">
+                                                    <span class="float-start f-w-700">
                                                         {{ucwords(strtolower($k))}}
                                                     </span>
                                                     <div class="d-inline-block float-end">
@@ -83,7 +83,7 @@
                                                         </td>
                                                         <td class="min-w-170">
                                                             <div>
-                                                                <span class="float-start js-text-work-element">
+                                                                <span class="float-start js-text-work-element f-w-700">
                                                                     {{$a}}
                                                                 </span>
                                                                 <div class="d-inline-block float-end">
