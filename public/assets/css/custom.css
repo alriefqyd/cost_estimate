@@ -550,6 +550,18 @@ custom-checkbox:checked:before {
     animation: pulse 1s infinite;
 }
 
+.font-arial {
+    font-family: "Montserrat", sans-serif;
+}
+
+.f-w-550 {
+    font-weight: 550 !important;
+}
+
+.f-10 {
+    font-size: 10px;
+}
+
 .notification-content {
     /*padding: 10px;*/
 }

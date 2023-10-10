@@ -29,12 +29,14 @@ class ProjectController extends Controller
     public function index(Request $request, Project $project)
     {
         $projectService = new ProjectServices();
+        $departmentController = new DepartmentsController();
         $civilEngineerList = $projectService->getDataEngineer('design_civil_engineer');
         $mechanicalEngineerList = $projectService->getDataEngineer('design_mechanical_engineer');
         $electricalEngineerList = $projectService->getDataEngineer('design_electrical_engineer');
         $instrumentEngineerList = $projectService->getDataEngineer('design_instrument_engineer');
         $this->authorize('viewAny',$project);
         $projectList = $projectService->getProjectsData($request)['projectList'];
+        $departments = $departmentController->getAllSubDepartment();
         return view('project.index',[
             'projects' => $projectList,
             'projectDraft' => $projectService->getProjectsData($request)['draft'],
@@ -43,6 +45,7 @@ class ProjectController extends Controller
             'mechanicalEngineerList' => $mechanicalEngineerList,
             'electricalEngineerList' => $electricalEngineerList,
             'instrumentEngineerList' => $instrumentEngineerList,
+            'departments' => $departments
         ]);
     }
 
@@ -53,8 +56,12 @@ class ProjectController extends Controller
      */
     public function create()
     {
+        $departmentController = new DepartmentsController();
+        $departments = $departmentController->getAllSubDepartment();
         $this->authorize('create',Project::class);
-        return view('project.create');
+        return view('project.create', [
+            'departments' => $departments
+        ]);
     }
 
     /**
@@ -73,7 +80,8 @@ class ProjectController extends Controller
             'project_title' => 'required',
             'project_sponsor' => 'required',
             'project_manager' => 'required',
-            'project_engineer' => 'required'
+            'project_engineer' => 'required',
+            'project_area' => 'required',
         ]);
 
         try{
@@ -83,6 +91,7 @@ class ProjectController extends Controller
                 'project_title' => $request->project_title,
                 'sub_project_title' => $request->sub_project_title,
                 'project_sponsor' => $request->project_sponsor,
+                'project_area_id' => $request->project_area,
                 'project_manager' => $request->project_manager,
                 'project_engineer' => $request->project_engineer,
                 'design_engineer_mechanical' => $request->design_engineer_mechanical,
@@ -123,10 +132,13 @@ class ProjectController extends Controller
     {
         $this->authorize('update', $project);
         $user = User::with(['profiles','roles'])->get();
+        $departmentController = new DepartmentsController();
+        $departments = $departmentController->getAllSubDepartment();
 
         return view('project.edit',[
             'project' => $project,
             'users' => $user,
+            'departments' => $departments
         ]);
     }
 
@@ -146,7 +158,8 @@ class ProjectController extends Controller
             'project_title' => 'required',
             'project_sponsor' => 'required',
             'project_manager' => 'required',
-            'project_engineer' => 'required'
+            'project_engineer' => 'required',
+            'project_area' => 'required',
         ]);
 
         DB::beginTransaction();
@@ -162,6 +175,7 @@ class ProjectController extends Controller
            $project->design_engineer_electrical = $request->design_engineer_electrical;
            $project->design_engineer_instrument = $request->design_engineer_instrument;
            $project->status = $request->status ?? Project::DRAFT;
+           $project->project_area_id = $request->project_area;
 
            $project->save();
            DB::commit();
@@ -193,6 +207,7 @@ class ProjectController extends Controller
         $costProjects = $projectService->getAllProjectCost($project, $request);
         $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
+        $project = $project->load('projectArea');
 
         return view('project.detail',[
             'project' => $project,

@@ -98,9 +98,30 @@ $(function(){
         }
     }
 
+    $(document).on('click', '.js-save-wbs', function(e){
+        e.preventDefault();
+        $('.js-modal-save-wbs').modal('show');
+    });
+
     $(document).on('click','.js-form-list-location-submit',function (e){
+        $('.js-modal-save-wbs').modal('hide');
         $('.js-modal-loading-wbs').modal('show');
         e.preventDefault();
+        var _isValid = true;
+        var _js_wbs_element = $('.js-mustache-wbs-element');
+        $.each(_js_wbs_element ,function(index, item){
+            if($(this).find('.dd-list').length < 1){
+                _isValid = false;
+                return false;
+            }
+        });
+
+        if(!_isValid){
+            $('.js-modal-loading-wbs').modal('hide');
+            notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error');
+            return false;
+        }
+
         var _nestable = $('.dd');
         _nestable.nestable({
             data: function (item, source){
@@ -409,7 +430,7 @@ $(function(){
 
     $(document).on('click','.js-delete-wbs-discipline',function(){
         var _this = $(this);
-        var _parent = _this.closest('li')
+        var _parent = _this.closest('ol')
         _parent.remove();
         bindBeforeUnloadEvent();
     });
