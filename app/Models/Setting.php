@@ -29,4 +29,5 @@ class Setting extends Model
     public const CODE_NEW_CHILD_WORK_ITEM = 'A';
     public const LEVEL_DISCIPLINE = 2;
     public const LEVEL_WORK_ELEMENT = 3;
+    public const USD_KURS = 15000;
 }

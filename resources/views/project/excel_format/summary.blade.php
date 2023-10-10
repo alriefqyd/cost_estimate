@@ -41,11 +41,18 @@
         <td>PROJECT ENGINEER : {{$project->project_engineer}}</td>
     </tr>
     <tr>
-        <td>DESIGN ENGINEER : {{$project->getMechanicalEngineer()}},{{$project->getCivilEngineer()}}
-            ,{{$project->getElectricalEngineer()}},{{$project->getInstrumentEngineer()}}</td>
+        <td>DESIGN ENGINEER : {{$project->getAllEngineerExcel()}}</td>
     </tr>
     <tr>
         <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>* USD converted from IDR (1 USD = 15,000 IDR).</td>
     </tr>
 
     <thead>
@@ -59,6 +66,7 @@
         <th rowspan="2" style="background-color: #FFC000">TOOL AND <br>EQUIPMENT COST (IDR)</th>
         <th rowspan="2" style="background-color: #FFC000">MATERIAL COST (IDR)</th>
         <th rowspan="2" style="background-color: #FFC000">TOTAL WORK COST (IDR)</th>
+        <th rowspan="2" style="background-color: #FFC000">TOTAL WORK COST (USD)</th>
     </tr>
     <tr></tr>
     </thead>
@@ -85,6 +93,7 @@
                     <td style="background-color: #C4BD97"></td>
                     <td colspan="4" style="background-color: #C4BD97;font-weight: bold">{{$key}}</td>
                     <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost}}</td>
+                    <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost / USD_KURS}}</td>
                 </tr>
             @endif
             @php($codeDiscipline = null);
@@ -100,6 +109,7 @@
                     <td style="background-color: #DDD9C4">{{$costProject[$key]->disciplineToolCost[$item->disciplineTitle]}}</td>
                     <td style="background-color: #DDD9C4">{{$costProject[$key]->disciplineMaterialCost[$item->disciplineTitle]}}</td>
                     <td style="background-color: #DDD9C4"></td>
+                    <td style="background-color: #DDD9C4"></td>
                 </tr>
             @endif
             @if($item->workElementTitle !== $previousElement || $key !== $previousLocation)
@@ -112,6 +122,8 @@
                     <td style="background-color: #eceae0">{{$costProject[$key]->elementLaborCost[$item->workElementTitle]}}</td>
                     <td style="background-color: #eceae0">{{$costProject[$key]->elementToolCost[$item->workElementTitle]}}</td>
                     <td style="background-color: #eceae0">{{$costProject[$key]->elementMaterialCost[$item->workElementTitle]}}</td>
+                    <td style="background-color: #eceae0"></td>
+                    <td style="background-color: #eceae0"></td>
                 </tr>
             @endif
             {{--
@@ -142,6 +154,7 @@
         <td style="background-color: #C4BD97"></td>
         <td style="background-color: #C4BD97"></td>
         <td style="background-color: #C4BD97">{{$project->getContingencyCost()}}</td>
+        <td style="background-color: #C4BD97">{{$project->getContingencyCost() / USD_KURS}}</td>
     </tr>
     <tr>
         <td style="background-color: #FFC000">{{chr(64 + sizeof($estimateAllDisciplines) + 2)}}</td>
@@ -152,6 +165,7 @@
         <td style="background-color: #FFC000"></td>
         <td style="background-color: #FFC000"></td>
         <td style="background-color: #FFC000">{{$project->getTotalCostWithContingency()}}</td>
+        <td style="background-color: #FFC000">{{$project->getTotalCostWithContingency() / USD_KURS}}</td>
     </tr>
     </tbody>
 </table>

@@ -81,6 +81,12 @@
                                     <td></td>
                                 </tr>
                                 <tr>
+                                    <td>Project Area</td>
+                                    <td>:</td>
+                                    <td class="m-2">{{$project->projectArea?->name}}</td>
+                                    <td></td>
+                                </tr>
+                                <tr>
                                     <td colspan="4">
                                         <p class="font-weight-bold" style="color: black"> Design Engineer </p>
                                     </td>
@@ -421,7 +427,12 @@
                                     </button>
                                 </a>
                             @endif
-                            @include('project.detail_table')
+                            <div class="col-md-6 float-end">
+                                <div class="btn btn-primary js-fullscreen-detail mb-2 float-end">Maximize Table <i data-feather="maximize" style="width: 12px !important; padding-top: 5px !important;"></i></div>
+                            </div>
+                            <span class="js-fullscreen-table">
+                                @include('project.detail_table')
+                            </span>
                         </div>
                     </div>
                 </div>

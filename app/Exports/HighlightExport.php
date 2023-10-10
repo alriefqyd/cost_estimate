@@ -49,7 +49,7 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         /**
          * Title
          */
-        $sheet->getStyle('A2:H5')->applyFromArray([
+        $sheet->getStyle('A2:I5')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'italic' => false,
@@ -63,8 +63,8 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         /**
          * Table Header
          */
-        $styleHeader = 'A13:H14';
-        if($this->isDetail) $styleHeader = 'A13:M14';
+        $styleHeader = 'A13:I14';
+        if($this->isDetail) $styleHeader = 'A13:N14';
         $sheet->getStyle($styleHeader)->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -100,7 +100,12 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
 
         $formatNumber = 'E15:I100';
         if($this->isDetail) $formatNumber = 'G15:M300';
+        $sheetColumnUsd = "I";
         $sheet->getStyle($formatNumber)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_IDR);
+        if($this->isDetail) {
+            $sheetColumnUsd = "N";
+        }
+        $sheet->getStyle($sheetColumnUsd)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
         $sheet->getStyle('A2:D5')->applyFromArray([
             'font' => [
                 'bold' => true,
@@ -111,8 +116,8 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
                 'vertical' => Alignment::HORIZONTAL_LEFT
             ],
         ]);
-        $styleBackground = 'A1:H12';
-        if($this->isDetail) $styleBackground = 'A1:M12';
+        $styleBackground = 'A1:I12';
+        if($this->isDetail) $styleBackground = 'A1:N12';
         $sheet->getStyle($styleBackground)
             ->getFill()
             ->setFillType(Fill::FILL_SOLID)
@@ -120,12 +125,29 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
             ->setRGB('FFFFFF');
 
         // Remove borders for each cell
-        $styleBorder = 'A1:H11';
-        if($this->isDetail) $styleBackground = 'A1:M11';
+        $styleBorder = 'A1:I11';
+        if($this->isDetail) $styleBackground = 'A1:N11';
         $sheet->getStyle($styleBorder)
             ->getBorders()
             ->getAllBorders()
             ->setBorderStyle(Border::BORDER_NONE);
+
+        $noteUsdKursSheet = "I12";
+        if($this->isDetail){
+            $noteUsdKursSheet = "N12";
+        }
+
+        $sheet->getStyle($noteUsdKursSheet)->applyFromArray([
+            'font' => [
+                'size' => 7,
+                'color' => ['rgb' => 'FF0000'], // Red color
+                'italic' => true,
+                'name' => 'Arial', // Font name
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_RIGHT,
+            ],
+        ]);
 
 
         for($i=1; $i<13; $i++){
@@ -161,6 +183,7 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
             $sheet->getColumnDimension('K')->setWidth(40);
             $sheet->getColumnDimension('L')->setWidth(30);
             $sheet->getColumnDimension('M')->setWidth(30);
+            $sheet->getColumnDimension('N')->setWidth(30);
         }
 
         // Enable text wrapping in column A
@@ -171,13 +194,13 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         $drawing = new Drawing();
         $drawing->setPath($imagePath);
 
-        $drawing->setWidth(50);
-        $drawing->setHeight(50);
-        $styleImagePosition = 'H2';
-        if($this->isDetail) $styleImagePosition = 'M2';
+        $drawing->setWidth(40);
+        $drawing->setHeight(40);
+        $styleImagePosition = 'I2';
+        if($this->isDetail) $styleImagePosition = 'N2';
         $drawing->setCoordinates($styleImagePosition); // Starting cell for the image
         $drawing->setOffsetX(100); // Adjust the X offset to position the image within the cell
-        $drawing->setOffsetY(10); // Adjust the Y offset to position the image within the cell
+        $drawing->setOffsetY(100); // Adjust the Y offset to position the image within the cell
         $drawing->setWorksheet($sheet);
         $pageSetup = new PageSetup();
 

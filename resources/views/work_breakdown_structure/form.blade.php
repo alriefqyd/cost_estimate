@@ -36,7 +36,7 @@
                                     </div>
                                 </div>
                                 @foreach($value as $k => $discipline)
-                                    <ol class="dd-list js-get-idx" data-idx="2">
+                                    <ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2">
                                         <li class="dd-item" data-identifier="{{$discipline->first()['identifier']}}" data-id="{{$discipline->first()['disciplineId']}}">
                                             <div class="dd-handle">
                                                 <div class="float-start col-md-10 js-dd-handle-edit">
@@ -94,7 +94,7 @@
             <a class="" href="/project/{{$project->id}}/">
                 <div class="btn btn-danger">Cancel</div>
             </a>
-            <button class="btn btn-success js-form-list-location-submit">
+            <button class="btn btn-success js-save-wbs">
                 <div class="loader-box" style="height: auto">
                     Save <div style="margin-left:3px" class="loader-34 d-none"></div>
                 </div>
@@ -109,6 +109,25 @@
             <div class="modal-body text-center">
                 <div class="loading-spinner mb-2"></div>
                 <div>Loading....</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade js-modal-save-wbs" id="" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Save Work Breakdown Structure</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to save this item?
+                    <p style="font-size: 10px; color: #fa0b0b;">Note: Changing the WBS will affect your estimate discipline data.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-success js-form-list-location-submit" type="button">Save</button>
             </div>
         </div>
     </div>
