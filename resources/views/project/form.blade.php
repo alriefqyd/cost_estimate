@@ -1,13 +1,27 @@
 @inject('setting',App\Models\Setting::class)
 @inject('profile',App\Models\Profile::class)
+    <div class="row g-3 mb-3">
+        <div class="col-md-6">
+            <label class="form-label form-label-black" for="validationCustom02">Project Area <span class="text-danger f-w-550">*</span></label>
+            <select class="select2 col-sm-12 js-project-area"
+                    name="project_area"
+                    data-placeholder="Project Area">
+                @foreach($departments as $department)
+                    <option {{isset($project->project_area_id)
+                        && $project->project_area_id == $department->id ? 'selected' : ''}}
+                            value="{{$department->id}}">{{$department->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
     <div class="row g-3 mb-2">
         <div class="col-md-6">
-            <label class="form-label form-label-black" for="validationCustom01">Project No</label>
+            <label class="form-label form-label-black" for="validationCustom01">Project No <span class="text-danger f-w-550">*</span> </label>
             <input class="form-control js-validate js-project_project_no" name="project_no"  type="text"
                    value="{{isset($project->project_no) ? $project->project_no : old('project_no')}}">
         </div>
         <div class="col-md-6">
-            <label class="form-label form-label-black" for="validationCustom02">Project Title</label>
+            <label class="form-label form-label-black" for="validationCustom02">Project Title <span class="text-danger f-w-550">*</span></label>
             <input class="form-control js-validate js-project_project_title" name="project_title" type="text"
                    value="{{isset($project->project_title) ? $project->project_title : old('project_title')}}">
         </div>
@@ -19,33 +33,19 @@
                    value="{{isset($project->project_no) ? $project->sub_project_title : old('sub_project_title')}}" >
         </div>
         <div class="col-md-6">
-            <label class="form-label form-label-black" for="validationCustom02">Project Sponsor</label>
+            <label class="form-label form-label-black" for="validationCustom02">Project Sponsor <span class="text-danger f-w-550">*</span></label>
             <input class="form-control js-project_project_sponsor" name="project_sponsor" type="text"
                    value="{{isset($project->project_sponsor) ? $project->project_sponsor : old('project_sponsor')}}">
         </div>
     </div>
     <div class="row g-3 mb-2">
         <div class="col-md-6">
-            <label class="form-label form-label-black" for="validationCustom02">Project Area</label>
-            <select class="select2 col-sm-12 js-project-area"
-                    name="project_area"
-                    data-placeholder="Project Area">
-                @foreach($departments as $department)
-                    <option {{isset($project->project_area_id)
-                    && $project->project_area_id == $department->id ? 'selected' : ''}}
-                            value="{{$department->id}}">{{$department->name}}</option>
-                @endforeach
-            </select>
-        </div>
-    </div>
-    <div class="row g-3 mb-2">
-        <div class="col-md-6">
-            <label class="form-label form-label-black" for="validationCustom02">Project Manager</label>
+            <label class="form-label form-label-black" for="validationCustom02">Project Manager <span class="text-danger f-w-550">*</span></label>
             <input class="form-control js-project_project_manager" name="project_manager" type="text"
                    value="{{isset($project->project_manager) ? $project->project_manager : old('project_manager')}}">
         </div>
         <div class="col-md-6">
-            <label class="form-label form-label-black" for="validationCustom02">Project Engineer</label>
+            <label class="form-label form-label-black" for="validationCustom02">Project Engineer <span class="text-danger f-w-550">*</span></label>
             <input class="form-control js-project_project_engineer" name="project_engineer" type="text"
                    value="{{isset($project->project_engineer) ? $project->project_engineer : old('project_engineer')}}">
         </div>
