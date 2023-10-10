@@ -312,6 +312,7 @@
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                    @{{ #isManPower }}
                     <div class="col-md-12 mb-5">
                         <label>Man Power</label>
                         <table class="table table-striped">
@@ -345,7 +346,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <hr>
+                    @{{ /isManPower }}
+                    @{{ #isEquipment }}
                     <div class="col-md-12 mb-5">
                         <label>Tool and Equipment</label>
                         <table class="table table-striped">
@@ -373,7 +375,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <hr>
+                    @{{ /isEquipment }}
+                    @{{ #isMaterial }}
                     <div class="col-md-12 mb-3">
                         <label>Material</label>
                         <table class="table table-striped">
@@ -399,6 +402,7 @@
                             </tbody>
                         </table>
                     </div>
+                    @{{ /isMaterial }}
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Close</button>

@@ -421,11 +421,13 @@ $(function(){
         var _this = $(this);
         var _id = _this.data('id');
         var _template = $('#js-template-modal-detail-estimate').html();
+        var _type = _this.data('type');
 
         $.ajax({
             url:'/getDetailWorkItem',
             data: {
-                'id' : _id
+                'id' : _id,
+                'type' : _type
             },
             success:function (item){
                 if(item.status === 200){
@@ -479,6 +481,15 @@ $(function(){
         // Scroll the table to the left
         _table.scrollLeft = 0;
     });
+
+
+    $(document).on('click','.js-fullscreen-detail',function(){
+        var _table = document.querySelector('.js-fullscreen-table');
+        _table.requestFullscreen();
+
+        var _element = $('.js-fullscreen-table')
+        _element.css('background-color','#f4f7fb')
+    })
 
     $(document).on('fullscreenchange', function () {
         // Check if the document is currently in fullscreen mode

@@ -24,6 +24,20 @@
                    value="{{isset($project->project_sponsor) ? $project->project_sponsor : old('project_sponsor')}}">
         </div>
     </div>
+<div class="row g-3 mb-2">
+        <div class="col-md-6">
+            <label class="form-label form-label-black" for="validationCustom02">Project Area</label>
+            <select class="select2 col-sm-12 js-project-area"
+                    name="project_area"
+                    data-placeholder="Project Area">
+                @foreach($departments as $department)
+                    <option {{isset($project->project_area_id)
+                    && $project->project_area_id == $department->id ? 'selected' : ''}}
+                            value="{{$department->id}}">{{$department->name}}</option>
+                @endforeach
+            </select>
+        </div>
+    </div>
     <div class="row g-3 mb-2">
         <div class="col-md-6">
             <label class="form-label form-label-black" for="validationCustom02">Project Manager</label>

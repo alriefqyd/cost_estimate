@@ -36,8 +36,10 @@
                                 <select class="select2 col-sm-12 js-search-form"
                                         name="sponsor"
                                         data-placeholder="Project Sponsor">
-                                    <option>Process Plant</option>
-                                    <option>Utilities</option>
+                                    <option {{!request()->sponsor ? 'selected' : ''}} readonly disabled>Select Project Area</option>
+                                    @foreach($departments as $department)
+                                        <option {{request()->sponsor == $department ? 'selected' : ''}} value="{{$department->id}}">{{$department->name}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-4">

@@ -75,7 +75,7 @@
                         <td colspan="14">{{$item->workElementTitle != $previousWorkElement ? $item->workElementTitle : ''}}</td>
                     </tr>
                 @endif
-                <tr>
+                <tr class="f-w-700 f-14">
                     <td></td>
                     <td></td>
                     <td></td>

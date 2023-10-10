@@ -627,51 +627,72 @@ class WorkItemController extends Controller
 
 
         if(isset($data)){
-            $manPower = $data->manPowers?->map(function($mp){
-                return [
-                    'id' => $mp->id,
-                    'title' => $mp->title,
-                    'basic_rate_month' => $mp->basic_rate_month,
-                    'overall_rate_hourly' => number_format($mp->overall_rate_hourly,2,',','.'),
-                    'labor_unit' => $mp->pivot->labor_unit,
-                    'labor_coefisient' => number_format((float) $mp->pivot->labor_coefisient,2),
-                    'amount' => number_format($mp->pivot->amount,2,'.',',')
-                ];
-            });
+            if($request->type == 'man_power'){
+                $manPower = $data->manPowers?->map(function($mp){
+                    return [
+                        'id' => $mp->id,
+                        'title' => $mp->title,
+                        'basic_rate_month' => $mp->basic_rate_month,
+                        'overall_rate_hourly' => number_format($mp->overall_rate_hourly,2,',','.'),
+                        'labor_unit' => $mp->pivot->labor_unit,
+                        'labor_coefisient' => number_format((float) $mp->pivot->labor_coefisient,2),
+                        'amount' => number_format($mp->pivot->amount,2,'.',',')
+                    ];
+                });
 
-            $equipment = $data->equipmentTools?->map(function($mp){
-                return [
-                    'id' => $mp->id,
-                    'description' => $mp->description,
-                    'unit' => $mp->unit,
-                    'quantity' => number_format($mp->pivot->quantity,2),
-                    'local_rate' => number_format($mp->local_rate,2),
-                    'amount' => number_format($mp->pivot->amount,2,'.',',')
-                ];
-            });
-
-            $material = $data->materials?->map(function($mp){
-               return [
-                   'id' => $mp->id,
-                   'description' => $mp->tool_equipment_description,
-                   'unit' => $mp->unit,
-                   'quantity' => number_format($mp->pivot->quantity,2),
-                   'rate' => number_format($mp->rate,2),
-                   'amount' => number_format($mp->pivot->amount,2,'.',',')
-               ];
-            });
+                return response()->json([
+                    'data' => [
+                        'isManPower' => true,
+                        'manPower' => $manPower,
+                    ],
+                    'status' => 200
+                ]);
+            }
 
 
+            if($request->type == 'equipment') {
+                $equipment = $data->equipmentTools?->map(function ($mp) {
+                    return [
+                        'id' => $mp->id,
+                        'description' => $mp->description,
+                        'unit' => $mp->unit,
+                        'quantity' => number_format($mp->pivot->quantity, 2),
+                        'local_rate' => number_format($mp->local_rate, 2),
+                        'amount' => number_format($mp->pivot->amount, 2, '.', ',')
+                    ];
+                });
 
-            return response()->json([
-                'data' => [
-                    'manPower' => $manPower,
-                    'equipment' => $equipment,
-                    'material' => $material
-                ],
+                return response()->json([
+                    'data' => [
+                        'isEquipment' => true,
+                        'equipment' => $equipment,
+                    ],
+                    'status' => 200
+                ]);
+            }
 
-                'status' => 200
-            ]);
+            if($request->type == 'material') {
+                $material = $data->materials?->map(function ($mp) {
+                    return [
+                        'id' => $mp->id,
+                        'description' => $mp->tool_equipment_description,
+                        'unit' => $mp->unit,
+                        'quantity' => number_format($mp->pivot->quantity, 2),
+                        'rate' => number_format($mp->rate, 2),
+                        'amount' => number_format($mp->pivot->amount, 2, '.', ',')
+                    ];
+                });
+
+                return response()->json([
+                    'data' => [
+                        'isMaterial' => true,
+                        'material' => $material
+                    ],
+
+                    'status' => 200
+                ]);
+            }
+
         } else {
             return response()->json([
                 'status' => 500

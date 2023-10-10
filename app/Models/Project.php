@@ -51,6 +51,10 @@ class Project extends Model
         ];
     }
 
+    public function projectArea(){
+        return $this->belongsTo(Departments::class,'project_area_id');
+    }
+
     public function estimateAllDisciplines(){
         return $this->hasMany(EstimateAllDiscipline::class,'project_id');
     }
@@ -88,6 +92,8 @@ class Project extends Model
                 $query->where('project_title', 'like', '%' . $q . '%')
                     ->orWhere('project_no', 'like', '%' . $q . '%');
             });
+        })->when($filters['sponsor'] ?? false, function($query, $q){
+            $query->where('project_area_id',$q);
         })->when($filters['mechanical'] ?? false, function($query, $q){
             $query->where('design_engineer_mechanical',$q);
         })->when($filters['civil'] ?? false, function($query, $q){

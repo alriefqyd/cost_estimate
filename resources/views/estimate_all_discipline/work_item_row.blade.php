@@ -132,8 +132,9 @@
         </span>
         <span class="float-end f-w-550 f-15">
             <i class="fa fa-exclamation-circle cursor-pointer
-            {{isset($item->workItemUnitRateTotalLaborCost) && $item->workItemUnitRateTotalLaborCost > 0 ? 'd-block' : 'd-none'}}
-            js-open-modal-detail js-work-item-man-power-cost-modal"
+                {{isset($item->workItemUnitRateTotalLaborCost) && $item->workItemUnitRateTotalLaborCost > 0 ? 'd-block' : 'd-none'}}
+                js-open-modal-detail js-work-item-man-power-cost-modal"
+               data-type="man_power"
                data-id="
                    @if(isset($item->workItemId))
                         {{$item->workItemId}}
@@ -153,8 +154,9 @@
         </span>
         <span class="float-end f-w-550 f-15">
             <i class="fa fa-exclamation-circle cursor-pointer
-            {{isset($item) && $item->workItemUnitRateTotalToolCost > 0 ? 'd-block' : 'd-none'}}
-            js-open-modal-detail js-work-item-equipment-cost-modal"
+                {{isset($item) && $item->workItemUnitRateTotalToolCost > 0 ? 'd-block' : 'd-none'}}
+                js-open-modal-detail js-work-item-equipment-cost-modal"
+               data-type="equipment"
                data-id="
                @if(isset($item->workItemId))
                     {{$item->workItemId}}
@@ -174,8 +176,9 @@
         </span>
         <span class="float-end f-w-550 f-15">
             <i class="fa fa-exclamation-circle cursor-pointer
-            {{isset($item) && $item->workItemUnitRateTotalMaterialCost > 0 ? 'd-block' : 'd-none'}}
-            js-open-modal-detail js-work-item-material-cost-modal"
+                {{isset($item) && $item->workItemUnitRateTotalMaterialCost > 0 ? 'd-block' : 'd-none'}}
+                js-open-modal-detail js-work-item-material-cost-modal"
+               data-type="material"
                data-id=
                    @if(isset($item->workItemId))
                         "{{$item->workItemId}}"
