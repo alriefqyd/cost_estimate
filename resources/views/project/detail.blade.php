@@ -415,21 +415,24 @@
                     <div class="card-body">
                         <div class="col-sm-12 col-lg-12 col-xl-12">
                             <div class="clearfix"></div>
-                            @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE)
-                                <a href="/cost-estimate-summary/export/{{$project->id}}">
-                                    <button data-id="{{$project->id}}"
-                                        data-name="Cost Estimate - {{$project->project_no}} - {{$project->project_title}}.xlsx"
-                                        class="js-download-summary-xlsx btn btn-success mb-3">
-                                        <div class="float-start">Download XLSX</div>
-                                        <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
-                                            <div class="loader-34"></div>
-                                        </div>
-                                    </button>
-                                </a>
-                            @endif
-                            <div class="col-md-6 float-end">
-                                <div class="btn btn-primary js-fullscreen-detail mb-2 float-end">Maximize Table <i data-feather="maximize" style="width: 12px !important; padding-top: 5px !important;"></i></div>
+                            <div class="col-md-6">
+                                @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE)
+                                    <a href="/cost-estimate-summary/export/{{$project->id}}">
+                                        <button data-id="{{$project->id}}"
+                                            data-name="Cost Estimate - {{$project->project_no}} - {{$project->project_title}}.xlsx"
+                                            class="js-download-summary-xlsx btn btn-success mb-3">
+                                            <div class="float-start">Download XLSX</div>
+                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
+                                                <div class="loader-34"></div>
+                                            </div>
+                                        </button>
+                                    </a>
+                                @endif
                             </div>
+                            <div class="col-md-6 float-end">
+                                <div class="btn btn-primary js-fullscreen-detail mb-2 float-end">Maximize Table <i data-feather="maximize" style="width: 12px !important;"></i></div>
+                            </div>
+                            <div class="clearfix"></div>
                             <span class="js-fullscreen-table">
                                 @include('project.detail_table')
                             </span>
