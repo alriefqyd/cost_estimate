@@ -233,7 +233,7 @@
              </div>
 
             @{{#dataList}}
-             <ol class="dd-list js-get-idx" data-idx="2">
+             <ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2">
                 <li class="dd-item" data-id="@{{id}}">
                     <div class="dd-handle">
                         <div class="float-start col-md-10 js-dd-handle-edit">
