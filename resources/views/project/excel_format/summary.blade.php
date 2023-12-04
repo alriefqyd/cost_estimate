@@ -52,7 +52,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>* USD converted from IDR (1 USD = {{toCurrency($usdIdr)}}).</td>
+        <td>* USD converted from IDR (1 USD = {{number_format($usdIdr2,2)}}).</td>
     </tr>
 
     <thead>
