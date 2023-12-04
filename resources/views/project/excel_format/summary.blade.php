@@ -52,7 +52,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td>* USD converted from IDR (1 USD = 15,000 IDR).</td>
+        <td>* USD converted from IDR (1 USD = {{toCurrency($usdIdr)}}).</td>
     </tr>
 
     <thead>
@@ -91,9 +91,9 @@
                     <td style="background-color: #C4BD97">{{$idxAlphabet++}}</td>
                     <td style="background-color: #C4BD97"></td>
                     <td style="background-color: #C4BD97"></td>
-                    <td colspan="4" style="background-color: #C4BD97;font-weight: bold">{{$key}}</td>
+                    <td colspan="4" style="background-color: #C4BD97;font-weight: bold"></td>
                     <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost}}</td>
-                    <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost / USD_KURS}}</td>
+                    <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost / $usdIdr}}</td>
                 </tr>
             @endif
             @php($codeDiscipline = null);

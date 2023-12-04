@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Http\Controllers\SettingController;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -24,6 +25,9 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         $this->project = $project;
         $this->costProject = $costProjects;
         $this->isDetail = $isDetail;
+        $settingController = new SettingController();
+        $this->getUsdIdr =  $settingController->getUsdRateFromDB();
+
     }
 
     public function title(): string
@@ -40,7 +44,8 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
             'project' => $this->project,
             'estimateAllDisciplines' => $estimateAllDisciplines,
             'costProject' => $costProject,
-            'isDetail' => $this->isDetail
+            'isDetail' => $this->isDetail,
+            'usdIdr' => $this->getUsdIdr
         ]);
     }
 

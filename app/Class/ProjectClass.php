@@ -11,12 +11,15 @@ class ProjectClass
     public $estimateVolume;
     public $workItemUnit;
     public $workItemUnitRateLaborCost;
+    public $workItemUnitRateLaborCostCurrFormat;
     public $workItemUnitRateTotalLaborCost;
     public $workItemTotalLaborCost;
     public $workItemUnitRateToolCost;
+    public $workItemUnitRateToolCostCurrFormat;
     public $workItemUnitRateTotalToolCost;
     public $workItemTotalToolCost;
     public $workItemUnitRateMaterialCost;
+    public $workItemUnitRateMaterialCostCurrFormat;
     public $workItemUnitRateTotalMaterialCost;
     public $workItemTotalMaterialCost;
     public $workItemLaborFactorial;

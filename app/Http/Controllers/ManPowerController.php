@@ -159,7 +159,7 @@ class ManPowerController extends Controller
             $manPower->total_benefit_hourly = $this->convertToDecimal($request->total_benefit_hourly);
             $manPower->overall_rate_hourly = $this->convertToDecimal($request->overall_rate_hourly);
             $manPower->monthly = $this->convertToDecimal($request->monthly);
-            $manPower->updatedBy = auth()->user()->id;
+//            $manPower->updatedBy = auth()->user()->id;
 
             $manPower->save();
             DB::commit();

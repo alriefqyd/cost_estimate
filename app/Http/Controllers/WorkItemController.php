@@ -414,6 +414,7 @@ class WorkItemController extends Controller
                     $manPowers = $subItems?->manPowers;
                     $equipmentTools = $subItems?->equipmentTools;
                     $materials = $subItems?->materials;
+
                     if($manPowers){
                         foreach ($manPowers as $manPower){
                             $manPowersArr[] = array(
@@ -558,36 +559,34 @@ class WorkItemController extends Controller
     }
 
     public function getTotalRateManPowers($value){
-        $data = $value->map(function($el){
-            $rate = $el->overall_rate_hourly ?: 0;
-            $coef = $el?->pivot?->labor_coefisient ?: 1;
-            $tot = $rate * $this->toDecimalRound($coef);
-            return $tot;
-        })->all();
+        $sum = $value->map(function ($mp) {
+            $coef = str_replace(',', '.', $mp->pivot->labor_coefisient);
+            $rate = $mp->overall_rate_hourly ?: 0; // Set default rate if null
+            return $rate * (float) $coef;
+        })->sum();
 
-        return array_sum($data);
+        return $sum;
     }
 
     public function getTotalRateEquipments($value){
-        $data = $value->map(function($el){
-            $rate = $el->local_rate;
-            $qty = $el->pivot->quantity;
-            $tot = $rate * (float) $qty;
-            return $tot;
-        })->all();
+        $sum = $value->map(function ($mp) {
+            $coef = str_replace(',', '.', $mp->pivot->quantity);
+            $rate = $mp->local_rate ?: 0; // Set default rate if null
+            return $rate * (float) $coef;
+        })->sum();
 
-        return array_sum($data);
+        return $sum;
     }
 
     public function getTotalRateMaterials($value){
-        $data = $value->map(function($el){
-            $rate = $el->rate;
-            $qty = $el->pivot->quantity;
-            $tot = $rate * (float) $qty;
-            return $tot;
-        })->all();
+        $sum = 0;
+        foreach($value as $mp){
+            $coef = str_replace(',','.',$mp?->pivot->quantity);
+            $tot = $mp?->rate * (float) $coef;
+            $sum += $tot;
+        }
 
-        return array_sum($data);
+        return $sum;
     }
 
         public function removeCommaCurrencyFormat($val){
@@ -636,7 +635,7 @@ class WorkItemController extends Controller
                         'overall_rate_hourly' => number_format($mp->overall_rate_hourly,2,',','.'),
                         'labor_unit' => $mp->pivot->labor_unit,
                         'labor_coefisient' => number_format((float) $mp->pivot->labor_coefisient,2),
-                        'amount' => number_format($mp->pivot->amount,2,'.',',')
+                        'amount' => number_format($mp->getAmount(),2,'.',',')
                     ];
                 });
 
@@ -658,7 +657,7 @@ class WorkItemController extends Controller
                         'unit' => $mp->unit,
                         'quantity' => number_format($mp->pivot->quantity, 2),
                         'local_rate' => number_format($mp->local_rate, 2),
-                        'amount' => number_format($mp->pivot->amount, 2, '.', ',')
+                        'amount' => number_format($mp->getAmount(), 2, '.', ',')
                     ];
                 });
 
@@ -679,7 +678,7 @@ class WorkItemController extends Controller
                         'unit' => $mp->unit,
                         'quantity' => number_format($mp->pivot->quantity, 2),
                         'rate' => number_format($mp->rate, 2),
-                        'amount' => number_format($mp->pivot->amount, 2, '.', ',')
+                        'amount' => number_format($mp->getAmount(), 2, '.', ',')
                     ];
                 });
 

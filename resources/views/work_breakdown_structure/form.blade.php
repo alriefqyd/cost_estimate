@@ -8,8 +8,8 @@
 
                 <div class="col-md-12 mb-5">
                     <div class="input-group">
-                        <input class="form-control js-form-location" type="text" placeholder="Location Equipment">
-                        <div class="btn btn-success js-add-btn-wbs">+</div>
+                        <input class="form-control js-form-location" type="text" placeholder="Type Location Equipment!">
+                        <button class="btn btn-success js-add-btn-wbs" disabled="disabled">+</button>
                     </div>
                 </div>
                 <div class="dd js-nestable-wbs-form" style="max-width: 100%" id="nestable">
