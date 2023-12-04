@@ -61,12 +61,46 @@ class WorkItem extends Model
     }
 
     public function getTotalSum(){
-       $total =  $this->materials->sum('pivot.amount') +
-                $this->equipmentTools->sum('pivot.amount') +
-                $this->manPowers->sum('pivot.amount');
+       $total =  $this->getTotalCostMaterial() +
+                $this->getTotalCostEquipment() +
+                $this->getTotalCostManPower();
 
        return $total;
     }
+
+    public function getTotalCostManPower(){
+        $sum = 0;
+        foreach($this->manPowers as $mp){
+            $coef = str_replace(',','.',$mp?->pivot->labor_coefisient);
+            $tot = $mp?->overall_rate_hourly * (float) $coef;
+            $sum += $tot;
+        }
+
+        return $sum;
+    }
+
+    public function getTotalCostEquipment(){
+        $sum = 0;
+        foreach($this->equipmentTools as $mp){
+            $coef = str_replace(',','.',$mp?->pivot->quantity);
+            $tot = $mp?->local_rate * (float) $coef;
+            $sum += $tot;
+        }
+
+        return $sum;
+    }
+
+    public function getTotalCostMaterial(){
+        $sum = 0;
+        foreach($this->materials as $mp){
+            $coef = str_replace(',','.',$mp?->pivot->quantity);
+            $tot = $mp?->rate * (float) $coef;
+            $sum += $tot;
+        }
+
+        return $sum;
+    }
+
     public function parent(){
         return $this->belongsTo(Workitem::class,'parent_id');
     }

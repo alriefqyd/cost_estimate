@@ -34,4 +34,9 @@ class EquipmentTools extends Model
             $query->where('status',$q)
         );
     }
+
+    public function getAmount(){
+        $qty = str_replace(',','.',$this->pivot->quantity);
+        return $this->local_rate * (float) $qty;
+    }
 }

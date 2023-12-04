@@ -38,4 +38,9 @@ class Material extends Model
             $query->where('status', $q)
         );
     }
+
+    public function getAmount(){
+        $qty = str_replace(',','.',$this->pivot->quantity);
+        return $this->rate * (float) $qty;
+    }
 }

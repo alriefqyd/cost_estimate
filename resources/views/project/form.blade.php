@@ -18,11 +18,13 @@
         <div class="col-md-6">
             <label class="form-label form-label-black" for="validationCustom01">Project No <span class="text-danger f-w-550">*</span> </label>
             <input class="form-control js-validate js-project_project_no" name="project_no"  type="text"
+                   autocomplete="off"
                    value="{{isset($project->project_no) ? $project->project_no : old('project_no')}}">
         </div>
         <div class="col-md-6">
             <label class="form-label form-label-black" for="validationCustom02">Project Title <span class="text-danger f-w-550">*</span></label>
             <input class="form-control js-validate js-project_project_title" name="project_title" type="text"
+                   autocomplete="off"
                    value="{{isset($project->project_title) ? $project->project_title : old('project_title')}}">
         </div>
     </div>
@@ -30,11 +32,13 @@
         <div class="col-md-6">
             <label class="form-label form-label-black">Sub Project Title</label>
             <input class="form-control js-project_sub_project_title" name="sub_project_title" type="text"
+                   autocomplete="off"
                    value="{{isset($project->project_no) ? $project->sub_project_title : old('sub_project_title')}}" >
         </div>
         <div class="col-md-6">
             <label class="form-label form-label-black" for="validationCustom02">Project Sponsor <span class="text-danger f-w-550">*</span></label>
             <input class="form-control js-project_project_sponsor" name="project_sponsor" type="text"
+                   autocomplete="off"
                    value="{{isset($project->project_sponsor) ? $project->project_sponsor : old('project_sponsor')}}">
         </div>
     </div>
@@ -42,11 +46,13 @@
         <div class="col-md-6">
             <label class="form-label form-label-black" for="validationCustom02">Project Manager <span class="text-danger f-w-550">*</span></label>
             <input class="form-control js-project_project_manager" name="project_manager" type="text"
+                   autocomplete="off"
                    value="{{isset($project->project_manager) ? $project->project_manager : old('project_manager')}}">
         </div>
         <div class="col-md-6">
             <label class="form-label form-label-black" for="validationCustom02">Project Engineer <span class="text-danger f-w-550">*</span></label>
             <input class="form-control js-project_project_engineer" name="project_engineer" type="text"
+                   autocomplete="off"
                    value="{{isset($project->project_engineer) ? $project->project_engineer : old('project_engineer')}}">
         </div>
     </div>

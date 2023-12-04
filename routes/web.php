@@ -159,3 +159,8 @@ Route::post('/material/update-list/',[\App\Http\Controllers\MaterialController::
 Route::post('/project/{project:id}/update-remark',[\App\Http\Controllers\ProjectController::class,'updateRemark'])->middleware('auth');
 Route::get('/getEstimateToSync',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getEstimateToSync'])->middleware('auth');
 
+Route::get('/generatequery/man-power-work-items', [\App\Http\Controllers\GeneratorQueryController::class,'manPowerWorkItems']);
+Route::get('/generatequery/equipment-work-items', [\App\Http\Controllers\GeneratorQueryController::class,'equipmentWorkItem']);
+Route::get('/generatequery/material-work-items', [\App\Http\Controllers\GeneratorQueryController::class,'materialWorkItem']);
+Route::get('/convert', [\App\Http\Controllers\SettingController::class,'getUsdRateApi']);
+

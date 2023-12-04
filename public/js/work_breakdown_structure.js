@@ -312,6 +312,15 @@ $(function(){
         _amount.text(toCurrency(_totalAmount));
     })
 
+    $('.js-form-location').on('change keyup keydown', function(){
+        var _this = $(this);
+        if(_this.val() != ''){
+            _this.siblings('.js-add-btn-wbs').removeAttr('disabled')
+        } else {
+            _this.siblings('.js-add-btn-wbs').attr('disabled','disabled')
+        }
+    })
+
     $('.js-add-btn-wbs').on('click', function(){
         var _modal_loading = $('.js-modal-loading-wbs');
         var _data_discipline = ''

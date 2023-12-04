@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Http\Controllers\SettingController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -16,6 +17,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        $settingController = new SettingController();
+        $schedule->call(function () use ($settingController) {
+            $settingController->updateCurrencyUsd();
+        })->cron('00 07 * * *');
     }
 
     /**
