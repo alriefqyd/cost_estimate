@@ -57,7 +57,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td class="">* USD converted from IDR (1 USD = {{number_format($usdIdr,2)}}).</td>
+        <td class="">* USD converted from IDR (1 USD = {{toCurrency($usdIdr)}}).</td>
     </tr>
 
     <thead>
@@ -161,9 +161,9 @@
                     <td>{{$item?->workItemUnit}}</td>
                     <td>{{strToCurr($item?->workItemUnitRateLaborCost)}}</td>
                     <td>{{$item?->workItemTotalLaborCost}}</td>
-                    <td>{{$item?->workItemUnitRateToolCost}}</td>
+                    <td>{{strToCurr($item?->workItemUnitRateToolCost)}}</td>
                     <td>{{$item?->workItemTotalToolCost}}</td>
-                    <td>{{$item?->workItemUnitRateMaterialCost}}</td>
+                    <td>{{strToCurr($item?->workItemUnitRateMaterialCost)}}</td>
                     <td>{{$item?->workItemTotalMaterialCost}}</td>
                     <td></td>
                     <td></td>
