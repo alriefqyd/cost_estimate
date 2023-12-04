@@ -321,7 +321,8 @@ $(function(){
         }
     })
 
-    $('.js-add-btn-wbs').on('click', function(){
+    $('.js-add-btn-wbs').on('click', function(e){
+        e.preventDefault()
         var _modal_loading = $('.js-modal-loading-wbs');
         var _data_discipline = ''
         var _template_discipline = $('#js-template-nestable-wbs').html();
