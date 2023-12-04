@@ -96,7 +96,7 @@
                                     <td>:</td>
                                     <td>
                                         <div class="mb-1">{{$project?->designEngineerCivil?->profiles?->full_name}}</div>
-                                        <div class="mb-2 js-form-parent-approval">
+                                        {{-- <div class="mb-2 js-form-parent-approval">
                                             @if($project?->designEngineerCivil && auth()->user()->isDisciplineReviewer('civil'))
                                                 <div class="col">
                                                     <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
@@ -121,12 +121,12 @@
                                                     </div>
                                                 </div>
                                                 <div class="col mt-3">
-                                                    {{--<textarea class="form-control js-remark-pending d-none"
+                                                    <textarea class="form-control js-remark-pending d-none"
                                                               data-discipline="{{$setting::DESIGN_ENGINEER_LIST['civil']}}"
-                                                              rows="5" name="remark"></textarea>--}}
+                                                              rows="5" name="remark"></textarea>
                                                 </div>
                                             @endif
-                                        </div>
+                                        </div> --}}
                                     </td>
                                     <td>
 
@@ -137,7 +137,7 @@
                                     <td>:</td>
                                     <td>
                                         <div class="mb-2">{{$project?->designEngineerMechanical?->profiles?->full_name}}</div>
-                                        <div class="js-form-parent-approval">
+                                        {{-- <div class="js-form-parent-approval">
                                             @if($project?->designEngineerMechanical && auth()->user()->isDisciplineReviewer('mechanical'))
                                                 <div class="col">
                                                     <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
@@ -163,13 +163,13 @@
                                                 </div>
                                                 <div class="col">
                                                     <div class="col mt-3">
-                                                        {{--<textarea class="form-control js-remark-pending d-none"
+                                                        <textarea class="form-control js-remark-pending d-none"
                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['mechanical']}}"
-                                                                  rows="5" name="remark"></textarea>--}}
+                                                                  rows="5" name="remark"></textarea>
                                                     </div>
                                                 </div>
                                             @endif
-                                        </div>
+                                        </div> --}}
                                     </td>
                                     <td>
 
@@ -182,7 +182,7 @@
                                         <div class="mb-2">
                                             {{$project?->designEngineerElectrical?->profiles?->full_name}}
                                         </div>
-                                        <div class="js-form-parent-approval">
+                                        {{--<div class="js-form-parent-approval">
                                             @if($project?->designEngineerElectrical && auth()->user()->isDisciplineReviewer('electrical'))
                                                 <div class="col">
                                                     <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
@@ -208,13 +208,13 @@
                                                 </div>
                                                 <div class="col">
                                                     <div class="col mt-3">
-                                                        {{--<textarea class="form-control js-remark-pending d-none"
+                                                        <textarea class="form-control js-remark-pending d-none"
                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['mechanical']}}"
-                                                                  rows="5" name="remark"></textarea>--}}
+                                                                  rows="5" name="remark"></textarea>
                                                     </div>
                                                 </div>
                                             @endif
-                                        </div>
+                                        </div> --}}
                                     </td>
                                     <td>
 
@@ -225,7 +225,7 @@
                                     <td>:</td>
                                     <td>
                                         <div class="mb-2">{{$project?->designEngineerInstrument?->profiles?->full_name}}</div>
-                                        <div class="js-form-parent-approval">
+                                        {{--<div class="js-form-parent-approval">
                                             @if($project?->designEngineerInstrument && auth()->user()->isDisciplineReviewer('instrument'))
                                                 <div class="col">
                                                     <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
@@ -250,7 +250,7 @@
                                                     </div>
                                                 </div>
                                             @endif
-                                        </div>
+                                        </div>--}}
                                     </td>
                                     <td>
 
@@ -268,7 +268,7 @@
                                                 @endforeach
                                             @endif
                                         </div>
-                                        @if($project->getProjectStatusApproval() == $projectModel::WAITING_FOR_APPROVAL
+                                        {{-- @if($project->getProjectStatusApproval() == $projectModel::WAITING_FOR_APPROVAL
                                                 && auth()->user()->isCostEstimateReviewer() && $project->status != $projectModel::APPROVE)
                                             <div>
                                                 <button class="btn btn-outline-success js-btn-approve-modal" data-bs-toggle="modal" data-original-title="test" data-bs-target="#approveModal"><i class="fa fa-check"></i> Approve Cost Estimate</button>
@@ -289,7 +289,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endif
+                                        @endif --}}
                                     </td>
                                     <td>
 
@@ -416,7 +416,7 @@
                         <div class="col-sm-12 col-lg-12 col-xl-12">
                             <div class="clearfix"></div>
                             <div class="col-md-6">
-                                @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE)
+                                {{-- @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE) --}}
                                     <a href="/cost-estimate-summary/export/{{$project->id}}">
                                         <button data-id="{{$project->id}}"
                                             data-name="Cost Estimate - {{$project->project_no}} - {{$project->project_title}}.xlsx"
@@ -427,7 +427,7 @@
                                             </div>
                                         </button>
                                     </a>
-                                @endif
+                               {{-- @endif --}}
                             </div>
                             <div class="col-md-6 float-end">
                                 <div class="btn btn-primary js-fullscreen-detail mb-2 float-end">Maximize Table <i data-feather="maximize" style="width: 12px !important;"></i></div>

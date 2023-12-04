@@ -34,4 +34,9 @@ class ManPower extends Model
     public function getSkillLevel(){
         return Setting::SKILL_LEVEL[$this->skill_level] ?? "";
     }
+
+    public function getAmount(){
+        $coef = str_replace(',','.',$this->pivot->labor_coefisient);
+        return $this->overall_rate_hourly * (float) $coef;
+    }
 }

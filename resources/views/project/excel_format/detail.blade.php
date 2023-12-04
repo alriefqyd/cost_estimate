@@ -57,7 +57,7 @@
         <td></td>
         <td></td>
         <td></td>
-        <td class="">* USD converted from IDR (1 USD = 15,000 IDR).</td>
+        <td class="">* USD converted from IDR (1 USD = {{toCurrency($usdIdr)}}).</td>
     </tr>
 
     <thead>
@@ -105,9 +105,9 @@
                     <td style="background-color: #C4BD97">{{$idxAlphabet++}}</td>
                     <td style="background-color: #C4BD97"></td>
                     <td style="background-color: #C4BD97"></td>
-                    <td colspan="9" style="background-color: #C4BD97;font-weight: bold">{{$key}}</td>
+                    <td colspan="9" style="background-color: #C4BD97;font-weight: bold"></td>
                     <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost}}</td>
-                    <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost / USD_KURS }}</td>
+                    <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost / $usdIdr }}</td>
                 </tr>
             @endif
             @php($codeDiscipline = null);
@@ -159,7 +159,7 @@
                     <td colspan="">{{$item?->workItemDescription}}</td>
                     <td>{{$item?->estimateVolume}}</td>
                     <td>{{$item?->workItemUnit}}</td>
-                    <td>{{$item?->workItemUnitRateLaborCost}}</td>
+                    <td>{{strToCurr($item?->workItemUnitRateLaborCost)}}</td>
                     <td>{{$item?->workItemTotalLaborCost}}</td>
                     <td>{{$item?->workItemUnitRateToolCost}}</td>
                     <td>{{$item?->workItemTotalToolCost}}</td>

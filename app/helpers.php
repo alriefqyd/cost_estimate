@@ -16,5 +16,13 @@ if(!function_exists('toCurrency')) {
     }
 }
 
+if(!function_exists('strToCurr')) {
+    function strToCurr($val){
+        if(!$val) return '';
+        $newVal = str_replace(',','',$val);
+        return $newVal;
+    }
+}
+
 
 

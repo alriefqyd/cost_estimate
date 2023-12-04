@@ -142,13 +142,13 @@
                                             <td>{{$manPower->pivot?->labor_unit}}</td>
                                             <td>{{$manPower->pivot?->labor_coefisient}}</td>
                                             <td>{{number_format($manPower->overall_rate_hourly,2,',','.')}}</td>
-                                            <td>{{number_format($manPower->pivot?->amount,2,',','.')}}</td>
+                                            <td>{{number_format($manPower->getAmount(),2,',','.')}}</td>
                                         </tr>
                                     @endforeach
                                     <tr>
                                         <td><label>Total :</label></td>
                                         <td colspan="4" class="text-end">
-                                            <label>{{number_format($work_item->manPowers->sum('pivot.amount'),2,'.',',')}}</label>
+                                            <label>{{number_format($work_item->getTotalCostManPower(),2,'.',',')}}</label>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -207,7 +207,7 @@
                                     <tr>
                                         <td><label>Total :</label></td>
                                         <td colspan="5" class="text-end">
-                                            <label>{{number_format($work_item->equipmentTools->sum('pivot.amount'),2,'.',',')}}</label>
+                                            <label>{{number_format($work_item->getTotalCostEquipment(),2,'.',',')}}</label>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -259,14 +259,14 @@
                                         <td>{{$material->pivot?->unit}}</td>
                                         <td>{{number_format($material->pivot?->quantity,2,',','.')}}</td>
                                         <td>{{number_format($material->rate,2,',','.')}}</td>
-                                        <td>{{number_format($material->pivot?->amount,2,',','.')}}</td>
+                                        <td>{{number_format($material->getAmount(),2,',','.')}}</td>
                                         <td></td>
                                     </tr>
                                 @endforeach
                                 <tr>
                                     <td><label>Total :</label></td>
                                     <td colspan="5" class="text-end">
-                                        <label>{{number_format($work_item->materials->sum('pivot.amount'),2,'.',',')}}</label>
+                                        <label>{{number_format($work_item->getTotalCostMaterial(),2,'.',',')}}</label>
                                     </td>
                                 </tr>
                                 </tbody>
