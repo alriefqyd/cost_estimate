@@ -35,10 +35,10 @@
         <td>PROJECT TITLE : {{$project->project_title}}</td>
     </tr>
     <tr>
-        <td>PROJECT MANAGER : {{$project->project_manager}}</td>
+        <td>PROJECT MANAGER : {{$project->projectManager?->profiles?->full_name}}</td>
     </tr>
     <tr>
-        <td>PROJECT ENGINEER : {{$project->project_engineer}}</td>
+        <td>PROJECT ENGINEER : {{$project->projectEngineer?->profiles?->full_name}}</td>
     </tr>
     <tr>
         <td>DESIGN ENGINEER : {{$project->getAllEngineerExcel()}}</td>
