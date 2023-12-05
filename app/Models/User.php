@@ -96,9 +96,10 @@ class User extends Authenticatable
 
     public function scopeFilter($query, array $filters){
         $query->when($filters['q'] ?? false, fn($query,$q) =>
-        $query->where('name','like','%'.$q.'%')
-            ->orWhere('email','like','%'.$q.'%')
-        );
+        $q->whereHas('profiles', function($qquery) use ($q){
+            return $qquery->where('name','like','%'.$q.'%')
+                ->orWhere('email','like','%'.$q.'%');
+        }));
     }
 
     public function getDecryptPass(){
