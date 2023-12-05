@@ -3,6 +3,7 @@
 namespace App\Exports;
 
 use App\Http\Controllers\SettingController;
+use App\Models\Setting;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -106,11 +107,11 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         $formatNumber = 'E15:I100';
         if($this->isDetail) $formatNumber = 'G15:M300';
         $sheetColumnUsd = "I";
-        $sheet->getStyle($formatNumber)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_IDR);
+        $sheet->getStyle($formatNumber)->getNumberFormat()->setFormatCode(Setting::FORMAT_CURRENCY);
         if($this->isDetail) {
             $sheetColumnUsd = "N";
         }
-        $sheet->getStyle($sheetColumnUsd)->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_CURRENCY_USD);
+        $sheet->getStyle($sheetColumnUsd)->getNumberFormat()->setFormatCode(Setting::FORMAT_CURRENCY);
         $sheet->getStyle('A2:D5')->applyFromArray([
             'font' => [
                 'bold' => true,
