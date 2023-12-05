@@ -44,7 +44,7 @@
                         <br> {{$project->project_title}}
                     </td>
                     <td>{{$project->project_sponsor}}</td>
-                    <td>{{$project->project_manager}}</td>
+                    <td>{{$project->projectManager?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerMechanical?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerCivil?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerElectrical?->profiles?->full_name}}</td>

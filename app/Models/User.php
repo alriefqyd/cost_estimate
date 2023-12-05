@@ -82,6 +82,14 @@ class User extends Authenticatable
         return $this->hasOne(Project::class,'design_engineer_instrument');
     }
 
+    public function projectEngineer(){
+        return $this->hasOne(Project::class,'project_engineer');
+    }
+
+    public function projectManager(){
+        return $this->hasOne(Project::class,'project_manager');
+    }
+
     public function roles(){
         return $this->belongsToMany(Role::class,'user_role')->withPivot('created_by','updated_by');
     }
