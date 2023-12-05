@@ -35,10 +35,10 @@
         <td>PROJECT TITLE : {{$project->project_title}}</td>
     </tr>
     <tr>
-        <td>PROJECT MANAGER : {{$project->project_manager}}</td>
+            <td>PROJECT MANAGER : {{$project->projectManager?->profiles?->full_name}}</td>
     </tr>
     <tr>
-        <td>PROJECT ENGINEER : {{$project->project_engineer}}</td>
+        <td>PROJECT ENGINEER : {{$project->projectEngineer?->profiles?->full_name}}</td>
     </tr>
     <tr>
         <td>DESIGN ENGINEER : {{$project->getAllEngineerExcel()}}</td>
@@ -160,11 +160,11 @@
                     <td>{{$item?->estimateVolume}}</td>
                     <td>{{$item?->workItemUnit}}</td>
                     <td>{{strToCurr($item?->workItemUnitRateLaborCost)}}</td>
-                    <td>{{$item?->workItemTotalLaborCost}}</td>
+                    <td>{{$item?->workItemTotalLaborCost ?: ""}}</td>
                     <td>{{strToCurr($item?->workItemUnitRateToolCost)}}</td>
-                    <td>{{$item?->workItemTotalToolCost}}</td>
+                    <td>{{$item?->workItemTotalToolCost ?: ""}}</td>
                     <td>{{strToCurr($item?->workItemUnitRateMaterialCost)}}</td>
-                    <td>{{$item?->workItemTotalMaterialCost}}</td>
+                    <td>{{$item?->workItemTotalMaterialCost ?: ""}}</td>
                     <td></td>
                     <td></td>
                 </tr>
