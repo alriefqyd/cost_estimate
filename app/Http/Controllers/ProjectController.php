@@ -207,7 +207,7 @@ class ProjectController extends Controller
         $costProjects = $projectService->getAllProjectCost($project, $request);
         $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
-        $project = $project->load('projectArea');
+        $project = $project->load(['projectArea','projectEngineer', 'projectManager']);
 
         return view('project.detail',[
             'project' => $project,

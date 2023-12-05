@@ -75,6 +75,14 @@ class Project extends Model
         return $this->belongsTo(User::class,'design_engineer_instrument');
     }
 
+    public function projectManager(){
+        return $this->belongsTo(User::class,'project_manager');
+    }
+
+    public function projectEngineer(){
+        return $this->belongsTo(User::class,'project_engineer');
+    }
+
     public function workElements(){
         return $this->hasMany(WorkElement::class,'project_id');
     }

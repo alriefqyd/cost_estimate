@@ -53,7 +53,7 @@
                     name="project_manager" >
                 @if(isset($project->project_manager))
                     <option value="{{$project->project_manager}}">
-                        {{$project->project_manager?->profiles?->full_name}}
+                        {{$project->projectManager?->profiles?->full_name}}
                     </option>
                 @endif
                 <option value="{{NULL}}">NR</option>
@@ -69,7 +69,7 @@
                     name="project_engineer" >
                 @if(isset($project->project_engineer))
                     <option value="{{$project->project_engineer}}">
-                        {{$project->project_engineer?->profiles?->full_name}}
+                        {{$project->projectEngineer?->profiles?->full_name}}
                     </option>
                 @endif
                 <option value="{{NULL}}">NR</option>
