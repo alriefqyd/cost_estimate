@@ -45,15 +45,35 @@
     <div class="row g-3 mb-2">
         <div class="col-md-6">
             <label class="form-label form-label-black" for="validationCustom02">Project Manager <span class="text-danger f-w-550">*</span></label>
-            <input class="form-control js-project_project_manager" name="project_manager" type="text"
-                   autocomplete="off"
-                   value="{{isset($project->project_manager) ? $project->project_manager : old('project_manager')}}">
+            <select class="select2 form-control js-design-engineer js-project_project_manager"
+                    data-allowClear="true"
+                    data-url="/getUserEmployee"
+                    data-subject="project_manager"
+                    data-minimumInputLength="3"
+                    name="project_manager" >
+                @if(isset($project->project_manager))
+                    <option value="{{$project->project_manager}}">
+                        {{$project->project_manager?->profiles?->full_name}}
+                    </option>
+                @endif
+                <option value="{{NULL}}">NR</option>
+            </select>
         </div>
         <div class="col-md-6">
             <label class="form-label form-label-black" for="validationCustom02">Project Engineer <span class="text-danger f-w-550">*</span></label>
-            <input class="form-control js-project_project_engineer" name="project_engineer" type="text"
-                   autocomplete="off"
-                   value="{{isset($project->project_engineer) ? $project->project_engineer : old('project_engineer')}}">
+            <select class="select2 form-control js-design-engineer js-project_project_engineer"
+                    data-allowClear="true"
+                    data-url="/getUserEmployee"
+                    data-subject="project_engineer"
+                    data-minimumInputLength="3"
+                    name="project_engineer" >
+                @if(isset($project->project_engineer))
+                    <option value="{{$project->project_engineer}}">
+                        {{$project->project_engineer?->profiles?->full_name}}
+                    </option>
+                @endif
+                <option value="{{NULL}}">NR</option>
+            </select>
         </div>
     </div>
     <div class="row g-3 mb-2">

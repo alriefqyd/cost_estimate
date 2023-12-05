@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -25,7 +26,15 @@ class UserServices
         $key = $request->q;
         $data = User::with('profiles')->whereHas('profiles', function ($q) use ($subject, $key){
             return $q->when((isset($subject)), function($qq) use ($subject,$key){
-                return $qq->where('position',$subject);
+                if ($subject === 'project_engineer') {
+                    return $qq->orWhere('position', Profile::POSITION['design_civil_engineer'])
+                        ->orWhere('position', Profile::POSITION['design_mechanical_engineer'])
+                        ->orWhere('position', Profile::POSITION['design_electrical_engineer'])
+                        ->orWhere('position', Profile::POSITION['design_instrument_engineer'])
+                        ->orWhere('position', Profile::POSITION['project_manager']);
+                } else {
+                    return $qq->where('position', $subject);
+                }
             })->when((isset($key)), function($qq) use ($subject,$key){
                 return $qq->where('full_name','like','%'.$key.'%');
             });
