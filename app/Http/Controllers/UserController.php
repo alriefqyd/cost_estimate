@@ -127,7 +127,7 @@ class UserController extends Controller
         }
         $this->validate($request, [
             Rule::unique('users')->ignore($user->user_name),
-            Rule::unique('profiles')->ignore($user->profiles->email),
+            Rule::unique('profiles')->ignore($user->profiles?->email),
             'full_name' => 'required',
             'position' => 'required',
             'role' => 'required',
@@ -142,6 +142,11 @@ class UserController extends Controller
             $user->save();
 
             $profile = $user->profiles;
+            if(!$profile) {
+                $profile = new Profile();
+                $profile->user_id = $user->id;
+            }
+
             $profile->full_name = $request->full_name;
             $profile->email = $request->email;
             $profile->position = $request->position;

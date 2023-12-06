@@ -110,6 +110,8 @@ class Project extends Model
             $query->where('design_engineer_electrical',$q);
         })->when($filters['instrument'] ?? false, function($query, $q){
             $query->where('design_engineer_instrument',$q);
+        })->when($filters['sponsor'] ?? false, function($query, $q){
+            $query->where('project_area_id', $q);
         });
     }
 
