@@ -42,9 +42,9 @@
             @endforeach
         </select>
     </div>
-    <div class="col-md-6 js-other-position-form {{isset($user) && $user->profiles->position == 'others' ? '' : 'd-none'}}">
+    <div class="col-md-6 js-other-position-form {{isset($user) && $user->profiles?->position == 'others' ? '' : 'd-none'}}">
         <label class="form-label form-label-black m-0">Others Position</label>
-        <input type="text" class="form-control height-40" name="other_position" value="{{isset($user) ? $user?->profiles->other_position : old('other_position')}}">
+        <input type="text" class="form-control height-40" name="other_position" value="{{isset($user) ? $user?->profiles?->other_position : old('other_position')}}">
     </div>
 </div>
 <div class="row mb-1">
