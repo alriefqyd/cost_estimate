@@ -151,6 +151,9 @@ $(function(){
                 } else {
                     $('.js-modal-loading-wbs').modal('hide');
                     notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error')
+                    _nestable.nestable('destroy');
+                    _nestable.removeClass('nestable-initialized');
+                    _nestable.removeAttr('data-action');
                 }
             }
         })

@@ -71,13 +71,13 @@
                                 <tr>
                                     <td>Project Manager</td>
                                     <td>:</td>
-                                    <td class="m-2">{{$project->project_manager}}</td>
+                                    <td class="m-2">{{$project->projectManager?->profiles?->full_name}}</td>
                                     <td></td>
                                 </tr>
                                 <tr>
                                     <td>Project Engineer</td>
                                     <td>:</td>
-                                    <td class="m-2">{{$project->project_engineer}}</td>
+                                    <td class="m-2">{{$project->projectEngineer?->profiles?->full_name}}</td>
                                     <td></td>
                                 </tr>
                                 <tr>
