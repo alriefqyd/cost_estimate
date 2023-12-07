@@ -14,6 +14,7 @@ class SettingController extends Controller
             $setting->setting_value = $this->getUsdRateApi();
             $setting->updated_at = now();
             $setting->save();
+            Log::info('Running cron job update currency usd');
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }
