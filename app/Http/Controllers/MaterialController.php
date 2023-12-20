@@ -250,66 +250,15 @@ class MaterialController extends Controller
             try {
                 $file = $request->file('file');
                 $spreadsheet = IOFactory::load($file);
-                $sheetName = 'Material List';
-                $worksheet = $spreadsheet->getSheetByName($sheetName);
-
-                $data = [];
-                foreach ($worksheet->getRowIterator() as $row) {
-                    $rowData = [];
-                    foreach ($row->getCellIterator() as $cell) {
-                        $rowData[] = $cell->getValue();
-                    }
-                    $data[] = $rowData;
-                }
-
-                $codeToSave = [];
-                DB::beginTransaction();
-                foreach ($data as $row) {
-                    $uniqueValue = $row[1];
-                    $user = auth()->user()->id;
-                    $category = MaterialCategory::where('description', $row[3])->first();
-                    if(isset($category))
-                    {
-                        $dataToUpsert = [
-                            'code' => $row[1],
-                            'tool_equipment_description' => $row[2] ?? '',
-                            'category_id' => $category?->id,
-                            'quantity' => $row[4] ?? '',
-                            'unit' => $row[5] ?? '',
-                            'rate' => $row[6] ?? '',
-                            'ref_material_number' => $row[7] ?? '',
-                            'remark' => $row[9] ?? '',
-                            'status' => 'DRAFT',
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                            'created_by' => $user,
-                            'updated_by' => $user,
-                            'stock_code' => $row[10] ?? ''
-                        ];
-
-                        $codeToSave[] = $row[1];
-
-                        Material::updateOrInsert(
-                            ['code' => $uniqueValue],
-                            $dataToUpsert
-                        );
-                    }
-                }
-
-                // Delete records that exist in the database but not in the imported data
-                $codesToDelete = Material::whereNotIn('code', $codeToSave);
-                $codesToDelete->each(function ($record) {
-                    $record->delete();
-                });
-
-                DB::commit();
+                $this->importMaterialCategory($spreadsheet);
+                $this->importMaterialList($spreadsheet);
 
                 Log::info('Import material successful');
                 return response()->json(['message' => 'Import Successful']);
             } catch (\Exception $e) {
                 DB::rollback();
                 Log::error('Import error: ' . $e->getMessage());
-                return response()->json(['message' => 'Import failed'], 500);
+                return response()->json(['message' => $e->getMessage()], 500);
             }
         }
 
@@ -322,5 +271,105 @@ class MaterialController extends Controller
         Session::flash('type', $type);
         Session::flash('icon', $icon);
         Session::flash('status', $status);
+    }
+
+    public function importMaterialList($spreadsheet){
+        $sheetName = 'Material List';
+        $worksheet = $spreadsheet->getSheetByName($sheetName);
+
+        $data = [];
+        foreach ($worksheet->getRowIterator() as $row) {
+            $rowData = [];
+            foreach ($row->getCellIterator() as $cell) {
+                $rowData[] = $cell->getValue();
+            }
+            $data[] = $rowData;
+        }
+
+        $codeToSave = [];
+        DB::beginTransaction();
+        foreach ($data as $row) {
+            $uniqueValue = $row[1];
+            $user = auth()->user()->id;
+            $category = MaterialCategory::where('description', $row[3])->first();
+            if(isset($category))
+            {
+                $dataToUpsert = [
+                    'code' => $row[1],
+                    'tool_equipment_description' => $row[2] ?? '',
+                    'category_id' => $category?->id,
+                    'quantity' => $row[4] ?? '',
+                    'unit' => $row[5] ?? '',
+                    'rate' => $row[6] ?? '',
+                    'ref_material_number' => $row[7] ?? '',
+                    'remark' => $row[9] ?? '',
+                    'status' => 'DRAFT',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                    'created_by' => $user,
+                    'updated_by' => $user,
+                    'stock_code' => $row[10] ?? ''
+                ];
+
+                $codeToSave[] = $row[1];
+
+                Material::updateOrInsert(
+                    ['code' => $uniqueValue],
+                    $dataToUpsert
+                );
+            }
+        }
+
+        // Delete records that exist in the database but not in the imported data
+        $codesToDelete = Material::whereNotIn('code', $codeToSave);
+        $codesToDelete->each(function ($record) {
+            $record->delete();
+        });
+
+        DB::commit();
+    }
+
+    public function importMaterialCategory($spreadsheet){
+        $sheetName = 'Materials Category';
+        $worksheet = $spreadsheet->getSheetByName($sheetName);
+
+        $data = [];
+        foreach ($worksheet->getRowIterator() as $row) {
+            $rowData = [];
+            foreach ($row->getCellIterator() as $cell) {
+                $rowData[] = $cell->getValue();
+            }
+            $data[] = $rowData;
+        }
+
+        $codeToSave = [];
+        DB::beginTransaction();
+        foreach ($data as $row) {
+            $uniqueValue = $row[1];
+            if (isset($uniqueValue)) {
+                $dataToUpsert = [
+                    'code' => $row[1],
+                    'description' => $row[2] ?? '',
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+
+                $codeToSave[] = $row[1];
+
+                MaterialCategory::updateOrInsert(
+                    ['code' => $uniqueValue],
+                    $dataToUpsert
+                );
+            }
+        }
+
+
+        // Delete records that exist in the database but not in the imported data
+        $codesToDelete = Material::whereNotIn('code', $codeToSave);
+        $codesToDelete->each(function ($record) {
+            $record->delete();
+        });
+
+        DB::commit();
     }
 }
