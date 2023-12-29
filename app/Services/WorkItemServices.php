@@ -6,6 +6,8 @@ use App\Class\WorkItemClass;
 use App\Class\WorkItemRelationItemListClass;
 use App\Models\WorkItem;
 use Exception;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 
 class WorkItemServices
 {
@@ -59,5 +61,61 @@ class WorkItemServices
         } catch (Exception $e) {
             return $e->getMessage();
         }
+    }
+
+    public function duplicateRelationWorkItem($newWorkItem, $parent){
+        $manPowers = DB::table('man_powers_work_items')->where('work_item_id',$parent)->get();
+        $toolsEquipments = DB::table('work_items_equipment_tools')->where('work_item_id', $parent)->get();
+        $materials = DB::table('work_items_materials')->where('work_item_id', $parent)->get();
+
+        $currentDate = now()->toDateTimeString();
+        try {
+            if ($manPowers->isNotEmpty()) {
+                foreach ($manPowers as $manPower) {
+                    DB::table('man_powers_work_items')->insert([
+                        'work_item_id' => $newWorkItem->id,
+                        'man_power_id' => $manPower->man_power_id,
+                        'created_at' => $currentDate,
+                        'updated_at' => $currentDate,
+                        'labor_unit' => $manPower->labor_unit,
+                        'labor_coefisient' => $manPower->labor_coefisient,
+                        'amount' => $manPower->amount
+                    ]);
+                }
+            }
+            if ($toolsEquipments->isNotEmpty()) {
+                foreach ($toolsEquipments as $toolsEquipment) {
+                    DB::table('work_items_equipment_tools')->insert([
+                        'work_item_id' => $newWorkItem->id,
+                        'equipment_tools_id' => $toolsEquipment->equipment_tools_id,
+                        'unit' => $toolsEquipment->unit,
+                        'quantity' => $toolsEquipment->quantity,
+                        'unit_price' => $toolsEquipment->unit_price,
+                        'created_at' => $currentDate,
+                        'updated_at' => $currentDate,
+                        'amount' => $toolsEquipment->amount
+                    ]);
+                }
+
+            }
+            if ($materials->isNotEmpty()) {
+                foreach ($materials as $material) {
+                    DB::table('work_items_materials')->insert([
+                        'work_item_id' => $newWorkItem->id,
+                        'materials_id' => $material->materials_id,
+                        'unit' => $material->unit,
+                        'quantity' => $material->quantity,
+                        'unit_price' => $material->unit_price,
+                        'created_at' => $currentDate,
+                        'updated_at' => $currentDate,
+                        'amount' => $material->amount
+                    ]);
+                }
+
+            }
+        } catch (Exception $e){
+            return $e->getMessage();
+        }
+
     }
 }
