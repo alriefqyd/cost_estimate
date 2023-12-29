@@ -7,6 +7,7 @@ use App\Models\ManPowersWorkItems;
 use App\Models\Setting;
 use App\Models\WorkItem;
 use App\Models\WorkItemType;
+use App\Services\WorkItemServices;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -79,9 +80,11 @@ class WorkItemController extends Controller
     }
 
     public function store(Request $request){
+        $workItemService = new WorkItemServices();
         if(!auth()->user()->can('create',WorkItem::class)){
             abort(403);
         }
+
         $code = $request->code;
         $this->validate($request,[
             Rule::unique('work_items')->where(function ($query) use ($request, $code) {
@@ -106,6 +109,7 @@ class WorkItemController extends Controller
                 'created_by' => auth()->user()->id
             ]);
             $workItem->save();
+            $workItemService->duplicateRelationWorkItem($workItem,$request->parent_id);
             DB::commit();
             return redirect('work-item/'.$workItem->id);
         } catch(\Exception $e){
@@ -457,7 +461,8 @@ class WorkItemController extends Controller
                         "code" => $subItems->code,
                         "totalChild" => $subItems->countChildren(),
                         "text" => $subItems->description,
-                        "vol" => $subItems->unit,
+                        "unit" => $subItems->unit,
+                        "vol" => $subItems->volume,
                         "manPowers" => $manPowersArr,
                         "manPowersTotalRate" => $this->toCurrency($totalRateManPowers),
                         "manPowersTotalRateInt" => $totalRateManPowers,

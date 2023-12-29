@@ -33,9 +33,6 @@
     <div class="col-md-4">
         <label class="form-label form-label-black m-0" for="validationCustom01">Code</label>
         <div class="input-group">
-{{--            @if(!$isEdit)--}}
-{{--                <input type="text" class="input-group-text col-4 js-prefix-code" name="prefix_code" value="{{$work_item_type[0]->code}}.">--}}
-{{--            @endif--}}
             <input class="form-control js-confirm-form js-validate js-work-item-code js-project_project_no height-40" name="code" type="text"
                    disabled
                    value="{{isset($work_item?->code) ? $work_item->code : old('code')}}">
@@ -45,13 +42,13 @@
     </div>
     <div class="col-md-4">
         <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Volume</label>
-        <input class="form-control js-material-quantity height-40 js-confirm-form"
+        <input class="form-control js-vol-work-item height-40 js-confirm-form"
                value="{{isset($work_item?->volume) ? $work_item?->volume : old('volume')}}"
                name="volume" type="number">
     </div>
     <div class="col-md-4">
         <label class="form-label form-label-black m-0" for="exampleFormControlInput1">Unit</label>
-        <input class="form-control js-material-unit height-40 js-confirm-form"
+        <input class="form-control js-unit-work-item height-40 js-confirm-form"
                value="{{isset($work_item?->unit) ? $work_item->unit : old('unit')}}"
                name="unit" type="text">
     </div>
