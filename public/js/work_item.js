@@ -237,6 +237,8 @@ $(function(){
            $('.js-parent-work-item').val(_val);
             var _code = _this.select2('data')[0].code;
             var _work_item_desc = _this.select2('data')[0].text;
+            var _volume = _this.select2('data')[0].vol;
+            var _unit = _this.select2('data')[0].unit;
 
             $.ajax({
                 method:'get',
@@ -246,6 +248,8 @@ $(function(){
                 }
             });
 
+            $('.js-vol-work-item').val(_volume);
+            $('.js-unit-work-item').val(_unit);
             $('.js-work-description').val(_work_item_desc);
         }
     });
