@@ -388,14 +388,14 @@ class WorkItemController extends Controller
                     });
                 })->when(!auth()->user()->isWorkItemReviewer(), function($query) {
                     return $query->where(function($q){
-                      return $q->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id);
+                        return $q->where('status', WorkItem::REVIEWED)
+                            ->orWhere('created_by', auth()->user()->id);
                     });
-                })->when(isset($request->category), function($query) use ($request){
+                })->when(isset($request->category) && $request->isCustom == "false", function($query) use ($request){
                     return $query->where('work_item_type_id', $request->category);
                 })->when(isset($request->term), function($query) use ($request){
                     return $query->where('description','like','%'.$request->term.'%');
-                })->get()->groupBy('workItemTypes.id');
-
+                })->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id)->get()->groupBy('workItemTypes.id');
             return $item;
         } catch (\Exception $e){
             return $e->getMessage();
@@ -536,7 +536,7 @@ class WorkItemController extends Controller
             switch ($type){
                 case 'man_power':
                     $cost[] = $item->workItems?->manPowers()->sum('amount') * $item?->volume;
-                break;
+                    break;
                 case 'tool_equipments':
                     $cost[] = $this->getTotalAmountToolsEquipment($item?->workItems?->equipmentTools) * $item?->volume;
                     break;
@@ -594,7 +594,7 @@ class WorkItemController extends Controller
         return $sum;
     }
 
-        public function removeCommaCurrencyFormat($val){
+    public function removeCommaCurrencyFormat($val){
         if(!$val) return 0;
         return str_replace(',','',$val);
     }
@@ -617,7 +617,16 @@ class WorkItemController extends Controller
 
         return response()->json([
             'status' => 200,
-            'data' => $code
+            'data' => $code,
+        ]);
+    }
+
+    public function getNumChildType(WorkItemType $workItemtype, Request $request){
+        $workItem = WorkItem::where('type', $workItemtype->id)->count();
+
+        return response()->json([
+            'status' => 200,
+            'data' => $workItemtype->code . $workItem
         ]);
     }
 
