@@ -395,7 +395,7 @@ class WorkItemController extends Controller
                     return $query->where('work_item_type_id', $request->category);
                 })->when(isset($request->term), function($query) use ($request){
                     return $query->where('description','like','%'.$request->term.'%');
-                })->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id)->get()->groupBy('workItemTypes.id');
+                })->get()->groupBy('workItemTypes.id');
             return $item;
         } catch (\Exception $e){
             return $e->getMessage();
