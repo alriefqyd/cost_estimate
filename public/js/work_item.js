@@ -267,11 +267,11 @@ $(function(){
                         $('.js-work-item-code').val(result.data);
                     }
                 });
-
-                $('.js-vol-work-item').val(_volume);
-                $('.js-unit-work-item').val(_unit);
-                $('.js-work-description').val(_work_item_desc);
             }
+
+            $('.js-vol-work-item').val(_volume);
+            $('.js-unit-work-item').val(_unit);
+            $('.js-work-description').val(_work_item_desc);
         }
     });
 
