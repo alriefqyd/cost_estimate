@@ -77,6 +77,14 @@ Route::get('/work-item/{workItem:id}/material/edit',[\App\Http\Controllers\WorkI
 Route::post('/work-item/{workItem:id}/material',[\App\Http\Controllers\WorkItemController::class,'storeMaterial'])->middleware('auth');
 Route::post('/work-item/{workItem:id}/material/update',[\App\Http\Controllers\WorkItemController::class,'updateMaterial'])->middleware('auth');
 
+Route::get('/work-item-category/',[\App\Http\Controllers\WorkItemTypeController::class,'index'])->middleware('auth');
+Route::get('/work-item-category/create',[\App\Http\Controllers\WorkItemTypeController::class,'create'])->middleware('auth');
+Route::post('/work-item-category/',[\App\Http\Controllers\WorkItemTypeController::class,'store'])->middleware('auth');
+Route::put('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'update'])->middleware('auth');
+Route::get('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'show'])->middleware('auth');
+Route::delete('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'destroy'])->middleware('auth');
+
+
 Route::get('/man-power/',[\App\Http\Controllers\ManPowerController::class,'index'])->middleware('auth');
 Route::get('/man-power/create',[\App\Http\Controllers\ManPowerController::class,'create'])->middleware('auth');
 Route::get('/man-power/export',[\App\Http\Controllers\ManPowerController::class,'export'])->middleware('auth');
@@ -142,6 +150,7 @@ Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'updat
 Route::get('/check',[\App\Http\Controllers\EstimateAllDisciplineController::class,'check'])->name('check')->middleware('auth');
 Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
 Route::get('/getNumChild/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChild'])->name('getNumChild')->middleware('auth');
+Route::get('/getNumChildType/{workItemType:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChildType'])->name('getNumChildType')->middleware('auth');
 Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getMaterial'])->name('getMaterial')->middleware('auth');
 Route::get('/getToolsEquipment',[\App\Http\Controllers\EquipmentToolsController::class,'getToolsEquipment'])->name('getToolsEquipment')->middleware('auth');
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');
