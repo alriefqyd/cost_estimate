@@ -20,10 +20,17 @@
                         </li>
                     @endCan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\WorkItem::class)
-                        <li class="margin-sm">
-                            <a class="nav-link menu-title" href="/work-item"><i data-feather="briefcase"></i>
+                        <li class="dropdown margin-sm">
+                            <a class="nav-link menu-title" href="javascript:void(0)"><i data-feather="briefcase"></i>
                                 <label class="text-small">Work Item</label>
                             </a>
+                            <ul class="nav-submenu menu-content">
+                                <li class="p-0 m-0 cursor-pointer"><a class="cursor-pointer" href="/work-item"><label class="text-small">
+                                            Work Item List <i class="fa fa-chevron-right"></i>
+                                        </label></a></li>
+                                <li class="p-0 m-0 cursor-pointer"><a class="cursor-pointer" href="/work-item-category"><label class="text-small">Work Item Category
+                                            <i class="fa fa-chevron-right"></i> </label></a></li>
+                            </ul>
                         </li>
                     @endcan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\ManPower::class)
