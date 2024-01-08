@@ -22,7 +22,7 @@
                                 <div style="width: 20%">
                                     @customDirective()
                                 </div>
-                                <div class="media-body"><span>{{auth()->user()->profiles?->full_name}}</span>
+                                <div class="media-body"><a href="/user/{{auth()->user()->id}}"> <span>{{auth()->user()->profiles?->full_name}}</span></a>
                                     <p class="f-12 light-font">{{auth()->user()->profiles?->getPosition()}}</p>
                                 </div>
                             </div>

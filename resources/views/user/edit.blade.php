@@ -37,7 +37,9 @@
                             <div class="row">
                                 @csrf
                                 @method('put')
-                                @include('user.form')
+                                @include('user.form', [
+                                    'isEdit' => true
+                                ])
                             </div>
                         </form>
                     </div>

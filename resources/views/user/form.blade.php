@@ -14,23 +14,68 @@
 </div>
 <div class="row mb-1">
     <div class="col-md-6">
-        <label class="form-label form-label-black m-0" for="validationCustom01">Password</label>
-        <div class="input-group">
-            <input class="form-control js-validate js-password js-user-password height-40" name="password"  type="password"
-                   autocomplete="off"
-                   value="">
-            <div class="input-group-text pt-2">
-                <i class="fa fa-eye cursor-pointer js-show-hide-password"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
         <label class="form-label form-label-black m-0" for="validationCustom01">Full Name</label>
         <input class="form-control js-validate js-user-full-name height-40" name="full_name"  type="text"
                value="{{isset($user?->profiles?->full_name) ? $user?->profiles?->full_name : old('full_name')}}">
     </div>
 </div>
+@if($isEdit)
+    <div class="row mb-2">
+        <div class="col-md-6">
+            <div class="checkbox checkbox-dark m-squar">
+                <input id="js-update_password_check" name="updatePassword" type="checkbox">
+                <label class="mt-0" for="js-update_password_check">Change Password</label>
+            </div>
+        </div>
+    </div>
 
+    <div class="row mb-1 js-update-password d-none">
+        <div class="col-md-6">
+            <label class="form-label form-label-black m-0" for="validationCustom01">Current Password</label>
+            <div class="input-group">
+                <input class="form-control js-validate js-password js-user-password height-40" name="old_password"  type="password"
+                       autocomplete="off"
+                       value="">
+                <div class="input-group-text pt-2">
+                    <i class="fa fa-eye cursor-pointer js-show-hide-password"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label form-label-black m-0" for="validationCustom01">New Password</label>
+            <div class="input-group">
+                <input class="form-control js-validate js-password js-user-password height-40" name="new_password"  type="password"
+                       autocomplete="off"
+                       value="">
+                <div class="input-group-text pt-2">
+                    <i class="fa fa-eye cursor-pointer js-show-hide-password"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+@else
+    <div class="row mb-1">
+        <div class="col-md-6">
+            <label class="form-label form-label-black m-0" for="validationCustom01">Password</label>
+            <div class="input-group">
+                <input class="form-control js-validate js-password js-user-password height-40" name="password"  type="password"
+                       autocomplete="off"
+                       value="">
+                <div class="input-group-text pt-2">
+                    <i class="fa fa-eye cursor-pointer js-show-hide-password"></i>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label form-label-black m-0" for="validationCustom01">Full Name</label>
+            <input class="form-control js-validate js-user-full-name height-40" name="full_name"  type="text"
+                   value="{{isset($user?->profiles?->full_name) ? $user?->profiles?->full_name : old('full_name')}}">
+        </div>
+    </div>
+@endif
+
+
+@if(isset($isUserHaveAccess) && $isUserHaveAccess == true)
 <div class="row mb-1">
     <div class="col-md-6">
         <label class="form-label form-label-black m-0" for="validationCustom01">Position</label>
@@ -56,7 +101,7 @@
         </select>
     </div>
 </div>
-
+@endif
 <div class="row">
     <div class="col-md-12 mt-5 text-end">
         <button class="btn js-btn-save-wbs-setting btn-outline-success">Save</button>

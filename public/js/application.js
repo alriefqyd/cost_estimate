@@ -334,4 +334,21 @@ $(function(){
             }
         });
     });
+
+    /**
+     * User Form
+     *
+     */
+
+    $(document).on('change', '#js-update_password_check', function (){
+       var _this = $(this);
+       if(_this.is(':checked')){
+            $('.js-update-password').removeClass('d-none')
+       } else {
+           $('.js-update-password').addClass('d-none')
+           $('.js-password').val('');
+       }
+    });
+
+
 });
