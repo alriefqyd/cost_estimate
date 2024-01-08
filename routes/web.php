@@ -25,7 +25,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified'
 ])->group(function () {
-    Route::get('/', [\App\Http\Controllers\ProjectController::class,'index'])->name('project.index')->middleware('auth');
+    Route::get('/', [\App\Http\Controllers\HomeController::class,'index'])->name('home.index')->middleware('auth');
 });
 
 Route::get('/project',[\App\Http\Controllers\ProjectController::class,'index'])->middleware('auth');
@@ -81,7 +81,7 @@ Route::get('/work-item-category/',[\App\Http\Controllers\WorkItemTypeController:
 Route::get('/work-item-category/create',[\App\Http\Controllers\WorkItemTypeController::class,'create'])->middleware('auth');
 Route::post('/work-item-category/',[\App\Http\Controllers\WorkItemTypeController::class,'store'])->middleware('auth');
 Route::put('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'update'])->middleware('auth');
-Route::get('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'show'])->middleware('auth');
+Route::get('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'sh\ow'])->middleware('auth');
 Route::delete('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'destroy'])->middleware('auth');
 
 
