@@ -1,5 +1,5 @@
 <!-- Page Sidebar Start-->
-<header class="main-nav">
+<header class="main-nav {{request()->segment(1) == "" ? "close_icon" : ""}}">
     <nav>
         <div class="main-navbar mt-1">
             <div class="left-arrow" id="left-arrow"><i data-feather="arrow-left"></i></div>
