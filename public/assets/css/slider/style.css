@@ -75,7 +75,7 @@
         .owl-carousel.home-slider .slider-item .slider-text h1 {
           font-size: 4vw;
           font-weight: 547;
-            margin-left: -150px;
+            /*margin-left: -150px;*/
           color: #fff;
           line-height: 1; }
           @media (max-width: 991.98px) {
@@ -88,7 +88,7 @@
           font-weight: 700;
           color: white;
           color: #f5e4c3;
-            margin-left: -140px;
+            /*margin-left: -140px;*/
           display: inline-block;
           position: relative;
           letter-spacing: 4px; }

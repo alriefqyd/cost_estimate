@@ -6,12 +6,15 @@
             <div class="slider-item js-fullheight" style="background-image:url({{ asset('/assets/images/vale2.jpg') }}); height: 550px">
                 <div class="overlay"></div>
                 <div class="container">
-                    <div class="row no-gutters slider-text js-fullheight align-items-center ">
-                        <div class="col-md-12 ftco-animate">
+                    <div class="row slider-text js-fullheight align-items-center m-l-25">
+                        <div class="col-md-12 m-t-5 ftco-animate">
                             <div class="text-animation-slider">
                                 <h1>Cost Estimate</h1>
                                 <h2 class="mb-3">Every Count Matters!</h2>
                             </div>
+                            <a href="/project" class="btn btn-square btn-outline-primary btn-outline-light-2x shadow" style="border-color: white; color: white; font-size: 15px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);" role="button" data-bs-original-title="" title="">
+                                Create Cost Estimate
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -19,12 +22,15 @@
             <div class="slider-item js-fullheight" style="background-image:url({{ asset('/assets/images/vale1.jpg') }}); height: 550px">
                 <div class="overlay"></div>
                 <div class="container">
-                    <div class="row no-gutters slider-text js-fullheight align-items-center ">
-                        <div class="col-md-12 ftco-animate">
+                    <div class="row slider-text js-fullheight align-items-center m-l-25">
+                        <div class="col-md-12 m-t-5 ftco-animate">
                             <div class="text-animation-slider">
                                 <h1>Cost Estimate</h1>
                                 <h2 class="mb-3">Every Count Matters!</h2>
                             </div>
+                            <a href="/project" class="btn btn-square btn-outline-primary btn-outline-light-2x" style="border-color: white; color: white; font-size: 15px;" role="button" data-bs-original-title="" title="">
+                                Create Cost Estimate
+                            </a>
                         </div>
                     </div>
                 </div>
