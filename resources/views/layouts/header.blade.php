@@ -1,15 +1,14 @@
 <!-- Page Header Start-->
-<div class="page-main-header">
+<div class="page-main-header {{request()->segment(1) == "" ? "close_icon" : ""}}">
     <div class="main-header-right row m-0">
         <div class="main-header-left">
             <div class="float-start">
-                <img class="img-fluid onhover-dropdown" style src="{{asset('/assets/images/logo-vale-256.png')}}" alt="">
-                <div class="dark-logo-wrapper"><a href=""><img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt=""></a></div>
-
+                <a href="/">
+                    <img class="img-fluid onhover-dropdown" style src="{{asset('/assets/images/logo-vale-256.png')}}" alt="">
+                    <div class="dark-logo-wrapper"><a href=""><img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt=""></a></div>
+                </a>
             </div>
-            <div class="float-end">
-                <div class="toggle-sidebar mt-2"><i class="status_toggle middle fa fa-navicon"></i></div>
-            </div>
+            <div class="toggle-sidebar " style="width: 40px; padding: 0; margin-left: 2px; margin-right: 2px; margin-top: 17px;"><span style="" > <i data-feather="align-justify"></i></span></div>
         </div>
         <div class="nav-right col pull-right right-menu p-0">
             <div class="float-end mr-6">
