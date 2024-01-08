@@ -141,7 +141,7 @@ Route::delete('/work-breakdown-structure/work-element/{id}',[\App\Http\Controlle
 Route::get('/user',[\App\Http\Controllers\UserController::class,'index'])->middleware('auth');
 Route::get('/user/create',[\App\Http\Controllers\UserController::class,'create'])->middleware('auth')->can('create',User::class);
 Route::post('/user',[\App\Http\Controllers\UserController::class,'store'])->middleware('auth')->can('create',User::class);
-Route::get('/user/{user:id}',[\App\Http\Controllers\UserController::class,'edit'])->middleware('auth')->can('viewAny',User::class);
+Route::get('/user/{user:id}',[\App\Http\Controllers\UserController::class,'edit'])->middleware('auth');
 Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'update'])->middleware('auth');
 
 /**

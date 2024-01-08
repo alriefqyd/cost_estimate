@@ -10,9 +10,9 @@
                         <div class="col-md-12 m-t-5 ftco-animate">
                             <div class="text-animation-slider">
                                 <h1>Cost Estimate</h1>
-                                <h2 class="mb-3">Every Count Matters!</h2>
+                                <h2 class="mb-3 m-l-5">Every Count Matters!</h2>
                             </div>
-                            <a href="/project" class="btn btn-square btn-outline-primary btn-outline-light-2x shadow" style="border-color: white; color: white; font-size: 15px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);" role="button" data-bs-original-title="" title="">
+                            <a href="/project" class="btn btn-square btn-outline-primary btn-outline-light-2x shadow m-l-5" style="border-color: white; color: white; font-size: 15px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);" role="button" data-bs-original-title="" title="">
                                 Create Cost Estimate
                             </a>
                         </div>
@@ -26,9 +26,9 @@
                         <div class="col-md-12 m-t-5 ftco-animate">
                             <div class="text-animation-slider">
                                 <h1>Cost Estimate</h1>
-                                <h2 class="mb-3">Every Count Matters!</h2>
+                                <h2 class="mb-3 m-l-5">Every Count Matters!</h2>
                             </div>
-                            <a href="/project" class="btn btn-square btn-outline-primary btn-outline-light-2x" style="border-color: white; color: white; font-size: 15px;" role="button" data-bs-original-title="" title="">
+                            <a href="/project" class="btn btn-square btn-outline-primary btn-outline-light-2x m-l-5" style="border-color: white; color: white; font-size: 15px;" role="button" data-bs-original-title="" title="">
                                 Create Cost Estimate
                             </a>
                         </div>
