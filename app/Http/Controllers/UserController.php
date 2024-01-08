@@ -52,8 +52,10 @@ class UserController extends Controller
     }
 
     public function edit(User $user, Request $request){
+        $isUserHaveAccess = true;
         if(auth()->user()->cannot('update',User::class)){
-            return view('not_authorized');
+            $user = auth()->user();
+            $isUserHaveAccess = false;
         }
         $role = Role::with(['users'])->get();
         $position = PROFILE::POSITION;
@@ -67,7 +69,8 @@ class UserController extends Controller
             'user' => $user,
             'roles' => $role,
             'existingRole' => $existingRole,
-            'position' => $position
+            'position' => $position,
+            'isUserHaveAccess' => $isUserHaveAccess
         ]);
     }
 
@@ -122,23 +125,48 @@ class UserController extends Controller
     }
 
     public function update(User $user, Request $request){
+        $isUserAuthorize = $user->id == auth()->user()->id;
         if(auth()->user()->cannot('update',User::class)){
-            abort(403);
+            if(!$isUserAuthorize) abort(403);
         }
-        $this->validate($request, [
+
+        $validateAuthorize = [
             Rule::unique('users')->ignore($user->user_name),
             Rule::unique('profiles')->ignore($user->profiles?->email),
             'full_name' => 'required',
             'position' => 'required',
             'role' => 'required',
-        ]);
+        ];
 
+        if($isUserAuthorize){
+            $validateAuthorize = [
+                Rule::unique('users')->ignore($user->user_name),
+                Rule::unique('profiles')->ignore($user->profiles?->email),
+                'full_name' => 'required',
+                ];
+            }
+
+
+
+        $this->validate($request,
+            $validateAuthorize
+        );
         DB::beginTransaction();
         try{
             $user->user_name = $request->user_name;
-            if(isset($request->password) && ! Hash::check($request->password, $user->password)) {
-                $user->password = Hash::make($request->password);
+
+            if($request->updatePassword == "on"){
+                if(isset($request->old_password) && isset($request->new_password)){
+                    if(Hash::check($request->old_password, $user->password)){
+                        $user->password = Hash::make($request->new_password);
+                    } else {
+                        DB::rollBack();
+                        return redirect('/user/'.$user->id)->withErrors('wrong old password');
+                    }
+
+                }
             }
+
             $user->save();
 
             $profile = $user->profiles;
@@ -147,28 +175,36 @@ class UserController extends Controller
                 $profile->user_id = $user->id;
             }
 
+
             $profile->full_name = $request->full_name;
             $profile->email = $request->email;
-            $profile->position = $request->position;
-            $profile->other_position = $request->other_position;
+            if(auth()->user()->can('update',User::class)){
+                $profile->position = $request->position;
+                $profile->other_position = $request->other_position;
+            }
+
             $profile->save();
 
             $roles = $request->role;
 
-            $pivotData = [];
-            foreach ($roles as $roleId) {
-                $pivotData[$roleId] = [
-                    'created_by' => auth()->user()->id,
-                    'updated_by' => auth()->user()->id,
-                    'created_at' => Carbon::now(),
-                    'updated_at' => Carbon::now()
-                ];
+            if(auth()->user()->can('update',User::class)){
+                $pivotData = [];
+                foreach ($roles as $roleId) {
+                    $pivotData[$roleId] = [
+                        'created_by' => auth()->user()->id,
+                        'updated_by' => auth()->user()->id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ];
+                }
+                $user->roles()->sync($pivotData);
             }
-            $user->roles()->sync($pivotData);
+
             DB::commit();
 
             $this->message('Data was successfully saved','success','fa fa-check','Success');
-            return redirect('/user/');
+            if(auth()->user()->can('update',User::class)) return redirect('/user/');
+            return redirect('/user/'.$user->id);
         } catch (Exception $e) {
             DB::rollback();
             return redirect('/user/'. $user->id)->withErrors($e->getMessage());

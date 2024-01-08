@@ -33,7 +33,9 @@
                         <form method="post" action="/user">
                             <div class="row">
                                 @csrf
-                                @include('user.form')
+                                @include('user.form',[
+                                    'isEdit' => true
+                                ])
                             </div>
                         </form>
                     </div>
