@@ -47,6 +47,7 @@
             <label class="form-label form-label-black" for="validationCustom02">Project Manager <span class="text-danger f-w-550">*</span></label>
             <select class="select2 form-control js-design-engineer js-project_project_manager"
                     data-allowClear="true"
+                    data-placeholder="Select Project Manager"
                     data-url="/getUserEmployee"
                     data-subject="project_manager"
                     data-minimumInputLength="3"
@@ -65,6 +66,7 @@
                     data-allowClear="true"
                     data-url="/getUserEmployee"
                     data-subject="project_engineer"
+                    data-placeholder="Select Project Engineer"
                     data-minimumInputLength="3"
                     name="project_engineer" >
                 @if(isset($project->project_engineer))
@@ -85,6 +87,7 @@
                         <select class="select2 form-control js-design-engineer js-project_engineer_civil"
                                 data-allowClear="true"
                                 data-url="/getUserEmployee"
+                                data-placeholder="Select Design Engineer Civil"
                                 data-subject="design_civil_engineer"
                                 name="design_engineer_civil" >
                             @if(isset($project->design_engineer_civil))
@@ -107,6 +110,7 @@
                         <select class="select2 form-control js-design-engineer js-project_engineer_mechanical"
                                 data-allowClear="true"
                                 data-url="/getUserEmployee"
+                                data-placeholder="Select Design Engineer Mechanical"
                                 data-subject="design_mechanical_engineer"
                                 data-minimumInputLength="3"
                                 name="design_engineer_mechanical" >
@@ -132,6 +136,7 @@
                         <select class="select2 form-control js-design-engineer js-project_engineer_electrical"
                                 data-allowClear="true"
                                 data-url="/getUserEmployee"
+                                data-placeholder="Select Design Engineer Electrical"
                                 data-subject="design_electrical_engineer"
                                 data-minimumInputLength="3"
                                 name="design_engineer_electrical" >
@@ -155,6 +160,7 @@
                         <select class="select2 form-control js-design-engineer js-project_engineer_instrument"
                                 data-allowClear="true"
                                 data-url="/getUserEmployee"
+                                data-placeholder="Select Design Engineer Instrument"
                                 data-subject="design_instrument_engineer"
                                 data-minimumInputLength="3"
                                 name="design_engineer_instrument" >
