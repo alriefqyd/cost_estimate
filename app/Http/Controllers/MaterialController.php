@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\MaterialExport;
 use App\Exports\MaterialMasterExport;
-use App\Models\ManPower;
+use App\Imports\MaterialCategoryImport;
+use App\Imports\MaterialImport;
 use App\Models\Material;
 use App\Models\MaterialCategory;
 use Exception;
@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
-use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class MaterialController extends Controller
 {
@@ -240,19 +239,17 @@ class MaterialController extends Controller
             Log::info($e->getMessage());
             return response()->json('Import Failed : ' . $e->getMessage());
         }
-
     }
 
     public function import(Request $request){
-        if ($request->hasFile('file')) {
+        $file = $request->file('file');
+        $file_category = $request->file('file_category');
+        if ($request->hasFile('file') && $request->hasFile('file_category')) {
             Log::info('Starting import Materials...');
 
             try {
-                $file = $request->file('file');
-                $spreadsheet = IOFactory::load($file);
-                $this->importMaterialCategory($spreadsheet);
-                $this->importMaterialList($spreadsheet);
-
+                Excel::import(new MaterialCategoryImport, $file_category);
+                Excel::import(new MaterialImport, $file);
                 Log::info('Import material successful');
                 return response()->json(['message' => 'Import Successful']);
             } catch (\Exception $e) {
@@ -313,18 +310,15 @@ class MaterialController extends Controller
 
                 $codeToSave[] = $row[1];
 
-                Material::updateOrInsert(
+                Material::updateOrCreate(
                     ['code' => $uniqueValue],
-                    $dataToUpsert
+                    $dataToUpsert + ['created_at' => now(), 'created_by' => $user]
                 );
             }
         }
 
         // Delete records that exist in the database but not in the imported data
-        $codesToDelete = Material::whereNotIn('code', $codeToSave);
-        $codesToDelete->each(function ($record) {
-            $record->delete();
-        });
+        Material::whereNotIn('code', $codeToSave)->delete();
 
         DB::commit();
     }

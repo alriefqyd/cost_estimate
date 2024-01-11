@@ -214,7 +214,15 @@
                         <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <input type="file" name="file">
+                        <label>Material List :</label>
+                        <div><input type="file" name="file"></div>
+                        <div class="mt-3">
+                            <div class="progress d-none">
+                                <div class="progress-bar progress-bar-animated bg-primary progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                        <label>Material Category :</label>
+                        <div><input type="file" name="file_category"></div>
                         <div class="mt-3">
                             <div class="progress d-none">
                                 <div class="progress-bar progress-bar-animated bg-primary progress-bar-striped" role="progressbar" style="width: 0%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
