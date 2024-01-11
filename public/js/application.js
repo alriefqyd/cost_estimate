@@ -310,7 +310,7 @@ $(function(){
         if (!allowedExtensions.includes(fileExtension.toLowerCase())) {
             $('.js-modal-import').modal('hide');
             $('.js-modal-loading-import').modal('hide');
-            notification('danger','Wrong Extension File', 'fa fa-time','Error')
+            notification('danger','Please re check your file', 'fa fa-time','Error')
             return; // Prevent the request if the extension is not allowed
         }
 
