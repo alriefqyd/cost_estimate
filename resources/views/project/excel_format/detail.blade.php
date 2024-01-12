@@ -105,7 +105,7 @@
                     <td style="background-color: #C4BD97">{{$idxAlphabet++}}</td>
                     <td style="background-color: #C4BD97"></td>
                     <td style="background-color: #C4BD97"></td>
-                    <td colspan="9" style="background-color: #C4BD97;font-weight: bold"></td>
+                    <td colspan="9" style="background-color: #C4BD97;font-weight: bold">{{$key}}</td>
                     <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost}}</td>
                     <td colspan="" style="background-color: #C4BD97">{{$costProject[$key]->totalWorkCost / $usdIdr }}</td>
                 </tr>

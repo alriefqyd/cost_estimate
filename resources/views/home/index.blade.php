@@ -13,7 +13,7 @@
                                 <h2 class="mb-3 m-l-5">Every Count Matters!</h2>
                             </div>
                             <a href="/project" class="btn btn-square btn-outline-primary btn-outline-light-2x shadow m-l-5" style="border-color: white; color: white; font-size: 15px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);" role="button" data-bs-original-title="" title="">
-                                Create Cost Estimate
+                                Get Started
                             </a>
                         </div>
                     </div>

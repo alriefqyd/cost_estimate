@@ -24,19 +24,21 @@ class UserServices
     public function getUserEmployee(Request $request){
         $subject = $request->subject;
         $key = $request->q;
-        $data = User::with('profiles')->whereHas('profiles', function ($q) use ($subject, $key){
-            return $q->when((isset($subject)), function($qq) use ($subject,$key){
+        $data = User::with('profiles')->whereHas('profiles', function ($q) use ($subject, $key) {
+            $q->when(isset($key), function ($qq) use ($subject, $key) {
+                $qq->where('full_name', 'like', '%' . $key . '%');
+            })->when(isset($subject), function ($qq) use ($subject, $key) {
                 if ($subject === 'project_engineer') {
-                    return $qq->orWhere('position', Profile::POSITION['design_civil_engineer'])
-                        ->orWhere('position', Profile::POSITION['design_mechanical_engineer'])
-                        ->orWhere('position', Profile::POSITION['design_electrical_engineer'])
-                        ->orWhere('position', Profile::POSITION['design_instrument_engineer'])
-                        ->orWhere('position', Profile::POSITION['project_manager']);
+                    $qq->orWhere(function ($pos) {
+                        $pos->where('position', Profile::POSITION['design_civil_engineer'])
+                            ->orWhere('position', Profile::POSITION['design_mechanical_engineer'])
+                            ->orWhere('position', Profile::POSITION['design_electrical_engineer'])
+                            ->orWhere('position', Profile::POSITION['design_instrument_engineer'])
+                            ->orWhere('position', Profile::POSITION['project_manager']);
+                    });
                 } else {
-                    return $qq->where('position', $subject);
+                    $qq->where('position', $subject);
                 }
-            })->when((isset($key)), function($qq) use ($subject,$key){
-                return $qq->where('full_name','like','%'.$key.'%');
             });
         });
 

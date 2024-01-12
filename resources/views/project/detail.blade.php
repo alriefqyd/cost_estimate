@@ -9,7 +9,8 @@
                 <div class="col-sm-6">
                     <h4>Project Detail</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/">Project</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/project">Project List</a></li>
                         <li class="breadcrumb-item active">Project Detail</li>
                     </ol>
                 </div>

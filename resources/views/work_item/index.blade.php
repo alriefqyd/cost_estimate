@@ -8,7 +8,7 @@
                 <div class="col-sm-6">
                     <h4>Work Item</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                         <li class="breadcrumb-item active">Work Item list</li>
                     </ol>
                 </div>
