@@ -96,8 +96,8 @@ class User extends Authenticatable
 
     public function scopeFilter($query, array $filters){
         $query->when($filters['q'] ?? false, fn($query,$q) =>
-        $q->whereHas('profiles', function($qquery) use ($q){
-            return $qquery->where('name','like','%'.$q.'%')
+        $query->whereHas('profiles', function($qquery) use ($q){
+            return $qquery->where('full_name','like','%'.$q.'%')
                 ->orWhere('email','like','%'.$q.'%');
         }));
     }
