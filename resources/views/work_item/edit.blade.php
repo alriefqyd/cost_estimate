@@ -6,8 +6,8 @@
                 <div class="col-sm-6">
                     <h4>Man Power</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item">Work Item List</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/work-item">Work Item List</a></li>
                         <li class="breadcrumb-item active">Edit Work Item</li>
                     </ol>
                 </div>

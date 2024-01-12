@@ -443,7 +443,7 @@ $(function(){
 
     $(document).on('click','.js-delete-wbs-discipline',function(){
         var _this = $(this);
-        var _parent = _this.closest('ol')
+        var _parent = _this.closest('li.dd-item')
         _parent.remove();
         bindBeforeUnloadEvent();
     });

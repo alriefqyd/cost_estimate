@@ -9,10 +9,10 @@
                 <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-400">Work Item</th>
                 <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-50">Vol</th>
                 <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center">Unit</th>
-                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Labour Cost</th>
-                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Tool & Equipment</th>
-                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Material Cost</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-160">Total Work Cost</th>
+                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Labour Cost (IDR)</th>
+                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Tool & Equipment (IDR)</th>
+                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Material Cost (IDR)</th>
+                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-160">Total Work Cost (IDR)</th>
                 <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-120">Labor Fact</th>
                 <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-150">Tool Equip Fact</th>
                 <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-120">Material Fact</th>
