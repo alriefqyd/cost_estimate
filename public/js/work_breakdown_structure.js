@@ -102,14 +102,14 @@ $(function(){
         e.preventDefault();
         $('.js-modal-save-wbs').modal('show');
     });
-
+    
     $(document).on('click','.js-form-list-location-submit',function (e){
         $('.js-modal-save-wbs').modal('hide');
         $('.js-modal-loading-wbs').modal('show');
-        e.preventDefault();
         var _isValid = true;
         var _js_wbs_element = $('.js-mustache-wbs-element');
-        $.each(_js_wbs_element ,function(index, item){
+        $.each(_js_wbs_element , function(index, item){
+            console.log($(this).find('.dd-list').length);
             if($(this).find('.dd-list').length < 1){
                 _isValid = false;
                 return false;
@@ -443,8 +443,11 @@ $(function(){
 
     $(document).on('click','.js-delete-wbs-discipline',function(){
         var _this = $(this);
-        var _parent = _this.closest('li.dd-item')
-        _parent.remove();
+        if(!_this.closest('.dd-list').hasClass('js-nestable-wbs')){
+            _this.closest('.dd-list').remove();
+        } else {
+            _this.closest('.dd-item').remove();
+        }
         bindBeforeUnloadEvent();
     });
 
