@@ -217,7 +217,7 @@
 </script>
 
 <script id="js-template-location-nestable-wbs" type="x-tmpl-mustache">
-         <li class="dd-item" data-id="@{{ text }}">
+         <li class="dd-item dd-location" data-id="@{{ text }}">
              <div class="dd-handle">
                 <div class="float-start col-md-10">
                     @{{ text }}
