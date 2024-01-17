@@ -137,4 +137,29 @@ $(function(){
         }
     });
 
+    $('.js-modal-delete-project').on('shown.bs.modal', function (e){
+        var _button = $(e.relatedTarget);
+        var _project_id = _button.data('id');
+        $(this).find('.js-delete-project').data('id', _project_id);
+    })
+    $('.js-delete-project').on('click', function(e){
+        e.preventDefault();
+        var _id = $(this).data('id');
+        $.ajax({
+            url:'/project/' + _id,
+            type: 'DELETE',
+            success: function (data) {
+                $('.js-modal-delete-project').modal('hide');
+                if (data.status === 200) {
+                    notification('success', data.message)
+                    setTimeout(function () {
+                        window.location.href = 'project';
+                    }, 1000);
+                } else {
+                    notification('error', data.message)
+                }
+            }
+        });
+    })
+
 });

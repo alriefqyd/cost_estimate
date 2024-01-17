@@ -1,6 +1,7 @@
 <tr class="js-row-work-item-tools-equipment js-row-column">
     <td class="min-w-160">
         <select class="select2 js-select-tools-equipment js-select-item js-confirm-form"
+                data-minimum-input-length="3"
                 data-url="/getToolsEquipment"
                 name="tools_equipment[]"
                 data-placeholder="Select Tools Equipment"

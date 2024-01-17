@@ -101,6 +101,11 @@
                                     <th class="text-left">
                                         Status
                                     </th>
+                                    @can('delete', \App\Models\WorkItem::class)
+                                        <th>
+                                            Action
+                                        </th>
+                                    @endCan
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -120,8 +125,12 @@
                                         <td class="min-w-65">{{$item->unit}}</td>
                                         <td class="min-w-120">{{number_format($item?->getTotalSum(),2,',','.')}}</td>
                                         <td class="min-w-90">{{$item->status}}</td>
-                                        {{--<td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
-                                               data-id="{{$item->id}}" class="text-danger js-delete-tool-equipment">Delete</a></td>--}}
+                                        @can('delete',App\Models\WorkItem::class)
+                                            <td>
+                                                <a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
+                                                   data-id="{{$item->id}}" class="text-danger js-delete-work-item-modal">Delete</a>
+                                            </td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -162,4 +171,24 @@
             </div>
         </div>
     </div>
+
+    @can('delete',App\Models\WorkItem::class)
+        <div class="modal fade js-modal-delete-work-item" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Delete Work Item</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this item?
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-danger js-delete-work-item" type="button">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endcan
 @endsection

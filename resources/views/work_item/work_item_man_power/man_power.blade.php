@@ -1,6 +1,7 @@
 <tr class="js-row-work-item-man-power js-row-column">
     <td class="min-w-160">
-        <select class="select2 js-select-man-power js-select-item js-confirm-form"
+        <select class="js-select-man-power js-select-item js-confirm-form"
+                data-minimum-input-length="0"
                 data-url="/getManPower"
                 name="man_power[]"
                 data-placeholder="Select Man Power"
