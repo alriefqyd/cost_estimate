@@ -31,6 +31,7 @@ Route::middleware([
 Route::get('/project',[\App\Http\Controllers\ProjectController::class,'index'])->middleware('auth');
 Route::post('/project',[\App\Http\Controllers\ProjectController::class,'store'])->middleware('auth');
 Route::put('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'update'])->middleware('auth');
+Route::delete('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'destroy'])->middleware('auth');
 Route::get('/project/create',[\App\Http\Controllers\ProjectController::class,'create'])->middleware('auth');
 Route::get('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth');
 Route::get('/project/edit/{project:id}',[\App\Http\Controllers\ProjectController::class,'edit'])->middleware('auth');
@@ -63,6 +64,7 @@ Route::get('/work-item/create',[\App\Http\Controllers\WorkItemController::class,
 Route::get('/work-item/edit/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'edit'])->middleware('auth');
 Route::post('/work-item/',[\App\Http\Controllers\WorkItemController::class,'store'])->middleware('auth');
 Route::put('/work-item/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'update'])->middleware('auth');
+Route::delete('/work-item/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'destroy'])->middleware('auth');
 Route::get('/work-item/{workItem:id}/man-power',[\App\Http\Controllers\WorkItemController::class,'createManPower'])->middleware('auth');
 Route::get('/work-item/{workItem:id}/man-power/edit',[\App\Http\Controllers\WorkItemController::class,'editManPower'])->middleware('auth');
 Route::post('/work-item/{workItem:id}/man-power',[\App\Http\Controllers\WorkItemController::class,'storeManPower'])->middleware('auth');

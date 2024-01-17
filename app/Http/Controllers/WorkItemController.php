@@ -757,6 +757,34 @@ class WorkItemController extends Controller
         }
     }
 
+    public function destroy(WorkItem $workItem){
+        if(auth()->user()->cannot('delete',WorkItem::class)){
+            return response()->json([
+                'status' => 403,
+                'message' => "You're not authorized"
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $workItem->manPowers()->detach();
+            $workItem->equipmentTools()->detach();
+            $workItem->materials()->detach();
+            $workItem->delete();
+            DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Work Item Successfully deleted'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => 500,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
     public function export(){
         try {
             Log::info('Starting Export Work Items');

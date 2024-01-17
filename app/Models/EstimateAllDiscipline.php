@@ -6,10 +6,12 @@ use App\Class\ProjectTotalCostClass;
 use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EstimateAllDiscipline extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'work_scope'

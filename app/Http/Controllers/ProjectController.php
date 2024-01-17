@@ -196,8 +196,37 @@ class ProjectController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Project $project)
     {
+        if(auth()->user()->cannot('delete',Project::class)){
+            return response()->json([
+                'status' => 403,
+                'message' => "You're not authorized"
+            ]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $project->estimateAllDisciplines?->each(function($data){
+                $data->delete();
+            });
+            $project->wbsLevel3s?->each(function ($data){
+                $data->delete();
+            });
+
+            $project->delete();
+            DB::commit();
+            return response()->json([
+               'status' => 200,
+               'message' => 'Project Successfully deleted'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+               'status' => 500,
+               'message' => $e->getMessage()
+            ]);
+        }
 
     }
 
