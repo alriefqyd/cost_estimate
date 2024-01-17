@@ -33,6 +33,9 @@
                     <th class="text-left min-w-100">
                         Status
                     </th>
+                    @can('delete',App\Models\Project::class)
+                        <th>Action</th>
+                    @endcan
                     {{--<th scope="col" class="text-left min-w-50">Date</th>--}}
                 </tr>
             </thead>
@@ -52,9 +55,35 @@
                     <td>{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
                     <td>{{$project->projectArea?->name}}</td>
                     <td>{{$project->status}}</td>
+                    @can('delete',App\Models\Project::class)
+                        <td>
+                            <a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
+                                    data-id="{{$project->id}}" class="text-danger js-delete-project-modal">Delete</a>
+                        </td>
+                    @endcan
                 </tr>
             @endforeach
             </tbody>
         </table>
     </div>
 </div>
+
+@can('delete',App\Models\Project::class)
+<div class="modal fade js-modal-delete-project" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Delete Project</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this item?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-danger js-delete-project" type="button">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endcan

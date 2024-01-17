@@ -619,6 +619,33 @@ custom-checkbox:checked:before {
     /* If 'Vale' is not available, fallback to a generic sans-serif font */
 }
 
+.cursor-pointer-hover:hover{
+    color: white !important;
+}
+
+.cursor-pointer-hover-green {
+    position: relative;
+    color: #246a5d;
+    font-weight: 500;
+    overflow: hidden;
+    padding: 3px;
+}
+
+.cursor-pointer-hover-green::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    /*left: 50%;*/
+    width: 0;
+    height: 2px;
+    background-color: #246a5d;
+    transition: width 0.3s ease-in-out;
+}
+
+.cursor-pointer-hover-green:hover::before {
+    width: 100%;
+}
+
 @keyframes slide {
     0% {
         transform: translateY(0);

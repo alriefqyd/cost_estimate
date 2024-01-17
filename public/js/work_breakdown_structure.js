@@ -102,14 +102,13 @@ $(function(){
         e.preventDefault();
         $('.js-modal-save-wbs').modal('show');
     });
-    
+
     $(document).on('click','.js-form-list-location-submit',function (e){
         $('.js-modal-save-wbs').modal('hide');
         $('.js-modal-loading-wbs').modal('show');
         var _isValid = true;
         var _js_wbs_element = $('.js-mustache-wbs-element');
         $.each(_js_wbs_element , function(index, item){
-            console.log($(this).find('.dd-list').length);
             if($(this).find('.dd-list').length < 1){
                 _isValid = false;
                 return false;

@@ -156,7 +156,7 @@ class MaterialController extends Controller
 
     public function destroy(Material $material)
     {
-        if(auth()->user()->cannot('create',Material::class)){
+        if(auth()->user()->cannot('delete',Material::class)){
             return response()->json([
                 'status' => 403,
                 'message' => "You're not authorized"

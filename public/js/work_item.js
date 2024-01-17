@@ -2,8 +2,9 @@ $(function(){
     var selectItemInit = function (el){
         var _this = $(el);
         if (_this.data("select2")) _this.select2("destroy");
+        var _minimum_input_length = _this.data('minimum-input-length');
         _this.select2({
-            minimumInputLength: 3,
+            minimumInputLength: _minimum_input_length,
             placeholder: _this.data('placeholder'),
             allowClear: true,
             width: '100%',
@@ -187,6 +188,33 @@ $(function(){
            }
        });
     });
+
+    $('.js-modal-delete-work-item').on('shown.bs.modal', function (e){
+        var _button = $(e.relatedTarget);
+        var _project_id = _button.data('id');
+        $(this).find('.js-delete-work-item').data('id', _project_id);
+    });
+
+    $('.js-delete-work-item').on('click', function(e){
+        e.preventDefault();
+        var _id = $(this).data('id');
+        $.ajax({
+            url:'/work-item/' + _id,
+            type: 'DELETE',
+            success: function (data) {
+                $('.js-modal-delete-work-item').modal('hide');
+                if (data.status === 200) {
+                    notification('success', data.message)
+                    setTimeout(function () {
+                        location.reload();
+                    }, 1000);
+                } else {
+                    notification('error', data.message);
+                }
+            }
+        });
+    })
+
 
 
     $('.js-select-work-item-type').on('change', function(){
