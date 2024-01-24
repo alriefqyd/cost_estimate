@@ -197,6 +197,19 @@ class ProjectServices
             return $q->where('position', $subject);
         })->get();
     }
+
+    public function checkReviewer($discipline, $designEngineer, $sizeEstimateDiscipline){
+        $user = new User();
+        $isReviewer = $user->isDisciplineReviewer($discipline);
+
+        if(isset($designEngineer)
+            && $sizeEstimateDiscipline > 0
+            && $isReviewer){
+            return true;
+        }
+
+        return false;
+    }
     public function toCurrency($val){
         if(!$val) return 0.00;
         return number_format($val, 2);

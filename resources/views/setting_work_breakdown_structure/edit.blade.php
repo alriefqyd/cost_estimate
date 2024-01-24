@@ -8,7 +8,8 @@
                 <div class="col-sm-6">
                     <h4>Work Breakdown Structure</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/work-breakdown-structure">Work Breakdown Structure List</a></li>
                         <li class="breadcrumb-item active">Setting Work Breakdown Structure</li>
                     </ol>
                 </div>

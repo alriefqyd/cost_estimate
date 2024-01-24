@@ -108,13 +108,13 @@
                         @canAny(['update','create'],App\Models\WorkItem::class)
                         <div class="float-end">
                             @if(sizeof($work_item->manPowers) > 0)
-                                <a href="/work-item/{{$work_item?->id}}/man-power/edit">
+                                <a href="/work-item/{{$work_item?->id}}/work-item-man-power/edit">
                                     <button class="btn btn-outline-success">
                                         Edit
                                     </button>
                                 </a>
                             @else
-                                <a href="/work-item/{{$work_item?->id}}/man-power/">
+                                <a href="/work-item/{{$work_item?->id}}/work-item-man-power/">
                                     <button class="btn btn-outline-success">
                                         Create
                                     </button>
@@ -164,13 +164,13 @@
                         <div class="float-end">
                             @canAny(['update','create'],App\Models\WorkItem::class)
                                 @if(sizeof($work_item->equipmentTools) > 0)
-                                    <a href="/work-item/{{$work_item?->id}}/tools-equipment/edit">
+                                    <a href="/work-item/{{$work_item?->id}}/work-item-tools-equipment/edit">
                                         <button class="btn btn-outline-success">
                                             Edit
                                         </button>
                                     </a>
                                 @else
-                                    <a href="/work-item/{{$work_item?->id}}/tools-equipment/">
+                                    <a href="/work-item/{{$work_item?->id}}/work-item-tools-equipment/">
                                         <button class="btn btn-outline-success">
                                             Create
                                         </button>
@@ -223,13 +223,13 @@
                         <div class="float-end">
                             @canAny(['update','create'],App\Models\WorkItem::class)
                                 @if(sizeof($work_item->materials) > 0)
-                                    <a href="/work-item/{{$work_item?->id}}/material/edit">
+                                    <a href="/work-item/{{$work_item?->id}}/work-item-material/edit">
                                         <button class="btn btn-outline-success">
                                             Edit
                                         </button>
                                     </a>
                                 @else
-                                    <a href="/work-item/{{$work_item?->id}}/material/">
+                                    <a href="/work-item/{{$work_item?->id}}/work-item-material/">
                                         <button class="btn btn-outline-success">
                                             Create
                                         </button>

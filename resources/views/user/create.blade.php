@@ -6,9 +6,8 @@
                 <div class="col-sm-12">
                     <h4>User</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item">dashboard</li>
-                        <li class="breadcrumb-item">user</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/user">User List</a></li>
                         <li class="breadcrumb-item active">Create New User</li>
                     </ol>
                 </div>

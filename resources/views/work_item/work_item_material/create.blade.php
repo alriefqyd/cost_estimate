@@ -4,11 +4,11 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-sm-6">
-                    <h4>Tools Equipment</h4>
+                    <h4>Material</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Home</a></li>
                         <li class="breadcrumb-item">Material List</li>
-                        <li class="breadcrumb-item active">{{$workItem->description}}</li>
+                        <li class="breadcrumb-item active"><a href="/work-item/{{$workItem->id}}">{{\Illuminate\Support\Str::limit($workItem->description, 50)}}</a></li>
                     </ol>
                 </div>
             </div>

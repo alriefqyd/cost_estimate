@@ -6,8 +6,8 @@
                 <div class="col-sm-6">
                     <h4>Tools Equipment</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item">Tools Equipment list</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/tool-equipment">Tools Equipment list</a></li>
                         <li class="breadcrumb-item active">Edit Tools Equipment</li>
                     </ol>
                 </div>

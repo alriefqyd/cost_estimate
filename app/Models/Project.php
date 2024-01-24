@@ -16,9 +16,10 @@ class Project extends Model
 
     const APPROVE = 'APPROVE';
     const DRAFT = 'DRAFT';
+    const REJECTED = 'REJECTED';
     const PENDING = 'PENDING';
     const PENDING_DISCIPLINE_APPROVAL = 'PENDING DISCIPLINE APPROVAL';
-    const WAITING_FOR_APPROVAL = 'WAITING FOR APPROVAL';
+    const WAITING_FOR_APPROVAL = 'WAITING FOR APPROVAL PROJECT MANAGER / REVIEWER';
     const APPROVE_BY_DISCIPLINE_REVIEWER = 'APPROVE BY DISCIPLINE REVIEWER';
 
     const APPROVAL_DISCIPLINE_LIST = [
@@ -206,17 +207,17 @@ class Project extends Model
         $list = [];
         foreach (self::APPROVAL_DISCIPLINE_LIST as $approval => $designEngineer){
             if(isset($this->$designEngineer)
-                && $this->$approval != self::APPROVE_BY_DISCIPLINE_REVIEWER){
+                && $this->$approval != self::APPROVE){
                 array_push($list, self::DESIGN_ENGINEER_KEY_LIST[$designEngineer]);
             }
         }
-
         return $list;
     }
 
     public function getProjectStatusApproval(){
-        if(sizeof($this->getProjectDisciplineStatusApproval()) < 1)
+        if(sizeof($this->getProjectDisciplineStatusApproval()) < 1) {
             return self::WAITING_FOR_APPROVAL;
+        }
         return self::PENDING_DISCIPLINE_APPROVAL;
     }
 
@@ -238,4 +239,15 @@ class Project extends Model
         $str = implode(", ", $arr);
         return $str;
     }
+
+    public function getStatusApprovalDiscipline($status){
+        if($status == $this::REJECTED){
+            return '<span class="checkmark-icon" style="position: relative; top: -8px; right: 0; font-size: 0.9em; color: red;">&#10008; Rejected</span>';
+        } else if ($status == $this::APPROVE){
+            return '<span class="checkmark-icon" style="position: relative; top: -8px; right: 0; font-size: 0.9em; color: green;">&#10004; Approve</span>';
+        } else {
+            return '<span style="position: relative; top: -3px";><i class="m-l-5" data-feather="clock" style="width: 13px; color: #eebe0b"> </i> <span style="font-size: 11px; color: #f3c107; position: relative; top: -8px"> Waiting For Approval </span></span> ';
+        }
+    }
+
 }

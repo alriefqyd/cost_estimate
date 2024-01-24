@@ -98,6 +98,10 @@ class ProjectController extends Controller
                 'design_engineer_civil' => $request->design_engineer_civil,
                 'design_engineer_electrical' => $request->design_engineer_electrical,
                 'design_engineer_instrument' => $request->design_engineer_instrument,
+                'mechanical_approval_status' => isset($request->design_engineer_mechanical) ? Project::PENDING : '',
+                'civil_approval_status' => isset($request->design_engineer_civil) ? Project::PENDING : '',
+                'electrical_approval_status' => isset($request->design_engineer_electrical) ? Project::PENDING : '',
+                'instrument_approval_status' => isset($request->design_engineer_instrument) ? Project::PENDING : '',
                 'status' => Project::DRAFT
             ]);
             $project->save();
@@ -237,12 +241,20 @@ class ProjectController extends Controller
         $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
         $project = $project->load(['projectArea','projectEngineer', 'projectManager']);
+        $isReviewerCivil = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['civil'],$project->design_engineer_civil,sizeof($estimateDisciplines));
+        $isReviewerMechanical = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['mechanical'],$project->design_engineer_mechanical,sizeof($estimateDisciplines));
+        $isReviewerElectrical = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['electrical'],$project->design_engineer_electrical,sizeof($estimateDisciplines));
+        $isReviewerInstrument = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['instrument'],$project->design_engineer_instrument,sizeof($estimateDisciplines));
 
         return view('project.detail',[
             'project' => $project,
             'costProject' => $costProjects,
             'wbs' => $wbs,
             'estimateAllDisciplines' => $estimateDisciplines,
+            'isAuthorizeToReviewCivil' => $isReviewerCivil,
+            'isAuthorizeToReviewMechanical' => $isReviewerMechanical,
+            'isAuthorizeToReviewElectrical' => $isReviewerElectrical,
+            'isAuthorizeToReviewInstrument' => $isReviewerInstrument,
             'project_date' => Carbon::parse($project->created_at)->format('d-M-Y'),
         ]);
     }
@@ -261,6 +273,29 @@ class ProjectController extends Controller
         $costProjects = $projectServices->getAllProjectCost($project, $request);
         Log::info('Export Estimate All Discipline Project ' . $project->project_title . ' by: ' . auth()->user()->profiles->full_name);
         return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary-export.xlsx');
+    }
+
+    public function getProjectDisciplineStatus(Request $request, Project $project){
+        $result = '';
+        switch ($request->discipline) {
+            case Setting::DESIGN_ENGINEER_LIST['civil']:
+                $result = $project->civil_approval_status;
+                break;
+            case Setting::DESIGN_ENGINEER_LIST['mechanical']:
+                $result = $project->mechanical_approval_status;
+                break;
+            case Setting::DESIGN_ENGINEER_LIST['electrical']:
+                $result = $project->electrical_approval_status;
+                break;
+            case Setting::DESIGN_ENGINEER_LIST['instrument']:
+                $result = $project->instrument_approval_status;
+                break;
+        }
+
+        return response()->json([
+            'status' => 200,
+            'data' => $result
+        ]);
     }
 
     public function updateStatus(Project $project, Request $request){

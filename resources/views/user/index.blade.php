@@ -8,7 +8,7 @@
                 <div class="col-sm-6">
                     <h3>User List</h3>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                         <li class="breadcrumb-item active">User List</li>
                     </ol>
                 </div>

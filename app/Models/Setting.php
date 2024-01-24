@@ -16,6 +16,13 @@ class Setting extends Model
         'instrument' => 'Instrument'
     ];
 
+    public const DESIGN_ENGINEER_LIST_KEY = [
+        'civil' => 'civil',
+        'mechanical' => 'mechanical',
+        'electrical' => 'electrical',
+        'instrument' => 'instrument'
+    ];
+
     public const SKILL_LEVEL = [
       'skilled' => 'Skilled',
       'semi_skilled' => 'Semi Skilled',
