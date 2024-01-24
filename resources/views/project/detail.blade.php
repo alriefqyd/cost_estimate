@@ -2,7 +2,6 @@
 @inject('setting', App\Models\Setting::class)
 @extends('layouts.main')
 @section('main')
-
     <div class="container-fluid">
         <div class="page-header">
             <div class="row">
@@ -44,48 +43,42 @@
                     </div>
                     <div class="card-body card-body-custom">
                         <div class="col-sm-10 float-start" style="margin-left: 20px!important">
+                            <input type="hidden" class="js-hidden-id-project" value="{{$project->id}}">
                             <table class="table">
                                 <tr>
                                     <td>Date</td>
                                     <td>:</td>
                                     <td>{{$project_date}}</td>
-                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>Project No</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->project_no}}</td>
-                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>Project Title</td>
                                     <td>:</td>
-                                    <td class="m-2">{{$project->project_title}}</td>
-                                    <td></td>
+                                    <td class="m-2" colspan="2">{{$project->project_title}}</td>
                                 </tr>
                                 <tr>
                                     <td>Project Sponsor</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->project_sponsor}}</td>
-                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>Project Manager</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->projectManager?->profiles?->full_name}}</td>
-                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>Project Engineer</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->projectEngineer?->profiles?->full_name}}</td>
-                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>Project Area</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->projectArea?->name}}</td>
-                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td colspan="4">
@@ -93,183 +86,70 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Civil/Structure</td>
+                                    <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
+                                        Civil
+                                        @if(isset($project->design_engineer_civil))
+                                            {!!$project->getStatusApprovalDiscipline($project->civil_approval_status) !!}
+                                        @endif
+                                    </td>
                                     <td>:</td>
                                     <td>
-                                        <div class="mb-1">{{$project?->designEngineerCivil?->profiles?->full_name}}</div>
-                                        {{-- <div class="mb-2 js-form-parent-approval">
-                                            @if($project?->designEngineerCivil && auth()->user()->isDisciplineReviewer('civil'))
-                                                <div class="col">
-                                                    <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
-                                                        <div class="radio radio-primary">
-                                                            <input class="js-approve-discipline" id="radio_civil_pending"
-                                                                   {{$project->civil_approval_status == $projectModel::PENDING ? 'checked' : ''}}
-                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['civil']}}"
-                                                                   type="radio" name="civil_approval_status" value="{{$projectModel::PENDING}}">
-                                                            <label class="mb-0 label-radio" for="radio_civil_pending">
-                                                                {{$projectModel::PENDING}}
-                                                            </label>
-                                                        </div>
-                                                        <div class="radio radio-primary">
-                                                            <input class="js-approve-discipline" id="radio_civil_approve"
-                                                                   {{$project->civil_approval_status == $projectModel::APPROVE_BY_DISCIPLINE_REVIEWER ? 'checked' : ''}}
-                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['civil']}}"
-                                                                   type="radio" name="civil_approval_status" value="{{$projectModel::APPROVE_BY_DISCIPLINE_REVIEWER}}">
-                                                            <label class="mb-0 label-radio" for="radio_civil_approve">
-                                                                {{$projectModel::APPROVE}}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col mt-3">
-                                                    <textarea class="form-control js-remark-pending d-none"
-                                                              data-discipline="{{$setting::DESIGN_ENGINEER_LIST['civil']}}"
-                                                              rows="5" name="remark"></textarea>
-                                                </div>
-                                            @endif
-                                        </div> --}}
-                                    </td>
-                                    <td>
-
+                                        {{$project?->designEngineerCivil?->profiles?->full_name  ?? 'NR'}}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Mechanical</td>
+                                    <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['mechanical']}}" {!! $isAuthorizeToReviewMechanical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewMechanical ? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
+                                            Mechanical
+                                        @if(isset($project->design_engineer_mechanical))
+                                            {!! $project->getStatusApprovalDiscipline($project->mechanical_approval_status) !!}
+                                        @endif
+                                    </td>
                                     <td>:</td>
-                                    <td>
-                                        <div class="mb-2">{{$project?->designEngineerMechanical?->profiles?->full_name}}</div>
-                                        {{-- <div class="js-form-parent-approval">
-                                            @if($project?->designEngineerMechanical && auth()->user()->isDisciplineReviewer('mechanical'))
-                                                <div class="col">
-                                                    <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
-                                                        <div class="radio radio-primary">
-                                                            <input class="js-approve-discipline" id="radio_mechanical_pending"
-                                                                   {{$project->mechanical_approval_status == $projectModel::PENDING ? 'checked' : ''}}
-                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['mechanical']}}"
-                                                                   type="radio" name="mechanical_approval_status" value="{{$projectModel::PENDING}}">
-                                                            <label class="mb-0 label-radio" for="radio_mechanical_pending">
-                                                                {{$projectModel::PENDING}}
-                                                            </label>
-                                                        </div>
-                                                        <div class="radio radio-primary">
-                                                            <input class="js-approve-discipline" id="radio_mechanical_approve"
-                                                                   {{$project->mechanical_approval_status == $projectModel::APPROVE_BY_DISCIPLINE_REVIEWER ? 'checked' : ''}}
-                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['mechanical']}}"
-                                                                   type="radio" name="mechanical_approval_status" value="{{$projectModel::APPROVE_BY_DISCIPLINE_REVIEWER}}">
-                                                            <label class="mb-0 label-radio" for="radio_mechanical_approve">
-                                                                {{$projectModel::APPROVE}}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="col mt-3">
-                                                        <textarea class="form-control js-remark-pending d-none"
-                                                                  data-discipline="{{$setting::DESIGN_ENGINEER_LIST['mechanical']}}"
-                                                                  rows="5" name="remark"></textarea>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div> --}}
-                                    </td>
-                                    <td>
-
-                                    </td>
+                                    <td>{{$project?->designEngineerMechanical?->profiles?->full_name  ?? 'NR'}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Electrical</td>
+                                    <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['electrical']}}" {!! $isAuthorizeToReviewElectrical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!}  class="{!! $isAuthorizeToReviewElectrical ? 'js-modal-approval cursor-pointer' : 'color-grey'!!} m-r-10" style="width: 17px"></i>
+                                        Electrical
+                                        @if(isset($project->design_engineer_electrical))
+                                            {!!$project->getStatusApprovalDiscipline($project->electrical_approval_status) !!}
+                                        @endif
+                                    </td>
                                     <td>:</td>
-                                    <td>
-                                        <div class="mb-2">
-                                            {{$project?->designEngineerElectrical?->profiles?->full_name}}
-                                        </div>
-                                        {{--<div class="js-form-parent-approval">
-                                            @if($project?->designEngineerElectrical && auth()->user()->isDisciplineReviewer('electrical'))
-                                                <div class="col">
-                                                    <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
-                                                        <div class="radio radio-primary">
-                                                            <input class="js-approve-discipline" id="radio_electrical_pending"
-                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['electrical']}}"
-                                                                   {{$project->electrical_approval_status == $projectModel::PENDING ? 'checked' : ''}}
-                                                                   type="radio" name="electrical_approval_status" value="{{$projectModel::PENDING}}">
-                                                            <label class="mb-0 label-radio" for="radio_electrical_pending">
-                                                                {{$projectModel::PENDING}}
-                                                            </label>
-                                                        </div>
-                                                        <div class="radio radio-primary">
-                                                            <input class="js-approve-discipline" id="radio_electrical_approve"
-                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['electrical']}}"
-                                                                   {{$project->electrical_approval_status == $projectModel::APPROVE_BY_DISCIPLINE_REVIEWER ? 'checked' : ''}}
-                                                                   type="radio" name="electrical_approval_status" value="{{$projectModel::APPROVE_BY_DISCIPLINE_REVIEWER}}">
-                                                            <label class="mb-0 label-radio" for="radio_electrical_approve">
-                                                                {{$projectModel::APPROVE}}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <div class="col mt-3">
-                                                        <textarea class="form-control js-remark-pending d-none"
-                                                                  data-discipline="{{$setting::DESIGN_ENGINEER_LIST['mechanical']}}"
-                                                                  rows="5" name="remark"></textarea>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div> --}}
-                                    </td>
-                                    <td>
-
-                                    </td>
+                                    <td>{{$project?->designEngineerElectrical?->profiles?->full_name  ?? 'NR'}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Instrument</td>
+                                    <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewInstrument ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewInstrument ? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
+                                            Instrument
+                                        @if(isset($project->design_engineer_instrument))
+                                            {!!$project->getStatusApprovalDiscipline($project->instrument_approval_status) !!}
+                                        @endif
+                                    </td>
+                                    <td>:</td>
+                                    <td>{{$project?->designEngineerInstrument?->profiles?->full_name ?? 'NR'}}</td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        @if(auth()->user()->isDisciplineReviewer(''))
+                                            <i class="fa fa-edit cursor-pointer js-edit-remark-project-btn m-r-10" style="font-size: 18px" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg"></i>
+                                        @endif
+                                            Remark
+                                    </td>
                                     <td>:</td>
                                     <td>
-                                        <div class="mb-2">{{$project?->designEngineerInstrument?->profiles?->full_name}}</div>
-                                        {{--<div class="js-form-parent-approval">
-                                            @if($project?->designEngineerInstrument && auth()->user()->isDisciplineReviewer('instrument'))
-                                                <div class="col">
-                                                    <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
-                                                        <div class="radio radio-primary">
-                                                            <input class="js-approve-discipline" id="radio_instrument_pending"
-                                                                   {{$project->instrument_approval_status == $projectModel::PENDING ? 'checked' : ''}}
-                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['instrument']}}"
-                                                                   type="radio" name="radio1" value="{{$projectModel::PENDING}}">
-                                                            <label class="mb-0 label-radio" for="radio_instrument_pending">
-                                                                {{$projectModel::PENDING}}
-                                                            </label>
-                                                        </div>
-                                                        <div class="radio radio-primary">
-                                                            <input class="js-approve-discipline" id="radio_instrument_approve"
-                                                                   {{$project->instrument_approval_status == $projectModel::APPROVE_BY_DISCIPLINE_REVIEWER ? 'checked' : ''}}
-                                                                   data-discipline="{{$setting::DESIGN_ENGINEER_LIST['instrument']}}"
-                                                                   type="radio" name="radio1" value="{{$projectModel::APPROVE_BY_DISCIPLINE_REVIEWER}}">
-                                                            <label class="mb-0 label-radio" for="radio_instrument_approve">
-                                                                {{$projectModel::APPROVE}}
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endif
-                                        </div>--}}
+                                        <span class="js-remark"> {!! $project->remark ?? '-' !!}</span>
                                     </td>
-                                    <td>
-
-                                    </td>
+                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>Status</td>
                                     <td>:</td>
                                     <td>
                                         <div class="mb-2 js-detail-status">{{$project->status}}</div>
-                                        <div class="mb-2">
-                                            @if($project->status != $projectModel::DRAFT)
-                                                @foreach($project->getProjectDisciplineStatusApproval() as $status)
-                                                    <li>{{$status}}</li>
-                                                @endforeach
-                                            @endif
-                                        </div>
-                                        {{-- @if($project->getProjectStatusApproval() == $projectModel::WAITING_FOR_APPROVAL
+                                        @if($project->getProjectStatusApproval() == $projectModel::WAITING_FOR_APPROVAL
                                                 && auth()->user()->isCostEstimateReviewer() && $project->status != $projectModel::APPROVE)
                                             <div>
                                                 <button class="btn btn-outline-success js-btn-approve-modal" data-bs-toggle="modal" data-original-title="test" data-bs-target="#approveModal"><i class="fa fa-check"></i> Approve Cost Estimate</button>
@@ -290,22 +170,10 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endif --}}
+                                        @endif
                                     </td>
                                     <td>
 
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        Remark
-                                    </td>
-                                    <td>:</td>
-                                    <td>
-                                        <span class="js-remark"> {!! $project->remark ?? '-' !!}</span>
-                                        @if(auth()->user()->isDisciplineReviewer(''))
-                                            <i class="fa fa-edit cursor-pointer js-edit-remark-project-btn" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg"></i>
-                                        @endif
                                     </td>
                                 </tr>
                             </table>
@@ -417,7 +285,7 @@
                         <div class="col-sm-12 col-lg-12 col-xl-12">
                             <div class="clearfix"></div>
                             <div class="col-md-6">
-                                {{-- @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE) --}}
+                                 @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE)
                                     <a href="/cost-estimate-summary/export/{{$project->id}}">
                                         <button data-id="{{$project->id}}"
                                             data-name="Cost Estimate - {{$project->project_no}} - {{$project->project_title}}.xlsx"
@@ -428,7 +296,7 @@
                                             </div>
                                         </button>
                                     </a>
-                               {{-- @endif --}}
+                                 @endif
                             </div>
                             <div class="col-md-6 float-end">
                                 <div class="btn btn-primary js-fullscreen-detail mb-2 float-end">Maximize Table <i data-feather="maximize" style="width: 12px !important;"></i></div>
@@ -450,10 +318,13 @@
                         <h5 class="modal-title" id="exampleModalLabel">Update Status By Discipline</h5>
                         <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">Are you sure you want to update status ?</div>
+                    <div class="modal-body text-center">
+                        <span class="js-form-approval"></span>
+                        <div class="loading-spinner mb-2">
+                    </div>
                     <div class="modal-footer">
                         <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success js-btn-approve-discipline-cost-estimate" type="button">Yes</button>
+                        <button class="btn btn-success js-btn-approve-discipline-cost-estimate" type="button">Update</button>
                     </div>
                 </div>
             </div>

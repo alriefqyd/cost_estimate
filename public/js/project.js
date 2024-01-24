@@ -56,12 +56,6 @@ $(function(){
         var _id = _modal.data('id');
         var _parent = _modal.find('.js-btn-approve-discipline-cost-estimate');
         var _val = _this.val();
-
-        // if(_val === 'PENDING'){
-        //     _this.prop('checked',true);
-        // _this.closest('.js-form-parent-approval').find('.js-remark-pending').removeClass('d-none');
-        // } else {
-
         _modal.modal('show');
         _parent.attr('data-form',_this.attr('name'));
         _parent.attr('data-value',_val);
@@ -70,13 +64,45 @@ $(function(){
         // }
     });
 
-    $(document).on('click','.js-btn-approve-discipline-cost-estimate', function(){
+    $('.js-modal-approve-discipline').on('shown.bs.modal', function (e){
+        var _source = $(e.relatedTarget);
+        var _discipline = _source.data('discipline');
+        var _template = $('#js-template-modal-update-status-project');
+        var template = $(_template).html();
+        var _id = $('.js-hidden-id-project').val();
+        Mustache.parse(template);
+        $.ajax({
+            url:"/project/getProjectDisciplineStatus/" + _id,
+            method: "GET",
+            data: {
+                'discipline': _discipline,
+            },
+            success: function (result){
+                var _data = {
+                    'discipline' : _discipline,
+                    'isPending' : result.data == "PENDING" ? true : false,
+                    'isApprove' : result.data == "APPROVE" ? true : false,
+                    'isRejected' : result.data == 'REJECTED' ? true : false
+                };
+                var _temp = Mustache.render(template,_data);
+                $('.js-modal-approve-discipline').find('.loading-spinner').addClass('d-none');
+                $('.js-form-approval').append(_temp);
+            }
+
+        });
+    });
+
+    $('.js-modal-approve-discipline').on('hide.bs.modal', function (){
+        $('.js-modal-approve-discipline').find('.loading-spinner').removeClass('d-none');
+        $('.js-form-approval').find('.js-row-form-status').remove();
+    });
+
+    $(document).on('click','.js-btn-approve-discipline-cost-estimate', function(e){
         var _this = $(this);
         var _parent = _this.closest('.js-modal-approve-discipline');
-        var _id = _parent.data('id');
-        var _discipline = _this.attr('data-discipline');
-        var _val = _this.attr('data-value');
-        var _name = _this.attr('data-form');
+        var _id = $('.js-hidden-id-project').val();
+        var _discipline = $('.js-modal-discipline').val();
+        var _val = $('input[name="checkbox-discipline"]:checked').val();
 
         $.ajax({
            url:'/project/update-status/' + _id,

@@ -6,8 +6,8 @@
                 <div class="col-sm-6">
                     <h4>Man Powers</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="">Home</a></li>
-                        <li class="breadcrumb-item">Man Power Detail</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/man-power/">Man Power List</a></li>
                         <li class="breadcrumb-item active">{{$man_power->title}}</li>
                     </ol>
                 </div>

@@ -7,8 +7,8 @@
                     <h4>Material</h4>
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="">Home</a></li>
-                        <li class="breadcrumb-item">Material Detail</li>
-                        <li class="breadcrumb-item active">{{$material->code}}</li>
+                        <li class="breadcrumb-item"><a href="/material">Material list</a></li>
+                        <li class="breadcrumb-item active">{{\Illuminate\Support\Str::limit($material->tool_equipment_description, 60)}}</li>
                     </ol>
                 </div>
             </div>

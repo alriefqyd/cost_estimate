@@ -6,8 +6,8 @@
                 <div class="col-sm-12">
                     <h4>Material Category</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                        <li class="breadcrumb-item">Material Category list</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/material">Material Category list</a></li>
                         <li class="breadcrumb-item active">Add Material Category</li>
                     </ol>
                 </div>
