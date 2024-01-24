@@ -646,6 +646,78 @@ custom-checkbox:checked:before {
     width: 100%;
 }
 
+
+.checkbox-rect {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    padding-left: 30px; /* Adjust as needed */
+}
+
+/* Hide the default radio button */
+.checkbox-rect input {
+    position: absolute;
+    opacity: 0;
+}
+
+/* Style the custom square container */
+.checkbox-rect .radio-container {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    width: 20px; /* Adjust as needed */
+    height: 20px; /* Adjust as needed */
+    background-color: #fff;
+    border: 2px solid #808080; /* Neutral border color for the unchecked state */
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px; /* Adjust as needed */
+}
+
+/* Style the checkmark when the radio button is checked */
+.checkbox-rect input:checked + .radio-container:before {
+    content: '\2713'; /* Checkmark character */
+    color: #24695c; /* Neutral checkmark color for the checked state */
+}
+
+/* Adjust background color when hovering over the label */
+.checkbox-rect:hover .radio-container {
+    background-color: #f0f0f0;
+}
+
+/* Ensure radio button is clickable */
+.checkbox-rect input {
+    z-index: 1;
+}
+
+/* Style the :before pseudo-element for checkmark */
+.checkbox-rect .radio-container:before {
+    content: '';
+    display: none;
+}
+
+/* Display :before pseudo-element when the checkbox is checked */
+.checkbox-rect input:checked + .radio-container:before {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.color-green {
+    color: green;
+}
+
+.color-grey {
+    color: grey;
+}
+
 @keyframes slide {
     0% {
         transform: translateY(0);

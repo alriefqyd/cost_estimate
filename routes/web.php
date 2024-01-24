@@ -52,6 +52,7 @@ Route::get('/project/{project:id}/estimate-discipline/create/{discipline}',[\App
 Route::post('/project/{project:id}/estimate-discipline/store',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth');
 Route::post('/project/{project:id}/estimate-discipline/update',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth');
 Route::post('/project/update-status/{project:id}/',[\App\Http\Controllers\ProjectController::class,'updateStatus'])->middleware('auth');
+Route::get('/project/getProjectDisciplineStatus/{project:id}/',[\App\Http\Controllers\ProjectController::class,'getProjectDisciplineStatus'])->middleware('auth');
 
 Route::post('/workElement/{project:id}',[\App\Http\Controllers\WorkElementController::class,'store'])->middleware('auth');
 Route::get('/getWorkItems',[\App\Http\Controllers\WorkItemController::class,'setWorkItems'])->name('getWorkItem')->middleware('auth');
@@ -65,19 +66,19 @@ Route::get('/work-item/edit/{workItem:id}',[\App\Http\Controllers\WorkItemContro
 Route::post('/work-item/',[\App\Http\Controllers\WorkItemController::class,'store'])->middleware('auth');
 Route::put('/work-item/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'update'])->middleware('auth');
 Route::delete('/work-item/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'destroy'])->middleware('auth');
-Route::get('/work-item/{workItem:id}/man-power',[\App\Http\Controllers\WorkItemController::class,'createManPower'])->middleware('auth');
-Route::get('/work-item/{workItem:id}/man-power/edit',[\App\Http\Controllers\WorkItemController::class,'editManPower'])->middleware('auth');
-Route::post('/work-item/{workItem:id}/man-power',[\App\Http\Controllers\WorkItemController::class,'storeManPower'])->middleware('auth');
-Route::post('/work-item/{workItem:id}/man-power/update',[\App\Http\Controllers\WorkItemController::class,'updateManPower'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/work-item-man-power',[\App\Http\Controllers\WorkItemController::class,'createManPower'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/work-item-man-power/edit',[\App\Http\Controllers\WorkItemController::class,'editManPower'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/work-item-man-power',[\App\Http\Controllers\WorkItemController::class,'storeManPower'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/work-item-man-power/update',[\App\Http\Controllers\WorkItemController::class,'updateManPower'])->middleware('auth');
 Route::get('/work-item/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'show'])->middleware('auth');
-Route::get('/work-item/{workItem:id}/tools-equipment',[\App\Http\Controllers\WorkItemController::class,'createToolsEquipment'])->middleware('auth');
-Route::get('/work-item/{workItem:id}/tools-equipment/edit',[\App\Http\Controllers\WorkItemController::class,'editToolsEquipment'])->middleware('auth');
-Route::post('/work-item/{workItem:id}/tools-equipment',[\App\Http\Controllers\WorkItemController::class,'storeToolsEquipment'])->middleware('auth');
-Route::post('/work-item/{workItem:id}/tools-equipment/update',[\App\Http\Controllers\WorkItemController::class,'updateToolsEquipment'])->middleware('auth');
-Route::get('/work-item/{workItem:id}/material',[\App\Http\Controllers\WorkItemController::class,'createMaterial'])->middleware('auth');
-Route::get('/work-item/{workItem:id}/material/edit',[\App\Http\Controllers\WorkItemController::class,'editMaterial'])->middleware('auth');
-Route::post('/work-item/{workItem:id}/material',[\App\Http\Controllers\WorkItemController::class,'storeMaterial'])->middleware('auth');
-Route::post('/work-item/{workItem:id}/material/update',[\App\Http\Controllers\WorkItemController::class,'updateMaterial'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/work-item-tools-equipment',[\App\Http\Controllers\WorkItemController::class,'createToolsEquipment'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/work-item-tools-equipment/edit',[\App\Http\Controllers\WorkItemController::class,'editToolsEquipment'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/work-item-tools-equipment',[\App\Http\Controllers\WorkItemController::class,'storeToolsEquipment'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/work-item-tools-equipment/update',[\App\Http\Controllers\WorkItemController::class,'updateToolsEquipment'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/work-item-material',[\App\Http\Controllers\WorkItemController::class,'createMaterial'])->middleware('auth');
+Route::get('/work-item/{workItem:id}/work-item-material/edit',[\App\Http\Controllers\WorkItemController::class,'editMaterial'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/work-item-material',[\App\Http\Controllers\WorkItemController::class,'storeMaterial'])->middleware('auth');
+Route::post('/work-item/{workItem:id}/work-item-material/update',[\App\Http\Controllers\WorkItemController::class,'updateMaterial'])->middleware('auth');
 
 Route::get('/work-item-category/',[\App\Http\Controllers\WorkItemTypeController::class,'index'])->middleware('auth');
 Route::get('/work-item-category/create',[\App\Http\Controllers\WorkItemTypeController::class,'create'])->middleware('auth');

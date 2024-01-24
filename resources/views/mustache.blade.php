@@ -412,5 +412,50 @@
     </div>
 </script>
 
+<script id="js-template-modal-update-status-project" type="x-templ-mustache">
+    <div class="row js-row-form-status m-b-20">
+    <input type="hidden" class="js-modal-discipline" value="@{{ discipline }}">
+        <div class="col-md-4">
+            <label class="checkbox-rect" for="checkbox-discipline-pending">
+                <input id="checkbox-discipline-pending"
+                       @{{ #isPending }}
+                        checked="checked"
+                       @{{ /isPending }}
+                       value="{{\App\Models\Project::PENDING}}"
+                       name="checkbox-discipline"
+                       class="js-checkbox-discipline-status" type="radio">
+                <div class="radio-container"></div>
+                Pending
+            </label>
+        </div>
+        <div class="col-md-4">
+            <label class="checkbox-rect" for="checkbox-discipline-approved">
+                <input id="checkbox-discipline-approved"
+                    @{{ #isApprove }}
+                        checked="checked"
+                    @{{ /isApprove }}
+                        value="{{\App\Models\Project::APPROVE}}"
+                       name="checkbox-discipline"
+                       class="js-checkbox-discipline-status" type="radio">
+                <div class="radio-container"></div>
+                Approved
+            </label>
+        </div>
+        <div class="col-md-4">
+            <label class="checkbox-rect" for="checkbox-discipline-rejected">
+                <input id="checkbox-discipline-rejected"
+                @{{ #isRejected }}
+                    checked="checked"
+                @{{ /isRejected }}
+                        value="{{\App\Models\Project::REJECTED}}"
+                       name="checkbox-discipline"
+                       class="js-checkbox-discipline-status" type="radio">
+                <div class="radio-container"></div>
+                Rejected
+            </label>
+        </div>
+    </div>
+</script>
+
 
 

@@ -9,8 +9,8 @@
                 <div class="col-sm-6">
                     <h4>Material</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="">Home</a></li>
-                        <li class="breadcrumb-item active">Material list</li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
+                        <li class="breadcrumb-item active"><a href="/material">Material list</a></li>
                     </ol>
                 </div>
                 @can('create',App\Models\Material::class)
