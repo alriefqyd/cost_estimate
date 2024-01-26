@@ -6,7 +6,7 @@
                 <div class="col-sm-6">
                     <h4>Material</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                         <li class="breadcrumb-item">Material List</li>
                         <li class="breadcrumb-item active"><a href="/work-item/{{$workItem->id}}">{{\Illuminate\Support\Str::limit($workItem->description, 50)}}</a></li>
                     </ol>
@@ -37,7 +37,7 @@
                             <form method="post"
                                   data-method="post"
                                   data-id="{{$workItem->id}}"
-                                  action="/work-item/{{$workItem->id}}/material">
+                                  action="/work-item/{{$workItem->id}}/work-item-material">
                                 <div class="row">
                                     @csrf
                                     <div class="col-sm-12 col-lg-12 col-xl-12">

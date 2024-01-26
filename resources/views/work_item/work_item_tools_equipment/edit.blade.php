@@ -6,7 +6,7 @@
                 <div class="col-sm-6">
                     <h4>Tools Equipment</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Home</a></li>
+                        <li class="breadcrumb-item"><a href="/">Home</a></li>
                         <li class="breadcrumb-item">Work Item List</li>
                         <li class="breadcrumb-item active"><a href="/work-item/{{$workItem->id}}">{{\Illuminate\Support\Str::limit($workItem->description, 50)}}</a></li>
                     </ol>
@@ -38,7 +38,7 @@
                                   data-method="put"
                                   data-id="{{$workItem->id}}"
                                   class="js-edit-work-item-man-power"
-                                  action="/work-item/{{$workItem->id}}/tools-equipment/update">
+                                  action="/work-item/{{$workItem->id}}/work-item-tools-equipment/update">
                                 <div class="row">
                                     @csrf
                                     <div class="col-sm-12 col-lg-12 col-xl-12">
