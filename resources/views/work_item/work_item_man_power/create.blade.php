@@ -37,7 +37,7 @@
                             <form method="post"
                                   data-method="post"
                                   data-id="{{$workItem->id}}"
-                                  action="/work-item/{{$workItem->id}}/man-power">
+                                  action="/work-item/{{$workItem->id}}/work-item-man-power">
                                 <div class="row">
                                     @csrf
                                     <div class="col-sm-12 col-lg-12 col-xl-12">
