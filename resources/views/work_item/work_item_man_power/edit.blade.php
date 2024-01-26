@@ -38,7 +38,7 @@
                                   data-method="put"
                                   data-id="{{$workItem->id}}"
                                   class="js-edit-work-item-man-power"
-                                  action="/work-item/{{$workItem->id}}/man-power/update">
+                                  action="/work-item/{{$workItem->id}}/work-item-man-power/update">
                                 <div class="row">
                                     @csrf
                                     <div class="col-sm-12 col-lg-12 col-xl-12">
