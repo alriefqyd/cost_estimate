@@ -41,36 +41,36 @@
 </div>
 <div class="row mt-3">
     <div class="col-xl-4 xl-50 col-lg-6 box-col-6">
-        <div class="card bg-primary">
+        <div class="card bg-primary" style="height: 290px">
             <div class="card-body">
                 <div class="media faq-widgets">
                     <div class="media-body">
                         <h5>About</h5>
-                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+                        <p>Web Cost Estimate is a platform for creating cost estimates for a project. This web was created by adopting the Excel-based Cost Estimate which has been used in the Engineering Project & Services (EPS) department. Hopefully the project team can make the project budget more accurate & effective as well as achieve the project goal efficiently.</p>
                     </div><i data-feather="book-open"></i>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-xl-4 xl-50 col-lg-6 box-col-6">
-        <div class="card bg-primary">
+    <div class="col-xl-4 xl-50 col-lg-6 box-col-6" >
+        <div class="card bg-primary" style="height: 290px">
             <div class="card-body">
                 <div class="media faq-widgets">
                     <div class="media-body">
                         <h5>Guidelines</h5>
-                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+                        <p>To find out more about how to use this Web Cost Estimate, we have provided you the user manual and video tutorial which you can access directly.</p>
                     </div><i data-feather="aperture"></i>
                 </div>
             </div>
         </div>
     </div>
     <div class="col-xl-4 col-lg-12 xl-100 box-col-12">
-        <div class="card bg-primary">
+        <div class="card bg-primary" style="height: 290px">
             <div class="card-body">
                 <div class="media faq-widgets">
                     <div class="media-body">
                         <h5>Feedback</h5>
-                        <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>
+                        <p>Please give your suggestions and comments so that this Web Cost Estimate can always be updated and can meet your needs.</p>
                     </div><i data-feather="file-text"></i>
                 </div>
             </div>
