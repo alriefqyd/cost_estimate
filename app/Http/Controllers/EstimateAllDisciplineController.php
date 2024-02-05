@@ -66,7 +66,7 @@ class EstimateAllDisciplineController extends Controller
                         $projectClass->workItemLaborFactorial = $ed?->labour_factorial;
                         $projectClass->workItemEquipmentFactorial = $ed?->equipment_factorial;
                         $projectClass->workItemMaterialFactorial = $ed?->material_factorial;
-                        $projectClass->workItemTotalCostStr = number_format($projectServices->getTotalCostWorkItem($ed), 2);
+                        $projectClass->workItemTotalCostStr = number_format($projectServices->getTotalCostWorkItem($ed), 2,',','.');
                         $projectClass->workItemTotalCost = $projectServices->getTotalCostWorkItem($ed);
                         $projectClass->wbs_level3_id = $ed->wbs_level3_id;
                         $projectClass->work_element_id = $ed->wbss?->work_element;
@@ -133,12 +133,12 @@ class EstimateAllDisciplineController extends Controller
                     $estimateAllDiscipline->labour_factorial = $item['labourFactorial'];
                     $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'];
                     $estimateAllDiscipline->material_factorial = $item['materialFactorial'];
-                    $estimateAllDiscipline->labor_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['labourUnitRate']);
-                    $estimateAllDiscipline->labor_cost_total_rate = $workItemController->removeCommaCurrencyFormat($item['totalRateManPowers']) * $item['vol'];
-                    $estimateAllDiscipline->tool_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['equipmentUnitRate']);
-                    $estimateAllDiscipline->tool_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateEquipments']) * $item['vol'];
-                    $estimateAllDiscipline->material_unit_rate =  $workItemController->removeCommaCurrencyFormat($item['materialUnitRate']);
-                    $estimateAllDiscipline->material_unit_rate_total =  $workItemController->removeCommaCurrencyFormat($item['totalRateMaterials']) * $item['vol'];
+                    $estimateAllDiscipline->labor_unit_rate =  $workItemController->strToFloat($item['labourUnitRate']);
+                    $estimateAllDiscipline->labor_cost_total_rate = $workItemController->strToFloat($item['totalRateManPowers']) * $item['vol'];
+                    $estimateAllDiscipline->tool_unit_rate =  $workItemController->strToFloat($item['equipmentUnitRate']);
+                    $estimateAllDiscipline->tool_unit_rate_total =  $workItemController->strToFloat($item['totalRateEquipments'])* $item['vol'];
+                    $estimateAllDiscipline->material_unit_rate =  $workItemController->strToFloat($item['materialUnitRate']);
+                    $estimateAllDiscipline->material_unit_rate_total =  $workItemController->strToFloat($item['totalRateMaterials']) * $item['vol'];
                     $estimateAllDiscipline->wbs_level3_id = $item['wbs_level3'];
                     $estimateAllDiscipline->equipment_location_id = $item['work_element'];
                     $estimateAllDiscipline->unique_identifier = $item['idx'];

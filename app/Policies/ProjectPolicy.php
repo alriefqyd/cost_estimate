@@ -51,16 +51,21 @@ class ProjectPolicy
             'mechanical' => 'design_engineer_mechanical',
             'civil' => 'design_engineer_civil',
             'electrical' => 'design_engineer_electrical',
-            'instrument' => 'design_engineer_instrument'
+            'instrument' => 'design_engineer_instrument',
+            'project_manager' => 'project_manager',
+            'project_engineer' => 'project_engineer'
         ];
+
 
         foreach ($roleMapping as $role => $field) {
             if ($user->isAssigneeCostEstimateRole() && $project->$field == $user->id) {
                 return true;
             }
 
-            if ($user->{"isAll{$role}CostEstimateRole"}() && isset($project->$field) && $project->$field !== '') {
-                return true;
+            if(method_exists($user, "isAll{$role}CostEstimateRole") ){
+                if ($user->{"isAll{$role}CostEstimateRole"}() && isset($project->$field) && $project->$field !== '') {
+                    return true;
+                }
             }
         }
 
@@ -94,7 +99,7 @@ class ProjectPolicy
      * @param  \App\Models\Project  $project
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, Project $project)
+    public function update(User $user)
     {
         // Eager load roles to minimize database queries
         $user->load('roles');

@@ -28,10 +28,10 @@
     </td>
     <td class="js-work-item-tools-equipment-rate min-w-100 js-item-rate"
         data-rate="{{$isEdit ? $exEquipmentTools->local_rate : ''}}">
-        {{$isEdit ? number_format($exEquipmentTools->local_rate,2,'.',',') : ''}}
+        @if($isEdit) @currencyFormat($exEquipmentTools->local_rate) @endif
     </td>
     <td class="js-work-item-tools-equipment-amount min-w-100 js-item-amount">
-        {{$isEdit ? number_format($exEquipmentTools->pivot->amount,2,'.',',') : ''}}
+        @if($isEdit) @currencyFormat($exEquipmentTools->pivot->amount) @endif
     </td>
     <td>
         <i class="fa fa-trash-o js-delete-item js-delete-work-item-tools-equipment text-danger js-confirm-form text-20"></i>

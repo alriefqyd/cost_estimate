@@ -299,8 +299,16 @@
     max-width: 10px !important;
 }
 
+.max_width50_td {
+    max-width: 50px !important;
+}
+
 .max_width40_td {
     max-width: 40px !important;
+}
+
+.max_width30_td {
+    max-width: 30px !important;
 }
 
 .max_width100_td {

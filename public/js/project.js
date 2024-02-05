@@ -80,9 +80,10 @@ $(function(){
             success: function (result){
                 var _data = {
                     'discipline' : _discipline,
-                    'isPending' : result.data == "PENDING" ? true : false,
-                    'isApprove' : result.data == "APPROVE" ? true : false,
-                    'isRejected' : result.data == 'REJECTED' ? true : false
+                    'isPending' : result.data.result == "PENDING" ? true : false,
+                    'isApprove' : result.data.result == "APPROVE" ? true : false,
+                    'isRejected' : result.data.result == 'REJECTED' ? true : false,
+                    'remark' : result.data.remark
                 };
                 var _temp = Mustache.render(template,_data);
                 $('.js-modal-approve-discipline').find('.loading-spinner').addClass('d-none');
@@ -97,18 +98,30 @@ $(function(){
         $('.js-form-approval').find('.js-row-form-status').remove();
     });
 
+    $(document).on('change','.js-checkbox-discipline-status',function(){
+       var _this = $(this);
+       var _val = _this.val();
+       if(_val === "REJECTED"){
+           _this.closest('.js-row-form-status').find('.js-form-remark-rejected').removeClass('d-none');
+       } else {
+           _this.closest('.js-row-form-status').find('.js-form-remark-rejected').addClass('d-none');
+       }
+    });
+
     $(document).on('click','.js-btn-approve-discipline-cost-estimate', function(e){
         var _this = $(this);
         var _parent = _this.closest('.js-modal-approve-discipline');
         var _id = $('.js-hidden-id-project').val();
         var _discipline = $('.js-modal-discipline').val();
         var _val = $('input[name="checkbox-discipline"]:checked').val();
+        var _remark = _this.closest('.js-modal-approve-discipline').find('.js-remark-project').val();
 
         $.ajax({
            url:'/project/update-status/' + _id,
            method:'post',
            data: {
                'discipline': _discipline,
+               'remark' : _remark,
                'status' : _val
            },
            success:function(result){
@@ -167,7 +180,8 @@ $(function(){
         var _button = $(e.relatedTarget);
         var _project_id = _button.data('id');
         $(this).find('.js-delete-project').data('id', _project_id);
-    })
+    });
+
     $('.js-delete-project').on('click', function(e){
         e.preventDefault();
         var _id = $(this).data('id');
@@ -187,5 +201,13 @@ $(function(){
             }
         });
     })
+
+    $(document).on('click','.js-full-text', function(e){
+        e.preventDefault();
+        var _this = $(this);
+        var _text = _this.closest('p').data('text');
+        _this.siblings('.js-text-full-remark').text(_text);
+        _this.remove();
+    });
 
 });

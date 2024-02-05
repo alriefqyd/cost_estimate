@@ -41,11 +41,13 @@ $(function(){
         var selectedText = selectedOption.text();
         var rate = $(this).select2('data')[0].rate;
         var parent = $(this).closest('.js-row-column');
-        parent.find('.js-item-amount').text(toCurrency(rate));
-        parent.find('.js-item-rate').text(toCurrency(rate));
+        parent.find('.js-item-amount').text(toCurrency(parseFloat(rate)));
+        parent.find('.js-item-rate').text(toCurrency(parseFloat(rate)));
         parent.find('.js-item-rate').attr('data-rate',rate);
         parent.find('.js-item-coef').removeAttr('disabled');
+        parent.find('.js-item-coef').val(1);
         parent.find('.js-item-unit').removeAttr('disabled');
+        countTotalAmount(0)
     });
 
     $(document).on('change keyup keypress','.js-item-coef',function(e){
@@ -76,7 +78,7 @@ $(function(){
         var _amount = _rate * _coef;
         var _amountStr = _amount.toString();
 
-        var decimalPattern = /(\d+\.\d{2})/;
+        var decimalPattern = /(\d+,\d{2})/;
         var match = _amountStr.match(decimalPattern);
 
         if (match) {
@@ -99,7 +101,7 @@ $(function(){
         Mustache.parse(template);
         var _temp = Mustache.render(template);
         _this.closest('.table-responsive').find('.js-table-body-work-item-item').append(_temp);
-        $('.select2').select2()
+        $('.select2').select2();
         _this.closest('.table-responsive').find('.js-select-item').each(function(index,element){
             selectItemInit(element);
         });
@@ -410,14 +412,19 @@ $(function(){
         _this.find('.loader-34').addClass('d-none');
     }
 
-    function toCurrency($val){
-        if($val == null) return '';
-        return new Intl.NumberFormat('en-US').format($val);
+    function toCurrency(val) {
+        if (typeof val !== 'number' || isNaN(val)) return '';
+
+        const parts = val.toFixed(2).toString().split('.');
+        const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        const decimalPart = parts[1];
+
+        return `${integerPart},${decimalPart}`;
     }
 
     function removeCurrency($val){
         if($val == null) return '';
-        $val = $val.toString().replaceAll(",", "")
+        $val = $val.toString().replaceAll(".", "")
         return $val;
     }
 });
