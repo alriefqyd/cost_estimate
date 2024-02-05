@@ -29,10 +29,10 @@
     </td>
     <td class="js-work-item-material-rate min-w-100 js-item-rate"
         data-rate="{{$isEdit ? $exMaterials->rate : ''}}">
-        {{$isEdit ? number_format($exMaterials->rate,2,'.',',') : ''}}
+        @if($isEdit) @currencyFormat($exMaterials->rate) @endif
     </td>
     <td class="js-work-item-material-amount min-w-150 js-item-amount">
-        {{$isEdit ? number_format($exMaterials->pivot->amount,2,'.',',') : ''}}
+        @if($isEdit) @currencyFormat($exMaterials->pivot->amount) @endif
     </td>
     <td>
         <i class="fa fa-trash-o js-delete-item js-delete-work-item-material text-danger js-confirm-form text-20"></i>

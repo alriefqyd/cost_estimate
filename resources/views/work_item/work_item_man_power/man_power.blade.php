@@ -1,6 +1,6 @@
 <tr class="js-row-work-item-man-power js-row-column">
     <td class="min-w-160">
-        <select class="js-select-man-power js-select-item js-confirm-form"
+        <select class="select2 js-select-man-power js-select-item js-confirm-form"
                 data-minimum-input-length="0"
                 data-url="/getManPower"
                 name="man_power[]"
@@ -29,10 +29,10 @@
     </td>
     <td class="js-work-item-man-power-rate min-w-100 js-item-rate"
         data-rate="{{$isEdit ? $exManPower->overall_rate_hourly : ''}}">
-        {{$isEdit ? number_format($exManPower->overall_rate_hourly,2,'.',',') : ''}}
+        @if($isEdit) @currencyFormat($exManPower->overall_rate_hourly) @endif
     </td>
     <td class="js-work-item-man-power-amount min-w-100 js-item-amount">
-        {{$isEdit ? number_format($exManPower->pivot->amount,2,'.',',') : ''}}
+        @if($isEdit) @currencyFormat($exManPower->getAmount())@endif
     </td>
     <td>
         <i class="fa fa-trash-o js-delete-item js-delete-work-item-man-power js-confirm-form text-danger text-20"></i>

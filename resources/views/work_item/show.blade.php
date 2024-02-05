@@ -131,8 +131,8 @@
                                         <th>Description</th>
                                         <th>Unit</th>
                                         <th>Coef</th>
-                                        <th>Rate</th>
-                                        <th>Amount</th>
+                                        <th>Rate (IDR)</th>
+                                        <th>Amount (IDR)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -148,7 +148,7 @@
                                     <tr>
                                         <td><label>Total :</label></td>
                                         <td colspan="4" class="text-end">
-                                            <label>{{number_format($work_item->getTotalCostManPower(),2,'.',',')}}</label>
+                                            <label>Rp @currencyFormat($work_item->getTotalCostManPower())</label>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -200,14 +200,14 @@
                                             <td>{{$tools->pivot?->unit}}</td>
                                             <td>{{number_format($tools->pivot?->quantity,2,',','.')}}</td>
                                             <td>{{number_format($tools->local_rate,2,',','.')}}</td>
-                                            <td>{{number_format($tools->pivot?->amount,2,',','.')}}</td>
+                                            <td> @currencyFormat($tools->pivot?->amount)</td>
                                             <td></td>
                                         </tr>
                                     @endforeach
                                     <tr>
                                         <td><label>Total :</label></td>
-                                        <td colspan="5" class="text-end">
-                                            <label>{{number_format($work_item->getTotalCostEquipment(),2,'.',',')}}</label>
+                                        <td colspan="6" class="text-end">
+                                            <label>Rp @currencyFormat($work_item->getTotalCostEquipment())</label>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -266,7 +266,7 @@
                                 <tr>
                                     <td><label>Total :</label></td>
                                     <td colspan="5" class="text-end">
-                                        <label>{{number_format($work_item->getTotalCostMaterial(),2,'.',',')}}</label>
+                                        <label>Rp @currencyFormat($work_item->getTotalCostMaterial())</label>
                                     </td>
                                 </tr>
                                 </tbody>

@@ -48,10 +48,10 @@
                     </td>
                     <td>{{$project->project_sponsor}}</td>
                     <td>{{$project->projectManager?->profiles?->full_name}}</td>
-                    <td>{{$project->designEngineerMechanical?->profiles?->full_name}}</td>
-                    <td>{{$project->designEngineerCivil?->profiles?->full_name}}</td>
-                    <td>{{$project->designEngineerElectrical?->profiles?->full_name}}</td>
-                    <td>{{$project->designEngineerInstrument?->profiles?->full_name}}</td>
+                    <td>{{$project->designEngineerMechanical?->profiles?->full_name ?? 'NR'}}</td>
+                    <td>{{$project->designEngineerCivil?->profiles?->full_name ?? 'NR'}}</td>
+                    <td>{{$project->designEngineerElectrical?->profiles?->full_name ?? 'NR'}}</td>
+                    <td>{{$project->designEngineerInstrument?->profiles?->full_name ?? 'NR'}}</td>
                     <td>{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
                     <td>{{$project->projectArea?->name}}</td>
                     <td>{{$project->status}}</td>

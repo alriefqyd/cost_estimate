@@ -133,7 +133,10 @@ class Project extends Model
                     ->orWhere('design_engineer_civil', $user->id)
                     ->orWhere('design_engineer_mechanical', $user->id)
                     ->orWhere('design_engineer_electrical', $user->id)
-                    ->orWhere('design_engineer_instrument', $user->id);
+                    ->orWhere('design_engineer_instrument', $user->id)
+                    ->orwhere('project_manager', $user->id)
+                    ->orWhere('project_engineer', $user->id)
+                    ;
             })->when($user->isAllElectricalCostEstimateRole(), function ($q) use ($user) {
                 return $q->orwhereNotNull('design_engineer_electrical');
             })->when($user->isAllInstrumentCostEstimateRole(), function ($q) use ($user) {

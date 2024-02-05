@@ -110,11 +110,9 @@
                                                     @endif
                                                 @endforeach
                                                 @php($previousWorkElement = $a)
-
                                             @endforeach
                                         @endforeach
                                     @endforeach
-
                                     </tbody>
                                 </table>
                             </div>

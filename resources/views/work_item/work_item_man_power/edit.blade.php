@@ -49,15 +49,15 @@
                                                     <th scope="col" class="text-left min-w-160 ">Code - Description</th>
                                                     <th scope="col" class="text-left">Unit</th>
                                                     <th scope="col" class="text-left">Coef</th>
-                                                    <th scope="col" class="text-left min-w-100">Rate</th>
-                                                    <th scope="col" class="text-left min-w-100">Amount</th>
+                                                    <th scope="col" class="text-left min-w-100">Rate (IDR)</th>
+                                                    <th scope="col" class="text-left min-w-100">Amount (IDR)</th>
                                                     <th scope="col" class="text-left min-w-30"></th>
                                                 </tr>
                                                 </thead>
                                                 <tbody class="js-table-body-work-item-item">
                                                 @if(isset($workItem->manPowers))
                                                     @foreach($workItem->manPowers as $exManPower)
-                                                        @include('work_item.work_item_man_power.man_power', ['isEdit' => true])
+                                                        @include('work_item.work_item_man_power.man_power', ['isEdit' => true, 'work_item' => $workItem])
                                                     @endforeach
                                                 @endif
                                                 </tbody>
@@ -68,7 +68,9 @@
                                                     <th scope="col" class="text-left"></th>
                                                     <th scope="col" class="text-left"></th>
                                                     <th scope="col" class="text-left min-w-100"></th>
-                                                    <th scope="col" class="text-center min-w-100 js-item-total"></th>
+                                                    <th scope="col" class="text-center min-w-100 js-item-total">
+                                                        @currencyFormat($workItem->getTotalCostManPower())
+                                                    </th>
                                                 </tr>
                                             </table>
                                             <div class="float-end mt-2 cursor-pointer js-add-new-item"

@@ -48,8 +48,8 @@
                                                         <th scope="col" class="text-left min-w-160 ">Code - Description</th>
                                                         <th scope="col" class="text-left">Unit</th>
                                                         <th scope="col" class="text-left">Coef</th>
-                                                        <th scope="col" class="text-left min-w-100">Rate</th>
-                                                        <th scope="col" class="text-left min-w-100">Amount</th>
+                                                        <th scope="col" class="text-left min-w-100">Rate (IDR)</th>
+                                                        <th scope="col" class="text-left min-w-100">Amount (IDR)</th>
                                                         <th scope="col" class="text-left min-w-30"></th>
                                                     </tr>
                                                 </thead>
