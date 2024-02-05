@@ -414,7 +414,7 @@
 
 <script id="js-template-modal-update-status-project" type="x-templ-mustache">
     <div class="row js-row-form-status m-b-20">
-    <input type="hidden" class="js-modal-discipline" value="@{{ discipline }}">
+        <input type="hidden" class="js-modal-discipline" value="@{{ discipline }}">
         <div class="col-md-4">
             <label class="checkbox-rect" for="checkbox-discipline-pending">
                 <input id="checkbox-discipline-pending"
@@ -453,6 +453,9 @@
                 <div class="radio-container"></div>
                 Rejected
             </label>
+        </div>
+        <div class="form-group js-form-remark-rejected mt-3 @{{ ^isRejected }} d-none @{{ /isRejected }}">
+            <textarea class="form-control js-remark-project" id="summernote" rows="5" name="remark">@{{ remark }}</textarea>
         </div>
     </div>
 </script>

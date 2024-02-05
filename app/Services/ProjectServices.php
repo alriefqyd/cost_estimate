@@ -210,6 +210,11 @@ class ProjectServices
 
         return false;
     }
+
+    public function getRemarkDiscipline(Project $project){
+        $data = json_decode($project->remark);
+        return $data;
+    }
     public function toCurrency($val){
         if(!$val) return 0.00;
         return number_format($val, 2);

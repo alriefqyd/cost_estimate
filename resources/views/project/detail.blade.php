@@ -42,110 +42,46 @@
                         </div>
                     </div>
                     <div class="card-body card-body-custom">
-                        <div class="col-sm-10 float-start" style="margin-left: 20px!important">
+                        <div class="col-sm-11 float-start" style="margin-left: 20px!important">
                             <input type="hidden" class="js-hidden-id-project" value="{{$project->id}}">
                             <table class="table">
                                 <tr>
-                                    <td>Date</td>
+                                    <td class="max_width40_td">Date</td>
                                     <td>:</td>
                                     <td>{{$project_date}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Project No</td>
+                                    <td class="max_width40_td">Project No</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->project_no}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Project Title</td>
+                                    <td class="max_width40_td">Project Title</td>
                                     <td>:</td>
-                                    <td class="m-2" colspan="2">{{$project->project_title}}</td>
+                                    <td class="m-2" >{{$project->project_title}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Project Sponsor</td>
+                                    <td class="max_width40_td">Project Sponsor</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->project_sponsor}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Project Manager</td>
+                                    <td class="max_width40_td">Project Manager</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->projectManager?->profiles?->full_name}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Project Engineer</td>
+                                    <td class="max_width40_td">Project Engineer</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->projectEngineer?->profiles?->full_name}}</td>
                                 </tr>
                                 <tr>
-                                    <td>Project Area</td>
+                                    <td class="max_width40_td">Project Area</td>
                                     <td>:</td>
                                     <td class="m-2">{{$project->projectArea?->name}}</td>
                                 </tr>
                                 <tr>
-                                    <td colspan="4">
-                                        <p class="font-weight-bold" style="color: black"> Design Engineer </p>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
-                                        Civil
-                                        @if(isset($project->design_engineer_civil))
-                                            {!!$project->getStatusApprovalDiscipline($project->civil_approval_status) !!}
-                                        @endif
-                                    </td>
-                                    <td>:</td>
-                                    <td>
-                                        {{$project?->designEngineerCivil?->profiles?->full_name  ?? 'NR'}}
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['mechanical']}}" {!! $isAuthorizeToReviewMechanical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewMechanical ? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
-                                            Mechanical
-                                        @if(isset($project->design_engineer_mechanical))
-                                            {!! $project->getStatusApprovalDiscipline($project->mechanical_approval_status) !!}
-                                        @endif
-                                    </td>
-                                    <td>:</td>
-                                    <td>{{$project?->designEngineerMechanical?->profiles?->full_name  ?? 'NR'}}</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['electrical']}}" {!! $isAuthorizeToReviewElectrical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!}  class="{!! $isAuthorizeToReviewElectrical ? 'js-modal-approval cursor-pointer' : 'color-grey'!!} m-r-10" style="width: 17px"></i>
-                                        Electrical
-                                        @if(isset($project->design_engineer_electrical))
-                                            {!!$project->getStatusApprovalDiscipline($project->electrical_approval_status) !!}
-                                        @endif
-                                    </td>
-                                    <td>:</td>
-                                    <td>{{$project?->designEngineerElectrical?->profiles?->full_name  ?? 'NR'}}</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewInstrument ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewInstrument ? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
-                                            Instrument
-                                        @if(isset($project->design_engineer_instrument))
-                                            {!!$project->getStatusApprovalDiscipline($project->instrument_approval_status) !!}
-                                        @endif
-                                    </td>
-                                    <td>:</td>
-                                    <td>{{$project?->designEngineerInstrument?->profiles?->full_name ?? 'NR'}}</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        @if(auth()->user()->isDisciplineReviewer(''))
-                                            <i class="fa fa-edit cursor-pointer js-edit-remark-project-btn m-r-10" style="font-size: 18px" data-bs-toggle="modal" data-bs-target=".bd-example-modal-lg"></i>
-                                        @endif
-                                            Remark
-                                    </td>
-                                    <td>:</td>
-                                    <td>
-                                        <span class="js-remark"> {!! $project->remark ?? '-' !!}</span>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Status</td>
+                                    <td class="max_width40_td">Status</td>
                                     <td>:</td>
                                     <td>
                                         <div class="mb-2 js-detail-status">{{$project->status}}</div>
@@ -172,8 +108,75 @@
                                             </div>
                                         @endif
                                     </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3">
+                                        <p class="font-weight-bold" style="color: black"> Design Engineer </p>
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
+                                        Civil
+                                        @if(isset($project->design_engineer_civil))
+                                            {!!$project->getStatusApprovalDiscipline($project->civil_approval_status) !!}
+                                        @endif
+                                    </td>
+                                    <td>:</td>
+                                    <td class="max_width50_td">
+                                        {{$project?->designEngineerCivil?->profiles?->full_name  ?? 'NR'}}
+                                        @if(isset($remark->civil) && $project->civil_approval_status == \App\Models\Project::REJECTED))
+                                            <p class="f-12 m-t-5" data-text="{{$remark->civil}}"><b>Remark :</b> <span class="js-text-full-remark"> {{\Illuminate\Support\Str::limit($remark->civil ?? '', 180)}} </span> {!!\Illuminate\Support\Str::length($remark->civil ?? '') > 180 ? '<a class="js-full-text" href="">read more</a>' : ''!!}</p>
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['mechanical']}}" {!! $isAuthorizeToReviewMechanical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewMechanical ? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
+                                            Mechanical
+                                        @if(isset($project->design_engineer_mechanical))
+                                            {!! $project->getStatusApprovalDiscipline($project->mechanical_approval_status) !!}
+                                        @endif
 
+                                    </td>
+                                    <td>:</td>
+                                    <td class="max_width40_td">
+                                        {{$project?->designEngineerMechanical?->profiles?->full_name  ?? 'NR'}}
+                                        @if(isset($remark->mechanical) && $project->mechanical_approval_status == \App\Models\Project::REJECTED)
+                                            <p class="f-12 m-t-5" data-text="{{$remark->mechanical}}"><b>Remark :</b> <span class="js-text-full-remark">{{\Illuminate\Support\Str::limit($remark->mechanical ?? '', 180)}} </span>{!!\Illuminate\Support\Str::length($remark->mechanical ?? '') > 180 ? '<a class="js-full-text" href="">read more</a>' : ''!!}</p>
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['electrical']}}" {!! $isAuthorizeToReviewElectrical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!}  class="{!! $isAuthorizeToReviewElectrical ? 'js-modal-approval cursor-pointer' : 'color-grey'!!} m-r-10" style="width: 17px"></i>
+                                        Electrical
+                                        @if(isset($project->design_engineer_electrical))
+                                            {!!$project->getStatusApprovalDiscipline($project->electrical_approval_status) !!}
+                                        @endif
+                                    </td>
+                                    <td>:</td>
+                                    <td class="max_width40_td">
+                                        {{$project?->designEngineerElectrical?->profiles?->full_name  ?? 'NR'}}
+                                        @if(isset($remark->electrical) && $project->electrical_approval_status == \App\Models\Project::REJECTED)
+                                            <p class="f-12 m-t-5" data-text="{{$remark->electrical}}"><b>Remark :</b> <span class="js-text-full-remark">{{\Illuminate\Support\Str::limit($remark->electrical ?? '', 180)}} </span> {!!\Illuminate\Support\Str::length($remark->electrical ?? '') > 180 ? '<a class="js-full-text" href="">read more</a>' : ''!!}</p>
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewInstrument ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewInstrument ? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
+                                            Instrument
+                                        @if(isset($project->design_engineer_instrument))
+                                            {!!$project->getStatusApprovalDiscipline($project->instrument_approval_status) !!}
+                                        @endif
+                                    </td>
+                                    <td>:</td>
+                                    <td class="max_width40_td">
+                                        {{$project?->designEngineerInstrument?->profiles?->full_name ?? 'NR'}}
+                                        @if(isset($remark->instrument) && $project->instrument_approval_status == \App\Models\Project::REJECTED)
+                                            <p class="f-12 m-t-5" data-text="{{$remark->instrument}}"><b>Remark :</b> <span class="js-text-full-remark">{{\Illuminate\Support\Str::limit($remark->instrument ?? '', 180)}} </span>{!!\Illuminate\Support\Str::length($remark->instrument ?? '') > 180 ? '<a class="js-full-text" href="">read more</a>' : ''!!}</p>
+                                        @endif
                                     </td>
                                 </tr>
                             </table>
@@ -311,11 +314,11 @@
             </div>
         </div>
 
-        <div data-id="{{$project->id}}" class="modal js-modal-approve-discipline fade" id="approveModalDiscipline" tabindex="-1" role="dialog" aria-labelledby="approveModalDiscipline" aria-hidden="true">
-            <div class="modal-dialog" role="document">
+        <div data-id="{{$project->id}}" class="modal bd-example-modal-lg js-modal-approve-discipline fade" id="approveModalDiscipline" tabindex="-1" role="dialog" aria-labelledby="approveModalDiscipline" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Update Status By Discipline</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Update  By Discipline</h5>
                         <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body text-center">
@@ -329,31 +332,7 @@
                 </div>
             </div>
         </div>
-
-        @if(auth()->user()->isDisciplineReviewer(''))
-            <div class="modal fade bd-example-modal-lg js-modal-remark-project" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title" id="myLargeModalLabel">
-                                Remark
-                            </h4>
-                            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="form-group">
-                                <textarea class="form-control js-remark-project" rows="5" name="remark">{{$project->remark}}</textarea>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <div class="btn btn-outline-danger" data-bs-dismiss="modal">Cancel</div>
-                            <div class="btn btn-outline-primary js-save-project-remark" data-id="{{$project->id}}">Save</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
     </div>
-    </div>
+</div>
 @endsection
 <!-- Container-fluid Ends-->
