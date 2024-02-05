@@ -519,12 +519,26 @@ $(function(){
 
     function removeCurrency($val){
         if($val == null || $val == '') return 0;
-        $val = $val.toString().replaceAll(",", "")
+        $val = $val.toString().replaceAll(".", "")
+        $val = $val.replaceAll(",",'.');
         return $val
     }
-    function toCurrency($val){
-        if($val == null || $val == 0) return '';
-        return new Intl.NumberFormat('en-US',{ minimumFractionDigits: 2, maximumFractionDigits: 2 }).format($val);
+
+    function convertDBCurrency($val){
+        if($val == null || $val == '') return 0;
+        $val = $val.toString().replaceAll(".", "")
+        $val = $val.replaceAll(",", ".")
+        return $val
+    }
+
+    function toCurrency(val) {
+        if (typeof val !== 'number' || isNaN(val)) return '';
+
+        const parts = val.toFixed(2).toString().split('.');
+        const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        const decimalPart = parts[1];
+
+        return `${integerPart},${decimalPart}`;
     }
 
     function generateId(){

@@ -83,11 +83,11 @@
                     <td>{{$item->estimateVolume}}</td>
                     <td>{{$item->workItemUnit}}</td>
                     <td>{{$item->workItemUnitRateLaborCost}}</td>
-                    <td>{{number_format($item->workItemTotalLaborCost,2,'.',',')}}</td>
+                    <td>{{number_format($item->workItemTotalLaborCost,2,',','.')}}</td>
                     <td>{{$item->workItemUnitRateToolCost}}</td>
-                    <td>{{number_format($item->workItemTotalToolCost,2,'.',',')}}</td>
+                    <td>{{number_format($item->workItemTotalToolCost,2,',','.')}}</td>
                     <td>{{$item->workItemUnitRateMaterialCost}}</td>
-                    <td>{{number_format($item->workItemTotalMaterialCost,2,'.',',')}}</td>
+                    <td>{{number_format($item->workItemTotalMaterialCost,2,',','.')}}</td>
                     <td></td>
                     <td>{{$item->workItemLaborFactorial}}</td>
                     <td>{{$item->workItemEquipmentFactorial}}</td>

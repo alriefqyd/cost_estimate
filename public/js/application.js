@@ -256,10 +256,6 @@ $(function(){
         $(this).closest('form').submit();
     });
 
-    var quill = new Quill('.js-quill',{
-        theme:'snow',
-    });
-
     /*
     Export
      */

@@ -245,11 +245,13 @@ class ProjectController extends Controller
         $isReviewerMechanical = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['mechanical'],$project->design_engineer_mechanical,sizeof($estimateDisciplines));
         $isReviewerElectrical = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['electrical'],$project->design_engineer_electrical,sizeof($estimateDisciplines));
         $isReviewerInstrument = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['instrument'],$project->design_engineer_instrument,sizeof($estimateDisciplines));
+        $remark = $projectService->getRemarkDiscipline($project);
 
         return view('project.detail',[
             'project' => $project,
             'costProject' => $costProjects,
             'wbs' => $wbs,
+            'remark' => $remark,
             'estimateAllDisciplines' => $estimateDisciplines,
             'isAuthorizeToReviewCivil' => $isReviewerCivil,
             'isAuthorizeToReviewMechanical' => $isReviewerMechanical,
@@ -277,62 +279,88 @@ class ProjectController extends Controller
 
     public function getProjectDisciplineStatus(Request $request, Project $project){
         $result = '';
+        $remark = json_decode($project->remark, true);
         switch ($request->discipline) {
             case Setting::DESIGN_ENGINEER_LIST['civil']:
                 $result = $project->civil_approval_status;
+                $remark = $remark['civil'] ?? '';
                 break;
             case Setting::DESIGN_ENGINEER_LIST['mechanical']:
                 $result = $project->mechanical_approval_status;
+                $remark = $remark['mechanical'] ?? '';
                 break;
             case Setting::DESIGN_ENGINEER_LIST['electrical']:
                 $result = $project->electrical_approval_status;
+                $remark = $remark['electrical'] ?? '';
                 break;
             case Setting::DESIGN_ENGINEER_LIST['instrument']:
                 $result = $project->instrument_approval_status;
+                $remark = $remark['instrument'] ?? '';
                 break;
         }
 
         return response()->json([
             'status' => 200,
-            'data' => $result
+            'data' => [
+                'result' => $result,
+                'remark' => $remark
+            ]
         ]);
     }
 
-    public function updateStatus(Project $project, Request $request){
+    public function updateStatus(Project $project, Request $request)
+    {
         $projectServices = new ProjectServices();
-        try{
+        $remark = isset($project->remark) ? json_decode($project->remark, true) : [
+            'civil' => '',
+            'mechanical' => '',
+            'electrical' => '',
+            'instrument' => '',
+        ];
+
+        try {
             DB::beginTransaction();
-            if($request->discipline) {
+
+            if ($request->discipline) {
                 switch ($request->discipline) {
                     case Setting::DESIGN_ENGINEER_LIST['civil']:
                         $project->civil_approval_status = $request->status;
+                        $remark['civil'] = $request->remark;; // Replace 'YourValueForCivil' with the actual value
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['mechanical']:
                         $project->mechanical_approval_status = $request->status;
+                        $remark['mechanical'] = $request->remark; // Replace 'YourValueForMechanical' with the actual value
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['electrical']:
                         $project->electrical_approval_status = $request->status;
+                        $remark['electrical'] = $request->remark;; // Replace 'YourValueForElectrical' with the actual value
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['instrument']:
                         $project->instrument_approval_status = $request->status;
+                        $remark['instrument'] = $request->remark;; // Replace 'YourValueForInstrument' with the actual value
                         break;
                 }
                 $projectServices->updateStatusProject($project);
+                $project->remark = json_encode($remark);
             } else {
                 $project->status = Project::APPROVE;
             }
+
             $project->save();
             DB::commit();
-            return response()->json([
+
+            $response = [
                 'status' => 200,
                 'message' => 'Project successfully approved',
                 'data' => Project::APPROVE,
-            ]);
+            ];
+
+            return response()->json($response);
         } catch (Exception $e) {
             DB::rollback();
             return response()->json([
                 'status' => 500,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ]);
         }
     }

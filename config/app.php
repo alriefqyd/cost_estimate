@@ -182,6 +182,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
+
         /*
          * Package Service Providers...
          */
@@ -198,6 +199,7 @@ return [
         App\Providers\JetstreamServiceProvider::class,
         App\Providers\CustomDirectiveServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        App\Providers\CurrencyFormatServiceProvider::class,
 
     ],
 

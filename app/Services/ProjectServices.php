@@ -153,9 +153,9 @@ class ProjectServices
 
                 $totalWorkCostByLocation = $totalPriceLabor + $totalPriceEquipment + $totalPriceMaterial;
                 $projectTotalCost = new ProjectTotalCostClass();
-                $projectTotalCost->totalLaborCost = $this->toCurrency($totalPriceLabor);
-                $projectTotalCost->totalEquipmentCost = $this->toCurrency($totalPriceEquipment);
-                $projectTotalCost->totalMaterialCost = $this->toCurrency($totalPriceMaterial);
+                $projectTotalCost->totalLaborCost = $this->toCurrencyIDR($totalPriceLabor);
+                $projectTotalCost->totalEquipmentCost = $this->toCurrencyIDR($totalPriceEquipment);
+                $projectTotalCost->totalMaterialCost = $this->toCurrencyIDR($totalPriceMaterial);
                 $projectTotalCost->totalWorkCost = $totalWorkCostByLocation;
                 $projectTotalCost->disciplineLaborCost = $disciplineLaborCost;
                 $projectTotalCost->disciplineToolCost = $disciplineToolCost;
@@ -210,16 +210,26 @@ class ProjectServices
 
         return false;
     }
+
+    public function getRemarkDiscipline(Project $project){
+        $data = json_decode($project->remark);
+        return $data;
+    }
     public function toCurrency($val){
         if(!$val) return 0.00;
         return number_format($val, 2);
+    }
+
+    public function toCurrencyIDR($val){
+        if(!$val) return "0,00";
+        return number_format($val, 2,',','.');
     }
 
     public function getResultCount($value,$factorial){
         if(!$value) return '';
         if(!$factorial) $factorial = 1;
         $newValue = $value * $factorial;
-        return $this->toCurrency($newValue);
+        return number_format($newValue,2,',','.');
     }
 
     public function message($message, $type, $icon, $status){

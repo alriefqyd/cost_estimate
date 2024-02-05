@@ -194,11 +194,12 @@ class WorkItemController extends Controller
         DB::beginTransaction();
         try{
             $pivotData = $this->processStoreManPower($workItem, $request);
-            $workItem->manPowers()->sync($pivotData);
+            $uniquePivotData = array_map("unserialize", array_unique(array_map("serialize", $pivotData)));
+            $workItem->manPowers()->sync($uniquePivotData);
             DB::commit();
             return response()->json([
                 'status' => 200,
-                'message' => 'Data Saved Successfully'
+                'message' => $pivotData
             ]);
         } catch (Exception $e){
             DB::rollback();
@@ -211,17 +212,19 @@ class WorkItemController extends Controller
 
     public function processStoreManPower(WorkItem $workItem,Request $request){
         $pivotData = [];
-        if(sizeof($request->data) > 0){
-            foreach($request->data as $item){
+
+        if (isset($request->data) && is_array($request->data)) {
+            foreach ($request->data as $item) {
                 $pivotData[$item['item']] = [
-                    'labor_unit' => $item['unit'],
-                    'labor_coefisient' => $item['coef'],
-                    'amount' => $this->removeCommaCurrencyFormat($item['amount']),
-                    'created_at' => now(),
-                    'updated_at' => now()
+                    'labor_unit'      => $item['unit'],
+                    'labor_coefisient'=> $item['coef'],
+                    'amount'          => $this->removeCommaCurrencyFormat($item['amount']),
+                    'created_at'      => now(),
+                    'updated_at'      => now(),
                 ];
             }
         }
+
         return $pivotData;
     }
 
@@ -275,7 +278,8 @@ class WorkItemController extends Controller
         }
         try{
             $pivotData = $this->processStoreToolEquipment($workItem,$request);
-            $workItem->equipmentTools()->sync($pivotData);
+            $uniquePivotData = array_map("unserialize", array_unique(array_map("serialize", $pivotData)));
+            $workItem->equipmentTools()->sync($uniquePivotData);
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
@@ -295,7 +299,7 @@ class WorkItemController extends Controller
                 $pivotData[$item['item']] = [
                     'unit' => $item['unit'],
                     'quantity' => $item['coef'],
-                    'amount' => $this->removeCommaCurrencyFormat($item['amount']),
+                    'amount' => $this->convertToCurrencyDBFormat($item['amount']),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
@@ -367,7 +371,7 @@ class WorkItemController extends Controller
                 $pivotData[$item['item']] = [
                     'unit' => $item['unit'],
                     'quantity' => $item['coef'],
-                    'amount' => $this->removeCommaCurrencyFormat($item['amount']),
+                    'amount' => $this->convertToCurrencyDBFormat($item['amount']),
                     'created_at' => now(),
                     'updated_at' => now()
                 ];
@@ -473,7 +477,7 @@ class WorkItemController extends Controller
                         "materialsRate" => $this->toCurrency($totalRateMaterials),
                         "materialsRateInt" => $totalRateMaterials,
                         "totalWorkItemRate" => $totalRateWorkItem,
-                        "totalWorkItemRateStr" => number_format($totalRateWorkItem,2)
+                        "totalWorkItemRateStr" => number_format($totalRateWorkItem,2,',','.')
                     );
                 }
 
@@ -495,7 +499,7 @@ class WorkItemController extends Controller
 
     public function toCurrency($val){
         if(!$val) return '';
-        return number_format($val, 2);
+        return number_format($val, 2,',','.');
     }
 
     public function toDecimalRound($val){
@@ -599,6 +603,18 @@ class WorkItemController extends Controller
         return str_replace(',','',$val);
     }
 
+    public function strToFloat($val){
+        if(!$val) return 0;
+        return (float) $val;
+    }
+
+    public function convertToCurrencyDBFormat($val){
+        if(!$val) return 0;
+        $str =  str_replace('.','', $val);
+        $str = str_replace(',','.', $str);
+        return $str;
+    }
+
     public function getNumChild(WorkItem $workItem, Request $request){
         $parent = $workItem?->parent;
         $children = $workItem?->children;
@@ -649,7 +665,7 @@ class WorkItemController extends Controller
                         'overall_rate_hourly' => number_format($mp->overall_rate_hourly,2,',','.'),
                         'labor_unit' => $mp->pivot->labor_unit,
                         'labor_coefisient' => number_format((float) $mp->pivot->labor_coefisient,2),
-                        'amount' => number_format($mp->getAmount(),2,'.',',')
+                        'amount' => number_format($mp->getAmount(),2,',','.')
                     ];
                 });
 
@@ -670,8 +686,8 @@ class WorkItemController extends Controller
                         'description' => $mp->description,
                         'unit' => $mp->unit,
                         'quantity' => number_format($mp->pivot->quantity, 2),
-                        'local_rate' => number_format($mp->local_rate, 2),
-                        'amount' => number_format($mp->getAmount(), 2, '.', ',')
+                        'local_rate' => number_format($mp->local_rate, 2,',','.'),
+                        'amount' => number_format($mp->getAmount(), 2, ',', '.')
                     ];
                 });
 
@@ -691,8 +707,8 @@ class WorkItemController extends Controller
                         'description' => $mp->tool_equipment_description,
                         'unit' => $mp->unit,
                         'quantity' => number_format($mp->pivot->quantity, 2),
-                        'rate' => number_format($mp->rate, 2),
-                        'amount' => number_format($mp->getAmount(), 2, '.', ',')
+                        'rate' => number_format($mp->rate, 2,',','.'),
+                        'amount' => number_format($mp->getAmount(), 2, ',', '.')
                     ];
                 });
 
