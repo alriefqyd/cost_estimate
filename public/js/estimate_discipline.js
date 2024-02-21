@@ -489,6 +489,7 @@ $(function(){
 
         var _element = $('.js-fullscreen-table')
         _element.css('background-color','#f4f7fb')
+        _element.css('font-size','10px !important');
     })
 
     $(document).on('fullscreenchange', function () {
