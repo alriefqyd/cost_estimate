@@ -3,39 +3,40 @@
     <table class="table table-bordered" style="border-color: black !important;">
         <thead class="bg-primary">
             <tr>
-                <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-250 th-lg">Location/Equipment</th>
-                <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-250 th-lg">Discipline</th>
-                <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-250 th-lg">Work Element</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-400">Work Item</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-50">Vol</th>
+                <th style="vertical-align : middle;" rowspan="2" class="text-center th-lg min-w-110">Location / Equipment</th>
+                <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-110 th-lg">Discipline</th>
+                <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-110 th-lg">Work Element</th>
+                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-300">Work Item</th>
+                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-40">Vol</th>
                 <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center">Unit</th>
                 <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Labour Cost (IDR)</th>
                 <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Tool & Equipment (IDR)</th>
                 <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Material Cost (IDR)</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-160">Total Work Cost (IDR)</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-120">Labor Fact</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-150">Tool Equip Fact</th>
-                <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-120">Material Fact</th>
+                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-130">Total Work Cost (IDR)</th>
+                <th scope="col" style="vertical-align : middle;" colspan="3" class="text-center">Fac</th>
             </tr>
             <tr style="text-align: center">
                 <th style="vertical-align : middle;">
                     Unit Rate
                 </th>
-                <th style="vertical-align : middle;">
-                    Total Labor
+                <th style="vertical-align : middle;" class="min-w-110">
+                    Total
                 </th>
                 <th style="vertical-align : middle;">
                     Unit Rate
                 </th>
-                <th style="vertical-align : middle;" class="min-w-150">
-                    Total Tool & Equip
+                <th style="vertical-align : middle;" class="min-w-110">
+                    Total
                 </th>
                 <th style="vertical-align : middle;">
                     Unit Rate
                 </th>
-                <th style="vertical-align : middle;" class="min-w-150">
-                    Total Material
+                <th style="vertical-align : middle;" class="min-w-110">
+                    Total
                 </th>
+                <th scope="col" style="vertical-align : middle;" class="text-center min-w-65">Labor</th>
+                <th scope="col" style="vertical-align : middle;" class="text-center min-w-65">Tool</th>
+                <th style="vertical-align : middle;" class="text-center min-w-75">Material</th>
             </tr>
         </thead>
         <tbody>
@@ -43,7 +44,7 @@
         @foreach($estimateAllDisciplines as $key => $value)
             @php($previousDiscipline = null)
             @php($previousWorkElement = null)
-            <tr class="font-weight-bold" style="background-color: #b5ac76">
+            <tr style="background-color: #C5C5C7D0">
                 <td>{{$key}}</td>
                 <td></td>
                 <td></td>
@@ -63,19 +64,22 @@
             </tr>
             @foreach($value as $item)
                 @if($item->disciplineTitle != $previousDiscipline)
-                    <tr class="font-weight-bold" style="background-color: #c4bd97">
+                    <tr class="" style="background-color: #DEDEDED0">
                         <td></td>
-                        <td colspan="15">{{$item->disciplineTitle != $previousDiscipline ? $item->disciplineTitle : ''}}</td>
+                        <td colspan="">{{$item->disciplineTitle != $previousDiscipline ? title_case($item->disciplineTitle) : ''}}</td>
+                        <td colspan="14"></td>
                     </tr>
                 @endif
                 @if($item->workElementTitle != $previousWorkElement)
-                    <tr class="font-weight-bold" style="background-color: #c9c5aa">
+                    <tr class="" style="background-color: #EFEFEFD0">
                         <td></td>
                         <td></td>
-                        <td colspan="14">{{$item->workElementTitle != $previousWorkElement ? $item->workElementTitle : ''}}</td>
+                        <td>{{$item->workElementTitle != $previousWorkElement ? title_case($item->workElementTitle) : ''}}
+                        </td>
+                        <td colspan="13"></td>
                     </tr>
                 @endif
-                <tr class="f-w-700 f-14">
+                <tr >
                     <td></td>
                     <td></td>
                     <td></td>
@@ -97,11 +101,11 @@
                 @php($previousWorkElement = $item->workElementTitle)
             @endforeach
         @endforeach
-        <tr class="bg-brown font-weight-bold">
+        <tr class="font-weight-bold" style="background-color: #C5C5C7D0">
             <td colspan="12">CONTINGENCY</td>
             <td colspan="4">{{number_format($project->getContingencyCost(),2,',','.')}}</td>
         </tr>
-        <tr class="bg-brown font-weight-bold">
+        <tr class="font-weight-bold" style="background-color: #C5C5C7D0">
             <td colspan="12" >TOTAL</td>
             <td colspan="4">{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
         </tr>

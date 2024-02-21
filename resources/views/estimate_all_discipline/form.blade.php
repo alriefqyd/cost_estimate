@@ -24,17 +24,17 @@
                                 <table class="table table-custom">
                                     <thead class="bg-primary">
                                         <tr>
-                                            <th scope="col" class="text-left min-w-200 bg-primary">Loc/Equip</th>
-                                            <th scope="col" class="text-left min-w-250 bg-primary">Discipline</th>
-                                            <th scope="col" class="text-left min-w-250 bg-primary">Work Element</th>
-                                            <th scope="col" class="text-left min-w-400 bg-primary">Work Item</th>
-                                            <th scope="col" class="text-left min-w-75 bg-primary">Vol</th>
-                                            <th scope="col" class="text-left min-w-150 bg-primary">Man Power Cost</th>
-                                            <th scope="col" class="text-left min-w-150 bg-primary">Equipment Cost</th>
-                                            <th scope="col" class="text-left min-w-120 bg-primary">Material Cost</th>
-                                            <th scope="col" class="text-left min-w-100 bg-primary">Labor Fac</th>
-                                            <th scope="col" class="text-left min-w-100 bg-primary">Equip Fac</th>
-                                            <th scope="col" class="text-left min-w-100 bg-primary">Material Fac</th>
+                                            <th scope="col" class="text-left min-w-110 bg-primary">Loc / Equip</th>
+                                            <th scope="col" class="text-left min-w-110 bg-primary">Discipline</th>
+                                            <th scope="col" class="text-left min-w-100 bg-primary">Work Element</th>
+                                            <th scope="col" class="text-left min-w-250 bg-primary">Work Item</th>
+                                            <th scope="col" class="text-left min-w-30 bg-primary">Vol</th>
+                                            <th scope="col" class="text-left min-w-110 bg-primary">Man Power</th>
+                                            <th scope="col" class="text-left min-w-110 bg-primary">Equipment</th>
+                                            <th scope="col" class="text-left min-w-110 bg-primary">Material</th>
+                                            <th scope="col" class="text-left min-w-65 bg-primary">Labor Fac</th>
+                                            <th scope="col" class="text-left min-w-65 bg-primary">Equip. Fac</th>
+                                            <th scope="col" class="text-left min-w-65 bg-primary">Material Fac</th>
                                             <th scope="col" class="text-left min-w-65 bg-primary">Total</th>
                                         </tr>
                                     </thead>
@@ -43,7 +43,7 @@
                                     @foreach($estimateAllDiscipline as $key => $discipline)
                                         <tr class="js-column-location" style="background-color: #C5C5C7D0" data-key="{{$key}}">
                                             <td class="min-w-100">
-                                                <span class="float-start f-w-700 f-14">
+                                                <span class="float-start f-w-500 f-12">
                                                         {{ucwords(strtolower($key))}}
                                                     </span>
                                                 <div class="d-inline-block float-end">
@@ -58,8 +58,8 @@
                                             <tr class="js-column-discipline"
                                                 style="background-color: #DEDEDED0">
                                                 <td></td>
-                                                <td class="min-w-100 js-discipline">
-                                                    <span class="float-start f-w-700">
+                                                <td class="js-discipline min-w-120">
+                                                    <span class="float-start f-w-500">
                                                         {{ucwords(strtolower($k))}}
                                                     </span>
                                                     <div class="d-inline-block float-end">
@@ -81,12 +81,12 @@
                                                         <td>
 
                                                         </td>
-                                                        <td class="min-w-170">
+                                                        <td class="min-w-160">
                                                             <div>
-                                                                <span class="float-start js-text-work-element f-w-700">
+                                                                <span class="float-start js-text-work-element f-w-500">
                                                                     {{$a}}
                                                                 </span>
-                                                                <div class="d-inline-block float-end">
+                                                                <div class="d-inline-block float-end m-l-5">
                                                                     <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
                                                                     <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
                                                                     <i class="fa fa-plus-circle cursor-pointer font-success js-add-work-item-element js-button-work-element"
