@@ -18,7 +18,7 @@
                 @endif
         ">
     </td>
-    <td>
+    <td class="min-w-150">
         @if(isset($item))
             <input type="hidden" name="wbs_level3" class="js-wbs_level3_id" value="{{$item->wbs_level3_id ?? ''}}">
             <input type="hidden" name="work_element" class="js-work_element_id" value="{{$item->work_element_id ?? ''}}">
@@ -83,7 +83,7 @@
                         "@{{ materialCost }}"
                     @endif
                 ">
-                <span class="float-start f-w-550 f-15">
+                <span class="float-start f-w-500 f-15">
                     @if(isset($item->workItemDescription))
                         {{$item->workItemDescription}}
                     @else
@@ -103,7 +103,7 @@
             </div>
         </div>
     </td>
-    <td class="min-w-150">
+    <td class="min-w-120">
         <div class="input-group">
             <input class="form-control js-input-vol" style="height:40px" type="text" placeholder="Vol"
                    @if(isset($item->estimateVolume))
@@ -113,7 +113,7 @@
                    @endif
                    {{!isset($item) ? 'disabled="disabled"' : '' }}
                    aria-label="Vol">
-            <span class="input-group-text font js-vol-result-ajax f-w-550 f-15" style="font-size: 10px">
+            <span class="input-group-text font js-vol-result-ajax f-w-500 f-15" style="font-size: 10px">
                 @if(isset($item))
                     {{$item->workItemUnit}}
                 @else
@@ -122,8 +122,8 @@
             </span>
         </div>
     </td>
-    <td class="min-w-140">
-        <span class="float-start js-work-item-man-power-cost f-w-550 f-15">
+    <td class="min-w-130">
+        <span class="float-start js-work-item-man-power-cost f-w-500 f-15">
             @if(isset($item->workItemUnitRateTotalLaborCost))
                 {{$item->workItemUnitRateTotalLaborCost}}
             @else
@@ -144,8 +144,8 @@
                "></i>
         </span>
     </td>
-    <td class="min-w-140">
-        <span class="float-start js-work-item-equipment-cost f-w-550 f-15">
+    <td class="min-w-130">
+        <span class="float-start js-work-item-equipment-cost f-w-500 f-15">
             @if(isset($item->workItemUnitRateTotalToolCost))
                 {{$item->workItemUnitRateTotalToolCost}}
             @else
@@ -166,8 +166,8 @@
            "></i>
         </span>
     </td>
-    <td class="min-w-140">
-        <span class="float-start js-work-item-material-cost f-w-550 f-15">
+    <td class="min-w-130">
+        <span class="float-start js-work-item-material-cost f-w-500 f-15">
              @if(isset($item->workItemUnitRateTotalMaterialCost))
                 {{$item->workItemUnitRateTotalMaterialCost}}
             @else
@@ -188,7 +188,7 @@
                ></i>
         </span>
     </td>
-    <td>
+    <td class="min-w-80">
         <input class="form-control js-input-labor_factorial"
                value=
                         @if(isset($item->workItemLaborFactorial))
@@ -198,7 +198,7 @@
                         @endif
                placeholder="Labor Factorial" type="number">
     </td>
-    <td>
+    <td class="min-w-80">
         <input class="form-control js-input-equipment_factorial"
                value=
                         @if(isset($item->workItemEquipmentFactorial))
@@ -208,7 +208,7 @@
                         @endif
                placeholder="Equipment Factorial" type="number">
     </td>
-    <td>
+    <td class="min-w-100">
         <input class="form-control js-input-material_factorial"
                value=
                         @if(isset($item->workItemMaterialFactorial))
@@ -218,8 +218,8 @@
                         @endif
                placeholder="Material Factorial" type="number" >
     </td>
-    <td class="min-w-150 js-total-work-item-rate">
-        <span class="f-w-550 f-15">
+    <td class="js-total-work-item-rate">
+        <span class="f-w-500 f-15">
             @if(isset($item->workItemTotalCostStr))
                 {{$item->workItemTotalCostStr}}
             @else

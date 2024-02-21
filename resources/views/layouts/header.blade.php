@@ -8,7 +8,7 @@
                     <div class="dark-logo-wrapper"><a href=""><img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt=""></a></div>
                 </a>
             </div>
-            <div class="toggle-sidebar" style="width: 40px; padding: 0; margin-left: 2px; margin-right: 2px; margin-top: 17px;"><span style="" > <i class="status_toggle" data-feather="align-justify"></i></span></div>
+            <div class="toggle-sidebar m-t-15"><span style="" > <i class="status_toggle" data-feather="align-center"></i></span></div>
         </div>
         <div class="nav-right col pull-right right-menu p-0">
             <div class="float-end mr-6">
