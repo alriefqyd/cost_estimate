@@ -66,7 +66,7 @@
                 @if($item->disciplineTitle != $previousDiscipline)
                     <tr class="" style="background-color: #DEDEDED0">
                         <td></td>
-                        <td colspan="">{{$item->disciplineTitle != $previousDiscipline ? title_case($item->disciplineTitle) : ''}}</td>
+                        <td colspan="">{{$item->disciplineTitle != $previousDiscipline ? $item->disciplineTitle : ''}}</td>
                         <td colspan="14"></td>
                     </tr>
                 @endif
@@ -74,7 +74,7 @@
                     <tr class="" style="background-color: #EFEFEFD0">
                         <td></td>
                         <td></td>
-                        <td>{{$item->workElementTitle != $previousWorkElement ? title_case($item->workElementTitle) : ''}}
+                        <td>{{$item->workElementTitle != $previousWorkElement ? $item->workElementTitle  : ''}}
                         </td>
                         <td colspan="13"></td>
                     </tr>
