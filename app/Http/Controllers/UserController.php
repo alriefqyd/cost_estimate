@@ -40,14 +40,17 @@ class UserController extends Controller
     }
 
     public function create(){
+        $isUserHaveAccess = true;
         if(auth()->user()->cannot('create',User::class)){
             return view('not_authorized');
+            $isUserHaveAccess = false;
         }
         $role = Role::with('users')->get();
         $position = PROFILE::POSITION;
         return view('user.create',[
             'roles' => $role,
-            'position' => $position
+            'position' => $position,
+            'isUserHaveAccess' => $isUserHaveAccess
         ]);
     }
 
