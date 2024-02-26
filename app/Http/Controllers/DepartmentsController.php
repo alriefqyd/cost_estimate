@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 class DepartmentsController extends Controller
 {
     public function getAllSubDepartment(){
-        $data = Departments::where('type',Departments::TYPE['sub_department'])->get();
+        $data = Departments::where('type',Departments::TYPE['sub_department'])->orderBy('name')->get();
         return $data;
     }
 }
