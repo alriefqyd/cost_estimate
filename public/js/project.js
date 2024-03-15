@@ -185,11 +185,15 @@ $(function(){
     $('.js-delete-project').on('click', function(e){
         e.preventDefault();
         var _id = $(this).data('id');
+
+        $('.js-modal-delete-project').modal('hide');
+        $('.js-modal-loading-project').modal('show');
+
         $.ajax({
             url:'/project/' + _id,
             type: 'DELETE',
             success: function (data) {
-                $('.js-modal-delete-project').modal('hide');
+                $('.js-modal-loading-project').modal('hide');
                 if (data.status === 200) {
                     notification('success', data.message)
                     setTimeout(function () {
@@ -210,4 +214,44 @@ $(function(){
         _this.remove();
     });
 
+    $('.js-modal-duplicate-project').on('shown.bs.modal', function (e){
+        var _button = $(e.relatedTarget);
+        var _project_id = _button.data('id');
+        $(this).find('.js-duplicate_project_id').val(_project_id);
+    });
+
+    $(document).on('click', '.js-duplicate-project', function(e) {
+        e.preventDefault();
+        var _this = $(this);
+        var _id = $('.js-duplicate_project_id').val();
+
+
+        $('.js-modal-duplicate-project').modal('hide');
+        $('.js-modal-loading-project').modal('show');
+
+        $.ajax({
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
+                // Include any other necessary headers, such as authentication tokens
+            },
+            url: '/duplicate-project/' + _id,
+            data: JSON.stringify({ project_id: _id }),
+            success: function(response) {
+                $('.js-modal-loading-project').modal('hide');
+                if (response.status === 200) { // Access status from the response object
+                    notification('success', response.message);
+                    setTimeout(function() {
+                        window.location.href = '/project';
+                    }, 1000);
+                } else {
+                    notification('error', response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText); // Log detailed error information
+            }
+        });
+    });
 });
