@@ -234,6 +234,12 @@ class ProjectController extends Controller
 
     }
 
+    /**
+     * @param Project $project
+     * @param Request $request
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     */
     public function detail(Project $project, Request $request){
         $projectService = new ProjectServices();
         $estimateDisciplines = $projectService->getEstimateDisciplineByProject($project,$request);
@@ -259,6 +265,60 @@ class ProjectController extends Controller
             'isAuthorizeToReviewInstrument' => $isReviewerInstrument,
             'project_date' => Carbon::parse($project->created_at)->format('d-M-Y'),
         ]);
+    }
+
+    public function duplicateProject(Project $project){
+        DB::beginTransaction();
+        try{
+            $duplicateProject = $project->replicate();
+            $duplicateProject->project_no = $project->project_no . '_copy';
+            $duplicateProject->status = Project::DRAFT; // Set a valid status
+            $duplicateProject->save();
+
+            $project->load('wbsLevel3s', 'estimateAllDisciplines'); // eager loading
+            $newId = $duplicateProject->id;
+            $oldId = $project->id;
+            $tempId = collect(); //store temp id to identify estimate discipline
+            if(isset($project->wbsLevel3s)) {
+                $project->wbsLevel3s()->chunk(100, function ($wbsLevel3s) use ($newId, $tempId, $oldId) {
+                    foreach ($wbsLevel3s as $q) {
+                        $newWbsLevel3 = $q->replicate();
+                        $newWbsLevel3->project_id = $newId;
+                        $newWbsLevel3->save();
+                        $tempId->push([
+                            'old' => $q->id,
+                            'new' => $newWbsLevel3->id,
+                            'project_id' => $oldId,
+                        ]);
+                    }
+                });
+            }
+
+
+            if(isset($project->estimateAllDisciplines)){
+                $project->estimateAllDisciplines->map(function ($q) use ($tempId, $newId, $oldId){
+                   $wbsLevel3Id = $tempId->where('old', $q->wbs_level3_id)->first();
+                   $newEstimate = $q->replicate();
+                   $newEstimate->unique_identifier = uniqid();
+                   $newEstimate->wbs_level3_id = $wbsLevel3Id['new'] ?? "";
+                   $newEstimate->project_id = $newId;
+                   $newEstimate->save();
+                });
+            }
+
+           DB::commit();
+            return response()->json([
+                'status' => 200,
+                'message' => 'Success'
+            ]);
+        } catch (Exception $e){
+            DB::rollBack();
+            Log::alert($e->getMessage());
+            return response()->json([
+                'status' => 400,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     public function checkDuplicateProjectNo(Request $request){

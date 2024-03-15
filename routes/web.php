@@ -29,13 +29,15 @@ Route::middleware([
 });
 
 Route::get('/project',[\App\Http\Controllers\ProjectController::class,'index'])->middleware('auth');
-Route::post('/project',[\App\Http\Controllers\ProjectController::class,'store'])->middleware('auth');
+Route::post('/project',[\App\Http\Controllers\ProjectController::class,'store'])->name('project.store')->middleware('auth');
+Route::post('/duplicate-project/{project:id}',[\App\Http\Controllers\ProjectController::class,'duplicateProject'])->name('project.duplicate')->middleware('auth');
 Route::put('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'update'])->middleware('auth');
 Route::delete('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'destroy'])->middleware('auth');
 Route::get('/project/create',[\App\Http\Controllers\ProjectController::class,'create'])->middleware('auth');
 Route::get('/project/{project:id}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth');
 Route::get('/project/edit/{project:id}',[\App\Http\Controllers\ProjectController::class,'edit'])->middleware('auth');
 Route::get('/project/{project:id}/discipline/{discipline}',[\App\Http\Controllers\ProjectController::class,'detail'])->middleware('auth');
+
 //Route::get('/cost-estimate/project/detail',[\App\Http\Controllers\CostEstimateController::class,'detail'])->middleware('auth');
 /**
  * Deprecated
@@ -84,7 +86,7 @@ Route::get('/work-item-category/',[\App\Http\Controllers\WorkItemTypeController:
 Route::get('/work-item-category/create',[\App\Http\Controllers\WorkItemTypeController::class,'create'])->middleware('auth');
 Route::post('/work-item-category/',[\App\Http\Controllers\WorkItemTypeController::class,'store'])->middleware('auth');
 Route::put('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'update'])->middleware('auth');
-Route::get('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'sh\ow'])->middleware('auth');
+Route::get('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'show'])->middleware('auth');
 Route::delete('/work-item-category/{workItemType:id}',[\App\Http\Controllers\WorkItemTypeController::class,'destroy'])->middleware('auth');
 
 
@@ -159,7 +161,7 @@ Route::get('/getToolsEquipment',[\App\Http\Controllers\EquipmentToolsController:
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');
 Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'checkDuplicateProjectNo'])->name('checkDuplicateProjectNo')->middleware('auth');
 Route::get('/dumpingRole',[\App\Http\Controllers\RoleController::class,'dumpingData'])->name('dumpingData')->middleware('auth');
-Route::get('/getDetailWorkItem',[\App\Http\Controllers\WorkItemController::class,'getDetail'])->name('dumpingData')->middleware('auth');
+Route::get('/getDetailWorkItem',[\App\Http\Controllers\WorkItemController::class,'getDetail'])->name('detailWorkItem')->middleware('auth');
 Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
 Route::get('/getDisciplineList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getDisciplineList'])->middleware('auth');
 Route::get('/getWorkElementList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWorkElementList'])->middleware('auth');
