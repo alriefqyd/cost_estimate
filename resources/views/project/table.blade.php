@@ -98,9 +98,9 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="col-md-6">
-                    <label class="form-label form-label-black" for="validationCustom02">Project Sponsor <span class="text-danger f-w-550">*</span></label>
-                    <input class="form-control js-duplicate_project_id" name="project_id" type="text"
+                <div class="col-md-12">
+                    Are you sure you want to duplicate this item?
+                    <input class="form-control js-duplicate_project_id" name="project_id" type="hidden"
                            autocomplete="off"
                            value="">
                 </div>
