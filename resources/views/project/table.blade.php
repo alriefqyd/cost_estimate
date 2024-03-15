@@ -59,6 +59,8 @@
                         <td>
                             <a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                     data-id="{{$project->id}}" class="text-danger js-delete-project-modal">Delete</a>
+                            <a data-bs-toggle="modal" data-original-title="test" data-bs-target="#duplicateProject"
+                               data-id="{{$project->id}}" class="text-success js-duplicate-project-modal">Duplicate</a>
                         </td>
                     @endcan
                 </tr>
@@ -87,3 +89,26 @@
     </div>
 </div>
 @endcan
+
+<div class="modal fade js-modal-duplicate-project" id="duplicateProject" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Duplicate Project</h5>
+                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-6">
+                    <label class="form-label form-label-black" for="validationCustom02">Project Sponsor <span class="text-danger f-w-550">*</span></label>
+                    <input class="form-control js-duplicate_project_id" name="project_id" type="text"
+                           autocomplete="off"
+                           value="">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                <button class="btn btn-success js-duplicate-project" type="button">Duplicate</button>
+            </div>
+        </div>
+    </div>
+</div>
