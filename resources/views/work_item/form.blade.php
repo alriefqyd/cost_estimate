@@ -4,7 +4,7 @@
         <label class="form-label form-label-black m-0" for="validationCustom01">Input Style</label>
         <div class="form-group m-t-15 m-checkbox-inline mb-0 custom-radio-ml">
             <div class="radio radio-primary">
-                <input id="radioinline1" class="js-work-item-input-style" type="radio" name="style" value="standard">
+                <input id="radioinline1" class="js-work-item-input-style" {{isset($work_item->id) ? "checked" : ""}} type="radio" name="style" value="standard">
                 <label class="mb-0" for="radioinline1">Standard</label>
             </div>
             <div class="radio radio-primary">
@@ -16,7 +16,7 @@
 
 </div>
 
-<div class="js-form-work-item d-none">
+<div class="js-form-work-item {{!$work_item->id ? 'd-none' : ''}}">
     <div class="row mb-1">
         <div class="col-md-5">
             <label class="form-label form-label-black m-0" for="validationCustom01">Category</label>
@@ -34,6 +34,7 @@
         <div class="col-md-7">
             <label class="form-label form-label-black m-0" for="validationCustom01">Existing Work Item</label>
             <select class="select2 form-control js-confirm-form js-validate js-project_project_desc">
+                <option disabled="disabled" value="" {{!isset($work_item->parent?->id) ? 'selected' : ''}}>Select Existing Work Item</option>
                 @if($isEdit)
                     <option value="{{$work_item->parent?->id}}">{{$work_item?->parent?->description}}</option>
                 @endif
