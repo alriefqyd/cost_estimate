@@ -16,7 +16,7 @@
 
 </div>
 
-<div class="js-form-work-item {{!$work_item->id ? 'd-none' : ''}}">
+<div class="js-form-work-item {{!isset($work_item->id) ? 'd-none' : ''}}">
     <div class="row mb-1">
         <div class="col-md-5">
             <label class="form-label form-label-black m-0" for="validationCustom01">Category</label>
