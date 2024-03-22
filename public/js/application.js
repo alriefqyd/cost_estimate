@@ -348,9 +348,9 @@ $(function(){
 
     $('.js-btn-approve').on("click", function(){
       var _this;
-      console.log('aa')
       if(_this.hasClass('show')){
           _this.siblings('.dropdown-menu').removeClass('show')
       };
     })
+
 });

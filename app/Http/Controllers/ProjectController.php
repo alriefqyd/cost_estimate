@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\WbsLevel3;
+use App\Rules\UniqueProject;
 use App\Services\ProjectServices;
 use Exception;
 use Illuminate\Http\Request;
@@ -14,6 +15,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Fluent;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -75,16 +78,15 @@ class ProjectController extends Controller
     {
         $projectService = new ProjectServices();
         $this->authorize('create',Project::class);
-        $data = $this->validate($request,[
-            'project_no' => 'required|unique:projects',
-            'project_title' => 'required',
+        $request->validate([
+            'project_title' => ['required', new UniqueProject],
             'project_sponsor' => 'required',
             'project_manager' => 'required',
             'project_engineer' => 'required',
             'project_area' => 'required',
         ]);
 
-        try{
+        try {
             DB::beginTransaction();
             $project = new Project([
                 'project_no' => $request->project_no,
