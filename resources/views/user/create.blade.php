@@ -33,7 +33,7 @@
                             <div class="row">
                                 @csrf
                                 @include('user.form',[
-                                    'isEdit' => true
+                                    'isEdit' => false
                                 ])
                             </div>
                         </form>

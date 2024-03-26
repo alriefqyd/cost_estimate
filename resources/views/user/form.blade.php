@@ -12,6 +12,7 @@
                value="{{isset($user?->user_name) ? $user?->user_name : old('user_name')}}">
     </div>
 </div>
+@if($isEdit)
 <div class="row mb-1">
     <div class="col-md-6">
         <label class="form-label form-label-black m-0" for="validationCustom01">Full Name</label>
@@ -19,7 +20,6 @@
                value="{{isset($user?->profiles?->full_name) ? $user?->profiles?->full_name : old('full_name')}}">
     </div>
 </div>
-@if($isEdit)
     <div class="row mb-2">
         <div class="col-md-6">
             <div class="checkbox checkbox-dark m-squar">
@@ -56,6 +56,11 @@
 @else
     <div class="row mb-1">
         <div class="col-md-6">
+            <label class="form-label form-label-black m-0" for="validationCustom01">Full Name</label>
+            <input class="form-control js-validate js-user-full-name height-40" name="full_name"  type="text"
+                   value="{{isset($user?->profiles?->full_name) ? $user?->profiles?->full_name : old('full_name')}}">
+        </div>
+        <div class="col-md-6">
             <label class="form-label form-label-black m-0" for="validationCustom01">Password</label>
             <div class="input-group">
                 <input class="form-control js-validate js-password js-user-password height-40" name="password"  type="password"
@@ -65,11 +70,6 @@
                     <i class="fa fa-eye cursor-pointer js-show-hide-password"></i>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label form-label-black m-0" for="validationCustom01">Full Name</label>
-            <input class="form-control js-validate js-user-full-name height-40" name="full_name"  type="text"
-                   value="{{isset($user?->profiles?->full_name) ? $user?->profiles?->full_name : old('full_name')}}">
         </div>
     </div>
 @endif
