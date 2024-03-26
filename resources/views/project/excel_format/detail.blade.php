@@ -159,11 +159,11 @@
                     <td colspan="">{{$item?->workItemDescription}}</td>
                     <td>{{$item?->estimateVolume}}</td>
                     <td>{{$item?->workItemUnit}}</td>
-                    <td>{{strToCurr($item?->workItemUnitRateLaborCost)}}</td>
+                    <td>{{$item?->workItemUnitRateLaborCost}}</td>
                     <td>{{$item?->workItemTotalLaborCost ?: ""}}</td>
-                    <td>{{strToCurr($item?->workItemUnitRateToolCost)}}</td>
+                    <td>{{$item?->workItemUnitRateToolCost}}</td>
                     <td>{{$item?->workItemTotalToolCost ?: ""}}</td>
-                    <td>{{strToCurr($item?->workItemUnitRateMaterialCost)}}</td>
+                    <td>{{$item?->workItemUnitRateMaterialCost}}</td>
                     <td>{{$item?->workItemTotalMaterialCost ?: ""}}</td>
                     <td></td>
                     <td></td>

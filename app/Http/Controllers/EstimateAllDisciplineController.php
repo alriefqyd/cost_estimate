@@ -103,7 +103,8 @@ class EstimateAllDisciplineController extends Controller
         try {
             $newArrEstimateAllDiscipline = [];
             $record = EstimateAllDiscipline::where('project_id',$request->project_id)->first();
-            if(sizeof($request->work_items) > 0){
+            $workItems = json_decode($request->work_items, true); // Decode JSON string into array
+            if(sizeof($workItems) > 0){
 
                 $existingEstimateDiscipline = $this->getExistingWorkItemByWbs($request);
                 if($existingEstimateDiscipline){
@@ -124,15 +125,15 @@ class EstimateAllDisciplineController extends Controller
                 || $request->version == 0 && !isset($record->version)
             ){
                 $newVersion = $record?->version + 1;
-                foreach ($request->work_items as $idx => $item){
+                foreach ($workItems as $idx => $item){
                     $estimateAllDiscipline = new EstimateAllDiscipline();
                     $estimateAllDiscipline->title = '';
                     $estimateAllDiscipline->work_item_id = $item['workItem'];
                     $estimateAllDiscipline->volume = $item['vol'] > 0 ? $item['vol'] : 1;
-                    $estimateAllDiscipline->project_id = $request->project_id;
-                    $estimateAllDiscipline->labour_factorial = $item['labourFactorial'];
-                    $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'];
-                    $estimateAllDiscipline->material_factorial = $item['materialFactorial'];
+                    $estimateAllDiscipline->project_id = isset($request->project_id) ? $request->project_id : $item['project_id'];
+                    $estimateAllDiscipline->labour_factorial = $item['labourFactorial'] > 0 ? $item['labourFactorial'] : NULL;
+                    $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'] > 0 ? $item['equipmentFactorial'] : NULL;
+                    $estimateAllDiscipline->material_factorial = $item['materialFactorial'] > 0 ? $item['materialFactorial'] : NULL;
                     $estimateAllDiscipline->labor_unit_rate =  $workItemController->strToFloat($item['labourUnitRate']);
                     $estimateAllDiscipline->labor_cost_total_rate = $workItemController->strToFloat($item['totalRateManPowers']) * $item['vol'];
                     $estimateAllDiscipline->tool_unit_rate =  $workItemController->strToFloat($item['equipmentUnitRate']);

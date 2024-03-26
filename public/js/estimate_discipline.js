@@ -142,7 +142,7 @@ $(function(){
         _this.find('.js-loading-save').removeClass('d-none')
 
         var _data = {
-            'work_items' : _array_estimate_disciplines,
+            'work_items' : JSON.stringify(_array_estimate_disciplines),
             'project_id' : _project_id,
             'version' : _version
         }
