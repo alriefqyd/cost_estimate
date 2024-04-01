@@ -23,10 +23,6 @@
                 <div class="legend-item-label">Monthly Production Submission Report</div>
             </div>
             <div class="legend-item">
-                <div class="legend-item-color" style="background-color: #00ffff;"></div>
-                <div class="legend-item-label">Monthly Production Submission Report</div>
-            </div>
-            <div class="legend-item">
                 <div class="legend-item-color" style="background-color: #a3c7a3;"></div>
                 <div class="legend-item-label">Quarterly Production Submission Report</div>
             </div>
