@@ -441,7 +441,7 @@
 
     .page-wrapper .page-main-header .main-header-right .main-header-left .img-fluid {
         width: 70px;
-    } 
+    }
 }
 
 @media screen and (max-width: 972px){
@@ -760,6 +760,37 @@ custom-checkbox:checked:before {
 
 .color-grey {
     color: grey;
+}
+
+.fc-multimonth-month{
+    margin-top: 5px;
+    width: 260px !important;
+    padding: 10px;
+}
+#calendar {
+    padding: 30px;
+}
+
+#legend {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.legend-item-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.legend-item-label {
+    font-size: 14px;
 }
 
 @keyframes slide {

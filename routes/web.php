@@ -176,5 +176,7 @@ Route::get('/getEstimateToSync',[\App\Http\Controllers\EstimateAllDisciplineCont
 Route::get('/generatequery/man-power-work-items', [\App\Http\Controllers\GeneratorQueryController::class,'manPowerWorkItems']);
 Route::get('/generatequery/equipment-work-items', [\App\Http\Controllers\GeneratorQueryController::class,'equipmentWorkItem']);
 Route::get('/generatequery/material-work-items', [\App\Http\Controllers\GeneratorQueryController::class,'materialWorkItem']);
-Route::get('/convert', [\App\Http\Controllers\SettingController::class,'getUsdRateApi']);
+
+Route::get('/convertApi', [\App\Http\Controllers\ApiController::class,'getUsdRateApi']);
+Route::get('/getPublicHolidayApi', [\App\Http\Controllers\ApiController::class,'getPublicHolidayApi']);
 
