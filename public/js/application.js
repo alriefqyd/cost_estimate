@@ -48,8 +48,8 @@ $(function(){
                     };
                 }
             }
-        })
-    }
+        });
+    };
 
     $('.js-design-engineer').each(function (){
         designEngineerInit(this);
@@ -78,13 +78,119 @@ $(function(){
 
     $(document).on('keypress keyup blur','.js-currency',function(e){
         // $('.js-currency-format').on('keypress keyup blur',function(e){
-        var _this = $(this)
+        var _this = $(this);
         var _val = currencyFormat(_this.val());
 
-        _this.val(_val)
+        _this.val(_val);
         if(e.which === 44 || e.which === 45) return true
-    })
+    });
 
+    function getPublicHoliday(){
+        var _data = '';
+        var _newdata = '';
+        $.ajax({
+            url:'/getPublicHolidayApi',
+            async:false,
+            success:function(results){
+                _data = results.filter(function (item){
+                    return item.is_national_holiday === true;
+                });
+
+
+                _newdata = _data.map(function(item){
+                    return {
+                        holiday_name: item.holiday_name,
+                        start : item.holiday_date,
+                        end : item.holiday_date,
+                        isHoliday : item.is_national_holiday,
+                        display: 'background',
+                        color: '#ff9f89'
+                    };
+                });
+            }
+        });
+
+        return _newdata;
+    }
+
+    function initCalendar(){
+        var _public_holiday = getPublicHoliday();
+        var calendarEl = $('#calendar')[0]; // Get the DOM element
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            events: _public_holiday,
+            initialView: 'multiMonthYear',
+            height: 'auto',
+            showNonCurrentDates:true,
+            selectable:true,
+            title: "Calendar Production 2024",
+            dayCellDidMount: function(info) {
+                var cell = info.el;
+                var date = info.date;
+                // Check if the day is a weekend (Saturday or Sunday)
+                if (date.getDay() === 0 || date.getDay() === 6) {
+                    // Apply red color to the background of the cell
+                    $(cell).find('a').css('color', 'red');
+                }
+
+                if (date.getDate() === 2) {
+                    // Apply red color to the background of the cell
+                    $(cell).css('background-color', 'yellow');
+                }
+
+                if (date.getDate() === 3) {
+                    // Apply red color to the background of the cell
+                    $(cell).css('background-color', '#00ffff');
+                }
+
+                if (date.getMonth() % 3 === 0){
+                    if(date.getMonth() === 9 && date.getDate() === 8){
+                        $(cell).css('background-color', '#a3c7a3');
+                    }
+                    if(date.getMonth() !== 9 && date.getDate() === 9){
+                        $(cell).css('background-color', '#a3c7a3');
+                    }
+                }
+            },
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+        });
+        calendar.render();
+        // Update the title
+        updateTitle(calendar);
+
+        // Bind event handler to "next" button
+        $('.fc-next-button, .fc-prev-button').on('click', function() {
+            updateTitle(calendar);
+        });
+
+        _public_holiday.reverse().forEach(function (item){
+            $('.js-public-holiday').append("" +
+                "<div class=\"legend-item\">\n" +
+                "     <div class=\"legend-item-label\"> <span style='color: red'>" + formatDate(item.start) + "</span> : " + item.holiday_name + "</div>\n" +
+                "</div>");
+        });
+
+        calendar.updateSize();
+    }
+
+    function formatDate(inputDate) {
+        return moment(inputDate).format('MMM D');
+    }
+
+    function updateTitle(calendar) {
+        var currentYear = calendar.view.title.match(/\d{4}/)[0];
+        var nextYear = parseInt(currentYear) + 1;
+        $('.fc-toolbar-title').text("Production Calendar " + currentYear);
+    }
+
+    setTimeout(function (){
+        $('.js-component-calendar').find('.loader-box').addClass('d-none');
+        $('.js-legend').removeClass('d-none');
+        initCalendar();
+    },500);
     function currencyFormat(_value){
 
         var number_string = _value.replace(/[^,\d]/g, '').toString(),

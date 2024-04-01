@@ -6,12 +6,16 @@ use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Running all schedule queue here
+ */
 class SettingController extends Controller
 {
     public function updateCurrencyUsd(){
         try {
+            $apiController = new ApiController();
             $setting = Setting::where('setting_type','USD_RATE')->first();
-            $setting->setting_value = $this->getUsdRateApi();
+            $setting->setting_value = $apiController->getUsdRateApi();
             $setting->updated_at = now();
             $setting->save();
             Log::info('Running cron job update currency usd');
@@ -19,31 +23,6 @@ class SettingController extends Controller
             Log::error($e->getMessage());
         }
 
-    }
-
-    public function getUsdRateApi(){
-        $req_url = "https://api.fxratesapi.com/latest?base=USD&currencies=IDR&format=json";
-        $response_json = file_get_contents($req_url);
-        if(false !== $response_json) {
-            try {
-
-                // Decoding
-                $response = json_decode($response_json);
-
-                // Check for success
-                if($response->success) {
-                    // YOUR APPLICATION CODE HERE, e.g.
-                    return $response->rates->IDR;
-
-                }
-
-            }
-            catch(Exception $e) {
-                return null;
-                $e->getMessage();
-            }
-
-        }
     }
 
     public function getUsdRateFromDB(){
