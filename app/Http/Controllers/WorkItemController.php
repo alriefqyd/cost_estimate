@@ -98,6 +98,7 @@ class WorkItemController extends Controller
 
         try{
             DB::beginTransaction();
+            $user = auth()->user()->id;
             $workItem = new WorkItem([
                 'code' => $code,
                 'parent_id' => $request->parent_id,
@@ -106,7 +107,8 @@ class WorkItemController extends Controller
                 'volume' => $request->volume,
                 'unit' => $request->unit,
                 'status' => WorkItem::DRAFT,
-                'created_by' => auth()->user()->id
+                'created_by' => $user,
+                'updated_by' => $user
             ]);
             $workItem->save();
             $workItemService->duplicateRelationWorkItem($workItem,$request->parent_id);
@@ -137,6 +139,7 @@ class WorkItemController extends Controller
             $workItem->description = $request->description;
             $workItem->volume = $request->volume;
             $workItem->unit = $request->unit;
+            $workItem->updated_by = auth()->user()->id;
 
             $workItem->save();
             DB::commit();

@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\WbsLevel3;
+use App\Rules\DesignEngineerRule;
 use App\Rules\UniqueProject;
 use App\Services\ProjectServices;
 use Exception;
@@ -14,10 +15,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Fluent;
-use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends Controller
@@ -79,15 +76,20 @@ class ProjectController extends Controller
         $projectService = new ProjectServices();
         $this->authorize('create',Project::class);
         $request->validate([
-            'project_title' => ['required', new UniqueProject],
+            'project_title' => ['required', new UniqueProject(null)],
             'project_sponsor' => 'required',
             'project_manager' => 'required',
             'project_engineer' => 'required',
             'project_area' => 'required',
+            'design_engineer_civil' => new DesignEngineerRule('design_engineer_civil'),
+            'design_engineer_mechanical' => new DesignEngineerRule('design_engineer_mechanical'),
+            'design_engineer_electrical' => new DesignEngineerRule('design_engineer_electrical'),
+            'design_engineer_instrument' => new DesignEngineerRule('design_engineer_instrument'),
         ]);
 
         try {
             DB::beginTransaction();
+            $user = auth()->user();
             $project = new Project([
                 'project_no' => $request->project_no,
                 'project_title' => $request->project_title,
@@ -104,7 +106,9 @@ class ProjectController extends Controller
                 'civil_approval_status' => isset($request->design_engineer_civil) ? Project::PENDING : '',
                 'electrical_approval_status' => isset($request->design_engineer_electrical) ? Project::PENDING : '',
                 'instrument_approval_status' => isset($request->design_engineer_instrument) ? Project::PENDING : '',
-                'status' => Project::DRAFT
+                'status' => Project::DRAFT,
+                'created_by' => $user->id,
+                'updated_by' => $user->id,
             ]);
             $project->save();
             DB::commit();
@@ -159,13 +163,16 @@ class ProjectController extends Controller
     {
         $projectService = new ProjectServices();
         $this->authorize('update',$project);
-        $data = $this->validate($request,[
-            Rule::unique('projects')->ignore($project->project_no),
-            'project_title' => 'required',
+        $request->validate([
+            'project_title' => ['required', new UniqueProject($project->id)],
             'project_sponsor' => 'required',
             'project_manager' => 'required',
             'project_engineer' => 'required',
             'project_area' => 'required',
+            'design_engineer_civil' => new DesignEngineerRule('design_engineer_civil'),
+            'design_engineer_mechanical' => new DesignEngineerRule('design_engineer_mechanical'),
+            'design_engineer_electrical' => new DesignEngineerRule('design_engineer_electrical'),
+            'design_engineer_instrument' => new DesignEngineerRule('design_engineer_instrument'),
         ]);
 
         DB::beginTransaction();
@@ -182,6 +189,7 @@ class ProjectController extends Controller
            $project->design_engineer_instrument = $request->design_engineer_instrument;
            $project->status = $request->status ?? Project::DRAFT;
            $project->project_area_id = $request->project_area;
+           $project->updated_by = auth()->user()->id;
 
            $project->save();
            DB::commit();
