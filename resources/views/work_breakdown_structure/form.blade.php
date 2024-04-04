@@ -103,16 +103,7 @@
     </div>
 </form>
 
-<div class="modal js-modal-loading-wbs" id="modal-loading" data-backdrop="static">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-body text-center">
-                <div class="loading-spinner mb-2"></div>
-                <div>Loading....</div>
-            </div>
-        </div>
-    </div>
-</div>
+@include('layouts.loading')
 
 <div class="modal fade js-modal-save-wbs" id="" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">

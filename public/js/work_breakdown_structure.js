@@ -105,7 +105,7 @@ $(function(){
 
     $(document).on('click','.js-form-list-location-submit',function (e){
         $('.js-modal-save-wbs').modal('hide');
-        $('.js-modal-loading-wbs').modal('show');
+        $('#modal-loading').modal('show');
         var _isValid = true;
         var _js_wbs_element = $('.js-mustache-wbs-element');
         $.each(_js_wbs_element , function(index, item){
@@ -116,7 +116,7 @@ $(function(){
         });
 
         if(!_isValid){
-            $('.js-modal-loading-wbs').modal('hide');
+            $('#modal-loading').modal('hide');
             notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error');
             return false;
         }
@@ -140,7 +140,7 @@ $(function(){
             data : {wbs:_data},
             success:function(result){
                 if(result.status === 200){
-                    $('.js-modal-loading-wbs').modal('hide');
+                    $('#modal-loading').modal('hide');
                     notification('success',result.message);
                     // return false
                     $(window).off('beforeunload');
@@ -148,7 +148,7 @@ $(function(){
                         window.location.href = '/project/' + id;
                     },2000);
                 } else {
-                    $('.js-modal-loading-wbs').modal('hide');
+                    $('#modal-loading').modal('hide');
                     notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error')
                     _nestable.nestable('destroy');
                     _nestable.removeClass('nestable-initialized');
@@ -325,7 +325,7 @@ $(function(){
 
     $('.js-add-btn-wbs').on('click', function(e){
         e.preventDefault()
-        var _modal_loading = $('.js-modal-loading-wbs');
+        var _modal_loading = $('#modal-loading');
         var _data_discipline = ''
         var _template_discipline = $('#js-template-nestable-wbs').html();
         var _template_location = $('#js-template-location-nestable-wbs').html();
@@ -375,7 +375,7 @@ $(function(){
         var _text = 'Select Discipline'
         var _discipline = '';
         var _showButton = true
-        var _modal_loading = $('.js-modal-loading-wbs');
+        var _modal_loading = $('#modal-loading');
         var _isSelect = true;
 
         _modal_loading.modal('show');
@@ -413,7 +413,7 @@ $(function(){
             },
             complete: function() {
                 // Hide loading modal after AJAX request is complete
-                $('.js-modal-loading-wbs').modal('hide');
+                $('#modal-loading').modal('hide');
             }
         })
     });

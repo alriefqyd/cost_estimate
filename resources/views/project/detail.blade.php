@@ -334,5 +334,8 @@
         </div>
     </div>
 </div>
+
+@include('layouts.loading')
+
 @endsection
 <!-- Container-fluid Ends-->
