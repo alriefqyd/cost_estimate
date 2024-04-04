@@ -6,8 +6,8 @@
             <div class="slider-item js-fullheight" style="background-image:url({{ asset('/assets/images/vale2.jpg') }}); height: 550px">
                 <div class="overlay"></div>
                 <div class="container">
-                    <div class="row slider-text js-fullheight align-items-center">
-                        <div class="col-md-6 m-t-5 ftco-animate">
+                    <div class="row slider-text js-fullheight align-items-center m-l-25">
+                        <div class="col-md-12 m-t-5 ftco-animate">
                             <div class="text-animation-slider">
                                 <h1>Cost Estimate</h1>
                                 <h2 class="mb-3 m-l-5">Every Count Matters!</h2>

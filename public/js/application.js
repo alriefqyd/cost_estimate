@@ -189,7 +189,7 @@ $(function(){
     setTimeout(function (){
         $('.js-component-calendar').find('.loader-box').addClass('d-none');
         $('.js-legend').removeClass('d-none');
-        initCalendar();
+        if($('.js-component-calendar').length > 0) initCalendar();
     },500);
     function currencyFormat(_value){
 
@@ -395,7 +395,7 @@ $(function(){
     $('.js-form-import').submit(function(e){
         e.preventDefault();
         $('.js-modal-import').modal('hide');
-        $('.js-modal-loading-import').modal('show');
+        $('#modal-loading').modal('show');
         const formData = new FormData(this);
         const progressBar = $('.progress-bar');
         const progress = $('.progress');
@@ -411,7 +411,7 @@ $(function(){
 
         if (!allowedExtensions.includes(fileExtension.toLowerCase())) {
             $('.js-modal-import').modal('hide');
-            $('.js-modal-loading-import').modal('hide');
+            $('#modal-loading').modal('hide');
             notification('danger','Please re check your file', 'fa fa-time','Error')
             return; // Prevent the request if the extension is not allowed
         }
@@ -424,14 +424,14 @@ $(function(){
             processData: false,
             success: function(response) {
                 progress.addClass('d-none');
-                $('.js-modal-loading-import').modal('hide');
+                $('#modal-loading').modal('hide');
                 notification('success',response.message, 'fa fa-check','Success')
                 setTimeout(function (){
                     window.location.href=_redirect_url;
                 },2000)
             },
             error: function(xhr) {
-                $('.js-modal-loading-import').modal('hide');
+                $('#modal-loading').modal('hide');
                 notification('danger',xhr.responseJSON.message, 'fa fa-time','Error')
             }
         });
