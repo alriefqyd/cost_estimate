@@ -28,9 +28,9 @@ class ApiController extends Controller
     }
     /** USD API */
     public function getUsdRateApi(){
-        $req_url = "https://api.fxratesapi.com/latest?base=USD&currencies=IDR&format=json";
+        $req_url = "https://api.frankfurter.app/latest?from=USD&to=IDR";
         $response = $this->getApi($req_url);
-        if($response->success) {
+        if($response) {
             return $response->rates->IDR;
         }
         return null;
