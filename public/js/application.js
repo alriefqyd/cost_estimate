@@ -217,7 +217,7 @@ $(function(){
         _val = _val.toString()
         var _split = _val.split('.')
         var _join =  _split.join('');
-        var _split_comma = _join.split(',')
+        var _split_comma = _join.split(',');
         return  _split_comma[0]
     }
 
