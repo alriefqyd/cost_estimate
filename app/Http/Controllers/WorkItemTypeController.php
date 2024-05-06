@@ -20,9 +20,11 @@ class WorkItemTypeController extends Controller
         $order = $request->order;
         $sort =  $request->sort;
 
-        $data = WorkItemType::filter(request(['q']))->orderBy('created_at','DESC')
-            ->when(isset($request->sort), function ($query) use ($order, $sort) {
+        $data = WorkItemType::filter(request(['q']))
+            ->when(isset($request->order), function ($query) use ($order, $sort) {
                 return $query->orderBy($order, $sort);
+            })->when(!isset($request->order), function ($query) {
+                return $query->orderBy('created_at','DESC');
             })
             ->paginate(20)->withQueryString();
         return view('work_item_category.index',[
