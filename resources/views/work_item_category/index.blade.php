@@ -34,6 +34,8 @@
                             <div class="row">
                                 <div class="col-md-6 mb-1">
                                     <input type="text" value="{{request()->q}}" name="q" placeholder="Code / Description" class="form-control" style="height: 40px">
+                                    <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
+                                    <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                 </div>
                                 <div class="col-md-2 mb-1" >
                                     <input type="submit" class="btn btn-outline-success btn btn-search-tool-equipment-category" value="search" style="height: 40px"></input>
@@ -46,8 +48,8 @@
                             <table class="table table-striped">
                                 <thead>
                                 <tr>
-                                    <th scope="col" class="text-left">Code</th>
-                                    <th scope="col" class="text-left">Description</th>
+                                    <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_item_types.code"></i></th>
+                                    <th scope="col" class="text-left">Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_item_types.title"></i></th>
                                     @can('delete', App\Models\WorkItemType::class)
                                         <th scope="col" class="text-left">Action</th>
                                     @endcan
