@@ -40,14 +40,16 @@ $(function(){
         var selectedOption = $(e.currentTarget).find('option:selected');
         var selectedText = selectedOption.text();
         var rate = $(this).select2('data')[0].rate;
+        var unit = $(this).select2('data')[0].unit;
         var parent = $(this).closest('.js-row-column');
         parent.find('.js-item-amount').text(toCurrency(parseFloat(rate)));
         parent.find('.js-item-rate').text(toCurrency(parseFloat(rate)));
         parent.find('.js-item-rate').attr('data-rate',rate);
         parent.find('.js-item-coef').removeAttr('disabled');
         parent.find('.js-item-coef').val(1);
+        parent.find('.js-item-unit').val(unit);
         parent.find('.js-item-unit').removeAttr('disabled');
-        countTotalAmount(0)
+        countTotalAmount(0);
     });
 
     $(document).on('change keyup keypress','.js-item-coef',function(e){
@@ -170,6 +172,8 @@ $(function(){
             _array.push(_data);
         });
 
+        console.log(_array)
+        // return false;
        $.ajax({
            method : 'post',
            url : _url,
@@ -177,6 +181,7 @@ $(function(){
            success : function(result){
                if(result.status === 200) {
                    $(window).off('beforeunload');
+                   console.log(result.message);
                    notification('success',result.message,'','Success');
                    setTimeout(function(){
                       window.location.href = '/work-item/' + _form.data('id');

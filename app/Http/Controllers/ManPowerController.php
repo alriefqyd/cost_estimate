@@ -217,7 +217,8 @@ class ManPowerController extends Controller
             $response[] = array(
                 "text" => "[".$v->code . "] - " . $v->title,
                 "id" => $v->id,
-                "rate" => $v->overall_rate_hourly
+                "rate" => $v->overall_rate_hourly,
+                "unit" => "hrs"
             );
         }
 
