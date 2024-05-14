@@ -51,6 +51,7 @@ class MaterialController extends Controller
         })->when(!isset($request->sort), function($query) use ($request,$order) {
             return $query->orderBy('code', 'ASC');
         })->paginate(20)->withQueryString();
+
         return view('material.index',[
             'material_category' => $materialCategory,
             'material' => $material
@@ -164,6 +165,8 @@ class MaterialController extends Controller
         }
 
         try{
+            $material->code = "D_" .$material->id ."_". $material->code;
+            $material->save();
             $material->delete();
             return response()->json([
                 'status' => 200,
@@ -365,5 +368,47 @@ class MaterialController extends Controller
         });
 
         DB::commit();
+    }
+
+    public function generateCodeMaterial(Request $request){
+        $material = Material::select('code','category_id')->where('category_id', $request->id)
+            ->orderBy('code')->get();
+
+        if(count($material) < 1){
+            return response()->json([
+                'status' => 500
+            ]);
+        }
+
+        $data = $material->filter(function ($item){
+            return (strpos($item->code, "A") === false);
+        })->pluck('code');
+
+
+        $suffix = "01";
+        $code = $this->getSuffix($material[0]->code)['prefix'];
+        foreach ($data as $key => $value){
+            $suffixWorkItem = $this->getSuffix($value);
+            if($suffix != $suffixWorkItem['suffix']){
+                break;
+            } else {
+                $suffix+=1;
+            }
+        }
+
+        return response()->json([
+            'status' => 200,
+            'data' => $code . '.' .str_pad($suffix, 3, '0', STR_PAD_LEFT),
+        ]);
+    }
+
+    public function getSuffix($value){
+        $parts = explode('.', $value);
+        $afterDot = isset($parts[1]) ? $parts[1] : ''; // Check if the dot exists in the string
+        $beforeDot = isset($parts[0]) ? $parts[0] : ''; // Check if the dot exists in the string
+        return [
+            'prefix' =>  $beforeDot,
+            'suffix' => $afterDot
+        ];
     }
 }

@@ -25,7 +25,7 @@
                     name="work_item_type_id" >
                 <option disabled="disabled" value="" {{!isset($work_item?->work_item_type_id) ? 'selected' : ''}}>Select Work Item Category</option>
                 @foreach($work_item_type as $item)
-                    <option data-code="{{$item->getMaxCode()}}" {{isset($work_item?->work_item_type_id) && $work_item?->work_item_type_id == $item->id ? 'selected' : ''}} value="{{$item->id}}">{{$item->title}}</option>
+                    <option {{isset($work_item?->work_item_type_id) && $work_item?->work_item_type_id == $item->id ? 'selected' : ''}} value="{{$item->id}}">{{$item->title}}</option>
                 @endforeach
             </select>
         </div>
