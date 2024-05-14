@@ -29,8 +29,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Blade::directive('usd', function () {
-            return '<?php echo USD_KURS; ?>';
-        });
+
     }
 }

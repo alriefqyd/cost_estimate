@@ -154,7 +154,7 @@
         <td style="background-color: #C4BD97"></td>
         <td style="background-color: #C4BD97"></td>
         <td style="background-color: #C4BD97">{{$project->getContingencyCost()}}</td>
-        <td style="background-color: #C4BD97">{{$project->getContingencyCost() / USD_KURS}}</td>
+        <td style="background-color: #C4BD97">{{$project->getContingencyCost() / $usdIdr}}</td>
     </tr>
     <tr>
         <td style="background-color: #FFC000">{{chr(64 + sizeof($estimateAllDisciplines) + 2)}}</td>
@@ -165,7 +165,7 @@
         <td style="background-color: #FFC000"></td>
         <td style="background-color: #FFC000"></td>
         <td style="background-color: #FFC000">{{$project->getTotalCostWithContingency()}}</td>
-        <td style="background-color: #FFC000">{{$project->getTotalCostWithContingency() / USD_KURS}}</td>
+        <td style="background-color: #FFC000">{{$project->getTotalCostWithContingency() / $usdIdr}}</td>
     </tr>
     </tbody>
 </table>
