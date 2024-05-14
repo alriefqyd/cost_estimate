@@ -14,6 +14,10 @@ class WorkItemType extends Model
         return $this->hasMany(WorkItem::class,'work_item_type_id');
     }
 
+    /**
+     * Deprecated!!!
+     * @return string
+     */
     public function getMaxCode(){
         $code = $this->code;
         $sufix = sizeof($this->workItems) + 1;
