@@ -225,7 +225,14 @@ $(function(){
         var selectedOption = _this.find('option:selected');
         var dataAttribute = selectedOption.data('code');
 
-        $('.js-work-item-code').val(dataAttribute);
+        $.ajax({
+            url:'/getNumChildType/' + _val,
+            success:function (result){
+                if(result.status === 200) $('.js-work-item-code').val(result.data);
+            }
+        });
+
+        // $('.js-work-item-code').val(dataAttribute);
         $('.js-project_project_desc').val('').trigger('change');
         $('.js-work-description').val('');
         existingProjectDesc($('.js-project_project_desc'));
@@ -235,6 +242,11 @@ $(function(){
     $('.js-project_project_desc').each(function(){
         existingProjectDesc($(this));
     });
+
+    /**
+     * get work item by work item type selected
+     * @param el
+     */
     function existingProjectDesc(el){
         var _category = $('.js-select-work-item-type').val();
         var _isCostum = '';

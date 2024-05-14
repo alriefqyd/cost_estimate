@@ -640,6 +640,12 @@ class WorkItemController extends Controller
         ]);
     }
 
+    /**
+     * Deprecated
+     * @param WorkItemType $workItemtype
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function getNumChildType(WorkItemType $workItemtype, Request $request){
         $workItem = WorkItem::where('type', $workItemtype->id)->count();
 
@@ -647,6 +653,40 @@ class WorkItemController extends Controller
             'status' => 200,
             'data' => $workItemtype->code . $workItem
         ]);
+    }
+
+    public function generateWorkItemCode(Request $request){
+        $workItem = WorkItem::select('code','work_item_type_id')->where('work_item_type_id', $request->id)->orderBy('code')->get();
+        $data = $workItem->filter(function ($item){
+            return (strpos($item->code, "A") === false);
+        })->pluck('code');
+
+        $suffix = "01";
+        $code = $this->getSuffix($workItem[0]->code)['prefix'];
+        foreach ($data as $key => $value){
+            $suffixWorkItem = $this->getSuffix($value);
+            if($suffix != $suffixWorkItem['suffix']){
+                break;
+            } else {
+                $suffix+=1;
+            }
+        }
+
+
+        return response()->json([
+            'status' => 200,
+            'data' => $code . '.' .str_pad($suffix, 2, '0', STR_PAD_LEFT),
+        ]);
+    }
+
+    public function getSuffix($value){
+        $parts = explode('.', $value);
+        $afterDot = isset($parts[1]) ? $parts[1] : ''; // Check if the dot exists in the string
+        $beforeDot = isset($parts[0]) ? $parts[0] : ''; // Check if the dot exists in the string
+        return [
+          'prefix' =>  $beforeDot,
+          'suffix' => $afterDot
+        ];
     }
 
     public function getDetail(Request $request){
@@ -789,6 +829,8 @@ class WorkItemController extends Controller
             $workItem->manPowers()->detach();
             $workItem->equipmentTools()->detach();
             $workItem->materials()->detach();
+            $workItem->code = 'D_'.$workItem->id .'_'. $workItem->code;
+            $workItem->save();
             $workItem->delete();
             DB::commit();
             return response()->json([

@@ -155,7 +155,7 @@ Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'updat
 Route::get('/check',[\App\Http\Controllers\EstimateAllDisciplineController::class,'check'])->name('check')->middleware('auth');
 Route::get('/getManPower',[\App\Http\Controllers\ManPowerController::class,'getManPower'])->name('getManPower')->middleware('auth');
 Route::get('/getNumChild/{workItem:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChild'])->name('getNumChild')->middleware('auth');
-Route::get('/getNumChildType/{workItemType:id}',[\App\Http\Controllers\WorkItemController::class,'getNumChildType'])->name('getNumChildType')->middleware('auth');
+Route::get('/getNumChildType/{id}',[\App\Http\Controllers\WorkItemController::class,'generateWorkItemCode'])->name('getNumChildType')->middleware('auth');
 Route::get('/getMaterial',[\App\Http\Controllers\MaterialController::class,'getMaterial'])->name('getMaterial')->middleware('auth');
 Route::get('/getToolsEquipment',[\App\Http\Controllers\EquipmentToolsController::class,'getToolsEquipment'])->name('getToolsEquipment')->middleware('auth');
 Route::get('/getUserEmployee',[\App\Http\Controllers\UserController::class,'getUserEmployee'])->name('getUserEmployee')->middleware('auth');
@@ -163,6 +163,7 @@ Route::get('/checkProjectNo',[\App\Http\Controllers\ProjectController::class,'ch
 Route::get('/dumpingRole',[\App\Http\Controllers\RoleController::class,'dumpingData'])->name('dumpingData')->middleware('auth');
 Route::get('/getDetailWorkItem',[\App\Http\Controllers\WorkItemController::class,'getDetail'])->name('detailWorkItem')->middleware('auth');
 Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
+Route::get('/cost-estimate-summary/exportCustom/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
 Route::get('/getDisciplineList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getDisciplineList'])->middleware('auth');
 Route::get('/getWorkElementList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWorkElementList'])->middleware('auth');
 Route::post('/updateStatusWorkItem',[\App\Http\Controllers\WorkItemController::class,'updateStatusWorkItem'])->middleware('auth');
