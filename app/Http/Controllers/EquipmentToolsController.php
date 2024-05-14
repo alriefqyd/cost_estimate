@@ -236,7 +236,7 @@ class EquipmentToolsController extends Controller
 
     public function getToolsEquipment(Request $request){
         $response = array();
-        $data = EquipmentTools::select('id','description','code','local_rate')
+        $data = EquipmentTools::select('id','description','code','local_rate','unit')
             ->when(!auth()->user()->isToolsEquipmentReviewerRole(), function($query){
                 return $query->where(function($q){
                     return $q->where('status', EquipmentTools::REVIEWED)
@@ -248,7 +248,8 @@ class EquipmentToolsController extends Controller
             $response[] = array(
                 "text" => "[".$v->code . "] - " . $v->description,
                 "id" => $v->id,
-                "rate" => $v->local_rate
+                "rate" => $v->local_rate,
+                "unit" => $v->unit
             );
         }
 
