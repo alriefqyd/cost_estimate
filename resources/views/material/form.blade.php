@@ -7,7 +7,7 @@
                 name="category_id" >
             <option selected disabled="disabled">Select Material Category</option>
             @foreach($material_category as $item)
-                <option data-code="{{$item->code}}" data-num-count="{{$item->materials->count()}}" {{isset($material?->category_id) && $material?->category_id == $item->id ? 'selected' : ''}} value="{{$item->id}}">{{$item->description}}</option>
+                <option data-code="{{$item->code}}" {{isset($material?->category_id) && $material?->category_id == $item->id ? 'selected' : ''}} value="{{$item->id}}">{{$item->description}}</option>
             @endforeach
         </select>
     </div>

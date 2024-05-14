@@ -130,6 +130,7 @@ Route::post('/material-category/',[\App\Http\Controllers\MaterialCategoryControl
 Route::put('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'update'])->middleware('auth');
 Route::get('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'show'])->middleware('auth');
 Route::delete('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'destroy'])->middleware('auth');
+Route::get('/generateCodeMaterial/{id}', [\App\Http\Controllers\MaterialController::class,'generateCodeMaterial'])->middleware('auth');
 
 Route::get('/work-breakdown-structure',[\App\Http\Controllers\settingWbsController::class,'index'])->middleware('auth');
 Route::get('/work-breakdown-structure/create',[\App\Http\Controllers\settingWbsController::class,'create'])->middleware('auth');
@@ -180,4 +181,5 @@ Route::get('/generatequery/material-work-items', [\App\Http\Controllers\Generato
 
 Route::get('/convertApi', [\App\Http\Controllers\ApiController::class,'getUsdRateApi']);
 Route::get('/getPublicHolidayApi', [\App\Http\Controllers\ApiController::class,'getPublicHolidayApi']);
+
 

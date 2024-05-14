@@ -17,7 +17,7 @@ $(function() {
             url: url,
             type: 'DELETE',
             success: function (data) {
-                $('.js-modal-delete-material').hide();
+                $('.js-modal-delete-material').modal('hide');
                 if (data.status === 200) {
                     notification('success', data.message)
                     setTimeout(function () {
@@ -33,9 +33,17 @@ $(function() {
     $(document).on('change','.js-select-category-material',function(){
         var _this = $(this);
         var _code = _this.find('option:selected').attr('data-code');
-        var _sufix = parseInt(_this.find('option:selected').attr('data-num-count')) + 1;
-        var _newCode = _code + '.' + _sufix.toString().padStart(3,'0');
-        $('.js-material-code').val(_newCode);
+        var _id = _this.val();
+
+        console.log(_id);
+        $.ajax({
+           url : "/generateCodeMaterial/" + _id,
+            success:function (result){
+               if(result.status === 200) {
+                   $('.js-material-code').val(result.data);
+               }
+            }
+        });
     });
 
     $('.js-approve-confirmation-material').on('click', function(){
