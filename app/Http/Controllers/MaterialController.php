@@ -182,7 +182,7 @@ class MaterialController extends Controller
 
     public function getMaterial(Request $request){
         $response = array();
-        $data = Material::select('id','tool_equipment_description','code','rate')
+        $data = Material::select('id','tool_equipment_description','code','rate','unit')
             ->when(!auth()->user()->isMaterialReviewerRole(), function($query){
                 return $query->where(function($subQuery){
                     return $subQuery->where('status',Material::REVIEWED)
@@ -194,7 +194,8 @@ class MaterialController extends Controller
             $response[] = array(
                 "text" => "[".$v->code . "] - " . $v->tool_equipment_description,
                 "id" => $v->id,
-                "rate" => $v->rate
+                "rate" => $v->rate,
+                "unit" => $v->unit
             );
         }
 

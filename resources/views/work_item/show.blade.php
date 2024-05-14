@@ -260,7 +260,6 @@
                                         <td>{{number_format($material->pivot?->quantity,2,',','.')}}</td>
                                         <td>{{number_format($material->rate,2,',','.')}}</td>
                                         <td>{{number_format($material->getAmount(),2,',','.')}}</td>
-                                        <td></td>
                                     </tr>
                                 @endforeach
                                 <tr>
