@@ -657,6 +657,15 @@ class WorkItemController extends Controller
 
     public function generateWorkItemCode(Request $request){
         $workItem = WorkItem::select('code','work_item_type_id')->where('work_item_type_id', $request->id)->orderBy('code')->get();
+
+        if(count($workItem) < 1){
+            $workItemType = WorkItemType::where('id', $request->id)->first();
+            return response()->json([
+                'status' => 200,
+                'data' => $workItemType->code . "." . "01"
+            ]);
+        }
+
         $data = $workItem->filter(function ($item){
             return (strpos($item->code, "A") === false);
         })->pluck('code');
