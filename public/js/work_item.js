@@ -171,8 +171,6 @@ $(function(){
 
             _array.push(_data);
         });
-
-        console.log(_array)
         // return false;
        $.ajax({
            method : 'post',
