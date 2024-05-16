@@ -376,6 +376,13 @@ class MaterialController extends Controller
             ->orderBy('code')->get();
 
         if(count($material) < 1){
+            $materialType = MaterialCategory::where('id', $request->id)->first();
+            return response()->json([
+                'status' => 200,
+                'data' => $materialType->code . "." . "01"
+            ]);
+        }
+        if(count($material) < 1){
             return response()->json([
                 'status' => 500
             ]);
