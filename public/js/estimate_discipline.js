@@ -74,6 +74,7 @@ $(function(){
             _parent_row.find('.js-work-item-equipment-cost-modal').addClass('d-none');
         }
         bindBeforeUnloadEvent();
+        setContingencyTotal();
     });
 
     $(document).on('click','.js-work-item-text',function(){
@@ -91,6 +92,7 @@ $(function(){
         var _parent = _this.closest('tr');
         _parent.remove();
         bindBeforeUnloadEvent();
+        setContingencyTotal();
     });
 
     var workItemSelectInit = function (el) {
@@ -137,6 +139,7 @@ $(function(){
 
         var _version = _form.find('.js-version-project-estimate').val();
         var _array_estimate_disciplines = getWorkItemList();
+        var _contingency = _form.find('.js-input-contingency').val();
 
         _this.attr('disabled','disabled');
         _this.find('.js-loading-save').removeClass('d-none')
@@ -144,7 +147,8 @@ $(function(){
         var _data = {
             'work_items' : JSON.stringify(_array_estimate_disciplines),
             'project_id' : _project_id,
-            'version' : _version
+            'version' : _version,
+            'contingency' : _contingency
         }
 
         $.ajax({
@@ -174,6 +178,32 @@ $(function(){
         })
 
     });
+
+    function countTotalPrice(){
+        var data = getWorkItemList();
+        data = data.map(function (item){
+            var total = parseFloat(item.totalRateManPowers) + parseFloat(item.totalRateMaterials) + parseFloat(item.totalRateEquipments)
+            total = total * parseFloat(item.vol);
+           return total;
+        });
+
+        var total = data.reduce(function(accumulator, currentValue) {
+            return accumulator + currentValue;
+        }, 0);
+
+        return total;
+    }
+
+    function setContingencyTotal(){
+        var _total = countTotalPrice()
+        var _contingency = $('.js-input-contingency').val()
+        _contingency = parseFloat(_contingency) / 100
+        _contingency = parseFloat(_total) * _contingency
+        var totalCostEstimate = _contingency + _total
+
+        $('.js-work-item-total-contingency').text(toCurrency(_contingency));
+        $('.js-total-cost-estimate').text(toCurrency(totalCostEstimate));
+    }
 
     function getWorkItemList(){
         var _form = $('.js-form-estimate-discipline');
@@ -268,6 +298,10 @@ $(function(){
 
     }
 
+    $('.js-input-contingency').on('keyup change', function (){
+       setContingencyTotal();
+    });
+
     $(document).on('click','.js-add-work-item-element',function(){
         var _this = $(this)
         var _template = $('#js-template-table-work_item_column').html()
@@ -286,6 +320,7 @@ $(function(){
         workItemSelectInit(_select2)
         setWhiteBackground(document.querySelector('.table-overflow'));
         bindBeforeUnloadEvent()
+        setContingencyTotal();
         checkInputVol()
     });
 
@@ -293,7 +328,9 @@ $(function(){
         var _this = $(this);
         var _parent_row = _this.closest('tr');
         countTotalWorkItem(_this, workItemSelected);
+        getWorkItemList()
         bindBeforeUnloadEvent();
+        setContingencyTotal()
         checkInputVol()
     });
 
@@ -312,6 +349,7 @@ $(function(){
     $(document).on('change keyup','.js-input-labor_factorial, .js-input-equipment_factorial, .js-input-material_factorial', function(){
         var _this = $(this);
         countTotalWorkItem(_this, workItemSelected);
+        setContingencyTotal()
         bindBeforeUnloadEvent();
     });
 

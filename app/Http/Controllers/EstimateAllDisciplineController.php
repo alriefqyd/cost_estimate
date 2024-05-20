@@ -97,7 +97,7 @@ class EstimateAllDisciplineController extends Controller
     // merge the data of two user using button generate
     //
 
-    public function update(Request $request){
+    public function update(Project $project, Request $request){
         $workItemController = new WorkItemController();
         DB::beginTransaction();
         try {
@@ -146,6 +146,10 @@ class EstimateAllDisciplineController extends Controller
                     $estimateAllDiscipline->version = $newVersion;
                     $estimateAllDiscipline->save();
                 }
+
+                $project->contingency = $request->contingency;
+                $project->save();
+
                 $response = [
                     'status' => 200,
                     'message' => 'Success, Your data was saved successfully',
