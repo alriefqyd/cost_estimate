@@ -169,7 +169,7 @@ class Project extends Model
 
     public function getContingencyCost(){
         try{
-            $total = $this->getTotalCost() * (15/100);
+            $total = $this->getTotalCost() * ($this->contingency/100);
             return $total;
         } catch(Exception $e){
             return 0;
