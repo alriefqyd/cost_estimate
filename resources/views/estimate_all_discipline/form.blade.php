@@ -113,6 +113,33 @@
                                             @endforeach
                                         @endforeach
                                     @endforeach
+                                    <tr class="f-w-700">
+                                        <td colspan="10"><p>Contingency</p></td>
+                                        <td>
+                                             <div class="input-group">
+                                                <input class="form-control js-input-contingency" style="height:40px" type="number" placeholder="Contingency"
+                                                       @if(isset($project->contingency))
+                                                           value="{{$project->contingency}}"
+                                                       @else
+                                                           value="15"
+                                                       @endif
+                                                       {{!isset($item) ? 'disabled="disabled"' : '' }}
+                                                       aria-label="Vol">
+                                                <span class="input-group-text font f-w-500 f-15" style="font-size: 10px">
+                                                   %
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <p class="js-work-item-total-contingency">{{number_format($project->getContingencyCost(),2,',','.')}}</p>
+                                        </td>
+                                    </tr>
+                                    <tr class="f-w-700">
+                                        <td colspan="11">Total</td>
+                                        <td>
+                                            <p class="js-total-cost-estimate">{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</p>
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>

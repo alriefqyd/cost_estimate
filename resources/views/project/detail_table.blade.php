@@ -102,7 +102,7 @@
             @endforeach
         @endforeach
         <tr class="font-weight-bold" style="background-color: #C5C5C7D0">
-            <td colspan="12">CONTINGENCY</td>
+            <td colspan="12">CONTINGENCY {{$project->contingency}} %</td>
             <td colspan="4">{{number_format($project->getContingencyCost(),2,',','.')}}</td>
         </tr>
         <tr class="font-weight-bold" style="background-color: #C5C5C7D0">
