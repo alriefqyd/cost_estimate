@@ -327,7 +327,7 @@
                             @{{#manPower}}
                             <tr>
                                 <td>
-                                    @{{ title }}
+                                    <a href="/man-power/@{{ id }}" target="_blank"> @{{ title }} </a>
                                 </td>
                                 <td>
                                     @{{ labor_unit }}
@@ -362,7 +362,7 @@
                             @{{ #equipment }}
                             <tr>
                                 <td>
-                                    @{{ description }}
+                                    <a href="/tool-equipment/@{{ id }}" target="_blank">@{{ description }} </a>
                                 </td>
                                 <td>
                                      @{{ unit }}
@@ -391,7 +391,7 @@
                             @{{ #material }}
                             <tr>
                                 <td>
-                                    @{{ description }}
+                                    <a href="/material/@{{ id }}" target="_blank"> @{{ description }} </a>
                                 </td>
                                 <td>@{{ unit }}</td>
                                 <td>@{{ quantity }}</td>

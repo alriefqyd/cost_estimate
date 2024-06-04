@@ -20,29 +20,17 @@ class WorkItemController extends Controller
         if(!auth()->user()->can('viewAny',WorkItem::class)){
             return view('not_authorized');
         }
-        $order = $request->order;
-        $sort =  $request->sort;
 
-        $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter(request(['q','category','status']))
-            ->leftJoin('users','work_items.created_by','users.id')
-            ->leftJoin('profiles','users.id','profiles.user_id')
-            ->when(isset($request->sort), function($query) use ($request,$order,$sort) {
-                return $query->when($request->order == 'work_items.volume', function ($q) use ($request, $order, $sort) {
-                    return $q->orderByRaw('CONVERT(work_items.volume, SIGNED)' . $sort);
-                })->when($request->sort != 'work_items.volume', function ($q) use ($request, $order, $sort) {
-                    return $q->orderBy($order, $sort);
-                });
-            })->when(!auth()->user()->isWorkItemReviewer(), function($query) {
-                return $query->where(function($q){
-                    return $q->where('status',WorkItem::REVIEWED)->orwhere('created_by',auth()->user()->id);
-                });
-            })->when(!isset($request->sort), function($query) use ($request,$order){
-                return $query->orderBy('work_items.code','ASC');
-            })->select('work_items.code','work_items.description','work_items.id','work_item_types.title as category','work_items.volume','work_items.unit','work_items.status','profiles.full_name')->paginate(20)->withQueryString();
+        $workItemServices = new WorkItemServices();
+        $workItem = $workItemServices->getWorkItem($request, false, null)->paginate(20)->withQueryString();
+        $workItemDraft = $workItemServices->getWorkItem($request, true,WorkItem::DRAFT)->count();
+        $workItemReviewed = $workItemServices->getWorkItem($request, true,WorkItem::REVIEWED)->count();
+
         $workItemCategory = WorkItemType::select('id','title')->get();
-
         return view('work_item.index',[
             'work_item' => $workItem,
+            'workItemDraft' => $workItemDraft,
+            'workItemReviewed' => $workItemReviewed,
             'work_item_category' => $workItemCategory
         ]);
     }
@@ -863,5 +851,13 @@ class WorkItemController extends Controller
             Log::info($e->getMessage());
             return response()->json('Import Failed : ' . $e->getMessage());
         }
+    }
+
+    public function getWorkUpdatePrice(Request $request){
+        $workItem = WorkItem::with(['materials','equipmentTools','manPowers'])->where('id',$request->id)->first();
+        return response()->json([
+            'status' => 200,
+            'data' => $workItem
+        ]);
     }
 }

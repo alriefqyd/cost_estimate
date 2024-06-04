@@ -138,7 +138,7 @@ $(function(){
 
 
         var _version = _form.find('.js-version-project-estimate').val();
-        var _array_estimate_disciplines = getWorkItemList();
+        var _array_estimate_disciplines = getWorkItemList(false);
         var _contingency = _form.find('.js-input-contingency').val();
 
         _this.attr('disabled','disabled');
@@ -180,7 +180,7 @@ $(function(){
     });
 
     function countTotalPrice(){
-        var data = getWorkItemList();
+        var data = getWorkItemList(false);
         data = data.map(function (item){
             var total = parseFloat(item.totalRateManPowers) + parseFloat(item.totalRateMaterials) + parseFloat(item.totalRateEquipments)
             total = total * parseFloat(item.vol);
@@ -205,14 +205,65 @@ $(function(){
         $('.js-total-cost-estimate').text(toCurrency(totalCostEstimate));
     }
 
-    function getWorkItemList(){
+    function getWorkItemList(isSync){
         var _form = $('.js-form-estimate-discipline');
         var _work_items = _form.find('.js-select-work-items');
         var _array_estimate_disciplines = [];
 
         $.each(_work_items, function (){
-            var _parent = $(this).closest('tr');
             var _work_item = $(this).val();
+            var _material_price_total = 0;
+            var _material_unit = 0;
+            var _tool_price_total = 0;
+            var _tool_unit = 0;
+            var _man_power_unit = 0;
+            var _man_power_total = 0;
+
+            if(isSync){
+                $.ajax({
+                    url: "/getWorkItemPrice/" + _work_item,
+                    async:false,
+                    success:function (result) {
+                        if (result.status === 200){
+                            var _data = result.data;
+                            _material_price_total = _data.materials.reduce(function (accumulator, value){
+                                var _rate = parseFloat(value.rate);
+                                var _qty = parseFloat(value.pivot.quantity);
+                                var _total = _rate * _qty
+                                return accumulator + _total
+                            }, 0);
+
+                            _tool_price_total = _data.equipment_tools.reduce(function (accumulator, value){
+                                var _rate = parseFloat(value.local_rate);
+                                var _qty = parseFloat(value.pivot.quantity);
+                                var _total = _rate * _qty
+                                return accumulator + _total
+                            },0)
+
+                            _man_power_total = _data.man_powers.reduce(function (accumulator, value){
+                                var _rate = parseFloat(value.overall_rate_hourly);
+                                var _qty = parseFloat(value.pivot.labor_coefisient);
+                                var _total = _rate * _qty
+                                return accumulator + _total
+                            },0)
+
+                            _material_unit = _data.materials.map(function (item){
+                                return parseFloat(item.rate) * item.pivot.quantity;
+                            });
+
+                            _tool_unit = _data.equipment_tools.map(function (item){
+                                return parseFloat(item.local_rate) * item.pivot.quantity;
+                            })
+
+                            _man_power_unit = _data.man_powers.map(function (item){
+                                return parseFloat(item.overall_rate_hourly) * item.pivot.labor_coefisient
+                            })
+                        }
+                    },
+                })
+            }
+
+            var _parent = $(this).closest('tr');
             var _work_item_text = _parent.find('.js-select-work-items option:selected').text();
             var _vol = _parent.find('.js-input-vol').val();
             var _unit = _parent.find('.js-vol-result-ajax').text();
@@ -238,6 +289,15 @@ $(function(){
 
             var _idx = _parent.find('.js-unique-identifier').val();
             var _version = _parent.find('.js-item-version').val();
+
+            if(isSync){
+                _material_unit_rate_total = _material_price_total;
+                _material_unit_rate = _material_unit
+                _tool_unit_rate_total = _tool_price_total;
+                _tool_unit_rate = _tool_unit
+                _labor_cost_total_rate = _man_power_total
+                _labor_unit_rate = _man_power_unit
+            }
 
             var _data = {
                 "idx": _idx,
@@ -328,7 +388,7 @@ $(function(){
         var _this = $(this);
         var _parent_row = _this.closest('tr');
         countTotalWorkItem(_this, workItemSelected);
-        getWorkItemList()
+        getWorkItemList(false)
         bindBeforeUnloadEvent();
         setContingencyTotal()
         checkInputVol()
@@ -595,7 +655,7 @@ $(function(){
         var _form = $('.js-form-estimate-discipline');
         var _project_id = _form.data('id');
         var _version = $('.js-version-project-estimate').val();
-        var _currentWorkItem = getWorkItemList();
+        var _currentWorkItem = getWorkItemList(true);
 
         $('#modal-loading').modal('show');
         $.ajax({
@@ -618,7 +678,7 @@ $(function(){
                     var _version_form = $('.js-version-project-estimate').val()
                     var _template = $('#js-template-table-work_item_column').html();
 
-                    if(_version_db != _version_form){
+                    // if(_version_db != _version_form){
                         var _array_join = [..._existingEstimate, ..._conflictEstimate];
                         $.each(_array_join, function(index, estimateItem) {
                             var wbsLevel3 = estimateItem.wbsLevel3Id;
@@ -639,9 +699,9 @@ $(function(){
                                 var _equipment_factorial = parseInt(itm.equipmentFactorial ?? 1)
                                 var _material_factorial = parseInt(itm.materialFactorial ?? 1)
 
-                                var _man_power_cost_rate = itm.workItemManPowerCostRate
-                                var _equipment_cost_rate = itm.workItemEquipmentCostRate
-                                var _material_cost_rate = itm.workItemMaterialCostRate
+                                var _man_power_cost_rate = itm.workItemManPowerCost
+                                var _equipment_cost_rate = itm.workItemEquipmentCost
+                                var _material_cost_rate = itm.workItemMaterialCost
 
                                 var _man_power_cost = _man_power_cost_rate * _labor_factorial
                                 var _equipment_cost = _equipment_cost_rate * _equipment_factorial
@@ -654,6 +714,8 @@ $(function(){
                                     'uniqueIdentifier' : itm.uniqueIdentifier,
                                     'workItemId' : itm.workItemId,
                                     'manPowerCost' : _man_power_cost,
+                                    'isShowMaterial' : _material_cost > 0 ? 'd-block' : 'd-none',
+                                    'isShowEquipment' : _equipment_cost > 0 ? 'd-block' : 'd-none',
                                     'equipmentCost': _equipment_cost,
                                     'materialCost': _material_cost,
                                     'manPowerCostRate' : _man_power_cost_rate,
@@ -685,12 +747,15 @@ $(function(){
 
                         })
                         $('.js-version-project-estimate').val(_version_db);
-                    }
+
+                    // }
+
 
                     $('#modal-loading').modal('hide');
                     $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
 
                 } else {
+                    $('#modal-loading').modal('hide');
                     console.log(result.message)
                 }
             }
