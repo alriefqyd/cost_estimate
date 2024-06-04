@@ -81,6 +81,7 @@ Route::get('/work-item/{workItem:id}/work-item-material',[\App\Http\Controllers\
 Route::get('/work-item/{workItem:id}/work-item-material/edit',[\App\Http\Controllers\WorkItemController::class,'editMaterial'])->middleware('auth');
 Route::post('/work-item/{workItem:id}/work-item-material',[\App\Http\Controllers\WorkItemController::class,'storeMaterial'])->middleware('auth');
 Route::post('/work-item/{workItem:id}/work-item-material/update',[\App\Http\Controllers\WorkItemController::class,'updateMaterial'])->middleware('auth');
+Route::get('/getWorkItemPrice/{id}', [\App\Http\Controllers\WorkItemController::class,'getWorkUpdatePrice'])->middleware('auth');
 
 Route::get('/work-item-category/',[\App\Http\Controllers\WorkItemTypeController::class,'index'])->middleware('auth');
 Route::get('/work-item-category/create',[\App\Http\Controllers\WorkItemTypeController::class,'create'])->middleware('auth');

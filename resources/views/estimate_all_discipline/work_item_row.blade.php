@@ -132,7 +132,7 @@
         </span>
         <span class="float-end f-w-550 f-15">
             <i class="fa fa-exclamation-circle cursor-pointer
-                {{isset($item->workItemUnitRateTotalLaborCost) && $item->workItemUnitRateTotalLaborCost > 0 ? 'd-block' : 'd-none'}}
+                {{isset($item->workItemUnitRateTotalLaborCost) ? floatval($item->workItemUnitRateTotalLaborCost) > 0 ? 'd-block' : 'd-none' : ''}}
                 js-open-modal-detail js-work-item-man-power-cost-modal"
                data-type="man_power"
                data-id="
@@ -154,7 +154,8 @@
         </span>
         <span class="float-end f-w-550 f-15">
             <i class="fa fa-exclamation-circle cursor-pointer
-                {{isset($item) && $item->workItemUnitRateTotalToolCost > 0 ? 'd-block' : 'd-none'}}
+                @{{ isShowEquipment }}
+                {{isset($item) ? floatval($item->workItemUnitRateTotalToolCost) > 0 ? 'd-block' : 'd-none' : ''}}
                 js-open-modal-detail js-work-item-equipment-cost-modal"
                data-type="equipment"
                data-id="
@@ -176,7 +177,8 @@
         </span>
         <span class="float-end f-w-550 f-15">
             <i class="fa fa-exclamation-circle cursor-pointer
-                {{isset($item) && $item->workItemUnitRateTotalMaterialCost > 0 ? 'd-block' : 'd-none'}}
+                @{{ isShowMaterial }}
+                {{isset($item) ? floatval($item->workItemUnitRateTotalMaterialCost) > 0 ? 'd-block' : 'd-none' : ''}}
                 js-open-modal-detail js-work-item-material-cost-modal"
                data-type="material"
                data-id=

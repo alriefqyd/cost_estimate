@@ -51,10 +51,10 @@
                                     <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                         <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $workItem::DRAFT ? 'active' : ''}} js-btn-status" data-value="{{$workItem::DRAFT}}" type="button">
-                                            {{$workItem::DRAFT}}
+                                            {{$workItem::DRAFT}} ({{$workItemDraft}})
                                         </button>
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $workItem::REVIEWED ? 'active' : ''}} js-btn-status" data-value="{{$workItem::REVIEWED}}" type="button">
-                                            {{$workItem::REVIEWED}}
+                                            {{$workItem::REVIEWED}} ({{$workItemReviewed}})
                                         </button>
                                     </div>
                                 </div>

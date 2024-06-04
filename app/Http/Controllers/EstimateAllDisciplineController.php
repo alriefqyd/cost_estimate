@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Class\EstimateDisciplineClass;
 use App\Class\ProjectClass;
 use App\Models\EstimateAllDiscipline;
+use App\Models\Material;
 use App\Models\Project;
 use App\Models\WbsLevel3;
 use App\Services\ProjectServices;
@@ -137,7 +138,7 @@ class EstimateAllDisciplineController extends Controller
                     $estimateAllDiscipline->labor_unit_rate =  $workItemController->strToFloat($item['labourUnitRate']);
                     $estimateAllDiscipline->labor_cost_total_rate = $workItemController->strToFloat($item['totalRateManPowers']) * $item['vol'];
                     $estimateAllDiscipline->tool_unit_rate =  $workItemController->strToFloat($item['equipmentUnitRate']);
-                    $estimateAllDiscipline->tool_unit_rate_total =  $workItemController->strToFloat($item['totalRateEquipments'])* $item['vol'];
+                    $estimateAllDiscipline->tool_unit_rate_total =  $workItemController->strToFloat($item['totalRateEquipments']) * $item['vol'];
                     $estimateAllDiscipline->material_unit_rate =  $workItemController->strToFloat($item['materialUnitRate']);
                     $estimateAllDiscipline->material_unit_rate_total =  $workItemController->strToFloat($item['totalRateMaterials']) * $item['vol'];
                     $estimateAllDiscipline->wbs_level3_id = $item['wbs_level3'];
@@ -213,7 +214,7 @@ class EstimateAllDisciplineController extends Controller
 
     public function getEstimateToSync(Request $request){
         try{
-            $data = EstimateAllDiscipline::with(['workItems'])->where('project_id', $request->project_id)
+            $data = EstimateAllDiscipline::with(['workItems.materials'])->where('project_id', $request->project_id)
                 ->orderBy('id','DESC')
                 ->get();
 
@@ -230,8 +231,8 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->workItemEquipmentCost = $cv['totalRateEquipments'];
                 $estimateToSync->workItemMaterialCost = $cv['totalRateMaterials'];
                 $estimateToSync->workItemManPowerCostRate = $cv['labourUnitRate'];
-                $estimateToSync->workItemEquipmentCostRate = $cv['equipmentUnitRate'];
-                $estimateToSync->workItemMaterialCostRate = $cv['materialUnitRate'];
+                $estimateToSync->workItemEquipmentCostRate = $cv['equipmentUnitRate'] ?? null;
+                $estimateToSync->workItemMaterialCostRate = $cv['materialUnitRate'] ?? null;
                 $estimateToSync->laborFactorial = $cv['labourFactorial'];
                 $estimateToSync->equipmentFactorial = $cv['equipmentFactorial'];
                 $estimateToSync->materialFactorial = $cv['materialFactorial'];
@@ -248,16 +249,36 @@ class EstimateAllDisciplineController extends Controller
 
             $uniqueIdentifierArr = [];
             $estimateAlreadySave = $data->map(function($item) use ($estimateConflict, &$uniqueIdentifierArr, $projectServices){
+
+                $material = $item->workItems?->materials;
+                $totalMaterial = $material->reduce(function($accumulator, $value){
+                    $total = $value->rate * $value->pivot?->quantity;
+                    return $accumulator + $total;
+                }, 0);
+
+                $equipmentTools = $item->workItems?->equipmentTools;
+                $totalEquipmentTools = $equipmentTools->reduce(function ($accumulator, $value){
+                    $total = $value->local_rate * $value->pivot?->quantity;
+                    return $accumulator + $total;
+                },0);
+
+                $manPowers = $item->workItems?->manPowers;
+                $totalManPowers = $manPowers->reduce(function ($accumulator, $value){
+                   $total = $value->overall_rate_hourly * $value->pivot?->labor_coefisient;
+                   return $accumulator + $total;
+                },0);
+
+
                 $estimateToSync = new EstimateDisciplineClass();
                 $estimateToSync->workItemId = $item->work_item_id;
                 $estimateToSync->workItemDescription = $item->workItems?->description;
                 $estimateToSync->workItemVolume = $item->volume;
-                $estimateToSync->workItemManPowerCost = $item->labor_cost_total_rate;
-                $estimateToSync->workItemEquipmentCost = $item->tool_unit_rate_total;
-                $estimateToSync->workItemMaterialCost = $item->material_unit_rate_total;
-                $estimateToSync->workItemManPowerCostRate = $item->labor_unit_rate;
-                $estimateToSync->workItemEquipmentCostRate = $item->tool_unit_rate;
-                $estimateToSync->workItemMaterialCostRate = $item->material_unit_rate;
+                $estimateToSync->workItemManPowerCost = $totalManPowers;
+                $estimateToSync->workItemEquipmentCost = $totalEquipmentTools;
+                $estimateToSync->workItemMaterialCost = $totalMaterial;
+                $estimateToSync->workItemManPowerCostRate = $totalManPowers;
+                $estimateToSync->workItemEquipmentCostRate = $totalEquipmentTools;
+                $estimateToSync->workItemMaterialCostRate = $totalMaterial;
                 $estimateToSync->laborFactorial = $item->labour_factorial;
                 $estimateToSync->equipmentFactorial = $item->equipment_factorial;
                 $estimateToSync->materialFactorial = $item->material_factorial;
@@ -313,7 +334,7 @@ class EstimateAllDisciplineController extends Controller
         $tool_cost = (float) $location?->workItemEquipmentCostRate * $tool_factorial;
         $material_cost = (float) $location?->workItemMaterialCostRate * $material_factorial;
         $totalWorkItemCost = $man_power_cost +  $tool_cost + $material_cost;
-        $totalWorkItemCost = $totalWorkItemCost * $location->workItemVolume;
+        $totalWorkItemCost = $totalWorkItemCost * (float) $location->workItemVolume;
 
         return $totalWorkItemCost;
     }

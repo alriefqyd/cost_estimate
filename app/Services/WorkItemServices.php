@@ -11,6 +11,33 @@ use Illuminate\Support\Facades\DB;
 
 class WorkItemServices
 {
+    public function getWorkItem($request, $isCount, $status){
+        $order = $request->order;
+        $sort =  $request->sort;
+        $filter = request(['q','category','status']);
+        if($isCount) $filter = request(['q','category']);
+        $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter($filter)
+            ->leftJoin('users','work_items.created_by','users.id')
+            ->leftJoin('profiles','users.id','profiles.user_id')
+            ->when(isset($request->sort), function($query) use ($request,$order,$sort) {
+                return $query->when($request->order == 'work_items.volume', function ($q) use ($request, $order, $sort) {
+                    return $q->orderByRaw('CONVERT(work_items.volume, SIGNED)' . $sort);
+                })->when($request->sort != 'work_items.volume', function ($q) use ($request, $order, $sort) {
+                    return $q->orderBy($order, $sort);
+                });
+            })->when(!auth()->user()->isWorkItemReviewer(), function($query) {
+                return $query->where(function ($q) {
+                    return $q->where('status', WorkItem::REVIEWED)->orwhere('created_by', auth()->user()->id);
+                });
+            })->when(isset($status), function ($q) use ($status) {
+                return $q->where('status', $status);
+            })->when(!isset($request->sort), function($query) use ($request,$order){
+                return $query->orderBy('work_items.code','ASC');
+            })->select('work_items.code','work_items.description','work_items.id','work_item_types.title as category','work_items.volume','work_items.unit','work_items.status','profiles.full_name');
+
+        return $workItem;
+    }
+
     public function getWorkItemList(){
         try{
             $workItemList = WorkItem::with(['manPowers','equipmentTools','materials','workItemTypes'])->get();
