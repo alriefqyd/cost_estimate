@@ -283,6 +283,12 @@ class ProjectController extends Controller
             $duplicateProject = $project->replicate();
             $duplicateProject->project_no = $project->project_no . '_copy';
             $duplicateProject->status = Project::DRAFT; // Set a valid status
+            $duplicateProject->mechanical_approval_status = ""; // Set a valid status
+            $duplicateProject->civil_approval_status = ""; // Set a valid status
+            $duplicateProject->electrical_approval_status = ""; // Set a valid status
+            $duplicateProject->instrument_approval_status = ""; // Set a valid status
+            $duplicateProject->remark = ""; // Set a valid status
+
             $duplicateProject->save();
 
             $project->load('wbsLevel3s', 'estimateAllDisciplines'); // eager loading
@@ -316,9 +322,14 @@ class ProjectController extends Controller
                 });
             }
 
+            $data = [
+                'project_id' => $duplicateProject->id
+            ];
+
            DB::commit();
             return response()->json([
                 'status' => 200,
+                'data' => $data,
                 'message' => 'Success'
             ]);
         } catch (Exception $e){

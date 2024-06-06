@@ -243,7 +243,7 @@ $(function(){
                 if (response.status === 200) { // Access status from the response object
                     notification('success', response.message);
                     setTimeout(function() {
-                        window.location.href = '/project';
+                        window.location.href = '/project/' + response.data.project_id;
                     }, 1000);
                 } else {
                     notification('error', response.message);
