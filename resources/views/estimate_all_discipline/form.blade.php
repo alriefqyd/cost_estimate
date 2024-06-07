@@ -118,8 +118,8 @@
                                         <td>
                                              <div class="input-group">
                                                 <input class="form-control js-input-contingency" style="height:40px" type="number" placeholder="Contingency"
-                                                       @if(isset($project->contingency))
-                                                           value="{{$project->contingency}}"
+                                                       @if(isset($project->projectSettings->contingency))
+                                                           value="{{$project->projectSettings->contingency}}"
                                                        @else
                                                            value="15"
                                                        @endif

@@ -94,6 +94,10 @@ class Project extends Model
         return $this->hasMany(WbsLevel3::class,'project_id');
     }
 
+    public function projectSettings(){
+        return $this->hasOne(ProjectSettings::class, 'project_id');
+    }
+
     public function scopeFilter($query, array $filters, $isCount){
 
         $query->when($filters['status'] ?? false, function ($query, $status) use ($isCount) {
@@ -169,7 +173,7 @@ class Project extends Model
 
     public function getContingencyCost(){
         try{
-            $total = $this->getTotalCost() * ($this->contingency/100);
+            $total = $this->getTotalCost() * ($this->projectSettings->contingency/100);
             return $total;
         } catch(Exception $e){
             return 0;

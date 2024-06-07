@@ -149,7 +149,12 @@ class EstimateAllDisciplineController extends Controller
                     $estimateAllDiscipline->save();
                 }
 
-                $project->contingency = $request->contingency;
+                // Save the contingency in project_settings
+                $projectSetting = $project->projectSettings()->updateOrCreate(
+                    ['project_id' => $project->id],
+                    ['contingency' => $request->contingency]
+                );
+
                 $projectServices->setStatusDraft($project);
                 $project->save();
 
