@@ -15,6 +15,9 @@
             </div>
         </div>
     </div>
+    @if(session('message'))
+        @include('flash')
+    @endif
     <div class="container-fluid product-wrapper">
         <div class="col-sm-12">
             <div class="row">
