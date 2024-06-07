@@ -187,10 +187,10 @@ class ProjectController extends Controller
            $project->design_engineer_civil = $request->design_engineer_civil;
            $project->design_engineer_electrical = $request->design_engineer_electrical;
            $project->design_engineer_instrument = $request->design_engineer_instrument;
-           $project->status = $request->status ?? Project::DRAFT;
+           if(isset($request->status)) $project->status = $request->status;
            $project->project_area_id = $request->project_area;
            $project->updated_by = auth()->user()->id;
-
+           $projectService->setStatusDraft($project);
            $project->save();
            DB::commit();
 

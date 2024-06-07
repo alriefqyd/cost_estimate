@@ -100,6 +100,7 @@ class EstimateAllDisciplineController extends Controller
 
     public function update(Project $project, Request $request){
         $workItemController = new WorkItemController();
+        $projectServices = new ProjectServices();
         DB::beginTransaction();
         try {
             $newArrEstimateAllDiscipline = [];
@@ -149,6 +150,7 @@ class EstimateAllDisciplineController extends Controller
                 }
 
                 $project->contingency = $request->contingency;
+                $projectServices->setStatusDraft($project);
                 $project->save();
 
                 $response = [

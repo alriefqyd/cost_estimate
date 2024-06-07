@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\WbsLevel3;
 use App\Models\WorkBreakdownStructure;
 use App\Models\WorkElement;
+use App\Services\ProjectServices;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -87,6 +88,8 @@ class WorkBreakdownStructureController extends Controller
             ]);
         }
 
+        $projectServices = new ProjectServices();
+
         try {
               DB::beginTransaction();
               $arrIdNotDelete = [];
@@ -130,7 +133,8 @@ class WorkBreakdownStructureController extends Controller
 
             // Delete EstimateAllDiscipline that don't have WbsLevel3
             EstimateAllDiscipline::whereNotIn('wbs_level3_id', $arrIdNotDelete)->where('project_id', $project->id)->delete();
-
+            $projectServices->setStatusDraft($project);
+            $project->save();
             DB::commit();
 
             $response = [
