@@ -185,6 +185,7 @@ class EquipmentToolsController extends Controller
             $equipmentTools->local_rate = $this->convertToDecimal($request->local_rate);
             $equipmentTools->national_rate = $this->convertToDecimal($request->national_rate);
             $equipmentTools->remark = $request->remark;
+            $this->setStatusDraft($equipmentTools);
             $equipmentTools->save();
             DB::commit();
             $this->message('Data was successfully saved','success','fa fa-check','Success');
@@ -366,6 +367,12 @@ class EquipmentToolsController extends Controller
 
         Log::info('No file uploaded');
         return response()->json(['message' => 'No file uploaded'], 400);
+    }
+
+    public function setStatusDraft(EquipmentTools $equipmentTools){
+        if($equipmentTools->status == EquipmentTools::REVIEWED){
+            $equipmentTools->status = EquipmentTools::DRAFT;
+        }
     }
 
     public function message($message, $type, $icon, $status){
