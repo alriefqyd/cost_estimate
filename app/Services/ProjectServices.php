@@ -233,6 +233,12 @@ class ProjectServices
         return number_format($newValue,2,',','.');
     }
 
+    public function setStatusDraft(Project $project){
+        if($project->status == Project::APPROVE){
+            $project->status = Project::WAITING_FOR_APPROVAL;
+        }
+    }
+
     public function message($message, $type, $icon, $status){
         Session::flash('message', $message);
         Session::flash('type', $type);

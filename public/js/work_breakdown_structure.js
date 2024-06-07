@@ -149,6 +149,7 @@ $(function(){
                     },2000);
                 } else {
                     $('#modal-loading').modal('hide');
+                    console.log(result.message);
                     notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error')
                     _nestable.nestable('destroy');
                     _nestable.removeClass('nestable-initialized');

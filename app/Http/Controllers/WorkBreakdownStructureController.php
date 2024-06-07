@@ -7,6 +7,7 @@ use App\Models\Project;
 use App\Models\WbsLevel3;
 use App\Models\WorkBreakdownStructure;
 use App\Models\WorkElement;
+use App\Services\ProjectServices;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -87,15 +88,18 @@ class WorkBreakdownStructureController extends Controller
             ]);
         }
 
+        $projectServices = new ProjectServices();
+
         try {
               DB::beginTransaction();
               $arrIdNotDelete = [];
                 foreach($request->wbs as $loc){
                     foreach($loc['children'] as $disc){
+                        $oldIdentifier = $disc['identifier'] ?? null;
                         foreach($disc['children'] as $el){
                             $uniqId = uniqid();
                             if($loc['id']) $uniqId = $loc['id'];
-                            $existing = WbsLevel3::where('identifier',$uniqId)->where('discipline',$disc['id'])
+                            $existing = WbsLevel3::where('identifier',$oldIdentifier)->where('discipline',$disc['id'])
                                 ->where('work_element',$el['oldElement'])->where('project_id',$project->id)->first();
                             if(!$existing){ // add new if there's a wbs to add
                                 $wbsLevel3 = new WbsLevel3();
@@ -107,7 +111,15 @@ class WorkBreakdownStructureController extends Controller
                                 $wbsLevel3->save();
                                 $arrIdNotDelete[] = $wbsLevel3->id;
                             } else {
+
+                                $ed = EstimateAllDiscipline::where('wbs_level3_id', $existing->id)->first();
+                                if(isset($ed)){
+                                    $ed->wbs_level3_id = $existing->id;
+                                    $ed->save();
+                                }
+
                                 $existing->title = $loc['id'];
+                                $existing->identifier = $uniqId;
                                 $existing->work_element = $el['id'];
                                 $existing->save();
                                 $arrIdNotDelete[] = $existing->id;
@@ -116,13 +128,18 @@ class WorkBreakdownStructureController extends Controller
                     }
                 }
 
-              WbsLevel3::whereNotIn('id',$arrIdNotDelete)->where('project_id',$project->id)->delete(); //delete wbsLevel3 that not exist anymore
-              EstimateAllDiscipline::whereNotIn('wbs_level3_id',$arrIdNotDelete)->where('project_id',$project->id)->delete();
+            // Delete WbsLevel3 that no longer exist
+            WbsLevel3::whereNotIn('id', $arrIdNotDelete)->where('project_id', $project->id)->delete();
 
+            // Delete EstimateAllDiscipline that don't have WbsLevel3
+            EstimateAllDiscipline::whereNotIn('wbs_level3_id', $arrIdNotDelete)->where('project_id', $project->id)->delete();
+            $projectServices->setStatusDraft($project);
+            $project->save();
             DB::commit();
+
             $response = [
                 'status' => 200,
-                'message' => 'Success, Your data was update successfully'
+                'message' => 'Success, Your data was updated successfully'
             ];
             return response()->json($response);
         } catch (\Exception $e) {

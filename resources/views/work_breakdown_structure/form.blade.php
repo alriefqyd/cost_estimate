@@ -23,9 +23,7 @@
                        @foreach($existingWbs as $key => $value)
                             <li class="dd-item" data-id="{{$key}}">
                                 <div class="dd-handle">
-                                    <div class="float-start col-md-10">
-                                        {{$key}}
-                                    </div>
+                                    <div class="float-start col-md-10 js-dd-title-text js-dd-loc-equipment" contenteditable="true">{{$key}}</div>
                                     <div class="float-end">
                                         <span class="js-add-new-nestable-wbs" data-is-element="false">
                                            <i data-feather="plus-circle"></i>

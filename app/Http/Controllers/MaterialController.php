@@ -144,6 +144,7 @@ class MaterialController extends Controller
             $material->stock_code = $request->stock_code;
             $material->remark = $request->remark;
             $material->ref_material_number = $request->ref_material_number;
+            $this->setStatusDraft($material);
             $material->save();
             DB::commit();
             $this->message('Data was successfully saved','success','fa fa-check','Success');
@@ -418,5 +419,11 @@ class MaterialController extends Controller
             'prefix' =>  $beforeDot,
             'suffix' => $afterDot
         ];
+    }
+
+    public function setStatusDraft(Material $material){
+        if($material->status == Material::REVIEWED){
+            $material->status = Material::DRAFT;
+        }
     }
 }

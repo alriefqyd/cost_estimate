@@ -6,6 +6,7 @@ use App\Exports\WorkItemExport;
 use App\Models\Setting;
 use App\Models\WorkItem;
 use App\Models\WorkItemType;
+use App\Services\ProjectServices;
 use App\Services\WorkItemServices;
 use Exception;
 use Illuminate\Http\Request;
@@ -69,6 +70,7 @@ class WorkItemController extends Controller
 
     public function store(Request $request){
         $workItemService = new WorkItemServices();
+        $projectService = new ProjectServices();
         if(!auth()->user()->can('create',WorkItem::class)){
             abort(403);
         }
@@ -101,6 +103,7 @@ class WorkItemController extends Controller
             $workItem->save();
             $workItemService->duplicateRelationWorkItem($workItem,$request->parent_id);
             DB::commit();
+            $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('work-item/'.$workItem->id);
         } catch(\Exception $e){
             DB::rollBack();
@@ -109,6 +112,7 @@ class WorkItemController extends Controller
     }
 
     public function update(WorkItem $workItem, Request $request){
+        $projectService = new ProjectServices();
         if(!auth()->user()->can('update',WorkItem::class)){
             abort(403);
         }
@@ -128,9 +132,10 @@ class WorkItemController extends Controller
             $workItem->volume = $request->volume;
             $workItem->unit = $request->unit;
             $workItem->updated_by = auth()->user()->id;
-
+            $this->setStatusDraft($workItem);
             $workItem->save();
             DB::commit();
+            $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('work-item/'.$workItem->id);
         } catch(\Exception $e){
             DB::rollBack();
@@ -164,6 +169,7 @@ class WorkItemController extends Controller
         try{
             $pivotData = $this->processStoreManPower($workItem,$request);
             $workItem->manPowers()->attach($pivotData);
+            $this->setStatusDraft($workItem);
             DB::commit();
             return response()->json([
                 'status' => 200,
@@ -187,10 +193,11 @@ class WorkItemController extends Controller
             $pivotData = $this->processStoreManPower($workItem, $request);
             $uniquePivotData = array_map("unserialize", array_unique(array_map("serialize", $pivotData)));
             $workItem->manPowers()->sync($uniquePivotData);
+            $this->setStatusDraft($workItem);
             DB::commit();
             return response()->json([
                 'status' => 200,
-                'message' => $pivotData
+                'message' => 'Data Saved Successfully'
             ]);
         } catch (Exception $e){
             DB::rollback();
@@ -249,6 +256,7 @@ class WorkItemController extends Controller
             DB::beginTransaction();
             $pivotData = $this->processStoreToolEquipment($workItem,$request);
             $workItem->equipmentTools()->attach($pivotData);
+            $this->setStatusDraft($workItem);
             DB::commit();
             return response()->json([
                 'status' => 200,
@@ -271,6 +279,7 @@ class WorkItemController extends Controller
             $pivotData = $this->processStoreToolEquipment($workItem,$request);
             $uniquePivotData = array_map("unserialize", array_unique(array_map("serialize", $pivotData)));
             $workItem->equipmentTools()->sync($uniquePivotData);
+            $this->setStatusDraft($workItem);
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
@@ -324,6 +333,7 @@ class WorkItemController extends Controller
         try{
             $pivotData = $this->processStoreMaterial($workItem,$request);
             $workItem->materials()->attach($pivotData);
+            $this->setStatusDraft($workItem);
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
@@ -343,6 +353,7 @@ class WorkItemController extends Controller
         try{
             $pivotData = $this->processStoreMaterial($workItem,$request);
             $workItem->materials()->sync($pivotData);
+            $this->setStatusDraft($workItem);
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
@@ -859,5 +870,12 @@ class WorkItemController extends Controller
             'status' => 200,
             'data' => $workItem
         ]);
+    }
+
+    public function setStatusDraft(WorkItem $workItem){
+        if($workItem->status == WorkItem::REVIEWED){
+            $workItem->status = WorkItem::DRAFT;
+            $workItem->save();
+        }
     }
 }

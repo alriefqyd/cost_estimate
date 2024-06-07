@@ -233,24 +233,23 @@ $(function(){
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
-                // Include any other necessary headers, such as authentication tokens
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             url: '/duplicate-project/' + _id,
             data: JSON.stringify({ project_id: _id }),
             success: function(response) {
                 $('.js-modal-loading-project').modal('hide');
-                if (response.status === 200) { // Access status from the response object
+                if (response.status === 200) {
                     notification('success', response.message);
                     setTimeout(function() {
-                        window.location.href = '/project';
+                        window.location.href = '/project/' + response.data.project_id;
                     }, 1000);
                 } else {
                     notification('error', response.message);
                 }
             },
             error: function(xhr, status, error) {
-                console.error(xhr.responseText); // Log detailed error information
+                console.error(xhr.responseText);
             }
         });
     });
