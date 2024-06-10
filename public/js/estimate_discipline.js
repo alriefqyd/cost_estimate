@@ -677,7 +677,7 @@ $(function(){
                     var _version_db = _data_sync['version'];
                     var _version_form = $('.js-version-project-estimate').val()
                     var _template = $('#js-template-table-work_item_column').html();
-
+                    
                     // if(_version_db != _version_form){
                         var _array_join = [..._existingEstimate, ..._conflictEstimate];
                         $.each(_array_join, function(index, estimateItem) {
@@ -750,7 +750,7 @@ $(function(){
 
                     // }
 
-
+                    setContingencyTotal();
                     $('#modal-loading').modal('hide');
                     $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
 

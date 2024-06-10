@@ -247,7 +247,7 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->uniqueIdentifier = $cv['idx'];
                 $estimateToSync->version = $version;
 
-                $total = number_format($this->countTotalCostWorkItem($estimateToSync));
+                $total = number_format($this->countTotalCostWorkItem($estimateToSync),'2',',','.');
                 $estimateToSync->total = $total;
 
 
@@ -256,7 +256,6 @@ class EstimateAllDisciplineController extends Controller
 
             $uniqueIdentifierArr = [];
             $estimateAlreadySave = $data->map(function($item) use ($estimateConflict, &$uniqueIdentifierArr, $projectServices){
-
                 $material = $item->workItems?->materials;
                 $totalMaterial = $material->reduce(function($accumulator, $value){
                     $total = $value->rate * $value->pivot?->quantity;
@@ -292,7 +291,7 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->wbsLevel3Id = $item->wbs_level3_id;
                 $estimateToSync->version = $item->version;
                 $estimateToSync->uniqueIdentifier = $item->unique_identifier;
-                $estimateToSync->total = number_format($projectServices->getTotalCostWorkItem($item));
+                $estimateToSync->total = number_format($this->countTotalCostWorkItem($estimateToSync),'2',',','.');;
                 $uniqueIdentifierArr[] = $item->unique_identifier;
                 $estimateToSync->unit = $item->workItems?->unit;
                 return $estimateToSync;
@@ -337,9 +336,9 @@ class EstimateAllDisciplineController extends Controller
         $labor_factorial = $location?->labourFactorial ?? 1;
         $tool_factorial = $location?->equipmentFactorial ?? 1;
         $material_factorial = $location?->materialFactorial ?? 1;
-        $man_power_cost = (float) $location?->workItemManPowerCostRate * $labor_factorial;
-        $tool_cost = (float) $location?->workItemEquipmentCostRate * $tool_factorial;
-        $material_cost = (float) $location?->workItemMaterialCostRate * $material_factorial;
+        $man_power_cost = (float) $location?->workItemManPowerCost * $labor_factorial;
+        $tool_cost = (float) $location?->workItemEquipmentCost * $tool_factorial;
+        $material_cost = (float) $location?->workItemMaterialCost * $material_factorial;
         $totalWorkItemCost = $man_power_cost +  $tool_cost + $material_cost;
         $totalWorkItemCost = $totalWorkItemCost * (float) $location->workItemVolume;
 
