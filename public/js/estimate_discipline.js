@@ -750,7 +750,7 @@ $(function(){
 
                     // }
 
-
+                    setContingencyTotal();
                     $('#modal-loading').modal('hide');
                     $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
 

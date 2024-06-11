@@ -2,7 +2,9 @@
 
 namespace App\Console;
 
+use App\Http\Controllers\EstimateAllDisciplineController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\WorkBreakdownStructureController;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -17,10 +19,21 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $settingController = new SettingController();
-        $schedule->call(function () use ($settingController) {
+
+        $schedule->call(function (){
+            $settingController = new SettingController();
             $settingController->updateCurrencyUsd();
         })->cron('00 07 * * *');
+
+        $schedule->call(function (){
+            $wbsController = new WorkBreakdownStructureController();
+            $wbsController->deleteWbsLevel3MoreOneMonth();
+        })->daily();
+
+        $schedule->call(function (){
+            $estimateController = new EstimateAllDisciplineController();
+            $estimateController->deleteEstimateDisciplineMoreOneMonth();
+        })->cron('00 03 * * *');
     }
 
     /**
