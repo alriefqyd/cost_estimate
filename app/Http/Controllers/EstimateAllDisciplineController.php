@@ -9,10 +9,12 @@ use App\Models\Material;
 use App\Models\Project;
 use App\Models\WbsLevel3;
 use App\Services\ProjectServices;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class EstimateAllDisciplineController extends Controller
 {
@@ -343,5 +345,19 @@ class EstimateAllDisciplineController extends Controller
         $totalWorkItemCost = $totalWorkItemCost * (float) $location->workItemVolume;
 
         return $totalWorkItemCost;
+    }
+
+    public function deleteEstimateDisciplineMoreOneMonth(){
+        try{
+            DB::beginTransaction();
+            $date = Carbon::now()->subMonth();
+            $estimateDiscipline = EstimateAllDiscipline::whereNotNull('deleted_at')
+                ->where('deleted_at','<', $date)->forceDelete();
+            DB::commit();
+            Log::info('Data Estimate Discipline deleted more two months successfully hard delete');
+        } catch (Exception $e){
+            DB::rollBack();
+            Log::error($e->getMessage());
+        }
     }
 }
