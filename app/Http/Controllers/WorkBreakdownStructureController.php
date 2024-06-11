@@ -8,10 +8,13 @@ use App\Models\WbsLevel3;
 use App\Models\WorkBreakdownStructure;
 use App\Models\WorkElement;
 use App\Services\ProjectServices;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class WorkBreakdownStructureController extends Controller
 {
@@ -254,5 +257,20 @@ class WorkBreakdownStructureController extends Controller
             'status' => 200,
             'data' => $data
         ]);
+    }
+
+    public function deleteWbsLevel3MoreOneMonth(){
+        try {
+            DB::beginTransaction();
+            $date = Carbon::now()->subMonth();
+            WbsLevel3::whereNotNull('deleted_at')
+                ->where('deleted_at', '<', $date)
+                ->forceDelete();
+            DB::commit();
+            Log::info("Data WBS Level 3 deleted more one month successfully hard delete");
+        } catch (Exception $e) {
+            Log::error("Error Delete WBS Level 3 : ". $e->getMessage());
+            DB::rollBack();
+        }
     }
 }

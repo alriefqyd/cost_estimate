@@ -9,10 +9,12 @@ use App\Models\Material;
 use App\Models\Project;
 use App\Models\WbsLevel3;
 use App\Services\ProjectServices;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class EstimateAllDisciplineController extends Controller
 {
@@ -247,7 +249,7 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->uniqueIdentifier = $cv['idx'];
                 $estimateToSync->version = $version;
 
-                $total = number_format($this->countTotalCostWorkItem($estimateToSync));
+                $total = number_format($this->countTotalCostWorkItem($estimateToSync),'2',',','.');
                 $estimateToSync->total = $total;
 
 
@@ -256,7 +258,6 @@ class EstimateAllDisciplineController extends Controller
 
             $uniqueIdentifierArr = [];
             $estimateAlreadySave = $data->map(function($item) use ($estimateConflict, &$uniqueIdentifierArr, $projectServices){
-
                 $material = $item->workItems?->materials;
                 $totalMaterial = $material->reduce(function($accumulator, $value){
                     $total = $value->rate * $value->pivot?->quantity;
@@ -292,7 +293,7 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->wbsLevel3Id = $item->wbs_level3_id;
                 $estimateToSync->version = $item->version;
                 $estimateToSync->uniqueIdentifier = $item->unique_identifier;
-                $estimateToSync->total = number_format($projectServices->getTotalCostWorkItem($item));
+                $estimateToSync->total = number_format($this->countTotalCostWorkItem($estimateToSync),'2',',','.');;
                 $uniqueIdentifierArr[] = $item->unique_identifier;
                 $estimateToSync->unit = $item->workItems?->unit;
                 return $estimateToSync;
@@ -337,12 +338,26 @@ class EstimateAllDisciplineController extends Controller
         $labor_factorial = $location?->labourFactorial ?? 1;
         $tool_factorial = $location?->equipmentFactorial ?? 1;
         $material_factorial = $location?->materialFactorial ?? 1;
-        $man_power_cost = (float) $location?->workItemManPowerCostRate * $labor_factorial;
-        $tool_cost = (float) $location?->workItemEquipmentCostRate * $tool_factorial;
-        $material_cost = (float) $location?->workItemMaterialCostRate * $material_factorial;
+        $man_power_cost = (float) $location?->workItemManPowerCost * $labor_factorial;
+        $tool_cost = (float) $location?->workItemEquipmentCost * $tool_factorial;
+        $material_cost = (float) $location?->workItemMaterialCost * $material_factorial;
         $totalWorkItemCost = $man_power_cost +  $tool_cost + $material_cost;
         $totalWorkItemCost = $totalWorkItemCost * (float) $location->workItemVolume;
 
         return $totalWorkItemCost;
+    }
+
+    public function deleteEstimateDisciplineMoreOneMonth(){
+        try{
+            DB::beginTransaction();
+            $date = Carbon::now()->subMonth();
+            $estimateDiscipline = EstimateAllDiscipline::whereNotNull('deleted_at')
+                ->where('deleted_at','<', $date)->forceDelete();
+            DB::commit();
+            Log::info('Data Estimate Discipline deleted more two months successfully hard delete');
+        } catch (Exception $e){
+            DB::rollBack();
+            Log::error($e->getMessage());
+        }
     }
 }
