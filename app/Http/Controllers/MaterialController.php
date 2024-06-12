@@ -7,6 +7,7 @@ use App\Imports\MaterialCategoryImport;
 use App\Imports\MaterialImport;
 use App\Models\Material;
 use App\Models\MaterialCategory;
+use App\Services\MaterialServices;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -30,31 +31,20 @@ class MaterialController extends Controller
             return view('not_authorized');
         }
 
-        $order = $request->order;
-        $sort =  $request->sort;
-        $materialCategory = MaterialCategory::select('id','description','code')->get();
+        $materialServices = new MaterialServices();
 
-        $material = Material::with('materialsCategory')->filter(request(['q','category','status']))
-            ->when(isset($request->sort), function($query) use ($request,$order,$sort) {
-                return $query->when($request->order == 'category', function ($qq) use ($request, $order, $sort) {
-                    return $qq->whereHas('materialsCategory', function ($relation) use ($sort) {
-                        $relation->orderBy('description', $sort);
-                    });
-                })->when($request->order != 'category', function ($qq) use ($request, $order, $sort) {
-                    return $qq->orderBy($order, $sort);
-                });
-        })->when(!auth()->user()->isMaterialReviewerRole(), function($query){
-            return $query->where(function($subQuery){
-                return $subQuery->where('status',Material::REVIEWED)
-                    ->orWhere('created_by', auth()->user()->id);
-            });
-        })->when(!isset($request->sort), function($query) use ($request,$order) {
-            return $query->orderBy('code', 'ASC');
-        })->paginate(20)->withQueryString();
+
+        $materialCategory = MaterialCategory::select('id','description','code')->get();
+        $material = $materialServices->getMaterial($request, false, null);
+        $dataMaterial = $material->paginate(20)->withQueryString();
+        $materialDraft = $materialServices->getMaterial($request,true,Material::DRAFT)->count();
+        $materialReviewed = $materialServices->getMaterial($request,true,Material::REVIEWED)->count();
 
         return view('material.index',[
             'material_category' => $materialCategory,
-            'material' => $material
+            'material' => $dataMaterial,
+            'materialDraft' => $materialDraft,
+            'materialReviewed' => $materialReviewed,
         ]);
     }
 

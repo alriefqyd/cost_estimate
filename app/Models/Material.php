@@ -39,6 +39,10 @@ class Material extends Model
         );
     }
 
+    public function createdBy(){
+        return $this->hasOne(User::class,'id','created_by');
+    }
+
     public function getAmount(){
         $qty = str_replace(',','.',$this->pivot->quantity);
         return $this->rate * (float) $qty;
