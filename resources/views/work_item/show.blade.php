@@ -34,11 +34,13 @@
                             <label>Work Item Detail</label>
                         </div>
                         @can('update',App\Models\WorkItem::class)
-                            <div class="float-end">
-                                <a href="/work-item/edit/{{$work_item->id}}">
-                                    <div class="btn btn-outline-success">Edit</div>
-                                </a>
-                            </div>
+                            @if(isset($isUserHaveAccess) && $isUserHaveAccess)
+                                <div class="float-end">
+                                    <a href="/work-item/edit/{{$work_item->id}}">
+                                        <div class="btn btn-outline-success">Edit</div>
+                                    </a>
+                                </div>
+                            @endif
                         @endcan
                     </div>
                     <div class="col-md-12 mt-3 mb-3">
@@ -111,11 +113,13 @@
                         @canAny(['update','create'],App\Models\WorkItem::class)
                         <div class="float-end">
                             @if(sizeof($work_item->manPowers) > 0)
-                                <a href="/work-item/{{$work_item?->id}}/work-item-man-power/edit">
-                                    <button class="btn btn-outline-success">
-                                        Edit
-                                    </button>
-                                </a>
+                                @if(isset($isUserHaveAccess) && $isUserHaveAccess)
+                                    <a href="/work-item/{{$work_item?->id}}/work-item-man-power/edit">
+                                        <button class="btn btn-outline-success">
+                                            Edit
+                                        </button>
+                                    </a>
+                                @endif
                             @else
                                 <a href="/work-item/{{$work_item?->id}}/work-item-man-power/">
                                     <button class="btn btn-outline-success">
@@ -167,11 +171,13 @@
                         <div class="float-end">
                             @canAny(['update','create'],App\Models\WorkItem::class)
                                 @if(sizeof($work_item->equipmentTools) > 0)
-                                    <a href="/work-item/{{$work_item?->id}}/work-item-tools-equipment/edit">
-                                        <button class="btn btn-outline-success">
-                                            Edit
-                                        </button>
-                                    </a>
+                                    @if(isset($isUserHaveAccess) && $isUserHaveAccess)
+                                        <a href="/work-item/{{$work_item?->id}}/work-item-tools-equipment/edit">
+                                            <button class="btn btn-outline-success">
+                                                Edit
+                                            </button>
+                                        </a>
+                                    @endif
                                 @else
                                     <a href="/work-item/{{$work_item?->id}}/work-item-tools-equipment/">
                                         <button class="btn btn-outline-success">
@@ -226,11 +232,13 @@
                         <div class="float-end">
                             @canAny(['update','create'],App\Models\WorkItem::class)
                                 @if(sizeof($work_item->materials) > 0)
-                                    <a href="/work-item/{{$work_item?->id}}/work-item-material/edit">
-                                        <button class="btn btn-outline-success">
-                                            Edit
-                                        </button>
-                                    </a>
+                                    @if(isset($isUserHaveAccess) && $isUserHaveAccess)
+                                        <a href="/work-item/{{$work_item?->id}}/work-item-material/edit">
+                                            <button class="btn btn-outline-success">
+                                                Edit
+                                            </button>
+                                        </a>
+                                    @endif
                                 @else
                                     <a href="/work-item/{{$work_item?->id}}/work-item-material/">
                                         <button class="btn btn-outline-success">

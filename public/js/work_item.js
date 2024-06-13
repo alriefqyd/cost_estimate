@@ -386,6 +386,7 @@ $(function(){
         var _form = $('.js-form-work-item');
 
         _form.removeClass('d-none');
+        $('.js-button-work-item-form').removeClass('d-none')
         $('.js-parent-work-item').val('');
         $('.js-select-work-item-type').val(null).trigger('change');
         $('.js-project_project_desc').val(null).trigger('change');
