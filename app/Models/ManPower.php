@@ -16,6 +16,10 @@ class ManPower extends Model
         return $this->belongsToMany(WorkItem::class,'man_powers_work_items')->withPivot('labor_unit', 'labor_coefisient','amount');
     }
 
+    public function createdBy(){
+        return $this->hasOne(User::class,'id','created_by');
+    }
+
     public function scopeFilter($query, array $filters){
         $query->when($filters['q'] ?? false, fn($query,$q) =>
             $query->where(function($qq) use ($q){

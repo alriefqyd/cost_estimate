@@ -20,6 +20,10 @@ class EquipmentTools extends Model
         return $this->belongsTo(EquipmentToolsCategory::class,'category_id');
     }
 
+    public function createdBy(){
+        return $this->hasOne(User::class,'id','created_by');
+    }
+
     public function scopeFilter($query, array $filters){
         $query->when($filters['q'] ?? false, fn($query,$q) =>
             $query->where(function($qq) use ($q){

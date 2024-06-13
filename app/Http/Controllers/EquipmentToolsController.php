@@ -7,6 +7,7 @@ use App\Imports\EquipmentToolsImport;
 use App\Models\EquipmentTools;
 use App\Models\EquipmentToolsCategory;
 use App\Models\MaterialCategory;
+use App\Services\EquipmentToolsServices;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -30,28 +31,17 @@ class EquipmentToolsController extends Controller
             return view('not_authorized');
         }
 
-        $order = $request->order;
-        $sort =  $request->sort;
-        $equipmentTools = EquipmentTools::with('equipmentToolsCategory')->filter(request(['q','category','status']))
-            ->when(isset($request->sort), function($query) use ($request,$order,$sort){
-                return $query->when($request->order == 'category', function($qq) use ($request,$order,$sort){
-                    return $qq->whereHas('equipmentToolsCategory',function($relation) use ($sort){
-                        $relation->orderBy('description',$sort);
-                    });
-                })->when($request->order != 'category', function($qq) use ($request,$order, $sort){
-                    return $qq->orderBy($order,$sort);
-                });
-            })->when(!auth()->user()->isToolsEquipmentReviewerRole(), function($query){
-                return $query->where(function($q){
-                   return $q->where('status',EquipmentTools::REVIEWED)->orWhere('created_by', auth()->user()->id);
-                });
-            })->when(!isset($request->sort), function($query) use ($request,$order) {
-                return $query->orderBy('equipment_tools.code', 'ASC');
-            })->paginate(20)->withQueryString();
+        $equipmentService = new EquipmentToolsServices();
+
+        $equipmentTools = $equipmentService->getEquipmentTools($request,false,null)->paginate(20)->withQueryString();
+        $reviewedEquipmentTools = $equipmentService->getEquipmentTools($request,true,EquipmentTools::REVIEWED)->count();
+        $draftEquipmentTools = $equipmentService->getEquipmentTools($request,true,EquipmentTools::DRAFT)->count();
         $equipmentToolsCategory = EquipmentToolsCategory::select('id','description')->get();
 
         return view('equipment_tool.index',[
             'equipment_tools' => $equipmentTools,
+            'draftEquipmentTools' => $draftEquipmentTools,
+            'reviewedEquipmentTools' => $reviewedEquipmentTools,
             'equipment_tools_category' => $equipmentToolsCategory
         ]);
     }

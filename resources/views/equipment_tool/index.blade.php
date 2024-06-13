@@ -56,10 +56,10 @@
                                     <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                         <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $equipmentTools::DRAFT ? 'active' : ''}} js-btn-status" data-value="{{$equipmentTools::DRAFT}}" type="button">
-                                            {{$equipmentTools::DRAFT}}
+                                            {{$equipmentTools::DRAFT}} ({{$draftEquipmentTools}})
                                         </button>
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $equipmentTools::REVIEWED ? 'active' : ''}} js-btn-status" data-value="{{$equipmentTools::REVIEWED}}" type="button">
-                                            {{$equipmentTools::REVIEWED}}
+                                            {{$equipmentTools::REVIEWED}} ({{$reviewedEquipmentTools}})
                                         </button>
                                     </div>
                                 </div>
@@ -116,6 +116,7 @@
                                     <th scope="col" class="text-left">Unit <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.unit"></i></th>
                                     <th scope="col" class="text-left">Local Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.local_rate"></i></th>
                                     <th scope="col" class="text-left">National Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.national_rate"></i></th>
+                                    <th scope="col" class="text-left">Created By <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.created_by"></i></th>
                                     <th scope="col" class="text-left">Status <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.status"></i></th>
                                     @can('delete',App\Models\EquipmentTools::class)
                                         <th scope="col" class="text-left">Action</th>
@@ -139,6 +140,7 @@
                                         <td class="min-w-80">{{$item->unit}}</td>
                                         <td>{{number_format($item->local_rate,2,',','.')}}</td>
                                         <td class="min-w-150">{{number_format($item->national_rate,2,',','.')}}</td>
+                                        <td class="min-w-80">{{$item->createdBy?->profiles?->full_name}}</td>
                                         <td class="min-w-80">{{$item->status}}</td>
                                         @can('delete',App\Models\EquipmentTools::class)
                                             <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"

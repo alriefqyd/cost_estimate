@@ -73,7 +73,7 @@
                                             @foreach($workElement as $a => $b)
                                                 @php ($wbsId = isset($b?->id) ? $b->id : $b[0]->wbs_level3_id)
                                                 @php ($workElement = isset($b?->work_element) ? $b->work_element : $b[0]->work_element_id)
-                                                @if($a !== $previousWorkElement)
+{{--                                                @if($a !== $previousWorkElement)--}}
                                                     <tr class="js-column-work-element"
                                                         data-wbs-level3-id="{{$wbsId}}"
                                                         style="background-color: #EFEFEFD0">
@@ -98,7 +98,7 @@
                                                         <td colspan="8"></td>
                                                         <td></td>
                                                     </tr>
-                                                @endif
+{{--                                                @endif--}}
                                                 @foreach($b as $item)
                                                     @if(isset($item->workItemId))
                                                         @include('estimate_all_discipline.work_item_row',
