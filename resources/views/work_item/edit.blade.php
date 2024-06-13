@@ -40,6 +40,16 @@
                                     @method('put')
                                     @include('work_item.form',['isEdit' => true])
                                 </div>
+                                <div class="row js-work-item {{!isset($work_item->id) ? 'd-none' : ''}}">
+                                    <div class="col-md-12 mt-5 text-end">
+                                        <a href="/work-item/">
+                                            <div class="btn js-btn-save-work-item btn-outline-danger">Cancel</div>
+                                        </a>
+                                        @if($isUserCanUpdate)
+                                            <button class="btn js-btn-save-work-item js-save-confirm-form btn-outline-success">Save</button>
+                                        @endif
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

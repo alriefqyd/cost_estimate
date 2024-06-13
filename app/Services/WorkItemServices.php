@@ -143,6 +143,9 @@ class WorkItemServices
         } catch (Exception $e){
             return $e->getMessage();
         }
+    }
 
+    public function isWorkItemCreateByUser($workItem){
+       return auth()->user()->id == $workItem->createdBy || auth()->user()->isWorkItemReviewer();
     }
 }
