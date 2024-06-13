@@ -39,6 +39,14 @@
                                     @csrf
                                     @include('work_item.form',['isEdit' => false])
                                 </div>
+                                <div class="row js-button-work-item-form {{!isset($work_item->id) ? 'd-none' : ''}}">
+                                    <div class="col-md-12 mt-5 text-end">
+                                        <a href="/work-item/">
+                                            <div class="btn js-btn-save-work-item btn-outline-danger">Cancel</div>
+                                        </a>
+                                        <button class="btn js-btn-save-work-item js-save-confirm-form btn-outline-success">Save</button>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>

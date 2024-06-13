@@ -42,8 +42,12 @@ class WorkItemController extends Controller
             return view('not_authorized');
         }
 
+        $workItemService = new WorkItemServices();
+        $isUserHaveAccess = $workItemService->isWorkItemCreateByUser($workItem);
+
         return view('work_item.show',[
-            'work_item' => $workItem
+            'work_item' => $workItem,
+            'isUserHaveAccess' => $isUserHaveAccess
         ]);
     }
 
@@ -61,10 +65,18 @@ class WorkItemController extends Controller
         if(!auth()->user()->can('update',WorkItem::class)){
             return view('not_authorized');
         }
+
+        $workItemService = new WorkItemServices();
+        $isUserCanUpdate= $workItemService->isWorkItemCreateByUser($workItem);
+        if(!$isUserCanUpdate){
+            return view('not_authorized');
+        }
+
         $workItemCategory = WorkItemType::select('id','title','code')->get();
         return view('work_item.edit', [
             'work_item' => $workItem,
-            'work_item_type' => $workItemCategory
+            'work_item_type' => $workItemCategory,
+            'isUserCanUpdate' => $isUserCanUpdate
         ]);
     }
 
@@ -156,8 +168,15 @@ class WorkItemController extends Controller
         if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
             return (view('not_authorized'));
         }
+
+        $workItemService = new WorkItemServices();
+        $isUserHaveAccess = $workItemService->isWorkItemCreateByUser($workItem);
+        if(!$isUserHaveAccess){
+            return (view('not_authorized'));
+        }
+
         return view('work_item.work_item_man_power.edit',[
-            'workItem' => $workItem
+            'workItem' => $workItem,
         ]);
     }
 
@@ -280,6 +299,13 @@ class WorkItemController extends Controller
             $uniquePivotData = array_map("unserialize", array_unique(array_map("serialize", $pivotData)));
             $workItem->equipmentTools()->sync($uniquePivotData);
             $this->setStatusDraft($workItem);
+
+            $workItemService = new WorkItemServices();
+            $isUserHaveAccess = $workItemService->isWorkItemCreateByUser($workItem);
+            if(!$isUserHaveAccess){
+                return (view('not_authorized'));
+            }
+
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
@@ -321,6 +347,13 @@ class WorkItemController extends Controller
         if(!auth()->user()->canAny(['create','update'],WorkItem::class)){
             return (view('not_authorized'));
         }
+
+        $workItemService = new WorkItemServices();
+        $isUserHaveAccess = $workItemService->isWorkItemCreateByUser($workItem);
+        if(!$isUserHaveAccess){
+            return (view('not_authorized'));
+        }
+
         return view('work_item.work_item_material.edit',[
             'workItem' => $workItem
         ]);
@@ -354,6 +387,13 @@ class WorkItemController extends Controller
             $pivotData = $this->processStoreMaterial($workItem,$request);
             $workItem->materials()->sync($pivotData);
             $this->setStatusDraft($workItem);
+
+            $workItemService = new WorkItemServices();
+            $isUserHaveAccess = $workItemService->isWorkItemCreateByUser($workItem);
+            if(!$isUserHaveAccess){
+                return (view('not_authorized'));
+            }
+
             return response()->json([
                 'status' => 200,
                 'message' => 'Data Saved Successfully'
