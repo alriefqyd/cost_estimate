@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Class\ManPowerServices;
 use App\Exports\ManPowerExport;
 use App\Imports\ManPowerImport;
 use App\Models\ManPower;
@@ -20,22 +21,15 @@ class ManPowerController extends Controller
         if(auth()->user()->cannot('viewAny',ManPower::class)){
             return view('not_authorized');
         }
-        $order = $request->order;
-        $sort =  $request->sort;
 
-        $man_power = ManPower::filter(request(['q','skill_level','status']))
-            ->when(isset($request->sort), function($query) use ($request,$order,$sort){
-                return $query->orderBy($order,$sort);
-            })->when(!isset($request->sort), function($query) use ($request,$order) {
-                return $query->orderBy('code', 'ASC');
-            })->when(!auth()->user()->isManPowerReviewer(), function($query){
-                return $query->where(function($q){
-                    return $q->where('status',ManPower::REVIEWED)->orWhere('created_by', auth()->user()->id);
-                });
-            })
-            ->orderBy('code', 'ASC')->paginate(20)->withQueryString();
+        $manPowerService = new ManPowerServices();
+        $man_power = $manPowerService->getManPower($request, false, null)->paginate(20)->withQueryString();
+        $draftManPower = $manPowerService->getManPower($request, true, ManPower::DRAFT)->count();
+        $reviewedManPower = $manPowerService->getManPower($request, true, ManPower::REVIEWED)->count();
         return view('man_power.index',[
-            'man_power' => $man_power
+            'man_power' => $man_power,
+            'draftManPower' => $draftManPower,
+            'reviewedManPower' => $reviewedManPower
         ]);
     }
     public function getAllManPower(Request $request){

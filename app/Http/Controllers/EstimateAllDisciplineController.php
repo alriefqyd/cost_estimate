@@ -354,7 +354,7 @@ class EstimateAllDisciplineController extends Controller
             $estimateDiscipline = EstimateAllDiscipline::whereNotNull('deleted_at')
                 ->where('deleted_at','<', $date)->forceDelete();
             DB::commit();
-            Log::info('Data Estimate Discipline deleted more two months successfully hard delete');
+            Log::info('Data Estimate Discipline deleted more one month successfully hard delete');
         } catch (Exception $e){
             DB::rollBack();
             Log::error($e->getMessage());

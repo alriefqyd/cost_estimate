@@ -56,10 +56,10 @@
                                     <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                         <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $materialModel::DRAFT ? 'active' : ''}} js-btn-status" data-value="{{$materialModel::DRAFT}}" type="button">
-                                            {{$materialModel::DRAFT}}
+                                            {{$materialModel::DRAFT}} ({{$materialDraft}})
                                         </button>
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $materialModel::REVIEWED ? 'active' : ''}} js-btn-status" data-value="{{$materialModel::REVIEWED}}" type="button">
-                                            {{$materialModel::REVIEWED}}
+                                            {{$materialModel::REVIEWED}} ({{$materialReviewed}})
                                         </button>
                                     </div>
                                 </div>
@@ -118,6 +118,7 @@
                                         <th scope="col" class="text-left">Rate <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="rate"></i></th>
                                         <th scope="col" class="text-left">Ref Material Num <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="ref_material_number"></i></th>
                                         <th scope="col" class="text-left">Stock Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="stock_code"></i></th>
+                                        <th scope="col" class="text-left">Created By <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="created_by"></i></th>
                                         <th scope="col" class="text-left">Status <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="status"></i></th>
                                         @can('delete',App\Models\Material::class)
                                             <th scope="col" class="text-left">Action</th>
@@ -140,6 +141,7 @@
                                         <td>{{number_format($item->rate,2)}}</td>
                                         <td class="min-w-150">{{$item->ref_material_number}}</td>
                                         <td class="min-w-120">{{$item->stock_code}}</td>
+                                        <td class="min-w-80">{{$item->createdBy?->profiles?->full_name}}</td>
                                         <td class="min-w-80">{{$item->status}}</td>
                                         @can('delete',App\Models\Material::class)
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
