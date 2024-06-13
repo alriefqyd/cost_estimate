@@ -55,10 +55,10 @@
                                     <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                         <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $manPower::DRAFT ? 'active' : ''}} js-btn-status" data-value="{{$manPower::DRAFT}}" type="button">
-                                            {{$manPower::DRAFT}}
+                                            {{$manPower::DRAFT}} ({{$draftManPower}})
                                         </button>
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $manPower::REVIEWED ? 'active' : ''}} js-btn-status" data-value="{{$manPower::REVIEWED}}" type="button">
-                                            {{$manPower::REVIEWED}}
+                                            {{$manPower::REVIEWED}} ({{$reviewedManPower}})
                                         </button>
                                     </div>
                                 </div>
@@ -115,6 +115,7 @@
                                         <th scope="col" class="text-left">Basic Rate Monthly <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="basic_rate_month"></i></th>
                                         <th scope="col" class="text-left">Basic Rate Hour <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="basic_rate_hour"></i></th>
                                         <th scope="col" class="text-left">Overall Rate Hourly <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="overall_rate_hourly"></i></th>
+                                        <th scope="col" class="text-left">Created By <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="created_by"></i></th>
                                         <th scope="col" class="text-left">Status</th>
                                         @can('delete',App\Models\ManPower::class)
                                             <th scope="col" class="text-left">Action</th>
@@ -135,6 +136,7 @@
                                         <td class="min-w-200">{{number_format($item->basic_rate_month,2)}}</td>
                                         <td class="min-w-150">{{number_format($item->basic_rate_hour,2)}}</td>
                                         <td class="min-w-170">{{number_format($item->overall_rate_hourly,2)}}</td>
+                                        <td class="min-w-170">{{$item->createdBy?->profiles?->full_name}}</td>
                                         @can('delete',App\Models\ManPower::class)
                                             <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                 data-id="{{$item->id}}" class="text-danger js-delete-man-power">Delete</a></td>
