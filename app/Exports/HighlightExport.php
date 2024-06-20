@@ -6,6 +6,9 @@ use App\Http\Controllers\SettingController;
 use App\Models\Setting;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
+use Maatwebsite\Excel\Concerns\WithDrawings;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -16,7 +19,9 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Events\AfterSheet;
-class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTitle
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTitle, WithHeadings
 {
     public function __construct($estimateDisciplines, $project, $costProjects, $isDetail){
         $worksheet = new WorkSheet();
@@ -196,8 +201,18 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         $sheet->getStyle('E')->getAlignment()->setWrapText(true);
 
         $imagePath = public_path('assets/images/vale.jpg');
+        $filePathV = storage_path('app/public/vale.png');
+
+        $qrCode = QrCode::format('png')
+            ->size(300)
+            ->errorCorrection('M')
+            ->generate('http://10.34.168.208:5000/project/'.$this->project->id);
+
+        $qrCodeImagePath = storage_path('app/qrcode/'.$this->project->id.'-qrcode.png');
+        file_put_contents($qrCodeImagePath, $qrCode);
 
         $drawing = new Drawing();
+        $drawing->setName('Logo');
         $drawing->setPath($imagePath);
 
         $drawing->setWidth(40);
@@ -207,7 +222,8 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         $drawing->setCoordinates($styleImagePosition); // Starting cell for the image
         $drawing->setOffsetX(100); // Adjust the X offset to position the image within the cell
         $drawing->setOffsetY(100); // Adjust the Y offset to position the image within the cell
-        $drawing->setWorksheet($sheet);
+
+
         $pageSetup = new PageSetup();
 
         // Set the page setup options
@@ -221,5 +237,27 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         // Apply the PageSetup instance to the worksheet
         $sheet->setPageSetup($pageSetup);
 
+        $drawingQrCode = new Drawing();
+        $drawingQrCode->setName('QR Code');
+        $drawingQrCode->setDescription('QR Code');
+        $drawingQrCode->setPath($qrCodeImagePath);
+        $drawingQrCode->setWidth(50);  // Adjust width as needed
+        $drawingQrCode->setHeight(50); // Adjust height as needed
+        $drawingQrCode->setCoordinates('A1'); // Adjust coordinates as needed
+        $styleQrPosition = 'I8';
+        if($this->isDetail) $styleQrPosition = 'N8';
+        $drawingQrCode->setCoordinates($styleQrPosition); // Starting cell for the image
+        $drawingQrCode->setOffsetX(240); // Adjust the X offset to position the image within the cell
+        $drawingQrCode->setOffsetY(240); // Adjust the Y offset to position the image within the cell
+
+        $drawingQrCode->setWorksheet($sheet);
+        $drawing->setWorksheet($sheet);
+    }
+
+    public function headings(): array
+    {
+        return [
+            'Column 1', 'Column 2', // your headers
+        ];
     }
 }
