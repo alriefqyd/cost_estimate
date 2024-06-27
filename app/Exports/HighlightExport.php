@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Events\AfterSheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTitle
 {
     public function __construct($estimateDisciplines, $project, $costProjects, $isDetail){
@@ -89,9 +90,7 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
             ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER);
 
-
-        $cellRange = 'A13:' . $highestColumn . $highestRow;
-
+        $cellRange = 'A13:' . $highestColumn . $highestRow - 3;
         $sheet->getStyle($cellRange)->applyFromArray([
             'borders' => [
                 'allBorders' => [
@@ -101,6 +100,18 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
             ],
             'background' => [
                 'color'=> '#2978ff'
+            ],
+        ]);
+
+        $sheet->getStyle($highestColumn . $highestRow)->applyFromArray([
+            'font' => [
+                'size' => 7,
+                'color' => ['rgb' => 'FF0000'], // Red color
+                'italic' => true,
+                'name' => 'Rockwell', // Font name
+            ],
+            'alignment' => [
+                'horizontal' => Alignment::HORIZONTAL_RIGHT,
             ],
         ]);
 
@@ -197,6 +208,7 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
 
         $imagePath = public_path('assets/images/vale.jpg');
 
+        /* logo drawing */
         $drawing = new Drawing();
         $drawing->setPath($imagePath);
 
@@ -208,9 +220,8 @@ class HighlightExport extends AfterSheet implements FromView, WithStyles, WithTi
         $drawing->setOffsetX(100); // Adjust the X offset to position the image within the cell
         $drawing->setOffsetY(100); // Adjust the Y offset to position the image within the cell
         $drawing->setWorksheet($sheet);
-        $pageSetup = new PageSetup();
-
         // Set the page setup options
+        $pageSetup = new PageSetup();
         $pageSetup->setFitToPage(true); // Fit the content to a single page
         $pageSetup->setFitToHeight(0); // Disable fitting to page height
         $pageSetup->setFitToWidth(1); // Fit the content to the page width
