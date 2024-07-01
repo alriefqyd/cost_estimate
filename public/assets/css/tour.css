@@ -155,7 +155,7 @@ tr.introjs-showElement > td, tr.introjs-showElement > th {
   position: absolute;
   visibility: visible;
   padding: 15px;
-  background-color: #4466f2;
+  background-color: #018f83;
   min-width: 250px;
   max-width: 300px;
   border-radius: 3px;
@@ -164,7 +164,7 @@ tr.introjs-showElement > td, tr.introjs-showElement > th {
   -webkit-transition: opacity 0.1s ease-out;
   transition: opacity 0.1s ease-out;
   color: white;
-  border: 6px solid #4466f2; }
+  border: 6px solid #f3c107; }
 
 .introjs-tooltipbuttons {
   text-align: right;
