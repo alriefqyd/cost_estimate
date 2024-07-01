@@ -1,7 +1,9 @@
 @extends('layouts.main')
 @section('main')
 <div class="row">
-    <div class="col-12">
+    <div class="col-12"
+         data-tg-scroll-margin="0"
+         data-tg-tour="Explore all project cost estimates and easily create new ones by clicking the button.">
         <div class="home-slider owl-carousel js-fullheight" style="height: 550px">
             <div class="slider-item js-fullheight" style="background-image:url({{ asset('/assets/images/vale2.jpg') }}); height: 550px">
                 <div class="overlay"></div>
@@ -12,7 +14,8 @@
                                 <h1>Cost Estimate</h1>
                                 <h2 class="mb-3 m-l-5">Every Count Matters!</h2>
                             </div>
-                            <a href="/project" class="btn btn-square btn-outline-primary btn-outline-light-2x shadow m-l-5" style="border-color: white; color: white; font-size: 15px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);" role="button" data-bs-original-title="" title="">
+
+                            <a href="/project" class="js-intro-duplicate btn btn-square btn-outline-primary btn-outline-light-2x shadow m-l-5" style="border-color: white; color: white; font-size: 15px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);" role="button" data-bs-original-title="" title="">
                                 Get Started
                             </a>
                         </div>
@@ -77,7 +80,10 @@
     </div>
 </div>
 
-<div class="">
+<div class=""
+     data-tg-scroll-margin="0"
+     data-tg-tour="Explore the detailed PTVI Production Calendar to stay informed about upcoming schedules and events.
+     We believe this will streamline your cost estimation process, offering a more efficient alternative to using Excel">
     <div class="col-xl-12 xl-100 box-col-12">
         @include('layouts.calendar')
     </div>

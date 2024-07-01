@@ -3,6 +3,26 @@ $(function(){
     /**
      * Project Form
      */
+    if(!localStorage.getItem('tour')){
+        const tour = new tourguide.TourGuideClient({
+            showStepNumbers: true,
+            showPrevStep: true,
+            showNextStep: true
+        });
+
+        // Start the tour
+        tour.start();
+
+        tour.onAfterStepChange(function (){
+            if(tour.activeStep === 2){
+                $('.main-nav').removeClass('close_icon');
+                // Add your custom code here
+            }
+        });
+
+        localStorage.setItem('tour',true);
+    }
+
     $('.js-add-project-form').validate({
         rules:{
             project_no : {
@@ -90,7 +110,6 @@ $(function(){
         var _newdata = '';
         $.ajax({
             url:'/getPublicHolidayApi',
-            async:false,
             success:function(results){
                 _data = results.filter(function (item){
                     return item.is_national_holiday === true;

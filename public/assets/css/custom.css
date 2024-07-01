@@ -793,6 +793,40 @@ custom-checkbox:checked:before {
     font-size: 14px;
 }
 
+.tourguide-tooltip {
+    background-color: #2A3F54; /* Change to Viho theme color */
+    color: #FFFFFF; /* Text color */
+    border: 1px solid #E7E7E7; /* Border color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow */
+}
+
+.tourguide-tooltip .tourguide-tooltip-header {
+    background-color: #1ABB9C; /* Header background color */
+    color: #FFFFFF; /* Header text color */
+}
+
+.tourguide-tooltip .tourguide-tooltip-content {
+    font-size: 14px; /* Content font size */
+    padding: 15px; /* Padding */
+}
+
+.tourguide-tooltip .tourguide-tooltip-footer {
+    background-color: #2A3F54; /* Footer background color */
+    text-align: right; /* Align footer buttons to the right */
+}
+
+.tourguide-tooltip .tourguide-tooltip-footer .tourguide-button {
+    background-color: #1ABB9C; /* Button background color */
+    color: #FFFFFF; /* Button text color */
+    border: none; /* Remove border */
+    padding: 8px 12px; /* Button padding */
+    margin-left: 5px; /* Margin between buttons */
+}
+
+.tourguide-tooltip .tourguide-tooltip-footer .tourguide-button:hover {
+    background-color: #169F85; /* Hover color */
+}
+
 @keyframes slide {
     0% {
         transform: translateY(0);

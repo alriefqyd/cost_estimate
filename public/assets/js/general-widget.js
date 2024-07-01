@@ -35,7 +35,7 @@ var general_widget = {
                 $("#min").css({ "transform" : mrotate });
 
             }, 1000 );
-        }); 
+        });
     }
 };
 (function($) {

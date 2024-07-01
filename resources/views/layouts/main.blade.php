@@ -3,7 +3,10 @@
 <head>
     @include('layouts.assets')
 </head>
-<body>
+<body  data-tg-scroll-margin="0"
+       data-tg-fixed
+       data-tg-order="1"
+       data-tg-tour="Welcome to the Cost Estimate Web Application! Follow this tour to understand its features.">
 <!-- Loader starts-->
 <div class="loader-wrapper">
     <div class="theme-loader">
@@ -12,7 +15,7 @@
 </div>
 <!-- Loader ends-->
 <!-- page-wrapper Start       -->
-<div class="page-wrapper compact-wrapper" id="pageWrapper">
+<div class="page-wrapper compact-wrapper" id="pageWrapper" >
 @include('layouts.header')
 <!-- Page Body Start-->
     <div class="page-body-wrapper sidebar-icon">
@@ -109,6 +112,10 @@
 <script src="{{asset('/assets/js/slider/popper.js')}}"></script>
 <script src="{{asset('/assets/js/slider/owl.carousel.min.js')}}"></script>
 <script src="{{asset('/assets/js/slider/main.js')}}"></script>
+<script src="{{asset('/assets/js/tour/intro.js')}}"></script>
+<script src="{{asset('/assets/js/tour/intro-init.js')}}"></script>
+<script src="{{asset('/assets/js/tour-guide/tour-guide.js')}}"></script>
+{{--<script src="{{asset('/assets/js/tour/intro-init.js')}}"></script>--}}
 
 <!-- login js-->
 <!-- Plugin used-->
