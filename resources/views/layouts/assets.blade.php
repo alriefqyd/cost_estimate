@@ -32,6 +32,8 @@
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/flag-icon.css')}}">
 <!-- Feather icon-->
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/feather-icon.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/css/tour.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/css/photoswipe.css')}}">
 <!-- Plugins css start-->
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/animate.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/chartist.css')}}">
@@ -58,5 +60,6 @@
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/slider/owl.carousel.min.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/slider/owl.theme.default.min.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/slider/style.css')}}">
+<link rel="stylesheet" type="text/css" href="{{asset('/assets/css/tour-guide.css')}}">
 {{--<link rel="stylesheet" type="text/css" href="{{asset('/assets/datatable/datatables.min.css')}}">--}}
 {{--<link rel="stylesheet" type="text/css" href="{{asset('/assets/datatable/FixedHeader-3.4.0/css/fixedHeader.dataTables.min.css')}}">--}}

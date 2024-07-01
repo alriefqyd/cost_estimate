@@ -8,11 +8,19 @@
                     <div class="dark-logo-wrapper"><a href=""><img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt=""></a></div>
                 </a>
             </div>
-            <div class="toggle-sidebar m-t-15"><span style="" > <i class="status_toggle" data-feather="align-center"></i></span></div>
+            <div class="toggle-sidebar m-t-15"
+                 data-tg-scroll-margin="0"
+                 data-tg-fixed
+                 data-tg-order="2"
+                 data-tg-tour="To view all menus and features of the Cost Estimate web application, click the icon next to the Vale logo."><span style=""> <i class="status_toggle" data-feather="align-center"></i></span></div>
         </div>
         <div class="nav-right col pull-right right-menu p-0">
             <div class="float-end mr-6">
-                <li class="onhover-dropdown">
+                <li class="onhover-dropdown"
+                    data-tg-scroll-margin="0"
+                    data-tg-fixed
+                    data-tg-order="3"
+                    data-tg-tour="To change your profile or log out, please click this icon.">
                     <div class="setting-primary">
                         @customDirective()
                     </div>
