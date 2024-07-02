@@ -151,6 +151,10 @@ Route::post('/user',[\App\Http\Controllers\UserController::class,'store'])->midd
 Route::get('/user/{user:id}',[\App\Http\Controllers\UserController::class,'edit'])->middleware('auth');
 Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'update'])->middleware('auth');
 
+
+Route::get('/survey',[\App\Http\Controllers\SurveyController::class,'index'])->middleware('auth');
+Route::post('/survey',[\App\Http\Controllers\SurveyController::class,'store'])->middleware('auth');
+
 /**
  * Request by AJAX
  */

@@ -18,6 +18,11 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-sm-12">
+            @if(session('message'))
+                @include('flash')
+            @endif
+        </div>
+        <div class="col-sm-12">
             <div class="card">
                 <div class="card-body">
                     <div class="row m-b-50">
