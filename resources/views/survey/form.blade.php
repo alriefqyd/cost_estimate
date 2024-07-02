@@ -178,19 +178,19 @@
                                         <label class="form-label" for="validationCustom01">How satisfied are you with the app overall? </label>
                                         <div class="col">
                                             <label class="d-block" for="Often">
-                                                <input class="radio_animated" value="very_statisfied" type="radio" name="user_experience">
+                                                <input class="radio_animated" value="very_statisfied" type="radio" name="overall">
                                                 Very Satisfied
                                             </label>
                                             <label class="d-block" for="edo-ani1">
-                                                <input class="radio_animated" value="satisfied" type="radio" name="user_experience">
+                                                <input class="radio_animated" value="satisfied" type="radio" name="overall">
                                                 Satisfied
                                             </label>
                                             <label class="d-block" for="edo-ani2">
-                                                <input class="radio_animated" value="unsatisfied" type="radio" name="user_experience">
+                                                <input class="radio_animated" value="unsatisfied" type="radio" name="overall">
                                                 Unsatisfied
                                             </label>
                                             <label class="d-block" for="edo-ani13">
-                                                <input class="radio_animated" value="very_unsatisfied" type="radio" name="user_experience">
+                                                <input class="radio_animated" value="very_unsatisfied" type="radio" name="overall">
                                                 Very Unsatisfied
                                             </label>
                                         </div>
