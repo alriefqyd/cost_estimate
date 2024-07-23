@@ -146,6 +146,6 @@ class WorkItemServices
     }
 
     public function isWorkItemCreateByUser($workItem){
-       return auth()->user()->id == $workItem->createdBy || auth()->user()->isWorkItemReviewer();
+       return auth()->user()->id == $workItem->created_by || auth()->user()->isWorkItemReviewer();
     }
 }
