@@ -82,8 +82,8 @@
 
 <div class=""
      data-tg-scroll-margin="0"
-     data-tg-tour="Explore the detailed PTVI Production Calendar to stay informed about upcoming schedules and events.
-     We believe this will streamline your cost estimation process, offering a more efficient alternative to using Excel">
+         data-tg-tour="Explore the detailed PTVI Production Calendar to stay informed about upcoming schedules and events.
+         We believe this will streamline your cost estimation process, offering a more efficient alternative to using Excel">
     <div class="col-xl-12 xl-100 box-col-12">
         @include('layouts.calendar')
     </div>

@@ -12,23 +12,28 @@
                 </ol>
             </div>
             @can('create', Project::class)
-                <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
+                <div class="col-md-6 col-sm-6 text-end"
+                ><span class="f-w-600 m-r-5"></span>
                     <div class="select2-drpdwn-product select-options d-inline-block">
-                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/project/create"> Create New Cost Estimate</a>
+                        <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary"
+                                                                   data-tg-tour="To create new cost estimate project you can click button Create Cost Estimate"
+                                                                   data-tg-order="2"
+                                                                   href="/project/create"> Create New Cost Estimate</a>
                     </div>
                 </div>
             @endcan
         </div>
     </div>
 </div>
-<div class="container-fluid product-wrapper">
+<div class="container-fluid product-wrapper" data-tg-tour="The Cost Estimate page allows you to create, update, or delete cost estimates for your projects. This is list of cost estimate project" data-tg-order="1">
     <div class="row project-cards">
         @if(session('message'))
             @include('flash')
         @endif
         <div class="card">
             <div class="card-body m-0 card-body-custom">
-                <div class="mb-5 mt-2">
+                <div class="mb-5 mt-2" data-tg-tour="You can filter project list by fill project area, project name/no, and engineers and click draft or review button."
+                data-tg-order="3">
                     <label>Filter By</label>
                     <form class="js-form-project-search" method="get" action="/project">
                         <div class="row margin-05">
@@ -104,7 +109,7 @@
                             </div>
                         </div>
                     </form>
-            </div>
+                </div>
                 @include('project.table')
             </div>
         </div>
@@ -121,6 +126,7 @@
         </div>
     @endif
 </div>
+
 <!-- Container-fluid Ends-->
 
 @include('layouts.loading')

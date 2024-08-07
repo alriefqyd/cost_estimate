@@ -6,7 +6,10 @@
 <body  data-tg-scroll-margin="0"
        data-tg-fixed
        data-tg-order="1"
-       data-tg-tour="Welcome to the Cost Estimate Web Application! Follow this tour to understand its features.">
+       @if(Request::segment(1) == '')
+           data-tg-tour="Welcome to the Cost Estimate Web Application! Follow this tour to understand its features."
+       @endif
+>
 <!-- Loader starts-->
 <div class="loader-wrapper">
     <div class="theme-loader">
@@ -109,12 +112,20 @@
 <script src="{{'/js/material_category.js'}}"></script>
 <script src="{{'/js/work_item.js'}}"></script>
 <script src="{{'/js/setting_wbs.js'}}"></script>
+{{--<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>--}}
+
+<!-- Load CKEditor script -->
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+
+<!-- jQuery CKEditor plugin -->
+<script src="https://cdn.ckeditor.com/4.22.1/standard/adapters/jquery.js"></script>
 <script src="{{asset('/assets/js/slider/popper.js')}}"></script>
 <script src="{{asset('/assets/js/slider/owl.carousel.min.js')}}"></script>
 <script src="{{asset('/assets/js/slider/main.js')}}"></script>
 <script src="{{asset('/assets/js/tour/intro.js')}}"></script>
 <script src="{{asset('/assets/js/tour/intro-init.js')}}"></script>
 <script src="{{asset('/assets/js/tour-guide/tour-guide.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 {{--<script src="{{asset('/assets/js/tour/intro-init.js')}}"></script>--}}
 
 <!-- login js-->

@@ -1,8 +1,53 @@
 
 $(function(){
+    $('#ckeditor').ckeditor({
+        // Configuration options
+        config: {
+            // Disable security warnings
+            showSecurityWarnings: false
+        }
+    });
     /**
      * Project Form
      */
+
+    $('#jstree')
+        // listen for event
+        .on('changed.jstree', function (e, data) {
+            var i, j, r = [];
+            for(i = 0, j = data.selected.length; i < j; i++) {
+                r.push(data.instance.get_node(data.selected[i]).text);
+            }
+            let text = r.join(', ');
+            if (data.node.children.length > 0) {
+                return false;
+            }
+            $.ajax({
+                'url' : `/getGuidelinessPage/${text}`,
+                success:function (result){
+                    var _template = result.content;
+                    if(result.status === 200){
+                        $('.js-content-guidelines').html(_template);
+                    } else {
+                        $('.js-content-guidelines').text('404 Not Found');
+                    }
+                }
+            });
+        })
+        // create the instance
+        .jstree();
+
+
+    $(document).on('click','.js-tour', function (e){
+        e.preventDefault();
+        var _this = $(this);
+        var _page = _this.data('page');
+        if(_page !== 'undefined'){
+            localStorage.removeItem('tour');
+            window.location.href = _page;
+        }
+    });
+
     if(!localStorage.getItem('tour')){
         const tour = new tourguide.TourGuideClient({
             showStepNumbers: true,
@@ -476,6 +521,22 @@ $(function(){
       if(_this.hasClass('show')){
           _this.siblings('.dropdown-menu').removeClass('show')
       };
+    })
+
+    /**
+     * Preview Page
+     */
+
+    $(document).on('change','.js-select-page', function (){
+        var _this = $(this);
+        var _page = _this.val();
+        $.ajax({
+            url:'/getContentPreview',
+            data:{page:_page},
+            success:function (result){
+                _this.closest('form').find('.js-content').val(result.content)
+            }
+        })
     })
 
 });

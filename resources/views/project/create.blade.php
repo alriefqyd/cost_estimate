@@ -38,8 +38,8 @@
                         <form class="needs-validation js-add-project-form" method="post" action="/project" novalidate="">
                             @csrf
                             @include('project.form')
-                            <button type="submit" class="btn btn-success float-end">Save Data</button>
-                            <a href="/project"><div class="btn btn-danger float-end m-r-5">Cancel</div></a>
+                            <button data-tg-tour="After all required and mandatory form filled you can click button save to submit your project" type="submit" class="btn btn-success float-end">Save Data</button>
+                            <a href="/project"><div data-tg-tour="If you want to cancel your submission you can click cancel button and you will redirect to project list page" class="btn btn-danger float-end m-r-5">Cancel</div></a>
                         </form>
                     </div>
                 </div>

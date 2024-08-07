@@ -38,4 +38,23 @@ class Setting extends Model
     public const LEVEL_WORK_ELEMENT = 3;
 
     const FORMAT_CURRENCY = '#,##0.00_-';
+    public const GUIDELINES_PAGE = [
+        'Home' => 'Home',
+        'Cost Estimate List' => 'Cost Estimate List',
+        'Create New Cost Estimate' => 'Create New Cost Estimate',
+        'Cost Estimate Detail Page' => 'Cost Estimate Detail Page',
+        'Work Breakdown Structure' => 'Work Breakdown Structure',
+        'Estimate Discipline' => 'Estimate Discipline',
+        'Export Cost Estimate' => 'Export Cost Estimate',
+        'Work Item' => 'Work Item',
+        'Man Power' => 'Man Power',
+        'Tools and Equipment' => 'Tools and Equipment',
+        'Material' => 'Material',
+        'Wbs Setting' => 'Wbs Setting',
+        'User Setting' => 'User Setting'
+    ];
+
+    public const GUIDELINES_PAGE_TYPE = 'GUIDELINES_PAGE';
+    public const HOME_PAGE = 'Home';
+    public const HOME_PAGE_CODE = 'HOME_PAGE';
 }

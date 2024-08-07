@@ -4,7 +4,10 @@
             <thead>
                 <tr>
                     <th scope="col" class="text-left min-w-160">
-                        Project Title <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                        Project Title <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"
+                                         data-tg-tour="You can order list of project by click icon next to title header table, if you click icon next to project title the list of cost estimate will ordering by project title and so on."
+                                        data-tg-order="4"
+                        ></i>
                     </th>
                     <th scope="col" class="text-left min-w-135">
                         Project Sponsor  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
@@ -58,8 +61,17 @@
                     @can('delete',App\Models\Project::class)
                         <td>
                             <a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
-                                    data-id="{{$project->id}}" class="text-danger js-delete-project-modal">Delete</a>
-                            <a data-bs-toggle="modal" data-original-title="test" data-bs-target="#duplicateProject"
+                               @if($loop->index == 0)
+                                   data-tg-tour="if you have access, you can delete the cost estimate by click delete icon"
+                                   data-tg-order="5"
+                               @endif
+                               data-id="{{$project->id}}" class="text-danger js-delete-project-modal">Delete</a>
+                            <a
+                                @if($loop->index == 0)
+                                    data-tg-tour="You can also duplicate the cost estimate. This is the best way if you want to create a new cost estimate and have major similarity with the existing cost estimate project ."
+                                    data-tg-order="6"
+                                @endif
+                                data-bs-toggle="modal" data-original-title="test" data-bs-target="#duplicateProject"
                                data-id="{{$project->id}}" class="text-success js-duplicate-project-modal">Duplicate</a>
                         </td>
                     @endcan

@@ -61,5 +61,9 @@
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/slider/owl.theme.default.min.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/slider/style.css')}}">
 <link rel="stylesheet" type="text/css" href="{{asset('/assets/css/tour-guide.css')}}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
+{{--<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/42.0.1/ckeditor5.css">--}}
+{{--<link href="node_modules/froala-editor/css/froala_editor.pkgd.min.css" rel="stylesheet" type="text/css" />--}}
+{{--<link rel="stylesheet" href="{{ mix('css/app.css') }}">--}}
 {{--<link rel="stylesheet" type="text/css" href="{{asset('/assets/datatable/datatables.min.css')}}">--}}
 {{--<link rel="stylesheet" type="text/css" href="{{asset('/assets/datatable/FixedHeader-3.4.0/css/fixedHeader.dataTables.min.css')}}">--}}

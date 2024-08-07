@@ -155,6 +155,7 @@ Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'updat
 Route::get('/survey',[\App\Http\Controllers\SurveyController::class,'index'])->middleware('auth');
 Route::post('/survey',[\App\Http\Controllers\SurveyController::class,'store'])->middleware('auth');
 
+Route::get('/guidelines',[\App\Http\Controllers\GuidelinesController::class,'index'])->middleware('auth');
 /**
  * Request by AJAX
  */
@@ -187,4 +188,9 @@ Route::get('/generatequery/material-work-items', [\App\Http\Controllers\Generato
 Route::get('/convertApi', [\App\Http\Controllers\ApiController::class,'getUsdRateApi']);
 Route::get('/getPublicHolidayApi', [\App\Http\Controllers\ApiController::class,'getPublicHolidayApi']);
 
+Route::get('/getGuidelinessPage/{page}', [\App\Http\Controllers\SettingController::class,'getGuidelinesPage']);
+Route::get('/getGuidelinessPageList/', [\App\Http\Controllers\SettingController::class,'getGuidelinesPageList']);
+Route::get('/preview/', [\App\Http\Controllers\SettingController::class,'viewPreviewPage']);
+Route::get('/getContentPreview/', [\App\Http\Controllers\SettingController::class,'getContentPreview']);
+Route::post('/preview/save', [\App\Http\Controllers\SettingController::class,'savePreview']);
 

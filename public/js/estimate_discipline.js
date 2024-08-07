@@ -338,7 +338,7 @@ $(function(){
     }
 
     function showNotification(element, message) {
-        var notificationElement = $('<div data-notify="container" class="col-xs-11 col-sm-4 js-manual-notify alert alert-success notify-alert animated fadeIn" role="alert" data-notify-position="top-right" style="display: inline-block; margin: 0px auto; position: fixed; transition: all 0.5s ease-in-out 0s; z-index: 1031; top: 20px; right: 20px;" data-closing="true">')
+        var notificationElement = $('<div data-notify="container" class="col-xs-11 col-sm-4 js-guidelines-notify alert alert-success notify-alert animated fadeIn" role="alert" data-notify-position="top-right" style="display: inline-block; margin: 0px auto; position: fixed; transition: all 0.5s ease-in-out 0s; z-index: 1031; top: 20px; right: 20px;" data-closing="true">')
             .text(message)
             .appendTo($(element));
 
@@ -598,13 +598,13 @@ $(function(){
             _element_full_screen.css('padding-left','0.8em')
             _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0')
             _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0')
-            $('.js-manual-notify').remove();
+            $('.js-guidelines-notify').remove();
         }
     });
 
     setInterval(function(){
         if(document.fullscreenElement){
-            $(document).find('.js-manual-notify').addClass('fadeOut');
+            $(document).find('.js-guidelines-notify').addClass('fadeOut');
         }
     },6000)
 
