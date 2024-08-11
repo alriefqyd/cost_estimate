@@ -186,5 +186,6 @@ Route::get('/generatequery/material-work-items', [\App\Http\Controllers\Generato
 
 Route::get('/convertApi', [\App\Http\Controllers\ApiController::class,'getUsdRateApi']);
 Route::get('/getPublicHolidayApi', [\App\Http\Controllers\ApiController::class,'getPublicHolidayApi']);
+Route::get('/getReviewer', [\App\Http\Controllers\ApiController::class,'getReviewer']);
 
 

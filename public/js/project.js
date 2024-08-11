@@ -253,4 +253,52 @@ $(function(){
             }
         });
     });
+
+    var getReviewerForm = function(_formEngineer, _formReviewer){
+        var _this = $(this);
+
+        if(_formEngineer.val() !== ""){
+            console.log(_formReviewer);
+            _formReviewer.removeClass('d-none');
+        } else {
+            _formReviewer.addClass('d-none');
+        }
+    }
+
+    var setOptionReviewer = function (e){
+        var _this = $(e);
+        var _subject = _this.closest('.row').find('.js-design-engineer');
+        if(_this.data("select2")) _this.select2("destroy")
+        _this.select2({
+            allowClear:true,
+            width:'100%',
+            ajax:{
+                url : '/getReviewer',
+                data:function (params) {
+                    return {
+                        discipline : _this.data('subject'),
+                        q: params.term
+                    };
+                },
+                processResults: function (resp) {
+                    return {
+                        results: resp
+                    };
+                }
+            }
+        });
+    }
+
+    $('.js-reviewer-engineer-select').each(function(){
+        setOptionReviewer(this);
+    });
+
+    $('.js-design-engineer').on('change',function(){
+        var _this = $(this);
+        var _formEngineer = _this;
+        var _formReviewer = _this.closest('.row').find('.js-reviewer-engineer');
+        getReviewerForm(_formEngineer, _formReviewer);
+    });
+
+
 });
