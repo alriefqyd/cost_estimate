@@ -1,12 +1,8 @@
 
 $(function(){
-    $('#ckeditor').ckeditor({
-        // Configuration options
-        config: {
-            // Disable security warnings
-            showSecurityWarnings: false
-        }
-    });
+    CKEDITOR.editorConfig = function( config ) {
+        config.versionCheck = false;
+    };
     /**
      * Project Form
      */
