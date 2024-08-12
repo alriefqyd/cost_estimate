@@ -2,6 +2,12 @@
 <html lang="en">
 <head>
     @include('layouts.assets')
+    <style>
+        .cke_notifications_area {
+            display: none !important;
+        }
+    </style>
+
 </head>
 <body  data-tg-scroll-margin="0"
        data-tg-fixed

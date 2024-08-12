@@ -1,5 +1,8 @@
 
 $(function(){
+    CKEDITOR.editorConfig = function( config ) {
+        config.versionCheck = false;
+    };
     /**
      * Project Form
      */
