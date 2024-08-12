@@ -200,6 +200,7 @@ return [
         App\Providers\CustomDirectiveServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         App\Providers\CurrencyFormatServiceProvider::class,
+        Ladumor\LaravelPwa\PWAServiceProvider::class
 
     ],
 
@@ -217,6 +218,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // 'ExampleClass' => App\Example\ExampleClass::class,
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+        'LaravelPwa' => \Ladumor\LaravelPwa\LaravelPwa::class,
     ])->toArray(),
 
 ];
