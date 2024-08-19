@@ -247,14 +247,19 @@ class Project extends Model
         return $str;
     }
 
-    public function getStatusApprovalDiscipline($status){
+    public function getStatusApprovalDiscipline($status, $reviewer){
         if($status == $this::REJECTED){
-            return '<span class="checkmark-icon" style="position: relative; top: -8px; right: 0; font-size: 0.9em; color: red;">&#10008; Rejected</span>';
+            return '<span class="checkmark-icon" style="position: relative; top: -8px; right: 0; font-size: 0.9em; color: red;">&#10008; Rejected </span>';
         } else if ($status == $this::APPROVE){
             return '<span class="checkmark-icon" style="position: relative; top: -8px; right: 0; font-size: 0.9em; color: green;">&#10004; Approve</span>';
         } else {
             return '<span style="position: relative; top: -3px";><i class="m-l-5" data-feather="clock" style="width: 13px; color: #eebe0b"> </i> <span style="font-size: 11px; color: #f3c107; position: relative; top: -8px"> Waiting For Approval </span></span> ';
         }
+    }
+
+    public function getProfileUser($user){
+        $user = User::where('id', $user)->first();
+        return $user->profiles ?? null;
     }
 
 }

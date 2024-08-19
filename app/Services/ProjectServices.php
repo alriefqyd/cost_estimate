@@ -198,13 +198,17 @@ class ProjectServices
         })->get();
     }
 
-    public function checkReviewer($discipline, $designEngineer, $sizeEstimateDiscipline){
+    public function checkReviewer($discipline, $approver, $designEngineer, $sizeEstimateDiscipline){
         $user = new User();
         $isReviewer = $user->isDisciplineReviewer($discipline);
 
         if(isset($designEngineer)
             && $sizeEstimateDiscipline > 0
             && $isReviewer){
+            return true;
+        }
+
+        if($approver == auth()->user()->id && $isReviewer){
             return true;
         }
 

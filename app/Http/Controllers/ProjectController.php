@@ -193,6 +193,10 @@ class ProjectController extends Controller
            $project->design_engineer_instrument = $request->design_engineer_instrument;
            if(isset($request->status)) $project->status = $request->status;
            $project->project_area_id = $request->project_area;
+           $project->mechanical_approver = $request-> reviewer_mechanical;
+           $project->civil_approver = $request-> reviewer_civil;
+           $project->electrical_approver = $request-> reviewer_electrical;
+           $project->instrument_approver = $request-> reviewer_instrument;
            $project->updated_by = auth()->user()->id;
            $projectService->setStatusDraft($project);
            $project->save();
@@ -261,10 +265,10 @@ class ProjectController extends Controller
         $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
         $project = $project->load(['projectArea','projectEngineer', 'projectManager']);
-        $isReviewerCivil = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['civil'],$project->design_engineer_civil,sizeof($estimateDisciplines));
-        $isReviewerMechanical = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['mechanical'],$project->design_engineer_mechanical,sizeof($estimateDisciplines));
-        $isReviewerElectrical = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['electrical'],$project->design_engineer_electrical,sizeof($estimateDisciplines));
-        $isReviewerInstrument = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['instrument'],$project->design_engineer_instrument,sizeof($estimateDisciplines));
+        $isReviewerCivil = $projectService->checkReviewer('civil',$project->civil_approver,$project->design_engineer_civil,sizeof($estimateDisciplines));
+        $isReviewerMechanical = $projectService->checkReviewer('mechanical',$project->mechanical_approver,$project->design_engineer_mechanical,sizeof($estimateDisciplines));
+        $isReviewerElectrical = $projectService->checkReviewer('electrical',$project->electrical_approver,$project->design_engineer_electrical,sizeof($estimateDisciplines));
+        $isReviewerInstrument = $projectService->checkReviewer('instrument',$project->instrument_approver,$project->design_engineer_instrument,sizeof($estimateDisciplines));
         $remark = $projectService->getRemarkDiscipline($project);
 
         return view('project.detail',[

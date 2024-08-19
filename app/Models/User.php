@@ -118,7 +118,6 @@ class User extends Authenticatable
         if ($discipline) $reviewerDiscipline = Role::ACTION_COST_ESTIMATE["review_{$discipline}_cost_estimate"];
         $reviewerRoles = [
             $reviewerDiscipline,
-            Role::ACTION_COST_ESTIMATE['review_cost_estimate'],
             Role::ACTION_COST_ESTIMATE['review_all_discipline_cost_estimate']
         ];
 

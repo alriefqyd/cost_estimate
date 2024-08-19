@@ -50,7 +50,7 @@ class ApiController extends Controller
     }
 
     public function getReviewer(Request $request){
-        $reviewer = DB::table('user_role as ur')->select('ur.id','p.full_name','r.name')->join('roles as r','ur.role_id','r.id')
+        $reviewer = DB::table('user_role as ur')->select('ur.user_id','p.full_name','r.name')->join('roles as r','ur.role_id','r.id')
             ->join('profiles as p','ur.user_id','p.user_id')->where('feature','cost_estimate')
             ->where(function($q) use ($request){
                 return $q->where('r.name','like','%review '.$request->discipline.'%')->orwhere('r.action','review_all_discipline_cost_estimate')
@@ -61,7 +61,7 @@ class ApiController extends Controller
 
         $reviewer = $reviewer->map(function ($item){
            return [
-               'id' => $item->id,
+               'id' => $item->user_id,
                'text' => $item->full_name
            ];
         });
