@@ -188,4 +188,6 @@ Route::get('/convertApi', [\App\Http\Controllers\ApiController::class,'getUsdRat
 Route::get('/getPublicHolidayApi', [\App\Http\Controllers\ApiController::class,'getPublicHolidayApi']);
 Route::get('/getReviewer', [\App\Http\Controllers\ApiController::class,'getReviewer']);
 
+Route::get('/send-email',[\App\Http\Controllers\ProjectController::class,'sendMail']);
+
 

@@ -4,11 +4,15 @@ namespace App\Services;
 
 use App\Class\ProjectClass;
 use App\Class\ProjectTotalCostClass;
+use App\Mail\SendMail;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use Twilio\Rest\Client;
 
 class ProjectServices
 {
@@ -248,5 +252,33 @@ class ProjectServices
         Session::flash('type', $type);
         Session::flash('icon', $icon);
         Session::flash('status', $status);
+    }
+
+    public function sendWa($project){
+        $sid    = getenv("TWILIO_AUTH_SID");
+        $token  = getenv("TWILIO_AUTH_TOKEN");
+        $wa_from= getenv("TWILIO_WHATSAPP_FROM");
+
+        $profile = $project->getProfileUser($project->instrument_approver);
+        $phone = $profile->phone_number;
+        $full_name = $profile->full_name;
+
+        $twilio = new Client($sid, $token);
+
+        $body = "There's one project in cost estimate web need to review by : ". $full_name . ". Project Name : ". $project->project_title;
+
+        $twilio->messages->create("whatsapp:$phone",["from" => "whatsapp:$wa_from", "body" => $body]);
+
+        Log::info('send wa');
+    }
+
+    public function sendEmail(){
+        $details = [
+            'title' => 'Mail from Your App',
+            'body' => 'This is a test email.'
+        ];
+
+        Mail::to('c0661472@vale.com')->send(new SendMail());
+
     }
 }

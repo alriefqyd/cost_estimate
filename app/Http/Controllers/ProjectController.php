@@ -109,13 +109,14 @@ class ProjectController extends Controller
                 'mechanical_approver' => $request-> reviewer_mechanical,
                 'civil_approver' => $request-> reviewer_civil,
                 'electrical_approver' => $request-> reviewer_electrical,
-                'instrument_approver' => $request-> reviewer_instrument,
+                'instrument_approver' => $request->reviewer_instrument,
                 'status' => Project::DRAFT,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
             $project->save();
             DB::commit();
+            $projectService->sendWa($project);
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('project/'.$project->id);
         } catch(\Exception $e){
@@ -203,6 +204,7 @@ class ProjectController extends Controller
            DB::commit();
 
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
+            $projectService->sendWa($project);
             return redirect('project/'.$project->id);
         } catch (Exception $e) {
             DB::rollBack();
@@ -471,6 +473,17 @@ class ProjectController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function sendMail(){
+        try{
+            $projectServices = new ProjectServices();
+            $projectServices->sendEmail();
+            dd('success');
+        } catch (Exception $e){
+            dd($e->getMessage());
+        }
+
     }
 
 }
