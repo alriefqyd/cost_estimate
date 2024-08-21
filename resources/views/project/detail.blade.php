@@ -119,7 +119,7 @@
                                         <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
                                         Civil
                                         @if(isset($project->design_engineer_civil))
-                                            {!!$project->getStatusApprovalDiscipline($project->civil_approval_status, $project->getProfileUser($project->civil_approver)->full_name) !!}
+                                            {!!$project->getStatusApprovalDiscipline($project->civil_approval_status, $project->getProfileUser($project->civil_approver)?->full_name) !!}
                                         @endif
                                     </td>
                                     <td>:</td>
@@ -135,7 +135,7 @@
                                         <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['mechanical']}}" {!! $isAuthorizeToReviewMechanical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewMechanical ? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px" ></i>
                                             Mechanical
                                         @if(isset($project->design_engineer_mechanical))
-                                            {!! $project->getStatusApprovalDiscipline($project->mechanical_approval_status, $project->getProfileUser($project->mechanical_approver)->full_name) !!}
+                                            {!! $project->getStatusApprovalDiscipline($project->mechanical_approval_status, $project->getProfileUser($project->mechanical_approver)?->full_name) !!}
                                         @endif
 
                                     </td>
@@ -152,7 +152,7 @@
                                         <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['electrical']}}" {!! $isAuthorizeToReviewElectrical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!}  class="{!! $isAuthorizeToReviewElectrical ? 'js-modal-approval cursor-pointer' : 'color-grey'!!} m-r-10" style="width: 17px"></i>
                                         Electrical
                                         @if(isset($project->design_engineer_electrical))
-                                            {!!$project->getStatusApprovalDiscipline($project->electrical_approval_status,$project->getProfileUser($project->electrical_approver)->full_name) !!}
+                                            {!!$project->getStatusApprovalDiscipline($project->electrical_approval_status,$project->getProfileUser($project->electrical_approver)?->full_name) !!}
                                         @endif
                                     </td>
                                     <td>:</td>
@@ -168,7 +168,7 @@
                                         <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewInstrument ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewInstrument ? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
                                             Instrument
                                         @if(isset($project->design_engineer_instrument))
-                                            {!!$project->getStatusApprovalDiscipline($project->instrument_approval_status, $project->getProfileUser($project->instrument_approver)->full_name) !!}
+                                            {!!$project->getStatusApprovalDiscipline($project->instrument_approval_status, $project->getProfileUser($project->instrument_approver)?->full_name) !!}
                                         @endif
                                     </td>
                                     <td>:</td>
