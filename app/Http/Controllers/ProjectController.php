@@ -110,13 +110,13 @@ class ProjectController extends Controller
                 'civil_approver' => $request-> reviewer_civil,
                 'electrical_approver' => $request-> reviewer_electrical,
                 'instrument_approver' => $request->reviewer_instrument,
+                'estimate_discipline_status' => "DRAFT",
                 'status' => Project::DRAFT,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
             $project->save();
             DB::commit();
-            $projectService->sendEmailToReviewer($project);
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('project/'.$project->id);
         } catch(\Exception $e){
@@ -204,7 +204,6 @@ class ProjectController extends Controller
            DB::commit();
 
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
-            $projectService->sendWa($project);
             return redirect('project/'.$project->id);
         } catch (Exception $e) {
             DB::rollBack();
@@ -432,6 +431,20 @@ class ProjectController extends Controller
                         break;
                 }
                 $projectServices->updateStatusProject($project);
+                //status estimate publish
+
+                //draft -> pending discipline => publish
+                //pending disc -> waiting for review pm => publish
+                //review -> approve => publish
+
+                //waiting -> pending / reject => draft dan status estimate publish
+
+                if($project->status != Project::APPROVE &&
+                    $project->status != Project::WAITING_FOR_APPROVAL &&
+                    $project->status != Project::PENDING_DISCIPLINE_APPROVAL &&
+                    $project->estimate_discipline_status == 'PUBLISH'){
+                    $project->estimate_discipline_status = 'DRAFT';
+                }
                 $project->remark = json_encode($remark);
             } else {
                 $project->status = Project::APPROVE;

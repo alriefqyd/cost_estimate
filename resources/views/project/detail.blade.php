@@ -34,7 +34,7 @@
                             </div>
                             @can('update',$project)
                                 <div class="col-md-6">
-                                    <a href="/project/edit/{{$project->id}}">
+                                    <a href="/project/edit/{{$project->id}}" class="{{$project->estimate_discipline_status == 'PUBLISH' ? 'd-none' : ''}}">
                                         <button class="btn btn-outline-success float-end m-r-10">Edit Project Info</button>
                                     </a>
                                 </div>
@@ -200,7 +200,7 @@
                             <div class="col-md-6">
                                 @if(sizeof($wbs) > 0)
                                     @can('update',App\Models\WbsLevel3::class)
-                                        <a href="/project/{{$project->id}}/wbs/edit">
+                                        <a href="/project/{{$project->id}}/wbs/edit" class="{{$project->estimate_discipline_status == 'PUBLISH' ? 'd-none' : ''}}">
                                             <button class="btn btn-outline-primary float-end m-r-10" type="button">
                                                 Edit WBS
                                             </button>
@@ -273,15 +273,17 @@
                                     <i class="fa fa-chevron-circle-down cursor-pointer js-chev-show-content d-none"></i>
                                 </p>
                             </div>
-                            <div class="col-md-6">
-                                @canAny(['create','update'], App\Models\EstimateAllDiscipline::class)
-                                    <a href="/project/{{$project->id}}/estimate-discipline/create">
-                                        <button class="btn btn-outline-primary float-end m-r-10" type="button">
-                                            {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
-                                        </button>
-                                    </a>
-                                @endcan
-                            </div>
+                            @if($project->estimate_discipline_status == "DRAFT")
+                                <div class="col-md-6">
+                                    @canAny(['create','update'], App\Models\EstimateAllDiscipline::class)
+                                        <a href="/project/{{$project->id}}/estimate-discipline/create">
+                                            <button class="btn btn-outline-primary float-end m-r-10" type="button">
+                                                {{sizeof($estimateAllDisciplines) > 0 ? 'Edit Data' : 'Add New Data'}}
+                                            </button>
+                                        </a>
+                                    @endcan
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="card-body" style="padding: 50px 10px 5px 10px">

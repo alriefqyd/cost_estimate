@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use PHPUnit\Exception;
-use Twilio\Rest\Client;
 
 class ProjectServices
 {
@@ -197,6 +196,21 @@ class ProjectServices
         }
     }
 
+    public function setRejectedDisciplineToWaiting(Project $project){
+        if($project->mechanical_approval_status == Project::REJECTED){
+            $project->mechanical_approval_status = Project::PENDING;
+        }
+        if($project->civil_approval_status == Project::REJECTED){
+            $project->civil_approval_status = Project::PENDING;
+        }
+        if($project->instrument_approval_status == Project::REJECTED){
+            $project->instrument_approval_status = Project::PENDING;
+        }
+        if($project->electrical_approval_status == Project::REJECTED){
+            $project->electrical_approval_status = Project::PENDING;
+        }
+    }
+
     public function getDataEngineer($subject){
         return User::with('profiles')->whereHas('profiles', function ($q) use ($subject) {
             return $q->where('position', $subject);
@@ -255,23 +269,23 @@ class ProjectServices
         Session::flash('status', $status);
     }
 
-    public function sendWa($project){
-        $sid    = getenv("TWILIO_AUTH_SID");
-        $token  = getenv("TWILIO_AUTH_TOKEN");
-        $wa_from= getenv("TWILIO_WHATSAPP_FROM");
-
-        $profile = $project->getProfileUser($project->instrument_approver);
-        $phone = $profile->phone_number;
-        $full_name = $profile->full_name;
-
-        $twilio = new Client($sid, $token);
-
-        $body = "There's one project in cost estimate web need to review by : ". $full_name . ". Project Name : ". $project->project_title;
-
-        $twilio->messages->create("whatsapp:$phone",["from" => "whatsapp:$wa_from", "body" => $body]);
-
-        Log::info('send wa');
-    }
+//    public function sendWa($project){
+//        $sid    = getenv("TWILIO_AUTH_SID");
+//        $token  = getenv("TWILIO_AUTH_TOKEN");
+//        $wa_from= getenv("TWILIO_WHATSAPP_FROM");
+//
+//        $profile = $project->getProfileUser($project->instrument_approver);
+//        $phone = $profile->phone_number;
+//        $full_name = $profile->full_name;
+//
+//        $twilio = new Client($sid, $token);
+//
+//        $body = "There's one project in cost estimate web need to review by : ". $full_name . ". Project Name : ". $project->project_title;
+//
+//        $twilio->messages->create("whatsapp:$phone",["from" => "whatsapp:$wa_from", "body" => $body]);
+//
+//        Log::info('send wa');
+//    }
 
     public function sendEmailToReviewer(Project $project){
         $electricalReviewer = $project->getProfileUser($project->electrical_approver)?->email;

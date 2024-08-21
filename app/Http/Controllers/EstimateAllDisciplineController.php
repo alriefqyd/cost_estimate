@@ -158,7 +158,15 @@ class EstimateAllDisciplineController extends Controller
                 );
 
                 $projectServices->setStatusDraft($project);
+                $project->estimate_discipline_status = $request->estimateStatus;
+
+                if($project->estimate_discipline_status == 'PUBLISH'){
+                    $projectServices->sendEmailToReviewer($project);
+                    //cek apakah ada yang reject discipline, kembalikan ke pendinf
+                    $projectServices->setRejectedDisciplineToWaiting($project);
+                }
                 $project->save();
+                DB::commit();
 
                 $response = [
                     'status' => 200,
@@ -166,7 +174,6 @@ class EstimateAllDisciplineController extends Controller
                     'version' => $newVersion
                 ];
 
-                DB::commit();
                 return response()->json($response);
             } else {
                 $response = [

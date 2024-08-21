@@ -144,11 +144,17 @@ $(function(){
         _this.attr('disabled','disabled');
         _this.find('.js-loading-save').removeClass('d-none')
 
+        if(_this.data('status') == 'MODAL'){
+            $('.js-modal-confirm-publish').modal('show');
+            return false;
+        }
+
         var _data = {
             'work_items' : JSON.stringify(_array_estimate_disciplines),
             'project_id' : _project_id,
             'version' : _version,
-            'contingency' : _contingency
+            'contingency' : _contingency,
+            'estimateStatus' : _this.data('status')
         }
 
         $.ajax({
@@ -164,8 +170,14 @@ $(function(){
                     }
                     $(window).off('beforeunload');
                     $('.js-version-project-estimate').val(data.version);
-                    _this.find('.js-loading-save').addClass('d-none')
-                    _this.removeAttr('disabled','disabled');
+                    $('.js-loading-save').addClass('d-none')
+                    $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
+                    $('.js-modal-confirm-publish').modal('hide');
+                    if(_this.data('status') == "PUBLISH"){
+                        setTimeout(function (){
+                            window.location.href = "/project/" + _project_id
+                        },1000)
+                    }
                 } else {
                     notification('danger',data.message,'fa fa-frown-o','Error')
                     if(data.sync){
