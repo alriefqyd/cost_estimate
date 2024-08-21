@@ -281,17 +281,16 @@ class ProjectServices
 
         $arr = [$electricalReviewer, $instrumentReviewer, $mechanicalReviewer, $civilReviewer];
         foreach ($arr as $k => $v){
-            if(isset($v)) $this->sendEmail($v);
+            if(isset($v)) {
+                try {
+                    Mail::to($v)->send(new SendMail($project));
+                    Log::info('Email send to : '.$v);
+                } catch (Exception $e){
+                    Log::error($e->getMessage());
+                }
+            } else {
+                Log::warning("No email found for {$v} reviewer in project ID: {$project->id}");
+            }
         }
-    }
-
-    public function sendEmail($sendTo){
-        try {
-            Mail::to($sendTo)->send(new SendMail());
-            Log::info('Email send to : '.$sendTo);
-        } catch (Exception $e){
-            Log::error($e->getMessage());
-        }
-
     }
 }

@@ -77,10 +77,10 @@
                             <td style="padding: 30px">
                                 <h6 style="font-weight: 600">Approval Reviewer</h6>
                                 <p>You have one cost estimate project need to review by discipline</p>
-                                <p><span class="font-weight-bold"> Project Name</span> : IT Office Renovation</p>
+                                <p><span class="font-weight-bold"> Project Name</span> : {{$project->project_title}}</p>
                                 <p class="font-weight-bold">Design Engineer</p>
-                                <p>Electrical : Asyhar Fanani<br>Instrument : Fathur Miftahuddin <br> Mechanical : Ari Hamdana<br>Civil : Eka Saputri</p>
-                                <p style="text-align: center"><a href="javascript:void(0)" style="padding: 10px; background-color: #24695c; color: #fff; display: inline-block; border-radius: 4px;font-weight:600;text-decoration:none">Go to Cost Estimate</a></p>
+                                <p>Electrical : {{$project->designEngineerElectrical?->profiles->full_name}}<br>Instrument : {{$project->designEngineerInstrument?->profiles->full_name}} <br> Mechanical : {{$project->designEngineerMechanical?->profiles->full_name}}<br>Civil : {{$project->designEngineerInstrument?->profiles->full_name}}</p>
+                                <p style="text-align: center"><a href="10.34.168.208:5000/{{$project->id}}" style="padding: 10px; background-color: #24695c; color: #fff; display: inline-block; border-radius: 4px;font-weight:600;text-decoration:none">Go to Cost Estimate</a></p>
                                 <p style="margin-bottom: 0">
                                     Regards,<br>Cost Estimate</p>
                             </td>

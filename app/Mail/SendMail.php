@@ -18,9 +18,9 @@ class SendMail extends Mailable
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($project)
     {
-        //
+        $this->project = $project;
     }
 
     /**
@@ -62,6 +62,8 @@ class SendMail extends Mailable
 
         return $this->from($from)
             ->subject('Cost Estimate Need To Review')
-            ->view('emails.approverNotification');
+            ->view('emails.approverNotification')->with([
+                'project' => $this->project
+            ]);
     }
 }
