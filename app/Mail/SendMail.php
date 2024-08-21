@@ -28,24 +28,24 @@ class SendMail extends Mailable
      *
      * @return \Illuminate\Mail\Mailables\Envelope
      */
-    public function envelope()
-    {
-        return new Envelope(
-            subject: 'Send Mail',
-        );
-    }
+//    public function envelope()
+//    {
+//        return new Envelope(
+//            subject: 'Send Mail',
+//        );
+//    }
 
     /**
      * Get the message content definition.
      *
      * @return \Illuminate\Mail\Mailables\Content
      */
-    public function content()
-    {
-        return new Content(
-            view: 'emails.approverNotification',
-        );
-    }
+//    public function content()
+//    {
+//        return new Content(
+//            view: 'emails.approverNotification',
+//        );
+//    }
 
     /**
      * Get the attachments for the message.
@@ -61,7 +61,7 @@ class SendMail extends Mailable
         $from = getenv('MAIL_FROM_ADDRESS');
 
         return $this->from($from)
-            ->subject('Your Email Subject')
+            ->subject('Cost Estimate Need To Review')
             ->view('emails.approverNotification');
     }
 }

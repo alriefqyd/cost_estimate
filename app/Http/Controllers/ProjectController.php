@@ -116,7 +116,7 @@ class ProjectController extends Controller
             ]);
             $project->save();
             DB::commit();
-            $projectService->sendWa($project);
+            $projectService->sendEmailToReviewer($project);
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('project/'.$project->id);
         } catch(\Exception $e){
@@ -475,15 +475,8 @@ class ProjectController extends Controller
         }
     }
 
-    public function sendMail(){
-        try{
-            $projectServices = new ProjectServices();
-            $projectServices->sendEmail();
-            dd('success');
-        } catch (Exception $e){
-            dd($e->getMessage());
-        }
-
+    public function sendMailPreview(){
+        return view('emails.approverNotification');
     }
 
 }

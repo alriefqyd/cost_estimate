@@ -189,5 +189,7 @@ Route::get('/getPublicHolidayApi', [\App\Http\Controllers\ApiController::class,'
 Route::get('/getReviewer', [\App\Http\Controllers\ApiController::class,'getReviewer']);
 
 Route::get('/send-email',[\App\Http\Controllers\ProjectController::class,'sendMail']);
+Route::get('/send-email-preview',[\App\Http\Controllers\ProjectController::class,'sendMailPreview']);
+
 
 

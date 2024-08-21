@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
+use PHPUnit\Exception;
 use Twilio\Rest\Client;
 
 class ProjectServices
@@ -272,13 +273,25 @@ class ProjectServices
         Log::info('send wa');
     }
 
-    public function sendEmail(){
-        $details = [
-            'title' => 'Mail from Your App',
-            'body' => 'This is a test email.'
-        ];
+    public function sendEmailToReviewer(Project $project){
+        $electricalReviewer = $project->getProfileUser($project->electrical_approver)?->email;
+        $instrumentReviewer = $project->getProfileUser($project->instrument_approver)?->email;
+        $mechanicalReviewer = $project->getProfileUser($project->mechanical_approver)?->email;
+        $civilReviewer = $project->getProfileUser($project->civil_approver)?->email;
 
-        Mail::to('c0661472@vale.com')->send(new SendMail());
+        $arr = [$electricalReviewer, $instrumentReviewer, $mechanicalReviewer, $civilReviewer];
+        foreach ($arr as $k => $v){
+            if(isset($v)) $this->sendEmail($v);
+        }
+    }
+
+    public function sendEmail($sendTo){
+        try {
+            Mail::to($sendTo)->send(new SendMail());
+            Log::info('Email send to : '.$sendTo);
+        } catch (Exception $e){
+            Log::error($e->getMessage());
+        }
 
     }
 }
