@@ -61,7 +61,7 @@ class SendMail extends Mailable
         $from = getenv('MAIL_FROM_ADDRESS');
 
         return $this->from($from)
-            ->subject('Cost Estimate Need To Review')
+            ->subject('Cost Estimate Review Required: Project "'.$this->project?->project_title.'"')
             ->view('emails.approverNotification')->with([
                 'project' => $this->project
             ]);
