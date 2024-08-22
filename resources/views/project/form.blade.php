@@ -99,7 +99,7 @@
                 <option value="{{NULL}}">NR</option>
             </select>
         </div>
-        <div class="col-md-6 js-reviewer-engineer d-none">
+        <div class="col-md-6 js-reviewer-engineer {{isset($project->design_engineer_mechanical) ? '' : 'd-none'}}">
             <label class="form-label form-label-black">Review Engineer Civil</label>
             <select class="select2 form-control js-reviewer-engineer-select"
                     data-allowClear="true"
@@ -107,9 +107,9 @@
                     data-subject="civil"
                     data-minimumInputLength="3"
                     name="reviewer_civil" >
-                @if(isset($project->design_engineer_mechanical))
-                    <option value="{{$project->design_engineer_mechanical}}">
-                        {{$project->designEngineerMechanical?->profiles?->full_name}}
+                @if(isset($project->design_engineer_civil))
+                    <option value="{{$project->design_engineer_civil}}">
+                        {{$project->getProfileUser($project->civil_approver)?->full_name}}
                     </option>
                 @endif
                 <option value="{{NULL}}">NR</option>
@@ -134,8 +134,8 @@
                 <option value="{{NULL}}">NR</option>
             </select>
         </div>
-        <div class="col-md-6 js-reviewer-engineer d-none">
-            <label class="form-label form-label-black">Review Engineer Civil</label>
+        <div class="col-md-6 js-reviewer-engineer {{isset($project->design_engineer_mechanical) ? '' : 'd-none'}}">
+            <label class="form-label form-label-black">Review Engineer Mechanical</label>
             <select class="select2 form-control js-reviewer-engineer-select"
                     data-allowClear="true"
                     data-placeholder="Select Reviewer Engineer Mechanical"
@@ -144,7 +144,7 @@
                     name="reviewer_mechanical" >
                 @if(isset($project->design_engineer_mechanical))
                     <option value="{{$project->design_engineer_mechanical}}">
-                        {{$project->designEngineerMechanical?->profiles?->full_name}}
+                        {{$project->getProfileUser($project->mechanical_approver)?->full_name}}
                     </option>
                 @endif
                 <option value="{{NULL}}">NR</option>
@@ -169,7 +169,7 @@
                 <option value="{{NULL}}">NR</option>
             </select>
         </div>
-        <div class="col-md-6 js-reviewer-engineer d-none">
+        <div class="col-md-6 js-reviewer-engineer {{isset($project->design_engineer_electrical) ? '' : 'd-none'}}">
             <label class="form-label form-label-black">Reviewer Engineer Electrical</label>
             <select class="select2 form-control js-reviewer-engineer-select"
                     data-allowClear="true"
@@ -179,7 +179,7 @@
                     name="reviewer_electrical" >
                 @if(isset($project->design_engineer_electrical))
                     <option value="{{$project->design_engineer_electrical}}">
-                        {{$project->designEngineerElectrical?->profiles?->full_name}}
+                        {{$project->getProfileUser($project->electrical_approver)?->full_name}}
                     </option>
                 @endif
                 <option value="{{NULL}}">NR</option>
@@ -204,7 +204,7 @@
                 <option value="{{NULL}}">NR</option>
             </select>
         </div>
-        <div class="col-md-6 js-reviewer-engineer d-none">
+        <div class="col-md-6 js-reviewer-engineer {{isset($project->design_engineer_instrument) ? '' : 'd-none'}}">
             <label class="form-label form-label-black">Reviewer Engineer Instrument</label>
             <select class="select2 form-control js-reviewer-engineer-select"
                     data-allowClear="true"
@@ -214,7 +214,7 @@
                     name="reviewer_instrument">
                 @if(isset($project->design_engineer_instrument))
                     <option value="{{$project->design_engineer_instrument}}">
-                        {{$project->designEngineerInstrument?->profiles?->full_name}}
+                        {{$project->getProfileUser($project->instrument_approver)?->full_name}}
                     </option>
                 @endif
                 <option value="{{NULL}}">NR</option>

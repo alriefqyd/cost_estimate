@@ -415,19 +415,19 @@ class ProjectController extends Controller
                 switch ($request->discipline) {
                     case Setting::DESIGN_ENGINEER_LIST['civil']:
                         $project->civil_approval_status = $request->status;
-                        $remark['civil'] = $request->remark;; // Replace 'YourValueForCivil' with the actual value
+                        $remark['civil'] = $request->remark;
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['mechanical']:
                         $project->mechanical_approval_status = $request->status;
-                        $remark['mechanical'] = $request->remark; // Replace 'YourValueForMechanical' with the actual value
+                        $remark['mechanical'] = $request->remark;
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['electrical']:
                         $project->electrical_approval_status = $request->status;
-                        $remark['electrical'] = $request->remark;; // Replace 'YourValueForElectrical' with the actual value
+                        $remark['electrical'] = $request->remark;
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['instrument']:
                         $project->instrument_approval_status = $request->status;
-                        $remark['instrument'] = $request->remark;; // Replace 'YourValueForInstrument' with the actual value
+                        $remark['instrument'] = $request->remark;
                         break;
                 }
                 $projectServices->updateStatusProject($project);
