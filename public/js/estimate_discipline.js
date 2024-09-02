@@ -196,9 +196,11 @@ $(function(){
 
     $(document).ready(function() {
         // Auto-save every 5 minutes (300,000 milliseconds)
-        setInterval(function() {
-            saveEstimateDiscipline();
-        }, 300000); // 300000 ms = 5 minutes
+        if($('.js-save-estimate-discipline').length > 0){
+            setInterval(function() {
+                saveEstimateDiscipline();
+            }, 300000); // 300000 ms = 5 minutes
+        }
     });
 
     function countTotalPrice(){
