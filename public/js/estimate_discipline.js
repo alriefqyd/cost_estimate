@@ -128,67 +128,77 @@ $(function(){
     }
 
 
-    $('.js-save-estimate-discipline').on('click',function (e) {
-        e.preventDefault();
-        var _this = $(this);
-        var _body_work_item = $('.js-body-work-item-table');
+    function saveEstimateDiscipline(status = '') {
+        var _this = $('.js-save-estimate-discipline');
         var _form = $('.js-form-estimate-discipline');
         var _project_id = _form.data('id');
-        var _url = '/project/' + _project_id + '/estimate-discipline/store'
-
+        var _url = '/project/' + _project_id + '/estimate-discipline/store';
 
         var _version = _form.find('.js-version-project-estimate').val();
         var _array_estimate_disciplines = getWorkItemList(false);
         var _contingency = _form.find('.js-input-contingency').val();
 
-        _this.attr('disabled','disabled');
-        _this.find('.js-loading-save').removeClass('d-none')
+        var _data = {
+            'work_items': JSON.stringify(_array_estimate_disciplines),
+            'project_id': _project_id,
+            'version': _version,
+            'contingency': _contingency,
+            'estimateStatus': status || _this.data('status')
+        };
 
-        if(_this.data('status') == 'MODAL'){
+        $.ajax({
+            url: _url,
+            data: _data,
+            type: 'POST',
+            success: function (data) {
+                if (data.status === 200) {
+                    if (document.fullscreenElement) {
+                        showNotification('.js-fullscreen-element', 'Your data was successfully saved');
+                    } else {
+                        notification('success', data.message);
+                    }
+                    $(window).off('beforeunload');
+                    $('.js-version-project-estimate').val(data.version);
+                    $('.js-loading-save').addClass('d-none');
+                    $('.js-save-estimate-discipline').removeAttr('disabled');
+                    $('.js-modal-confirm-publish').modal('hide');
+                    if (status === "PUBLISH") {
+                        setTimeout(function () {
+                            window.location.href = "/project/" + _project_id;
+                        }, 1000);
+                    }
+                } else {
+                    notification('danger', data.message, 'fa fa-frown-o', 'Error');
+                    if (data.sync) {
+                        $('.js-btn-loading-sync').removeClass('d-none');
+                        _this.find('.js-loading-save').addClass('d-none');
+                    }
+                }
+            }
+        });
+    }
+
+    $('.js-save-estimate-discipline').on('click', function (e) {
+        e.preventDefault();
+
+        var _this = $(this);
+
+        _this.attr('disabled', 'disabled');
+        _this.find('.js-loading-save').removeClass('d-none');
+
+        if (_this.data('status') === 'MODAL') {
             $('.js-modal-confirm-publish').modal('show');
             return false;
         }
 
-        var _data = {
-            'work_items' : JSON.stringify(_array_estimate_disciplines),
-            'project_id' : _project_id,
-            'version' : _version,
-            'contingency' : _contingency,
-            'estimateStatus' : _this.data('status')
-        }
+        saveEstimateDiscipline(_this.data('status'));
+    });
 
-        $.ajax({
-            url: _url,
-            data : _data,
-            type : 'POST',
-            success : function(data){
-                if(data.status === 200){
-                    if (document.fullscreenElement) {
-                        showNotification('.js-fullscreen-element', 'Your data was successfully saved');
-                    } else {
-                        notification('success',data.message)
-                    }
-                    $(window).off('beforeunload');
-                    $('.js-version-project-estimate').val(data.version);
-                    $('.js-loading-save').addClass('d-none')
-                    $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
-                    $('.js-modal-confirm-publish').modal('hide');
-                    if(_this.data('status') == "PUBLISH"){
-                        setTimeout(function (){
-                            window.location.href = "/project/" + _project_id
-                        },1000)
-                    }
-                } else {
-                    notification('danger',data.message,'fa fa-frown-o','Error')
-                    if(data.sync){
-                        $('.js-btn-loading-sync').removeClass('d-none');
-                        _this.find('.js-loading-save').addClass('d-none');
-
-                    }
-                }
-            }
-        })
-
+    $(document).ready(function() {
+        // Auto-save every 5 minutes (300,000 milliseconds)
+        setInterval(function() {
+            saveEstimateDiscipline();
+        }, 300000); // 300000 ms = 5 minutes
     });
 
     function countTotalPrice(){
