@@ -115,6 +115,20 @@ class ProjectController extends Controller
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
+
+            $statusDiscipline = [];
+            foreach (Project::DESIGN_ENGINEER_KEY_LIST as $k => $v) {
+                if(isset($request->$k)){
+                    $data = [
+                        'position' => $k,
+                        'status' => "DRAFT"
+                    ];
+                    array_push($statusDiscipline, $data);
+                }
+            }
+
+            $project->estimate_discipline_status = json_encode($statusDiscipline);
+
             $project->save();
             DB::commit();
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
@@ -200,7 +214,30 @@ class ProjectController extends Controller
            $project->instrument_approver = $request-> reviewer_instrument;
            $project->updated_by = auth()->user()->id;
            $projectService->setStatusDraft($project);
-           $project->save();
+
+            $statusDiscipline = json_decode($project->estimate_discipline_status);
+            $existingStatus = collect($statusDiscipline);
+
+            foreach (Project::DESIGN_ENGINEER_KEY_LIST as $k => $v) {
+                $isAlreadyExistDiscipline = $existingStatus->contains('position',$k);
+                if(isset($request->$k) ){
+                    if(!$isAlreadyExistDiscipline) {
+                        $data = [
+                            'position' => $k,
+                            'status' => "DRAFT"
+                        ];
+                        array_push($statusDiscipline, $data);
+                    }
+                } else {
+                    $statusDiscipline = collect($statusDiscipline)->reject(function ($item) use ($k) {
+                        return $item->position === $k;
+                    })->values()->toArray();
+                }
+            }
+
+            $project->estimate_discipline_status = $statusDiscipline;
+            $project->save();
+
            DB::commit();
 
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
@@ -411,7 +448,11 @@ class ProjectController extends Controller
         try {
             DB::beginTransaction();
 
-            if ($request->discipline) {
+            if (isset($request->discipline)) {
+                $discipline = strtolower($request->discipline);
+                $column = $discipline.'_approval_status';
+                $oldStatusDiscipline = $project->$column;
+
                 switch ($request->discipline) {
                     case Setting::DESIGN_ENGINEER_LIST['civil']:
                         $project->civil_approval_status = $request->status;
@@ -431,20 +472,22 @@ class ProjectController extends Controller
                         break;
                 }
                 $projectServices->updateStatusProject($project);
-                //status estimate publish
 
-                //draft -> pending discipline => publish
-                //pending disc -> waiting for review pm => publish
-                //review -> approve => publish
+                $newStatusDiscipline = $request->status;
+                $statusEstimate = collect(json_decode($project->estimate_discipline_status));
+                if($oldStatusDiscipline == "APPROVE" || $newStatusDiscipline == "REJECTED" || $newStatusDiscipline == "PENDING"){
+                    $statusEstimate = $statusEstimate->map(function ($item) use ($discipline){
+                        $position = 'design_engineer_'.$discipline;
+                        //find by user the position status tu update
+                        if($item->position == $position){
+                            $item->status = "DRAFT";
+                        };
 
-                //waiting -> pending / reject => draft dan status estimate publish
-
-                if($project->status != Project::APPROVE &&
-                    $project->status != Project::WAITING_FOR_APPROVAL &&
-                    $project->status != Project::PENDING_DISCIPLINE_APPROVAL &&
-                    $project->estimate_discipline_status == 'PUBLISH'){
-                    $project->estimate_discipline_status = 'DRAFT';
+                        return $item;
+                    });
                 }
+
+                $project->estimate_discipline_status = $statusEstimate;
                 $project->remark = json_encode($remark);
             } else {
                 $project->status = Project::APPROVE;

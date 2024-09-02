@@ -183,4 +183,11 @@ class User extends Authenticatable
         return $this->checkReviewerAuthorization('reviewer','material');
     }
 
+    public function getDiscipline(){
+        $position = auth()->user()->profiles?->position;
+        $discipline = explode('_', $position);
+        $discipline = $discipline[1];
+        return $discipline;
+    }
+
 }

@@ -153,8 +153,14 @@ class Project extends Model
         });
     }
 
-    public function scopeReviewerAccess($query){
-        return $query;
+    public function isDesignEngineer(){
+        $user = auth()->user()->id;
+        if($this->design_engineer_electrical == $user ||
+            $this->design_engineer_instrument == $user ||
+            $this->design_engineer_mechanical == $user ||
+            $this->design_engineer_civil == $user
+        ){return true;}
+        return false;
     }
 
     public function getTotalCost(){
@@ -260,6 +266,23 @@ class Project extends Model
     public function getProfileUser($user){
         $user = User::where('id', $user)->first();
         return $user->profiles ?? null;
+    }
+
+    public function getStatusEstimateDiscipline($discipline){
+        if($discipline == null){
+            $position = explode('_',auth()->user()->profiles?->position);
+            $position = $position[1] ?? null;
+            $discipline = 'design_engineer_' . $position;
+        }
+
+        $json = json_decode($this->estimate_discipline_status, true);
+        $data = collect($json);
+        $data = $data->filter(function($item) use ($discipline){
+           return $item["position"] == $discipline ;
+        })->pluck('status');
+        
+        if(isset($data[0]) && $data[0] == "PUBLISH") return true;
+        return false;
     }
 
 }

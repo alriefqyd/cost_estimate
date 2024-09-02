@@ -32,6 +32,18 @@ class EstimateAllDisciplineController extends Controller
     }
 
     public function create(Project $project, Request $request){
+        if(!$project->isDesignEngineer())  {
+            abort(403);
+        }
+        $discipline = auth()->user()->profiles?->position;
+        $discipline = explode('_',$discipline)[1];
+        $statusEstimate = collect(json_decode($project->estimate_discipline_status));
+        $statusEstimate = $statusEstimate->filter(function ($item) use ($discipline){
+            $position = 'design_engineer_'.$discipline;
+            return $item->position == $position;
+        })->pluck('status')->first();
+
+        if($statusEstimate == "PUBLISH") abort(403);
         $wbs = WbsLevel3::with(['workElements','estimateDisciplines.wbss.workElements','estimateDisciplines.workitems'])->where('project_id', $project->id)->get();
         $wbs = $wbs->mapToGroups(function ($loc){
             return [$loc->title => $loc];
@@ -98,7 +110,6 @@ class EstimateAllDisciplineController extends Controller
     // save version of data
     // if version is not same than return error
     // merge the data of two user using button generate
-    //
 
     public function update(Project $project, Request $request){
         $workItemController = new WorkItemController();
@@ -131,7 +142,7 @@ class EstimateAllDisciplineController extends Controller
                 $newVersion = $record?->version + 1;
                 foreach ($workItems as $idx => $item){
                     $estimateAllDiscipline = new EstimateAllDiscipline();
-                    $estimateAllDiscipline->title = '';
+                    $estimateAllDiscipline->title = $item['workItemText'];
                     $estimateAllDiscipline->work_item_id = $item['workItem'];
                     $estimateAllDiscipline->volume = $item['vol'] > 0 ? $item['vol'] : 1;
                     $estimateAllDiscipline->project_id = isset($request->project_id) ? $request->project_id : $item['project_id'];
@@ -157,12 +168,25 @@ class EstimateAllDisciplineController extends Controller
                     ['contingency' => $request->contingency]
                 );
 
+                $statusEstimate = collect(json_decode($project->estimate_discipline_status));
+                $statusEstimate->map(function ($item) use ($request){
+                    $user = auth()->user();
+                    $position = explode('_', $user->profiles?->position)[1];
+                    $position = 'design_engineer_'.$position;
+                    //find by user the position status tu update
+                   if($item->position == $position){
+                       $item->status = $request->estimateStatus;
+                   };
+
+                   return $item;
+                });
+
                 $projectServices->setStatusDraft($project);
-                $project->estimate_discipline_status = $request->estimateStatus;
+
+                $project->estimate_discipline_status = $statusEstimate;
 
                 if($project->estimate_discipline_status == 'PUBLISH'){
                     $projectServices->sendEmailToReviewer($project);
-                    //cek apakah ada yang reject discipline, kembalikan ke pendinf
                     $projectServices->setRejectedDisciplineToWaiting($project);
                 }
                 $project->save();

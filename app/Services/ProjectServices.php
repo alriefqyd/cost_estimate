@@ -54,7 +54,7 @@ class ProjectServices
             $projectClass->disciplineTitle = $location?->wbss?->wbsDiscipline?->title;
             $projectClass->workItemIdentifier = $location?->wbss?->identifier;
             $projectClass->workElementTitle = $location?->wbss?->work_element;
-            $projectClass->workItemDescription = $location?->workItems?->description;
+            $projectClass->workItemDescription = $location?->workItems?->description ?? $location?->title;
             $projectClass->workItemId = $location?->workItems?->id;
             $projectClass->workItemUnit = $location?->workItems?->unit;
             $projectClass->workItemUnitRateLaborCost = $this->getResultCount($location?->labor_unit_rate, $location?->labour_factorial);

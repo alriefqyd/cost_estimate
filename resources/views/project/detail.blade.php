@@ -116,7 +116,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil && $project->getStatusEstimateDiscipline('design_engineer_civil') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil && $project->getStatusEstimateDiscipline('design_engineer_civil') ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
                                         Civil
                                         @if(isset($project->design_engineer_civil))
                                             {!!$project->getStatusApprovalDiscipline($project->civil_approval_status, $project->getProfileUser($project->civil_approver)?->full_name) !!}
@@ -132,7 +132,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['mechanical']}}" {!! $isAuthorizeToReviewMechanical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewMechanical ? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px" ></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['mechanical']}}" {!! $isAuthorizeToReviewMechanical && $project->getStatusEstimateDiscipline('design_engineer_mechanical') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewMechanical && $project->getStatusEstimateDiscipline('design_engineer_mechanical')? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px" ></i>
                                             Mechanical
                                         @if(isset($project->design_engineer_mechanical))
                                             {!! $project->getStatusApprovalDiscipline($project->mechanical_approval_status, $project->getProfileUser($project->mechanical_approver)?->full_name) !!}
@@ -149,7 +149,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['electrical']}}" {!! $isAuthorizeToReviewElectrical ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!}  class="{!! $isAuthorizeToReviewElectrical ? 'js-modal-approval cursor-pointer' : 'color-grey'!!} m-r-10" style="width: 17px"></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['electrical']}}" {!! $isAuthorizeToReviewElectrical && $project->getStatusEstimateDiscipline('design_engineer_electrical')? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!}  class="{!! $isAuthorizeToReviewElectrical && $project->getStatusEstimateDiscipline('design_engineer_electrical')? 'js-modal-approval cursor-pointer' : 'color-grey'!!} m-r-10" style="width: 17px"></i>
                                         Electrical
                                         @if(isset($project->design_engineer_electrical))
                                             {!!$project->getStatusApprovalDiscipline($project->electrical_approval_status,$project->getProfileUser($project->electrical_approver)?->full_name) !!}
@@ -165,7 +165,7 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewInstrument ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewInstrument ? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewInstrument && $project->getStatusEstimateDiscipline('design_engineer_instrument') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewInstrument && $project->getStatusEstimateDiscipline('design_engineer_instrument')? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
                                             Instrument
                                         @if(isset($project->design_engineer_instrument))
                                             {!!$project->getStatusApprovalDiscipline($project->instrument_approval_status, $project->getProfileUser($project->instrument_approver)?->full_name) !!}
@@ -273,7 +273,8 @@
                                     <i class="fa fa-chevron-circle-down cursor-pointer js-chev-show-content d-none"></i>
                                 </p>
                             </div>
-                            @if($project->estimate_discipline_status == "DRAFT")
+                            @if($project->isDesignEngineer())
+                                @if(!$project->getStatusEstimateDiscipline(null))
                                 <div class="col-md-6">
                                     @canAny(['create','update'], App\Models\EstimateAllDiscipline::class)
                                         <a href="/project/{{$project->id}}/estimate-discipline/create">
@@ -283,6 +284,7 @@
                                         </a>
                                     @endcan
                                 </div>
+                                @endif
                             @endif
                         </div>
                     </div>
