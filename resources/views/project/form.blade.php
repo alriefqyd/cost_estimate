@@ -186,7 +186,7 @@
             </select>
         </div>
     </div>
-    <div class="row g-3 mb-5">
+    <div class="row g-3 mb-2">
         <div class="col-md-6">
             <label class="form-label form-label-black">Design Engineer Instrument</label>
             <select class="select2 form-control js-design-engineer js-project_engineer_instrument"
@@ -215,6 +215,41 @@
                 @if(isset($project->design_engineer_instrument))
                     <option value="{{$project->design_engineer_instrument}}">
                         {{$project->getProfileUser($project->instrument_approver)?->full_name}}
+                    </option>
+                @endif
+                <option value="{{NULL}}">NR</option>
+            </select>
+        </div>
+    </div>
+    <div class="row g-3 mb-5">
+        <div class="col-md-6">
+            <label class="form-label form-label-black">Design Engineer IT</label>
+            <select class="select2 form-control js-design-engineer js-project_engineer_instrument"
+                    data-allowClear="true"
+                    data-url="/getUserEmployee"
+                    data-placeholder="Select Design Engineer IT"
+                    data-subject="design_instrument_engineer"
+                    data-minimumInputLength="3"
+                    name="design_engineer_it" >
+                @if(isset($project->design_engineer_it))
+                    <option value="{{$project->design_engineer_it}}">
+                        {{$project->designEngineerIt?->profiles?->full_name}}
+                    </option>
+                @endif
+                <option value="{{NULL}}">NR</option>
+            </select>
+        </div>
+        <div class="col-md-6 js-reviewer-engineer {{isset($project->design_engineer_it) ? '' : 'd-none'}}">
+            <label class="form-label form-label-black">Reviewer Engineer IT</label>
+            <select class="select2 form-control js-reviewer-engineer-select"
+                    data-allowClear="true"
+                    data-placeholder="Select Reviewer Engineer IT"
+                    data-subject="instrument"
+                    data-minimumInputLength="3"
+                    name="reviewer_it">
+                @if(isset($project->design_engineer_it))
+                    <option value="{{$project->design_engineer_it}}">
+                        {{$project->getProfileUser($project->it_approver)?->full_name}}
                     </option>
                 @endif
                 <option value="{{NULL}}">NR</option>

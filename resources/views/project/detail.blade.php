@@ -179,6 +179,22 @@
                                         @endif
                                     </td>
                                 </tr>
+                                <tr>
+                                    <td>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewIt && $project->getStatusEstimateDiscipline('design_engineer_instrument') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewIt && $project->getStatusEstimateDiscipline('design_engineer_instrument')? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
+                                        IT
+                                        @if(isset($project->design_engineer_it))
+                                            {!!$project->getStatusApprovalDiscipline($project->instrument_approval_status, $project->getProfileUser($project->instrument_approver)?->full_name) !!}
+                                        @endif
+                                    </td>
+                                    <td>:</td>
+                                    <td class="max_width40_td">
+                                        {{$project?->designEngineerIt?->profiles?->full_name ?? 'NR'}}
+                                        @if(isset($remark->instrument) && $project->instrument_approval_status == \App\Models\Project::REJECTED)
+                                            <p class="f-12 m-t-5" data-text="{{$remark->instrument}}"><b>Remark :</b> <span class="js-text-full-remark">{{\Illuminate\Support\Str::limit($remark->instrument ?? '', 180)}} </span>{!!\Illuminate\Support\Str::length($remark->instrument ?? '') > 180 ? '<a class="js-full-text" href="">read more</a>' : ''!!}</p>
+                                        @endif
+                                    </td>
+                                </tr>
                             </table>
                         </div>
                     </div>

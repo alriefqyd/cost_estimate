@@ -22,7 +22,7 @@ class ProjectServices
 
         $requestFilter = request(['q','status','civil','mechanical','electrical','instrument','sponsor']);
 
-        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles','projectArea','projectManager.profiles'])
+        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles','designEngineerIt.profiles','projectArea','projectManager.profiles'])
             ->when(!auth()->user()->isViewAllCostEstimateRole(), function ($subQuery){
                 return $subQuery->access();
             });

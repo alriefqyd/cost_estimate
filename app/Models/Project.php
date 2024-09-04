@@ -26,13 +26,15 @@ class Project extends Model
         'mechanical_approval_status' => 'design_engineer_mechanical',
         'civil_approval_status' => 'design_engineer_civil',
         'electrical_approval_status' => 'design_engineer_electrical',
-        'instrument_approval_status' => 'design_engineer_instrument'
+        'instrument_approval_status' => 'design_engineer_instrument',
+        'instrument_approval_status' => 'design_engineer_it'
     ];
     public const DESIGN_ENGINEER_KEY_LIST = [
         'design_engineer_civil' => 'Design Engineer Civil',
         'design_engineer_mechanical' => 'Design Engineer Mechanical',
         'design_engineer_electrical' => 'Design Engineer Electrical',
-        'design_engineer_instrument' => 'Design Engineer Instrument'
+        'design_engineer_instrument' => 'Design Engineer Instrument',
+        'design_engineer_it' => 'Design Engineer IT'
     ];
 
     protected static function boot()
@@ -76,6 +78,10 @@ class Project extends Model
 
     public function designEngineerInstrument(){
         return $this->belongsTo(User::class,'design_engineer_instrument');
+    }
+
+    public function designEngineerIt(){
+        return $this->belongsTo(User::class,'design_engineer_it');
     }
 
     public function projectManager(){
@@ -138,6 +144,7 @@ class Project extends Model
                     ->orWhere('design_engineer_mechanical', $user->id)
                     ->orWhere('design_engineer_electrical', $user->id)
                     ->orWhere('design_engineer_instrument', $user->id)
+                    ->orWhere('design_engineer_it', $user->id)
                     ->orwhere('project_manager', $user->id)
                     ->orWhere('project_engineer', $user->id)
                     ;
@@ -158,7 +165,8 @@ class Project extends Model
         if($this->design_engineer_electrical == $user ||
             $this->design_engineer_instrument == $user ||
             $this->design_engineer_mechanical == $user ||
-            $this->design_engineer_civil == $user
+            $this->design_engineer_civil == $user ||
+            $this->design_engineer_it == $user
         ){return true;}
         return false;
     }
@@ -280,7 +288,7 @@ class Project extends Model
         $data = $data->filter(function($item) use ($discipline){
            return $item["position"] == $discipline ;
         })->pluck('status');
-        
+
         if(isset($data[0]) && $data[0] == "PUBLISH") return true;
         return false;
     }
