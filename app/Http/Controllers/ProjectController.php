@@ -243,6 +243,7 @@ class ProjectController extends Controller
                     }
                 } else {
                     $statusDiscipline = collect($statusDiscipline)->reject(function ($item) use ($k) {
+                        if(!isset($item->position)) return null;
                         return $item->position === $k;
                     })->values()->toArray();
                 }
