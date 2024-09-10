@@ -288,11 +288,11 @@ class ProjectServices
 //        Log::info('send wa');
 //    }
 
-    public function sendEmailToReviewer(Project $project){
-        $electricalReviewer = $project->getProfileUser($project->electrical_approver)?->email;
-        $instrumentReviewer = $project->getProfileUser($project->instrument_approver)?->email;
-        $mechanicalReviewer = $project->getProfileUser($project->mechanical_approver)?->email;
-        $civilReviewer = $project->getProfileUser($project->civil_approver)?->email;
+    public function sendEmailToReviewer(Project $project, $discipline){
+        $electricalReviewer = $discipline == 'electrical' ? $project->getProfileUser($project->electrical_approver)?->email : null;
+        $instrumentReviewer = $discipline == 'instrument' ? $project->getProfileUser($project->instrument_approver)?->email : null;
+        $mechanicalReviewer = $discipline == 'mechanical' ? $project->getProfileUser($project->mechanical_approver)?->email : null;
+        $civilReviewer = $discipline == 'civil' ? $project->getProfileUser($project->civil_approver)?->email : null;
 
         $arr = [$electricalReviewer, $instrumentReviewer, $mechanicalReviewer, $civilReviewer];
         foreach ($arr as $k => $v){

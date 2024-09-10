@@ -169,12 +169,13 @@ class EstimateAllDisciplineController extends Controller
                 );
 
                 $statusEstimate = collect(json_decode($project->estimate_discipline_status));
-                $statusEstimate->map(function ($item) use ($request){
-                    $user = auth()->user();
-                    $position = explode('_', $user->profiles?->position)[1];
-                    $position = 'design_engineer_'.$position;
+                $user = auth()->user();
+                $position = explode('_', $user->profiles?->position)[1];
+                $positionDesign = 'design_engineer_'.$position;
+
+                $statusEstimate->map(function ($item) use ($request, $positionDesign){
                     //find by user the position status tu update
-                   if($item->position == $position){
+                   if($item->position == $positionDesign){
                        $item->status = $request->estimateStatus;
                    };
 
@@ -185,8 +186,8 @@ class EstimateAllDisciplineController extends Controller
 
                 $project->estimate_discipline_status = $statusEstimate;
 
-                if($project->estimate_discipline_status == 'PUBLISH'){
-                    $projectServices->sendEmailToReviewer($project);
+                if($request->estimateStatus == 'PUBLISH'){
+                    $projectServices->sendEmailToReviewer($project, $position);
                     $projectServices->setRejectedDisciplineToWaiting($project);
                 }
                 $project->save();
