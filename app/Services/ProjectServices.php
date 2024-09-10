@@ -289,23 +289,17 @@ class ProjectServices
 //    }
 
     public function sendEmailToReviewer(Project $project, $discipline){
-        $electricalReviewer = $discipline == 'electrical' ? $project->getProfileUser($project->electrical_approver)?->email : null;
-        $instrumentReviewer = $discipline == 'instrument' ? $project->getProfileUser($project->instrument_approver)?->email : null;
-        $mechanicalReviewer = $discipline == 'mechanical' ? $project->getProfileUser($project->mechanical_approver)?->email : null;
-        $civilReviewer = $discipline == 'civil' ? $project->getProfileUser($project->civil_approver)?->email : null;
-
-        $arr = [$electricalReviewer, $instrumentReviewer, $mechanicalReviewer, $civilReviewer];
-        foreach ($arr as $k => $v){
-            if(isset($v)) {
+        $approver = $discipline.'_approver';
+        $mail = $project->getProfileUser($project->$approver)?->email;
+            if(isset($mail)) {
                 try {
-                    Mail::to($v)->send(new SendMail($project));
-                    Log::info('Email send to : '.$v);
+                    Mail::to($mail)->send(new SendMail($project));
+                    Log::info('Email send to : '.$mail);
                 } catch (Exception $e){
                     Log::error($e->getMessage());
                 }
             } else {
-                Log::warning("No email found for {$v} reviewer in project ID: {$project->id}");
+                Log::warning("No email found for {$mail} reviewer in project ID: {$project->id}");
             }
         }
-    }
 }
