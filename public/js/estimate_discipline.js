@@ -171,6 +171,7 @@ $(function(){
                     notification('danger', data.message, 'fa fa-frown-o', 'Error');
                     if (data.sync) {
                         $('.js-btn-loading-sync').removeClass('d-none');
+                        $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
                         _this.find('.js-loading-save').addClass('d-none');
                     }
                 }
@@ -286,7 +287,6 @@ $(function(){
                     },
                 })
             }
-
             var _parent = $(this).closest('tr');
             var _work_item_text = _parent.find('.js-select-work-items option:selected').text();
             var _vol = _parent.find('.js-input-vol').val();
@@ -674,35 +674,40 @@ $(function(){
     }
 
     $('.js-btn-loading-sync').on('click', function(){
-        var _this = $(this)
-        var _loading = _this.find('.js-loading-sync')
-        var _form = $('.js-form-estimate-discipline');
-        var _project_id = _form.data('id');
-        var _version = $('.js-version-project-estimate').val();
-        var _currentWorkItem = getWorkItemList(true);
-
         $('#modal-loading').modal('show');
-        $.ajax({
-            url: '/getEstimateToSync',
-            data:
-                {
-                    project_id:_project_id,
-                    current_version:_version,
-                    estimate_sync:_currentWorkItem
+        setTimeout(function (){
+            var _this = $(this)
+            var _loading = _this.find('.js-loading-sync')
+            var _form = $('.js-form-estimate-discipline');
+            var _project_id = _form.data('id');
+            var _version = $('.js-version-project-estimate').val();
+            var _currentWorkItem = getWorkItemList(true);
+
+            $.ajax({
+                url: '/getEstimateToSync',
+                type:'GET',
+                data:
+                    {
+                        project_id:_project_id,
+                        current_version:_version,
+                        estimate_sync:_currentWorkItem
+                    },
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
                 },
-            success:function(result){
-                if(result.status == 200){
-                    var _data_sync = result.data;
+                success:function(result){
+                    if(result.status == 200){
+                        var _data_sync = result.data;
 
-                    var _existingEstimate = _data_sync['existingEstimate'];
-                    var _conflictEstimate = _data_sync['itemToMerge'];
+                        var _existingEstimate = _data_sync['existingEstimate'];
+                        var _conflictEstimate = _data_sync['itemToMerge'];
 
-                    var groupedByWbsLevel3 = {};
-                    var _version_db = _data_sync['version'];
-                    var _version_form = $('.js-version-project-estimate').val()
-                    var _template = $('#js-template-table-work_item_column').html();
+                        var groupedByWbsLevel3 = {};
+                        var _version_db = _data_sync['version'];
+                        var _version_form = $('.js-version-project-estimate').val()
+                        var _template = $('#js-template-table-work_item_column').html();
 
-                    // if(_version_db != _version_form){
+                        // if(_version_db != _version_form){
                         var _array_join = [..._existingEstimate, ..._conflictEstimate];
                         $.each(_array_join, function(index, estimateItem) {
                             var wbsLevel3 = estimateItem.wbsLevel3Id;
@@ -719,9 +724,9 @@ $(function(){
 
                         $.each(groupedByWbsLevel3, function (index, item){
                             $.each(item,function (idx,itm){
-                                var _labor_factorial = parseInt(itm.laborFactorial ?? 1)
-                                var _equipment_factorial = parseInt(itm.equipmentFactorial ?? 1)
-                                var _material_factorial = parseInt(itm.materialFactorial ?? 1)
+                                var _labor_factorial = parseFloat(itm.laborFactorial ?? 1)
+                                var _equipment_factorial = parseFloat(itm.equipmentFactorial ?? 1)
+                                var _material_factorial = parseFloat(itm.materialFactorial ?? 1)
 
                                 var _man_power_cost_rate = itm.workItemManPowerCost
                                 var _equipment_cost_rate = itm.workItemEquipmentCost
@@ -772,17 +777,19 @@ $(function(){
                         })
                         $('.js-version-project-estimate').val(_version_db);
 
-                    // }
+                        // }
 
-                    setContingencyTotal();
-                    $('#modal-loading').modal('hide');
-                    $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
+                        setContingencyTotal();
+                        $('#modal-loading').modal('hide');
+                        $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
 
-                } else {
-                    $('#modal-loading').modal('hide');
-                    console.log(result.message)
+                    } else {
+                        $('#modal-loading').modal('hide');
+                        console.log(result.message)
+                    }
                 }
-            }
-        })
+            })
+        },10)
+
     })
 });
