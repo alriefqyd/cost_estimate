@@ -85,28 +85,28 @@
                                     <td>:</td>
                                     <td>
                                         <div class="mb-2 js-detail-status">{{$project->status}}</div>
-                                        @if($project->getProjectStatusApproval() == $projectModel::WAITING_FOR_APPROVAL
-                                                && auth()->user()->isCostEstimateReviewer() && $project->status != $projectModel::APPROVE)
-                                            <div>
-                                                <button class="btn btn-outline-success js-btn-approve-modal" data-bs-toggle="modal" data-original-title="test" data-bs-target="#approveModal"><i class="fa fa-check"></i> Approve Cost Estimate</button>
+{{--                                        @if($project->getProjectStatusApproval() == $projectModel::WAITING_FOR_APPROVAL--}}
+{{--                                                && auth()->user()->isCostEstimateReviewer() && $project->status != $projectModel::APPROVE)--}}
+{{--                                            <div>--}}
+{{--                                                <button class="btn btn-outline-success js-btn-approve-modal" data-bs-toggle="modal" data-original-title="test" data-bs-target="#approveModal"><i class="fa fa-check"></i> Approve Cost Estimate</button>--}}
 
-                                                <div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">
-                                                    <div class="modal-dialog" role="document">
-                                                        <div class="modal-content">
-                                                            <div class="modal-header">
-                                                                <h5 class="modal-title" id="exampleModalLabel">Approve Cost Estimate</h5>
-                                                                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                            </div>
-                                                            <div class="modal-body">Are you sure you want to approve this cost estimate?</div>
-                                                            <div class="modal-footer">
-                                                                <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
-                                                                <button class="btn btn-success js-btn-approve-cost-estimate" type="button">Approve</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endif
+{{--                                                <div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">--}}
+{{--                                                    <div class="modal-dialog" role="document">--}}
+{{--                                                        <div class="modal-content">--}}
+{{--                                                            <div class="modal-header">--}}
+{{--                                                                <h5 class="modal-title" id="exampleModalLabel">Approve Cost Estimate</h5>--}}
+{{--                                                                <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>--}}
+{{--                                                            </div>--}}
+{{--                                                            <div class="modal-body">Are you sure you want to approve this cost estimate?</div>--}}
+{{--                                                            <div class="modal-footer">--}}
+{{--                                                                <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>--}}
+{{--                                                                <button class="btn btn-success js-btn-approve-cost-estimate" type="button">Approve</button>--}}
+{{--                                                            </div>--}}
+{{--                                                        </div>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                            </div>--}}
+{{--                                        @endif--}}
                                     </td>
                                 </tr>
                                 <tr>

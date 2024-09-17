@@ -237,7 +237,8 @@ class Project extends Model
 
     public function getProjectStatusApproval(){
         if(sizeof($this->getProjectDisciplineStatusApproval()) < 1) {
-            return self::WAITING_FOR_APPROVAL;
+//            return self::WAITING_FOR_APPROVAL;
+            return self::APPROVE;
         }
         return self::PENDING_DISCIPLINE_APPROVAL;
     }
