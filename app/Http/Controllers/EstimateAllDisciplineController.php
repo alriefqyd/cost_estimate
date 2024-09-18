@@ -185,6 +185,7 @@ class EstimateAllDisciplineController extends Controller
                 $projectServices->setStatusDraft($project);
 
                 $project->estimate_discipline_status = $statusEstimate;
+                if($request->estimateStatus == "PUBLISH") $project->status = Project::PENDING_DISCIPLINE_APPROVAL;
 
                 if($request->estimateStatus == 'PUBLISH'){
                     $projectServices->sendEmailToReviewer($project, $position);

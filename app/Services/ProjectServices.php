@@ -6,6 +6,7 @@ use App\Class\ProjectClass;
 use App\Class\ProjectTotalCostClass;
 use App\Mail\SendMail;
 use App\Models\EstimateAllDiscipline;
+use App\Models\Profile;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -292,15 +293,40 @@ class ProjectServices
     public function sendEmailToReviewer(Project $project, $discipline){
         $approver = $discipline.'_approver';
         $mail = $project->getProfileUser($project->$approver)?->email;
-            if(isset($mail)) {
-                try {
-                    Mail::to($mail)->send(new SendMail($project));
-                    Log::info('Email send to : '.$mail);
-                } catch (Exception $e){
-                    Log::error($e->getMessage());
+        if(isset($mail)) {
+            try {
+                Mail::to($mail)->send(new SendMail($project));
+                Log::info('Email send to : '.$mail);
+            } catch (Exception $e){
+                Log::error($e->getMessage());
+            }
+        } else {
+            Log::warning("No email found for {$mail} reviewer in project ID: {$project->id}");
+        }
+    }
+
+    public function sendEmailRemainderToReviewer() {
+        $projects = Project::where('status', Project::PENDING_DISCIPLINE_APPROVAL)->get();
+
+        foreach ($projects as $project) {
+            $approvers = [
+                'civil' => $project->civil_approval_status,
+                'mechanical' => $project->mechanical_approval_status,
+                'electrical' => $project->electrical_approval_status,
+                'instrument' => $project->instrument_approval_status
+            ];
+
+            foreach ($approvers as $discipline => $approvalStatus) {
+                if ($approvalStatus == 'PENDING') {
+                    $profile = Profile::where('user_id', $project->{$discipline . '_approver'})->first();
+                    $mail = $profile ? $profile->email : null;
+                    if ($mail) {
+                        Mail::to($mail)->send(new SendMail($project));
+                        Log::info("Email reminder approval for project $project->project_title sent to: $mail for $discipline.");
+                    }
                 }
-            } else {
-                Log::warning("No email found for {$mail} reviewer in project ID: {$project->id}");
             }
         }
+    }
 }
+

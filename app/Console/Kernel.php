@@ -3,8 +3,10 @@
 namespace App\Console;
 
 use App\Http\Controllers\EstimateAllDisciplineController;
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\WorkBreakdownStructureController;
+use App\Services\ProjectServices;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -34,6 +36,11 @@ class Kernel extends ConsoleKernel
             $estimateController = new EstimateAllDisciplineController();
             $estimateController->deleteEstimateDisciplineMoreOneMonth();
         })->cron('00 03 * * *');
+
+        $schedule->call(function() {
+            $projectController = new ProjectServices();
+            $projectController->sendEmailRemainderToReviewer();
+        })->cron('20 07 * * *');
     }
 
     /**
