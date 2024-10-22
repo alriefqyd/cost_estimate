@@ -152,6 +152,7 @@ $(function(){
             var __item = __this.find('.js-select-item').val();
             var __unit = __this.find('.js-item-unit').val();
             var __coef = __this.find('.js-item-coef').val();
+            __coef = __coef.replaceAll(',','.');
             var __rate = __this.find('.js-item-rate').text();
             var __amount = __this.find('.js-item-amount').text();
 

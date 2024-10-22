@@ -26,13 +26,15 @@ class Project extends Model
         'mechanical_approval_status' => 'design_engineer_mechanical',
         'civil_approval_status' => 'design_engineer_civil',
         'electrical_approval_status' => 'design_engineer_electrical',
-        'instrument_approval_status' => 'design_engineer_instrument'
+        'instrument_approval_status' => 'design_engineer_instrument',
+        'instrument_approval_status' => 'design_engineer_it'
     ];
     public const DESIGN_ENGINEER_KEY_LIST = [
         'design_engineer_civil' => 'Design Engineer Civil',
         'design_engineer_mechanical' => 'Design Engineer Mechanical',
         'design_engineer_electrical' => 'Design Engineer Electrical',
-        'design_engineer_instrument' => 'Design Engineer Instrument'
+        'design_engineer_instrument' => 'Design Engineer Instrument',
+        'design_engineer_it' => 'Design Engineer IT'
     ];
 
     protected static function boot()
@@ -76,6 +78,10 @@ class Project extends Model
 
     public function designEngineerInstrument(){
         return $this->belongsTo(User::class,'design_engineer_instrument');
+    }
+
+    public function designEngineerIt(){
+        return $this->belongsTo(User::class,'design_engineer_it');
     }
 
     public function projectManager(){
@@ -138,6 +144,7 @@ class Project extends Model
                     ->orWhere('design_engineer_mechanical', $user->id)
                     ->orWhere('design_engineer_electrical', $user->id)
                     ->orWhere('design_engineer_instrument', $user->id)
+                    ->orWhere('design_engineer_it', $user->id)
                     ->orwhere('project_manager', $user->id)
                     ->orWhere('project_engineer', $user->id)
                     ;
@@ -153,8 +160,15 @@ class Project extends Model
         });
     }
 
-    public function scopeReviewerAccess($query){
-        return $query;
+    public function isDesignEngineer(){
+        $user = auth()->user()->id;
+        if($this->design_engineer_electrical == $user ||
+            $this->design_engineer_instrument == $user ||
+            $this->design_engineer_mechanical == $user ||
+            $this->design_engineer_civil == $user ||
+            $this->design_engineer_it == $user
+        ){return true;}
+        return false;
     }
 
     public function getTotalCost(){
@@ -223,7 +237,8 @@ class Project extends Model
 
     public function getProjectStatusApproval(){
         if(sizeof($this->getProjectDisciplineStatusApproval()) < 1) {
-            return self::WAITING_FOR_APPROVAL;
+//            return self::WAITING_FOR_APPROVAL;
+            return self::APPROVE;
         }
         return self::PENDING_DISCIPLINE_APPROVAL;
     }
@@ -247,14 +262,36 @@ class Project extends Model
         return $str;
     }
 
-    public function getStatusApprovalDiscipline($status){
+    public function getStatusApprovalDiscipline($status, $reviewer){
         if($status == $this::REJECTED){
-            return '<span class="checkmark-icon" style="position: relative; top: -8px; right: 0; font-size: 0.9em; color: red;">&#10008; Rejected</span>';
+            return '<span class="checkmark-icon" style="position: relative; top: -8px; right: 0; font-size: 0.9em; color: red;">&#10008; Rejected </span>';
         } else if ($status == $this::APPROVE){
             return '<span class="checkmark-icon" style="position: relative; top: -8px; right: 0; font-size: 0.9em; color: green;">&#10004; Approve</span>';
         } else {
             return '<span style="position: relative; top: -3px";><i class="m-l-5" data-feather="clock" style="width: 13px; color: #eebe0b"> </i> <span style="font-size: 11px; color: #f3c107; position: relative; top: -8px"> Waiting For Approval </span></span> ';
         }
+    }
+
+    public function getProfileUser($user){
+        $user = User::where('id', $user)->first();
+        return $user->profiles ?? null;
+    }
+
+    public function getStatusEstimateDiscipline($discipline){
+        if($discipline == null){
+            $position = explode('_',auth()->user()->profiles?->position);
+            $position = $position[1] ?? null;
+            $discipline = 'design_engineer_' . $position;
+        }
+
+        $json = json_decode($this->estimate_discipline_status, true);
+        $data = collect($json);
+        $data = $data->filter(function($item) use ($discipline){
+           return $item["position"] == $discipline ;
+        })->pluck('status');
+
+        if(isset($data[0]) && $data[0] == "PUBLISH") return true;
+        return false;
     }
 
 }

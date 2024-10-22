@@ -52,6 +52,7 @@ class ProjectPolicy
             'civil' => 'design_engineer_civil',
             'electrical' => 'design_engineer_electrical',
             'instrument' => 'design_engineer_instrument',
+            'it' => 'design_engineer_it',
             'project_manager' => 'project_manager',
             'project_engineer' => 'project_engineer'
         ];

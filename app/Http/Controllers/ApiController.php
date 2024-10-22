@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Cassandra\Date;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use function PHPUnit\TestFixture\func;
 
 class ApiController extends Controller
 {
@@ -44,6 +47,26 @@ class ApiController extends Controller
         });
 
         return $collection;
+    }
+
+    public function getReviewer(Request $request){
+        $reviewer = DB::table('user_role as ur')->select('ur.user_id','p.full_name','r.name')->join('roles as r','ur.role_id','r.id')
+            ->join('profiles as p','ur.user_id','p.user_id')->where('feature','cost_estimate')
+            ->where(function($q) use ($request){
+                return $q->where('r.name','like','%review '.$request->discipline.'%')->orwhere('r.action','review_all_discipline_cost_estimate')
+                    ->orwhere(function($qq) use ($request){
+                        return $qq->where('r.action','review_cost_estimate')->where('p.position','design_'.$request->discipline.'_engineer');
+                    });
+            })->groupBy('p.full_name')->get();
+
+        $reviewer = $reviewer->map(function ($item){
+           return [
+               'id' => $item->user_id,
+               'text' => $item->full_name
+           ];
+        });
+
+        return $reviewer;
     }
 
 }

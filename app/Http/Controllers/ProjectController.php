@@ -85,6 +85,7 @@ class ProjectController extends Controller
             'design_engineer_mechanical' => new DesignEngineerRule('design_engineer_mechanical'),
             'design_engineer_electrical' => new DesignEngineerRule('design_engineer_electrical'),
             'design_engineer_instrument' => new DesignEngineerRule('design_engineer_instrument'),
+            'design_engineer_it' => new DesignEngineerRule('design_engineer_it'),
         ]);
 
         try {
@@ -102,14 +103,42 @@ class ProjectController extends Controller
                 'design_engineer_civil' => $request->design_engineer_civil,
                 'design_engineer_electrical' => $request->design_engineer_electrical,
                 'design_engineer_instrument' => $request->design_engineer_instrument,
+                'design_engineer_it' => $request->design_engineer_it,
                 'mechanical_approval_status' => isset($request->design_engineer_mechanical) ? Project::PENDING : '',
                 'civil_approval_status' => isset($request->design_engineer_civil) ? Project::PENDING : '',
                 'electrical_approval_status' => isset($request->design_engineer_electrical) ? Project::PENDING : '',
                 'instrument_approval_status' => isset($request->design_engineer_instrument) ? Project::PENDING : '',
+                'mechanical_approver' => $request-> reviewer_mechanical,
+                'civil_approver' => $request-> reviewer_civil,
+                'electrical_approver' => $request-> reviewer_electrical,
+                'instrument_approver' => $request->reviewer_instrument,
+                'it_approver' => $request->reviewer_it,
                 'status' => Project::DRAFT,
                 'created_by' => $user->id,
                 'updated_by' => $user->id,
             ]);
+
+            $statusDiscipline = [];
+            foreach (Project::DESIGN_ENGINEER_KEY_LIST as $k => $v) {
+                if(isset($request->$k)){
+                    $data = [
+                        'position' => $k,
+                        'status' => "DRAFT"
+                    ];
+                    array_push($statusDiscipline, $data);
+                }
+            }
+
+            if(isset($request->design_engineer_it) && !isset($request->design_engineer_instrument)) {
+                $data = [
+                    'position' => 'design_engineer_instrument',
+                    'status' => "DRAFT"
+                ];
+                array_push($statusDiscipline, $data);
+            }
+
+            $project->estimate_discipline_status = json_encode($statusDiscipline);
+
             $project->save();
             DB::commit();
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
@@ -173,6 +202,7 @@ class ProjectController extends Controller
             'design_engineer_mechanical' => new DesignEngineerRule('design_engineer_mechanical'),
             'design_engineer_electrical' => new DesignEngineerRule('design_engineer_electrical'),
             'design_engineer_instrument' => new DesignEngineerRule('design_engineer_instrument'),
+            'design_engineer_it' => new DesignEngineerRule('design_engineer_it'),
         ]);
 
         DB::beginTransaction();
@@ -187,11 +217,41 @@ class ProjectController extends Controller
            $project->design_engineer_civil = $request->design_engineer_civil;
            $project->design_engineer_electrical = $request->design_engineer_electrical;
            $project->design_engineer_instrument = $request->design_engineer_instrument;
+           $project->design_engineer_it = $request->design_engineer_it;
            if(isset($request->status)) $project->status = $request->status;
            $project->project_area_id = $request->project_area;
+           $project->mechanical_approver = $request-> reviewer_mechanical;
+           $project->civil_approver = $request-> reviewer_civil;
+           $project->electrical_approver = $request-> reviewer_electrical;
+           $project->instrument_approver = $request-> reviewer_instrument;
+           $project->it_approver = $request-> reviewer_it;
            $project->updated_by = auth()->user()->id;
            $projectService->setStatusDraft($project);
-           $project->save();
+
+            $statusDiscipline = json_decode($project->estimate_discipline_status);
+            $existingStatus = collect($statusDiscipline);
+
+            foreach (Project::DESIGN_ENGINEER_KEY_LIST as $k => $v) {
+                $isAlreadyExistDiscipline = $existingStatus->contains('position',$k);
+                if(isset($request->$k) ){
+                    if(!$isAlreadyExistDiscipline) {
+                        $data = [
+                            'position' => $k,
+                            'status' => "DRAFT"
+                        ];
+                        array_push($statusDiscipline, $data);
+                    }
+                } else {
+                    $statusDiscipline = collect($statusDiscipline)->reject(function ($item) use ($k) {
+                        if(!isset($item->position)) return null;
+                        return $item->position === $k;
+                    })->values()->toArray();
+                }
+            }
+
+            $project->estimate_discipline_status = $statusDiscipline;
+            $project->save();
+
            DB::commit();
 
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
@@ -257,10 +317,11 @@ class ProjectController extends Controller
         $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
         $project = $project->load(['projectArea','projectEngineer', 'projectManager']);
-        $isReviewerCivil = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['civil'],$project->design_engineer_civil,sizeof($estimateDisciplines));
-        $isReviewerMechanical = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['mechanical'],$project->design_engineer_mechanical,sizeof($estimateDisciplines));
-        $isReviewerElectrical = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['electrical'],$project->design_engineer_electrical,sizeof($estimateDisciplines));
-        $isReviewerInstrument = $projectService->checkReviewer(Setting::DESIGN_ENGINEER_LIST_KEY['instrument'],$project->design_engineer_instrument,sizeof($estimateDisciplines));
+        $isReviewerCivil = $projectService->checkReviewer('civil',$project->civil_approver,$project->design_engineer_civil,sizeof($estimateDisciplines));
+        $isReviewerMechanical = $projectService->checkReviewer('mechanical',$project->mechanical_approver,$project->design_engineer_mechanical,sizeof($estimateDisciplines));
+        $isReviewerElectrical = $projectService->checkReviewer('electrical',$project->electrical_approver,$project->design_engineer_electrical,sizeof($estimateDisciplines));
+        $isReviewerInstrument = $projectService->checkReviewer('instrument',$project->instrument_approver,$project->design_engineer_instrument,sizeof($estimateDisciplines));
+        $isReviewerIt = $projectService->checkReviewer('instrument',$project->it_approver,$project->design_engineer_it,sizeof($estimateDisciplines));
         $remark = $projectService->getRemarkDiscipline($project);
 
         return view('project.detail',[
@@ -273,6 +334,7 @@ class ProjectController extends Controller
             'isAuthorizeToReviewMechanical' => $isReviewerMechanical,
             'isAuthorizeToReviewElectrical' => $isReviewerElectrical,
             'isAuthorizeToReviewInstrument' => $isReviewerInstrument,
+            'isAuthorizeToReviewIt' => $isReviewerIt,
             'project_date' => Carbon::parse($project->created_at)->format('d-M-Y'),
         ]);
     }
@@ -402,26 +464,46 @@ class ProjectController extends Controller
         try {
             DB::beginTransaction();
 
-            if ($request->discipline) {
+            if (isset($request->discipline)) {
+                $discipline = strtolower($request->discipline);
+                $column = $discipline.'_approval_status';
+                $oldStatusDiscipline = $project->$column;
+
                 switch ($request->discipline) {
                     case Setting::DESIGN_ENGINEER_LIST['civil']:
                         $project->civil_approval_status = $request->status;
-                        $remark['civil'] = $request->remark;; // Replace 'YourValueForCivil' with the actual value
+                        $remark['civil'] = $request->remark;
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['mechanical']:
                         $project->mechanical_approval_status = $request->status;
-                        $remark['mechanical'] = $request->remark; // Replace 'YourValueForMechanical' with the actual value
+                        $remark['mechanical'] = $request->remark;
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['electrical']:
                         $project->electrical_approval_status = $request->status;
-                        $remark['electrical'] = $request->remark;; // Replace 'YourValueForElectrical' with the actual value
+                        $remark['electrical'] = $request->remark;
                         break;
                     case Setting::DESIGN_ENGINEER_LIST['instrument']:
                         $project->instrument_approval_status = $request->status;
-                        $remark['instrument'] = $request->remark;; // Replace 'YourValueForInstrument' with the actual value
+                        $remark['instrument'] = $request->remark;
                         break;
                 }
                 $projectServices->updateStatusProject($project);
+
+                $newStatusDiscipline = $request->status;
+                $statusEstimate = collect(json_decode($project->estimate_discipline_status));
+                if($oldStatusDiscipline == "APPROVE" || $newStatusDiscipline == "REJECTED" || $newStatusDiscipline == "PENDING"){
+                    $statusEstimate = $statusEstimate->map(function ($item) use ($discipline){
+                        $position = 'design_engineer_'.$discipline;
+                        //find by user the position status tu update
+                        if($item->position == $position){
+                            $item->status = "DRAFT";
+                        };
+
+                        return $item;
+                    });
+                }
+
+                $project->estimate_discipline_status = $statusEstimate;
                 $project->remark = json_encode($remark);
             } else {
                 $project->status = Project::APPROVE;
@@ -463,6 +545,10 @@ class ProjectController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function sendMailPreview(){
+        return view('emails.approverNotification');
     }
 
 }
