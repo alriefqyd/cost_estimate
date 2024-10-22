@@ -147,7 +147,7 @@
                                         <tr>
                                             <td>{{$manPower->title}}</td>
                                             <td>{{$manPower->pivot?->labor_unit}}</td>
-                                            <td>{{$manPower->pivot?->labor_coefisient}}</td>
+                                            <td>{{number_format($manPower->pivot?->labor_coefisient,2,',','.')}}</td>
                                             <td>{{number_format($manPower->overall_rate_hourly,2,',','.')}}</td>
                                             <td>{{number_format($manPower->getAmount(),2,',','.')}}</td>
                                         </tr>
