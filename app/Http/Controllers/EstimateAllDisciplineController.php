@@ -32,6 +32,18 @@ class EstimateAllDisciplineController extends Controller
     }
 
     public function create(Project $project, Request $request){
+        if(!$project->isDesignEngineer())  {
+            abort(403);
+        }
+        $discipline = auth()->user()->profiles?->position;
+        $discipline = explode('_',$discipline)[1];
+        $statusEstimate = collect(json_decode($project->estimate_discipline_status));
+        $statusEstimate = $statusEstimate->filter(function ($item) use ($discipline){
+            $position = 'design_engineer_'.$discipline;
+            return $item->position == $position;
+        })->pluck('status')->first();
+
+        if($statusEstimate == "PUBLISH") abort(403);
         $wbs = WbsLevel3::with(['workElements','estimateDisciplines.wbss.workElements','estimateDisciplines.workitems'])->where('project_id', $project->id)->get();
         $wbs = $wbs->mapToGroups(function ($loc){
             return [$loc->title => $loc];
@@ -98,7 +110,6 @@ class EstimateAllDisciplineController extends Controller
     // save version of data
     // if version is not same than return error
     // merge the data of two user using button generate
-    //
 
     public function update(Project $project, Request $request){
         $workItemController = new WorkItemController();
@@ -131,13 +142,13 @@ class EstimateAllDisciplineController extends Controller
                 $newVersion = $record?->version + 1;
                 foreach ($workItems as $idx => $item){
                     $estimateAllDiscipline = new EstimateAllDiscipline();
-                    $estimateAllDiscipline->title = '';
+                    $estimateAllDiscipline->title = $item['workItemText'];
                     $estimateAllDiscipline->work_item_id = $item['workItem'];
                     $estimateAllDiscipline->volume = $item['vol'] > 0 ? $item['vol'] : 1;
                     $estimateAllDiscipline->project_id = isset($request->project_id) ? $request->project_id : $item['project_id'];
-                    $estimateAllDiscipline->labour_factorial = $item['labourFactorial'] > 0 ? $item['labourFactorial'] : NULL;
-                    $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'] > 0 ? $item['equipmentFactorial'] : NULL;
-                    $estimateAllDiscipline->material_factorial = $item['materialFactorial'] > 0 ? $item['materialFactorial'] : NULL;
+                    $estimateAllDiscipline->labour_factorial = $item['labourFactorial'] > 0 ? (float) $item['labourFactorial'] : NULL;
+                    $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'] > 0 ? (float) $item['equipmentFactorial'] : NULL;
+                    $estimateAllDiscipline->material_factorial = $item['materialFactorial'] > 0 ? (float) $item['materialFactorial'] : NULL;
                     $estimateAllDiscipline->labor_unit_rate =  $workItemController->strToFloat($item['labourUnitRate']);
                     $estimateAllDiscipline->labor_cost_total_rate = $workItemController->strToFloat($item['totalRateManPowers']) * $item['vol'];
                     $estimateAllDiscipline->tool_unit_rate =  $workItemController->strToFloat($item['equipmentUnitRate']);
@@ -157,8 +168,31 @@ class EstimateAllDisciplineController extends Controller
                     ['contingency' => $request->contingency]
                 );
 
+                $statusEstimate = collect(json_decode($project->estimate_discipline_status));
+                $user = auth()->user();
+                $position = explode('_', $user->profiles?->position)[1];
+                $positionDesign = 'design_engineer_'.$position;
+
+                $statusEstimate->map(function ($item) use ($request, $positionDesign){
+                    //find by user the position status tu update
+                   if($item->position == $positionDesign){
+                       $item->status = $request->estimateStatus;
+                   };
+
+                   return $item;
+                });
+
                 $projectServices->setStatusDraft($project);
+
+                $project->estimate_discipline_status = $statusEstimate;
+                if($request->estimateStatus == "PUBLISH") $project->status = Project::PENDING_DISCIPLINE_APPROVAL;
+
+                if($request->estimateStatus == 'PUBLISH'){
+                    $projectServices->sendEmailToReviewer($project, $position);
+                    $projectServices->setRejectedDisciplineToWaiting($project);
+                }
                 $project->save();
+                DB::commit();
 
                 $response = [
                     'status' => 200,
@@ -166,7 +200,6 @@ class EstimateAllDisciplineController extends Controller
                     'version' => $newVersion
                 ];
 
-                DB::commit();
                 return response()->json($response);
             } else {
                 $response = [
@@ -242,9 +275,9 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->workItemManPowerCostRate = $cv['labourUnitRate'];
                 $estimateToSync->workItemEquipmentCostRate = $cv['equipmentUnitRate'] ?? null;
                 $estimateToSync->workItemMaterialCostRate = $cv['materialUnitRate'] ?? null;
-                $estimateToSync->laborFactorial = $cv['labourFactorial'];
-                $estimateToSync->equipmentFactorial = $cv['equipmentFactorial'];
-                $estimateToSync->materialFactorial = $cv['materialFactorial'];
+                $estimateToSync->laborFactorial = (float) $cv['labourFactorial'] > 0 ? (float) $cv['labourFactorial'] : 1;
+                $estimateToSync->equipmentFactorial =  (float) $cv['equipmentFactorial'] > 0 ? (float) $cv['equipmentFactorial'] : 1;
+                $estimateToSync->materialFactorial = (float) $cv['materialFactorial'] > 0 ? (float) $cv['materialFactorial'] : 1;
                 $estimateToSync->wbsLevel3Id = $cv['wbs_level3'];
                 $estimateToSync->uniqueIdentifier = $cv['idx'];
                 $estimateToSync->version = $version;
@@ -267,12 +300,16 @@ class EstimateAllDisciplineController extends Controller
                 $equipmentTools = $item->workItems?->equipmentTools;
                 $totalEquipmentTools = $equipmentTools->reduce(function ($accumulator, $value){
                     $total = $value->local_rate * $value->pivot?->quantity;
-                    return $accumulator + $total;
+                     return $accumulator + $total;
                 },0);
 
                 $manPowers = $item->workItems?->manPowers;
                 $totalManPowers = $manPowers->reduce(function ($accumulator, $value){
-                   $total = $value->overall_rate_hourly * $value->pivot?->labor_coefisient;
+                    $coef = 1;
+                    if(isset($value->pivot?->labor_coefisient) && $value->pivot?->labor_coefisient != ""){
+                        $coef = (float) $value->pivot?->labor_coefisient;
+                    }
+                   $total = $value->overall_rate_hourly * $coef;
                    return $accumulator + $total;
                 },0);
 
@@ -287,9 +324,9 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->workItemManPowerCostRate = $totalManPowers;
                 $estimateToSync->workItemEquipmentCostRate = $totalEquipmentTools;
                 $estimateToSync->workItemMaterialCostRate = $totalMaterial;
-                $estimateToSync->laborFactorial = $item->labour_factorial;
-                $estimateToSync->equipmentFactorial = $item->equipment_factorial;
-                $estimateToSync->materialFactorial = $item->material_factorial;
+                $estimateToSync->laborFactorial = (float) $item->labour_factorial > 0 ? (float) $item->labour_factorial : 1;
+                $estimateToSync->equipmentFactorial = (float) $item->equipment_factorial > 0 ? (float) $item->equipment_factorial : 1;
+                $estimateToSync->materialFactorial = (float) $item->material_factorial > 0 ? (float) $item->material_factorial : 1;
                 $estimateToSync->wbsLevel3Id = $item->wbs_level3_id;
                 $estimateToSync->version = $item->version;
                 $estimateToSync->uniqueIdentifier = $item->unique_identifier;
@@ -335,7 +372,7 @@ class EstimateAllDisciplineController extends Controller
      * This function is redundant with getTotalCostWorkItem
      */
     public function countTotalCostWorkItem($location){
-        $labor_factorial = $location?->labourFactorial ?? 1;
+        $labor_factorial = $location?->laborFactorial ?? 1;
         $tool_factorial = $location?->equipmentFactorial ?? 1;
         $material_factorial = $location?->materialFactorial ?? 1;
         $man_power_cost = (float) $location?->workItemManPowerCost * $labor_factorial;

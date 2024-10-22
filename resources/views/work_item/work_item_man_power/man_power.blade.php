@@ -21,7 +21,7 @@
     <td class="js-work-item-man-power-coef min-w-50">
         <input type="text" name="coef[]" step="0.01"
                {{!$isEdit ? 'disabled' : ''}}
-               value="{{$isEdit ? $exManPower->pivot->labor_coefisient : ''}}"
+               value="{{$isEdit ? number_format($exManPower->pivot?->labor_coefisient,2,',','.') : ''}}"
                class="form-control js-coef-work-item-man-power
                js-confirm-form
                js-item-coef

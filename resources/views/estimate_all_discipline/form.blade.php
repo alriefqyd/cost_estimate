@@ -149,19 +149,45 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-12">
-            <div class="float-end">
-                <a href="/project/{{$project->id}}"><button class="btn btn-danger js-btn-cancel-estimate-form cancel mb-4" >Back</button></a>
-                <button class="btn btn-primary js-save-estimate-discipline mb-4">Save As Draft
-                <div class="loader-box float-end d-none js-loading-save" style="height: 1px; width: 50px; margin-top: 7%">
-                    <div class="loader-15"></div>
+        @if($project->isDesignEngineer())
+            <div class="col-md-12">
+                <div class="float-end">
+                    <a href="/project/{{$project->id}}"><button class="btn btn-danger js-btn-cancel-estimate-form cancel mb-4" >Back</button></a>
+                    <button class="btn btn-secondary js-save-estimate-discipline mb-4" data-status="DRAFT">Save As Draft
+                    <div class="loader-box float-end d-none js-loading-save" style="height: 1px; width: 50px; margin-top: 7%">
+                        <div class="loader-15"></div>
+                    </div>
+                    </button>
+                    <button class="btn btn-primary js-save-estimate-discipline mb-4" data-status="MODAL">Publish
+                    <div class="loader-box float-end d-none js-loading-save" style="height: 1px; width: 50px; margin-top: 7%">
+                        <div class="loader-15"></div>
+                    </div>
+                    </button>
                 </div>
-                </button>
             </div>
-        </div>
+        @endif
     </span>
 </div>
 
+    @if($project->isDesignEngineer())
+        <div class="modal fade js-modal-confirm-publish" id="publishEstimateDiscipline" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Publish Estimate Discipline</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to publish estimate discipline, once you publish you cannot update it anymore?
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-success js-save-estimate-discipline" data-status="PUBLISH" type="button">Publish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+   @endif
 
 @include('layouts.loading')
 
