@@ -99,6 +99,7 @@
 <script src="{{'/assets/js/calendar/moment.min.js'}}"></script>
 
 <script src="{{'/js/config.js'}}"></script>
+<script src="{{'/assets/js/editor/ckeditor/ckeditor.js'}}"></script>
 <script src="{{'/assets/select2/dist/js/select2.min.js'}}"></script>
 <script src="{{'/js/notification.js'}}"></script>
 <script src="{{'/js/bind_before_unload_event.js'}}"></script>
