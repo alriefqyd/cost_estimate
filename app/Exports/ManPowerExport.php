@@ -39,7 +39,7 @@ class ManPowerExport implements FromView, WithColumnFormatting,
         $columns = range('E', 'R');
 
         foreach ($columns as $column) {
-            $columnFormats[$column] = NumberFormat::FORMAT_CURRENCY_IDR;
+            $columnFormats[$column] = NumberFormat::FORMAT_CURRENCY_USD;
         }
 
         return $columnFormats;
