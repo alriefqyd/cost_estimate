@@ -506,7 +506,7 @@ class WorkItemController extends Controller
                         "id" => $subItems->id,
                         "code" => $subItems->code,
                         "totalChild" => $subItems->countChildren(),
-                        "text" => $subItems->description,
+                        "text" => $subItems->description . ' - (' . $subItems->status .')',
                         "unit" => $subItems->unit,
                         "vol" => $subItems->volume,
                         "manPowers" => $manPowersArr,
