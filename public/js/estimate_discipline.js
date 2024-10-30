@@ -9,6 +9,7 @@ $(function(){
         var _parent_row = _this.closest('tr');
         var selectedOption = e.params.data;
         var _text = selectedOption.text;
+        _text = _text.replace(/ - \(REVIEWED\)| - \(DRAFT\)/, "");
         var _unitVol = selectedOption.unit;
         var _totalRateManPowerStr = selectedOption.manPowersTotalRate;
         var _totalRateEquipmentStr = selectedOption.equipmentToolsRate;
