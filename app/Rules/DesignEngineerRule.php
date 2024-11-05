@@ -30,8 +30,10 @@ class DesignEngineerRule implements Rule
         $designEngineerElectrical = request()->input('design_engineer_electrical');
         $designEngineerInstrument = request()->input('design_engineer_instrument');
         $designEngineerIt = request()->input('design_engineer_it');
+        $designEngineerArchitect = request()->input('design_engineer_architect');
         if(isset($designEngineerCivil) || isset($designEngineerMechanical)
-        || isset($designEngineerElectrical) || isset($designEngineerInstrument) || isset($designEngineerIt)){
+        || isset($designEngineerElectrical) || isset($designEngineerInstrument)
+            || isset($designEngineerIt) || isset($designEngineerArchitect)){
             return true;
         }
 

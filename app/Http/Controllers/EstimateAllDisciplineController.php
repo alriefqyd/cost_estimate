@@ -35,6 +35,7 @@ class EstimateAllDisciplineController extends Controller
         if(!$project->isDesignEngineer())  {
             abort(403);
         }
+
         $discipline = auth()->user()->profiles?->position;
         $discipline = explode('_',$discipline)[1];
         $statusEstimate = collect(json_decode($project->estimate_discipline_status));
