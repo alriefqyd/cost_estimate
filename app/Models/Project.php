@@ -27,14 +27,16 @@ class Project extends Model
         'civil_approval_status' => 'design_engineer_civil',
         'electrical_approval_status' => 'design_engineer_electrical',
         'instrument_approval_status' => 'design_engineer_instrument',
-        'instrument_approval_status' => 'design_engineer_it'
+        'it_approval_status' => 'design_engineer_it',
+        'architect_approval_status' => 'design_engineer_architect'
     ];
     public const DESIGN_ENGINEER_KEY_LIST = [
         'design_engineer_civil' => 'Design Engineer Civil',
         'design_engineer_mechanical' => 'Design Engineer Mechanical',
         'design_engineer_electrical' => 'Design Engineer Electrical',
         'design_engineer_instrument' => 'Design Engineer Instrument',
-        'design_engineer_it' => 'Design Engineer IT'
+        'design_engineer_it' => 'Design Engineer IT',
+        'design_engineer_architect' => 'Design Engineer Architect'
     ];
 
     protected static function boot()
@@ -82,6 +84,10 @@ class Project extends Model
 
     public function designEngineerIt(){
         return $this->belongsTo(User::class,'design_engineer_it');
+    }
+
+    public function designEngineerArchitect(){
+        return $this->belongsTo(User::class,'design_engineer_architect');
     }
 
     public function projectManager(){
@@ -166,7 +172,8 @@ class Project extends Model
             $this->design_engineer_instrument == $user ||
             $this->design_engineer_mechanical == $user ||
             $this->design_engineer_civil == $user ||
-            $this->design_engineer_it == $user
+            $this->design_engineer_it == $user ||
+            $this->design_engineer_architect
         ){return true;}
         return false;
     }

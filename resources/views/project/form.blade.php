@@ -152,6 +152,41 @@
         </div>
     </div>
     <div class="row g-3 mb-2">
+        <div class="col-md-6 mb-2">
+            <label class="form-label form-label-black">Design Engineer Architecture</label>
+            <select class="select2 form-control js-design-engineer js-project_engineer_architect"
+                    data-allowClear="true"
+                    data-url="/getUserEmployee"
+                    data-placeholder="Select Design Engineer Architecture"
+                    data-subject="design_architect_engineer"
+                    data-minimumInputLength="3"
+                    name="design_engineer_architect" >
+                @if(isset($project->design_engineer_architect))
+                    <option value="{{$project->design_engineer_architect}}">
+                        {{$project->designEngineerArchitect?->profiles?->full_name}}
+                    </option>
+                @endif
+                <option value="{{NULL}}">NR</option>
+            </select>
+        </div>
+        <div class="col-md-6 js-reviewer-engineer {{isset($project->design_engineer_architect) ? '' : 'd-none'}}">
+            <label class="form-label form-label-black">Review Engineer Architecture</label>
+            <select class="select2 form-control js-reviewer-engineer-select"
+                    data-allowClear="true"
+                    data-placeholder="Select Reviewer Engineer Architecture"
+                    data-subject="architect"
+                    data-minimumInputLength="3"
+                    name="reviewer_architect" >
+                @if(isset($project->design_engineer_architect))
+                    <option value="{{$project->architect_approver}}">
+                        {{$project->getProfileUser($project->architect_approver)?->full_name}}
+                    </option>
+                @endif
+                <option value="{{NULL}}">NR</option>
+            </select>
+        </div>
+    </div>
+    <div class="row g-3 mb-2">
         <div class="col-md-6">
             <label class="form-label form-label-black">Design Engineer Electrical</label>
             <select class="select2 form-control js-design-engineer js-project_engineer_electrical"
@@ -228,7 +263,7 @@
                     data-allowClear="true"
                     data-url="/getUserEmployee"
                     data-placeholder="Select Design Engineer IT"
-                    data-subject="design_instrument_engineer"
+                    data-subject="design_it_engineer"
                     data-minimumInputLength="3"
                     name="design_engineer_it" >
                 @if(isset($project->design_engineer_it))

@@ -33,6 +33,8 @@ class Role extends Model
         'review_mechanical_cost_estimate' => 'Review Mechanical Discipline Cost Estimates',
         'review_electrical_cost_estimate' => 'Review Electrical Discipline Cost Estimates',
         'review_instrument_cost_estimate' => 'Review Instrument Discipline Cost Estimates',
+        'review_it_cost_estimate' => 'Review IT Discipline Cost Estimates',
+        'review_architect_cost_estimate' => 'Review Architect Discipline Cost Estimates',
         'review_all_discipline_cost_estimate' => 'Review All Discipline Cost Estimates',
         'review_cost_estimate' => 'Review Cost Estimates',
     ];
