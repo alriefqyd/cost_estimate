@@ -13,7 +13,9 @@ class Setting extends Model
         'civil' => 'Civil',
         'mechanical' => 'Mechanical',
         'electrical' => 'Electrical',
-        'instrument' => 'Instrument'
+        'instrument' => 'Instrument',
+        'architect' => 'Architect',
+        'it' => 'IT'
     ];
 
     public const DESIGN_ENGINEER_LIST_KEY = [

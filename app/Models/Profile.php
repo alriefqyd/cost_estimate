@@ -29,6 +29,8 @@ class Profile extends Model
         'design_mechanical_engineer' => 'Design Mechanical Engineer',
         'design_electrical_engineer' => 'Design Electrical Engineer',
         'design_instrument_engineer' => 'Design Instrument Engineer',
+        'design_it_engineer' => 'Design IT Engineer',
+        'design_architect_engineer' => 'Design Architecture Engineer',
         'administrator' => 'Administrator',
         'reviewer_cost_estimate' => 'Reviewer Cost Estimate',
         'reviewer_all_discipline_cost_estimate' => 'Reviewer All Discipline Cost Estimate',

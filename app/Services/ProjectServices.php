@@ -191,8 +191,7 @@ class ProjectServices
     }
 
     public function updateStatusProject(Project $project){
-//        if($project->getProjectStatusApproval() ==  Project::WAITING_FOR_APPROVAL){
-        if($project->getProjectStatusApproval() == Project::APPROVE){
+        if(sizeof($project->getProjectDisciplineStatusApproval()) < 1){
             $project->status = Project::APPROVE;
         } else {
             $project->status = Project::PENDING_DISCIPLINE_APPROVAL;
