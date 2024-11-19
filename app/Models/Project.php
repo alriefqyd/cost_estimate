@@ -129,6 +129,10 @@ class Project extends Model
             $query->where('design_engineer_electrical',$q);
         })->when($filters['instrument'] ?? false, function($query, $q){
             $query->where('design_engineer_instrument',$q);
+        })->when($filters['it'] ?? false, function($query, $q){
+            $query->where('design_engineer_it',$q);
+        })->when($filters['architect'] ?? false, function($query, $q){
+            $query->where('design_engineer_architect',$q);
         })->when($filters['sponsor'] ?? false, function($query, $q){
             $query->where('project_area_id', $q);
         });
@@ -150,6 +154,7 @@ class Project extends Model
                     ->orWhere('design_engineer_mechanical', $user->id)
                     ->orWhere('design_engineer_electrical', $user->id)
                     ->orWhere('design_engineer_instrument', $user->id)
+                    ->orWhere('design_engineer_architect', $user->id)
                     ->orWhere('design_engineer_it', $user->id)
                     ->orwhere('project_manager', $user->id)
                     ->orWhere('project_engineer', $user->id)

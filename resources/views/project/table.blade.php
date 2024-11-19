@@ -19,10 +19,16 @@
                         Civil  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
                     </th>
                     <th scope="col" class="text-left min-w-135">
+                        Architect  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-135">
                         Electrical  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
                     </th>
                     <th scope="col" class="text-left min-w-140">
                         Instrument  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
+                    </th>
+                    <th scope="col" class="text-left min-w-140">
+                        IT  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
                     </th>
                     <th scope="col" class="text-left min-w-100">
                         Total Cost  <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="user_name"></i>
@@ -50,8 +56,10 @@
                     <td>{{$project->projectManager?->profiles?->full_name}}</td>
                     <td>{{$project->designEngineerMechanical?->profiles?->full_name ?? 'NR'}}</td>
                     <td>{{$project->designEngineerCivil?->profiles?->full_name ?? 'NR'}}</td>
+                    <td>{{$project->designEngineerArchitect?->profiles?->full_name ?? 'NR'}}</td>
                     <td>{{$project->designEngineerElectrical?->profiles?->full_name ?? 'NR'}}</td>
                     <td>{{$project->designEngineerInstrument?->profiles?->full_name ?? 'NR'}}</td>
+                    <td>{{$project->designEngineerIt?->profiles?->full_name ?? 'NR'}}</td>
                     <td>{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
                     <td>{{$project->projectArea?->name}}</td>
                     <td>{{$project->status}}</td>

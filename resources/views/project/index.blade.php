@@ -49,7 +49,7 @@
                                 <button class="btn btn-outline-success btn btn-search-project" style="height: 40px">Search <i class="fa fa-search"></i></button>
                             </div>--}}
                         </div>
-                        <div class="row mb-2">
+                        <div class="row margin-05">
                             <div class="col-md-2 mb-1-responsive">
                                 <select class="select2 col-sm-12 js-search-form"
                                         name="mechanical"
@@ -60,7 +60,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2 mb-1 mb-1-responsive">
+                            <div class="col-md-2 mb-1-responsive">
                                 <select class="select2 col-sm-12 js-search-form"
                                         name="civil"
                                         data-placeholder="Civil">
@@ -70,6 +70,18 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-md-2 mb-1-responsive">
+                                <select class="select2 col-sm-12 js-search-form"
+                                        name="architect"
+                                        data-placeholder="Architect">
+                                    <option disabled selected></option>
+                                    @foreach($architectEngineerList as $a)
+                                        <option value="{{$a->id}}" {{request()->architect == $a->id ? 'selected' : ''}}>{{$a->profiles->full_name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row margin-05">
                             <div class="col-md-2 mb-1-responsive">
                                 <select class="select2 col-sm-12 js-search-form"
                                         name="electrical"
@@ -87,6 +99,16 @@
                                     <option disabled selected></option>
                                     @foreach($instrumentEngineerList as $data)
                                         <option value="{{$data->id}}" {{request()->instrument == $data->id ? 'selected' : ''}}>{{$data->profiles->full_name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2 mb-1-responsive">
+                                <select class="select2 col-sm-12 js-search-form"
+                                        name="it"
+                                        data-placeholder="IT">
+                                    <option disabled selected></option>
+                                    @foreach($itEngineerList as $data)
+                                        <option value="{{$data->id}}" {{request()->it == $data->id ? 'selected' : ''}}>{{$data->profiles->full_name}}</option>
                                     @endforeach
                                 </select>
                             </div>

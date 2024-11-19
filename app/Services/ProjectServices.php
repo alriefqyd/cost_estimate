@@ -22,9 +22,9 @@ class ProjectServices
         $order = $request->order;
         $sort =  $request->sort;
 
-        $requestFilter = request(['q','status','civil','mechanical','electrical','instrument','sponsor']);
+        $requestFilter = request(['q','status','civil','mechanical','electrical','instrument','sponsor','it','architect']);
 
-        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles','designEngineerIt.profiles','projectArea','projectManager.profiles'])
+        $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles','designEngineerIt.profiles','designEngineerArchitect.profiles','projectArea','projectManager.profiles'])
             ->when(!auth()->user()->isViewAllCostEstimateRole(), function ($subQuery){
                 return $subQuery->access();
             });
