@@ -34,6 +34,8 @@ class ProjectController extends Controller
         $mechanicalEngineerList = $projectService->getDataEngineer('design_mechanical_engineer');
         $electricalEngineerList = $projectService->getDataEngineer('design_electrical_engineer');
         $instrumentEngineerList = $projectService->getDataEngineer('design_instrument_engineer');
+        $itEngineerList = $projectService->getDataEngineer('design_it_engineer');
+        $architectEngineerList = $projectService->getDataEngineer('design_architect_engineer');
         $this->authorize('viewAny',$project);
         $projectList = $projectService->getProjectsData($request)['projectList'];
         $departments = $departmentController->getAllSubDepartment();
@@ -45,6 +47,8 @@ class ProjectController extends Controller
             'mechanicalEngineerList' => $mechanicalEngineerList,
             'electricalEngineerList' => $electricalEngineerList,
             'instrumentEngineerList' => $instrumentEngineerList,
+            'itEngineerList' => $itEngineerList,
+            'architectEngineerList' => $architectEngineerList,
             'departments' => $departments
         ]);
     }
