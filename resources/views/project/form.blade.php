@@ -108,7 +108,7 @@
                     data-minimumInputLength="3"
                     name="reviewer_civil" >
                 @if(isset($project->design_engineer_civil))
-                    <option value="{{$project->design_engineer_civil}}">
+                    <option value="{{$project->civil_approver}}">
                         {{$project->getProfileUser($project->civil_approver)?->full_name}}
                     </option>
                 @endif
@@ -143,7 +143,7 @@
                     data-minimumInputLength="3"
                     name="reviewer_mechanical" >
                 @if(isset($project->design_engineer_mechanical))
-                    <option value="{{$project->design_engineer_mechanical}}">
+                    <option value="{{$project->mechanical_approver}}">
                         {{$project->getProfileUser($project->mechanical_approver)?->full_name}}
                     </option>
                 @endif
@@ -213,7 +213,7 @@
                     data-minimumInputLength="3"
                     name="reviewer_electrical" >
                 @if(isset($project->design_engineer_electrical))
-                    <option value="{{$project->design_engineer_electrical}}">
+                    <option value="{{$project->electrical_approver}}">
                         {{$project->getProfileUser($project->electrical_approver)?->full_name}}
                     </option>
                 @endif
@@ -248,7 +248,7 @@
                     data-minimumInputLength="3"
                     name="reviewer_instrument">
                 @if(isset($project->design_engineer_instrument))
-                    <option value="{{$project->design_engineer_instrument}}">
+                    <option value="{{$project->instrument_approver}}">
                         {{$project->getProfileUser($project->instrument_approver)?->full_name}}
                     </option>
                 @endif
@@ -283,7 +283,7 @@
                     data-minimumInputLength="3"
                     name="reviewer_it">
                 @if(isset($project->design_engineer_it))
-                    <option value="{{$project->design_engineer_it}}">
+                    <option value="{{$project->it_approver}}">
                         {{$project->getProfileUser($project->it_approver)?->full_name}}
                     </option>
                 @endif
