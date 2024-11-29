@@ -10,8 +10,8 @@ class MaterialServices
         $order = $request->order;
         $sort =  $request->sort;
 
-        $filter = request(['q','category','status']);
-        if($isCount) $filter = request(['q','category']);
+        $filter = request(['q','category','status','creator']);
+        if($isCount) $filter = request(['q','category','creator']);
         $material = Material::with(['materialsCategory','createdBy.profiles'])->filter($filter)
             ->when(isset($request->sort), function($query) use ($request,$order,$sort) {
                 return $query->when($request->order == 'category', function ($qq) use ($request, $order, $sort) {
