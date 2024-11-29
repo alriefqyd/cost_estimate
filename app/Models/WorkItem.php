@@ -59,6 +59,8 @@ class WorkItem extends Model
             });
         })->when($filters['status'] ?? false, fn($query, $q) =>
             $query->where('status',$q)
+        )->when($filters['creator'] ?? false, fn($query, $q) =>
+            $query->where('created_by',$q)
         );
     }
 

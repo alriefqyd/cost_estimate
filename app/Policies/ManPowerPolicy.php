@@ -135,4 +135,42 @@ class ManPowerPolicy
     {
         //
     }
+
+    /**
+     * Determine whether the user can import the xlsx file
+     * @param User $user
+     * @return mixed
+     */
+    public function import(User $user)
+    {
+        // Eager load roles to minimize database queries
+        $user->load('roles');
+
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'man_power' &&
+                ($role->action === 'import');
+        });
+
+        return $hasPermission;
+    }
+
+    /**
+     * Determine whether the user can import the xlsx file
+     * @param User $user
+     * @return mixed
+     */
+    public function export(User $user)
+    {
+        // Eager load roles to minimize database queries
+        $user->load('roles');
+
+        // Check if the user has the required role
+        $hasPermission = $user->roles->contains(function ($role) {
+            return $role->feature === 'man_power' &&
+                ($role->action === 'export');
+        });
+
+        return $hasPermission;
+    }
 }

@@ -1,8 +1,13 @@
 
 $(function(){
-    CKEDITOR.editorConfig = function( config ) {
-        config.versionCheck = false;
-    };
+
+    if($('.page-wrapper').length > 0){
+    console.log($('body').length)
+        CKEDITOR.editorConfig = function( config ) {
+                config.versionCheck = false;
+            };
+    }
+
     /**
      * Project Form
      */
@@ -108,67 +113,65 @@ $(function(){
         if(e.which === 44 || e.which === 45) return true
     });
 
-    function getPublicHoliday(){
-        var _data = '';
-        var _newdata = '';
+    function getPublicHoliday(callback) {
         $.ajax({
-            url:'/getPublicHolidayApi',
-            success:function(results){
-                _data = results.filter(function (item){
-                    return item.is_national_holiday === true;
-                });
+            url: '/getPublicHolidayApi',
+            success: function(results) {
+                const _newdata = results
+                    .filter(function(item) {
+                        return item.is_national_holiday === true;
+                    })
+                    .map(function(item) {
+                        return {
+                            holiday_name: item.holiday_name,
+                            start: item.holiday_date,
+                            end: item.holiday_date,
+                            isHoliday: item.is_national_holiday,
+                            display: 'background',
+                            color: '#ff9f89'
+                        };
+                    });
 
-
-                _newdata = _data.map(function(item){
-                    return {
-                        holiday_name: item.holiday_name,
-                        start : item.holiday_date,
-                        end : item.holiday_date,
-                        isHoliday : item.is_national_holiday,
-                        display: 'background',
-                        color: '#ff9f89'
-                    };
-                });
+                callback(_newdata);
+            },
+            error: function(err) {
+                console.error('Error fetching public holidays:', err);
+                callback([]); // Handle error gracefully with an empty array
             }
         });
-
-        return _newdata;
     }
 
-    function initCalendar(){
-        var _public_holiday = getPublicHoliday();
+    function initCalendar(publicHolidays) {
         var calendarEl = $('#calendar')[0]; // Get the DOM element
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            events: _public_holiday,
+            events: publicHolidays,
             initialView: 'multiMonthYear',
             height: 'auto',
-            showNonCurrentDates:true,
-            selectable:true,
+            showNonCurrentDates: true,
+            selectable: true,
             title: "Calendar Production 2024",
             dayCellDidMount: function(info) {
                 var cell = info.el;
                 var date = info.date;
+
                 // Check if the day is a weekend (Saturday or Sunday)
                 if (date.getDay() === 0 || date.getDay() === 6) {
-                    // Apply red color to the background of the cell
                     $(cell).find('a').css('color', 'red');
                 }
 
                 if (date.getDate() === 2) {
-                    // Apply red color to the background of the cell
                     $(cell).css('background-color', 'yellow');
                 }
 
                 if (date.getDate() === 3) {
-                    // Apply red color to the background of the cell
                     $(cell).css('background-color', '#00ffff');
                 }
 
-                if (date.getMonth() % 3 === 0){
-                    if(date.getMonth() === 9 && date.getDate() === 8){
+                if (date.getMonth() % 3 === 0) {
+                    if (date.getMonth() === 9 && date.getDate() === 8) {
                         $(cell).css('background-color', '#a3c7a3');
                     }
-                    if(date.getMonth() !== 9 && date.getDate() === 9){
+                    if (date.getMonth() !== 9 && date.getDate() === 9) {
                         $(cell).css('background-color', '#a3c7a3');
                     }
                 }
@@ -179,24 +182,36 @@ $(function(){
                 right: 'dayGridMonth,timeGridWeek,timeGridDay'
             },
         });
+
         calendar.render();
+
         // Update the title
         updateTitle(calendar);
 
-        // Bind event handler to "next" button
+        // Bind event handler to "next" and "prev" buttons
         $('.fc-next-button, .fc-prev-button').on('click', function() {
             updateTitle(calendar);
         });
 
-        _public_holiday.reverse().forEach(function (item){
-            $('.js-public-holiday').append("" +
-                "<div class=\"legend-item\">\n" +
-                "     <div class=\"legend-item-label\"> <span style='color: red'>" + formatDate(item.start) + "</span> : " + item.holiday_name + "</div>\n" +
-                "</div>");
+        // Append public holiday legend
+        publicHolidays.reverse().forEach(function(item) {
+            $('.js-public-holiday').append(`
+                <div class="legend-item">
+                    <div class="legend-item-label">
+                        <span style="color: red">${formatDate(item.start)}</span> : ${item.holiday_name}
+                    </div>
+                </div>
+            `);
         });
 
         calendar.updateSize();
     }
+
+    // Initialize
+    getPublicHoliday(function(publicHolidays) {
+        initCalendar(publicHolidays); // Pass the public holidays to the calendar
+    });
+
 
     function formatDate(inputDate) {
         return moment(inputDate).format('MMM D');

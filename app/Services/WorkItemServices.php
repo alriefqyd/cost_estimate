@@ -14,8 +14,8 @@ class WorkItemServices
     public function getWorkItem($request, $isCount, $status){
         $order = $request->order;
         $sort =  $request->sort;
-        $filter = request(['q','category','status']);
-        if($isCount) $filter = request(['q','category']);
+        $filter = request(['q','category','status','creator']);
+        if($isCount) $filter = request(['q','category','creator']);
         $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter($filter)
             ->leftJoin('users','work_items.created_by','users.id')
             ->leftJoin('profiles','users.id','profiles.user_id')
