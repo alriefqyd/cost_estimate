@@ -32,7 +32,7 @@
                 <div class="card">
                     <div class="mt-5 mb-4">
                         <form method="get" action="/material">
-                            <div class="row mb-3">
+                            <div class="row">
                                 <div class="col-md-3">
                                     <select class="select2 col-sm-12 js-search-form"
                                             name="category"
@@ -51,7 +51,19 @@
                                     <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                 </div>
                             </div>
-                            <div class="row mb-4">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <select class="select2 col-sm-12 js-search-form"
+                                            name="creator"
+                                            data-placeholder="Creator">
+                                        <option></option>
+                                        @foreach($engineers as $mc)
+                                            <option {{isset(request()->creator) && request()->creator == $mc['id'] ? 'selected' : ''}} value="{{$mc['id']}}">{{$mc['full_name']}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-6">
                                     <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                         <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">

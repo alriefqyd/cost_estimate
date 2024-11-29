@@ -7,6 +7,7 @@ use App\Imports\MaterialCategoryImport;
 use App\Imports\MaterialImport;
 use App\Models\Material;
 use App\Models\MaterialCategory;
+use App\Models\User;
 use App\Services\MaterialServices;
 use Exception;
 use Illuminate\Http\Request;
@@ -40,11 +41,24 @@ class MaterialController extends Controller
         $materialDraft = $materialServices->getMaterial($request,true,Material::DRAFT)->count();
         $materialReviewed = $materialServices->getMaterial($request,true,Material::REVIEWED)->count();
 
+        $engineers = User::with('profiles') // Eager load the profile relationship
+        ->whereHas('profiles', function ($query) {
+            $query->where('position', 'design_civil_engineer')->orwhere('position', 'design_mechanical_engineer')
+                ->orwhere('position', 'design_architect_engineer')->orwhere('position', 'design_electrical_engineer')
+                ->orwhere('position', 'design_instrument_engineer')->orwhere('position', 'design_it_engineer');
+        })->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'full_name' => $user->profiles->full_name, // Access the related profile's full_name
+            ];
+        })->toArray();
+
         return view('material.index',[
             'material_category' => $materialCategory,
             'material' => $dataMaterial,
             'materialDraft' => $materialDraft,
             'materialReviewed' => $materialReviewed,
+            'engineers' => $engineers
         ]);
     }
 
