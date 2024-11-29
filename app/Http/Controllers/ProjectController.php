@@ -364,7 +364,10 @@ class ProjectController extends Controller
             $duplicateProject->civil_approval_status = ""; // Set a valid status
             $duplicateProject->electrical_approval_status = ""; // Set a valid status
             $duplicateProject->instrument_approval_status = ""; // Set a valid status
+            $duplicateProject->it_approval_status = ""; // Set a valid status
+            $duplicateProject->architect_approval_status = ""; // Set a valid status
             $duplicateProject->remark = ""; // Set a valid status
+            $duplicateProject->estimate_discipline_status = "";
 
             $duplicateProject->save();
 

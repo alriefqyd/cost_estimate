@@ -63,27 +63,29 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="btn btn-outline-success js-btn-export float-end m-1"
-                                            data-file-name="Man Power.xlsx"
-                                            data-url="/man-power/export/">
-                                        <div class="float-start">
-                                            Export
-                                        </div>
-                                        <div class="float-end">
-                                            <div class="loader-box m-2 d-none" style="height:0px">
-                                                <div class="loader-3"></div>
+                                    @can('export', \App\Models\ManPower::class)
+                                        <div class="btn btn-outline-success js-btn-export float-end m-1"
+                                                data-file-name="Man Power.xlsx"
+                                                data-url="/man-power/export/">
+                                            <div class="float-start">
+                                                Export
+                                            </div>
+                                            <div class="float-end">
+                                                <div class="loader-box m-2 d-none" style="height:0px">
+                                                    <div class="loader-3"></div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-{{--                                    @can('create', \App\Models\ManPower::class)--}}
-{{--                                        <div class="btn btn-outline-success float-end m-1 js-btn-import-man-power"--}}
-{{--                                                data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportManPower">--}}
-{{--                                            Import--}}
-{{--                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">--}}
-{{--                                                <div class="loader-34"></div>--}}
-{{--                                            </div>--}}
-{{--                                        </div>--}}
-{{--                                    @endcan--}}
+                                    @endcan
+                                    @can('import', \App\Models\ManPower::class)
+                                        <div class="btn btn-outline-success float-end m-1 js-btn-import-man-power"
+                                                data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportManPower">
+                                            Import
+                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
+                                                <div class="loader-34"></div>
+                                            </div>
+                                        </div>
+                                    @endcan
                                 </div>
                             </div>
                             @if(auth()->user()->isManPowerReviewer())
