@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\WorkItemExport;
 use App\Models\Setting;
+use App\Models\User;
 use App\Models\WorkItem;
 use App\Models\WorkItemType;
 use App\Services\ProjectServices;
@@ -27,12 +28,25 @@ class WorkItemController extends Controller
         $workItemDraft = $workItemServices->getWorkItem($request, true,WorkItem::DRAFT)->count();
         $workItemReviewed = $workItemServices->getWorkItem($request, true,WorkItem::REVIEWED)->count();
 
+        $engineers = User::with('profiles') // Eager load the profile relationship
+        ->whereHas('profiles', function ($query) {
+            $query->where('position', 'design_civil_engineer')->orwhere('position', 'design_mechanical_engineer')
+            ->orwhere('position', 'design_architect_engineer')->orwhere('position', 'design_electrical_engineer')
+            ->orwhere('position', 'design_instrument_engineer')->orwhere('position', 'design_it_engineer');
+        })->get()->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'full_name' => $user->profiles->full_name, // Access the related profile's full_name
+                ];
+            })->toArray();
+
         $workItemCategory = WorkItemType::select('id','title')->get();
         return view('work_item.index',[
             'work_item' => $workItem,
             'workItemDraft' => $workItemDraft,
             'workItemReviewed' => $workItemReviewed,
-            'work_item_category' => $workItemCategory
+            'work_item_category' => $workItemCategory,
+            'engineers' => $engineers
         ]);
     }
 
