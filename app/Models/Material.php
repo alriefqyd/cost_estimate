@@ -37,6 +37,10 @@ class Material extends Model
         $query->when($filters['status'] ?? false, fn($query, $q) =>
             $query->where('status', $q)
         );
+
+        $query->when($filters['creator'] ?? false, fn($query, $q) =>
+        $query->where('created_by', $q)
+        );
     }
 
     public function createdBy(){
