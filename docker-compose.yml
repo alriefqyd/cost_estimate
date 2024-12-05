@@ -10,8 +10,12 @@ services:
             - app
             - db
         volumes:
+            - ./storage:/var/www/storage
             - ./public:/var/www/public
             - ./nginx/conf.d:/etc/nginx/conf.d
+        networks:
+            - app-network
+
     db:
         image: mysql
         container_name: mysql
@@ -20,8 +24,11 @@ services:
         volumes:
             - ./mysql/data:/var/lib/mysql
         environment:
-            - MYSQL_DATABASE=cost_estimate_prod_3
-            - MYSQL_ROOT_PASSWORD=password
+            MYSQL_DATABASE: cost_estimate_prod_3
+            MYSQL_ROOT_PASSWORD: password
+        networks:
+            - app-network
+
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         container_name: phpmyadmin
@@ -29,6 +36,9 @@ services:
             - "3400:80"
         depends_on:
             - db
+        networks:
+            - app-network
+
     app:
         build:
             context: .
@@ -38,76 +48,17 @@ services:
             - .:/var/www
         depends_on:
             - db
+        networks:
+            - app-network
 
-#version: '3.8'
-#
-#services:
-#    nginx :
-#        container_name: nginx
-#        image: nginx:alpine
-#        ports:
-#            - "8080:80"
-#        depends_on:
-#            - app
-#            - db
-#        volumes:
-#            -   ./src:/var/www
-#            - ./nginx/conf.d/:/etc/nginx/conf.d
-#    db:
-#        image: mysql
-#        container_name: mysql
-#        ports:
-#            - "3307:3306"
-#        volumes:
-#            -   ./mysql/data:var/lib/mysql
-#        environment:
-#            - MYSQL_DATABASE=cost_estimate_prod_3
-#            - MYSQL_ROOT_PASSWORD=password
-#    phpmyadmin:
-#        image: phpmyadmin/phpmyadmin
-#        container_name: phpmyadmin
-#        ports:
-#            - "3400:80"
-#        depends_on:
-#            -   db
-#    app:
-#        build:
-#            context: .
-#        ports:
-#            - "8000:8000"  # Expose the port 8000 for the app
-#        volumes:
-#            - .:/var/www
-#        environment:
-#            - APACHE_DOCUMENT_ROOT=/var/www/html/public
-#            - APACHE_SERVER_NAME=localhost
-#        depends_on:
-#            - db
-#
+    mailhog:
+        image: mailhog/mailhog
+        ports:
+            - "8025:8025"
+            - "1025:1025"
+        networks:
+            - app-network
 
-#    app:
-#        build:
-#            context: .
-#        ports:
-#            - "8000:8000"  # Expose the port 8000 for the app
-#        volumes:
-#            - .:/var/www
-#        environment:
-#            - APACHE_DOCUMENT_ROOT=/var/www/html/public
-#            - APACHE_SERVER_NAME=localhost
-#        depends_on:
-#            - db
-#
-#    db:
-#        image: mysql:8.4.3
-#        environment:
-#            MYSQL_ROOT_PASSWORD: P@ssw0rd        # Root password for MySQL
-#            MYSQL_DATABASE: cost_estimate_prod_3  # Database name to create
-#            MYSQL_USER: app_user                  # Non-root user for the app
-#            MYSQL_PASSWORD: P@ssw0rd             # Password for the app user
-#        ports:
-#            - "3307:3306"  # Expose MySQL port 3306
-#        volumes:
-#            - db-data:/var/lib/mysql  # Persistent volume for MySQL data
-
-#volumes:
-#    db-data:
+networks:
+    app-network:
+        driver: bridge
