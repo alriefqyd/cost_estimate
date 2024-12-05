@@ -133,17 +133,17 @@ Route::get('/material-category/{materialCategory:id}',[\App\Http\Controllers\Mat
 Route::delete('/material-category/{materialCategory:id}',[\App\Http\Controllers\MaterialCategoryController::class,'destroy'])->middleware('auth');
 Route::get('/generateCodeMaterial/{id}', [\App\Http\Controllers\MaterialController::class,'generateCodeMaterial'])->middleware('auth');
 
-Route::get('/work-breakdown-structure',[\App\Http\Controllers\settingWbsController::class,'index'])->middleware('auth');
-Route::get('/work-breakdown-structure/create',[\App\Http\Controllers\settingWbsController::class,'create'])->middleware('auth');
-Route::get('/work-breakdown-structure/{id}/work-element/create',[\App\Http\Controllers\settingWbsController::class,'createWorkElement'])->middleware('auth');
-Route::get('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'edit'])->middleware('auth');
-Route::get('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'editWorkElement'])->middleware('auth');
-Route::put('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'update'])->middleware('auth');
-Route::put('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'updateWorkElement'])->middleware('auth');
-Route::post('/work-breakdown-structure/work-element',[\App\Http\Controllers\settingWbsController::class,'storeWorkElement'])->middleware('auth');
-Route::post('/work-breakdown-structure/',[\App\Http\Controllers\settingWbsController::class,'store'])->middleware('auth');
-Route::delete('/work-breakdown-structure/{id}',[\App\Http\Controllers\settingWbsController::class,'delete'])->middleware('auth');
-Route::delete('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\settingWbsController::class,'deleteWorkElement'])->middleware('auth');
+Route::get('/work-breakdown-structure',[\App\Http\Controllers\SettingWbsController::class,'index'])->middleware('auth');
+Route::get('/work-breakdown-structure/create',[\App\Http\Controllers\SettingWbsController::class,'create'])->middleware('auth');
+Route::get('/work-breakdown-structure/{id}/work-element/create',[\App\Http\Controllers\SettingWbsController::class,'createWorkElement'])->middleware('auth');
+Route::get('/work-breakdown-structure/{id}',[\App\Http\Controllers\SettingWbsController::class,'edit'])->middleware('auth');
+Route::get('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\SettingWbsController::class,'editWorkElement'])->middleware('auth');
+Route::put('/work-breakdown-structure/{id}',[\App\Http\Controllers\SettingWbsController::class,'update'])->middleware('auth');
+Route::put('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\SettingWbsController::class,'updateWorkElement'])->middleware('auth');
+Route::post('/work-breakdown-structure/work-element',[\App\Http\Controllers\SettingWbsController::class,'storeWorkElement'])->middleware('auth');
+Route::post('/work-breakdown-structure/',[\App\Http\Controllers\SettingWbsController::class,'store'])->middleware('auth');
+Route::delete('/work-breakdown-structure/{id}',[\App\Http\Controllers\SettingWbsController::class,'delete'])->middleware('auth');
+Route::delete('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\SettingWbsController::class,'deleteWorkElement'])->middleware('auth');
 
 Route::get('/user',[\App\Http\Controllers\UserController::class,'index'])->middleware('auth');
 Route::get('/user/create',[\App\Http\Controllers\UserController::class,'create'])->middleware('auth')->can('create',User::class);
