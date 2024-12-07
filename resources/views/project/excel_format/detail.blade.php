@@ -257,7 +257,7 @@
     </tbody>
 </table>
 <div style="margin-bottom: 100px">
-    <p style="font-family: Arial, Helvetica, sans-serif">Status Approval</p>
+    <p style="font-family: Arial, Helvetica, sans-serif">Approval Status</p>
     <table style="margin-top: 20px; font-family: Arial, Helvetica, sans-serif">
         <tr>
             @if(isset($project->designEngineerCivil))
@@ -294,7 +294,7 @@
                 <td style="padding: 0 20px 0 20px ">{{$project->electrical_approval_status}}</td>
             @endif
             @if(isset($project->designEngineerInstrument))
-                <td style="padding: 0 20px 0 20px ">{{$project->instument_approval_status}}</td>
+                <td style="padding: 0 20px 0 20px ">{{$project->instrument_approval_status}}</td>
             @endif
             @if(isset($project->designEngineerIt))
                 <td style="padding: 0 20px 0 20px ">{{$project->it_approval_status}}</td>
