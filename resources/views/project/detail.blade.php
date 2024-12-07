@@ -325,17 +325,36 @@
                         <div class="col-sm-12 col-lg-12 col-xl-12">
                             <div class="clearfix"></div>
                             <div class="col-md-6">
-                                 @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE)
-                                    <a href="/cost-estimate-summary/export/{{$project->id}}">
-                                        <button data-id="{{$project->id}}"
-                                            data-name="Cost Estimate - {{$project->project_no}} - {{$project->project_title}}.xlsx"
-                                            class="js-download-summary-xlsx btn btn-success mb-3">
-                                            <div class="float-start">Download XLSX</div>
-                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
+{{--                                 @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE)--}}
+                                 @if(sizeof($estimateAllDisciplines) > 0)
+                                    <div class="btn-group">
+                                        <button type="button" class="js-btn-dropdown-dwd btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="text-dwd"> Download Options</span>
+                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 5%">
                                                 <div class="loader-34"></div>
                                             </div>
                                         </button>
-                                    </a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <button class="dropdown-item js-download-summary-xlsx"
+                                                   data-id="{{$project->id}}"
+                                                   data-isDetail="false"
+                                                   data-name="Cost Estimate Summary- {{$project->project_no}} - {{$project->project_title}}.pdf"
+                                                  >
+                                                    Download Cost Estimate Summary
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button class="dropdown-item js-download-summary-xlsx mb-3"
+                                                   data-id="{{$project->id}}"
+                                                   data-isDetail="true"
+                                                   data-name="Cost Estimate Estimate All Discipline - {{$project->project_no}} - {{$project->project_title}}.pdf"
+                                                   >
+                                                    Download Estimate All Discipline
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
                                  @endif
                             </div>
                             <div class="col-md-6 float-end">
