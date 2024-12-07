@@ -10,6 +10,7 @@ use App\Models\WbsLevel3;
 use App\Rules\DesignEngineerRule;
 use App\Rules\UniqueProject;
 use App\Services\ProjectServices;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -432,10 +433,28 @@ class ProjectController extends Controller
 
     public function export(Project $project, Request $request){
         $projectServices = new ProjectServices();
-        $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project,$request);
+        $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project, $request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
+
+        $settingController = new SettingController();
+        $getUsdIdr =  $settingController->getUsdRateFromDB();
         Log::info('Export Estimate All Discipline Project ' . $project->project_title . ' by: ' . auth()->user()->profiles->full_name);
-        return Excel::download(new SummaryExport($estimateDisciplines,$project, $costProjects), 'summary-export.xlsx');
+        // Pass data to a view
+        $view = 'project.excel_format.summary';
+        if($request->isDetail == "true"){
+            $view = 'project.excel_format.detail';
+        }
+
+        $pdf = Pdf::loadView($view,[
+            'project' => $project,
+            'estimateAllDisciplines' => $estimateDisciplines,
+            'costProject' => $costProjects,
+            'isDetail' => true,
+            'usdIdr' => $getUsdIdr
+        ]) ->setPaper('A3', 'landscape');
+
+        // Return the generated PDF
+        return $pdf->download('summary-export.pdf');
     }
 
     public function getProjectDisciplineStatus(Request $request, Project $project){

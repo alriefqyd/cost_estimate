@@ -90,6 +90,30 @@ class Project extends Model
         return $this->belongsTo(User::class,'design_engineer_architect');
     }
 
+    public function reviewerMechanical(){
+        return $this->belongsTo(User::class,'mechanical_approver');
+    }
+
+    public function reviewerCivil(){
+        return $this->belongsTo(User::class,'civil_approver');
+    }
+
+    public function reviewerElectrical(){
+        return $this->belongsTo(User::class,'electrical_approver');
+    }
+
+    public function reviewerInstrument(){
+        return $this->belongsTo(User::class,'instrument_approver');
+    }
+
+    public function reviewerIt(){
+        return $this->belongsTo(User::class,'it_approver');
+    }
+
+    public function reviewerArchitect(){
+        return $this->belongsTo(User::class,'architect_approver');
+    }
+
     public function projectManager(){
         return $this->belongsTo(User::class,'project_manager');
     }
@@ -236,6 +260,16 @@ class Project extends Model
         return $this->designEngineerInstrument?->profiles?->full_name;
     }
 
+    public function getItEngineer(){
+        if(!$this->designEngineerIt) return '';
+        return $this->designEngineerIt?->profiles?->full_name;
+    }
+
+    public function getArchitectEngineer(){
+        if(!$this->designEngineerArchitect) return '';
+        return $this->designEngineerArchitect?->profiles?->full_name;
+    }
+
     public function getProjectDisciplineStatusApproval(){
         $list = [];
         foreach (self::APPROVAL_DISCIPLINE_LIST as $approval => $designEngineer){
@@ -268,6 +302,12 @@ class Project extends Model
         }
         if($this->getInstrumentEngineer()){
             array_push($arr,$this->getInstrumentEngineer());
+        }
+        if($this->getItEngineer()){
+            array_push($arr,$this->getItEngineer());
+        }
+        if($this->getArchitectEngineer()){
+            array_push($arr,$this->getArchitectEngineer());
         }
 
         $str = implode(", ", $arr);
