@@ -80,7 +80,7 @@
                                 <p><span class="font-weight-bold"> Project Name</span> : {{$project->project_title ?? "-"}}</p>
                                 <p class="font-weight-bold">Design Engineer</p>
                                 <p>Electrical : {{$project->designEngineerElectrical?->profiles->full_name ?? "-"}}<br>Instrument : {{$project->designEngineerInstrument?->profiles->full_name ?? "-"}} <br> Mechanical : {{$project->designEngineerMechanical?->profiles->full_name ?? "-"}}<br>Civil : {{$project->designEngineerCivil?->profiles->full_name ?? "-"}}</p>
-                                <p style="text-align: center"><a href="10.34.168.208:5000/project/{{$project->id}}" style="padding: 10px; background-color: #24695c; color: #fff; display: inline-block; border-radius: 4px;font-weight:600;text-decoration:none">Go to Cost Estimate Project</a></p>
+                                <p style="text-align: center"><a href="10.34.168.90:8080/project/{{$project->id}}" style="padding: 10px; background-color: #24695c; color: #fff; display: inline-block; border-radius: 4px;font-weight:600;text-decoration:none">Go to Cost Estimate Project</a></p>
                                 <p style="margin-bottom: 0">
                                     Regards,<br>Cost Estimate Team</p>
                             </td>
