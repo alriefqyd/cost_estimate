@@ -827,6 +827,12 @@ custom-checkbox:checked:before {
     background-color: #169F85; /* Hover color */
 }
 
+.select2-selection--multiple {
+    border:solid 1px #e6edef !important;
+    border-radius:1px !important;
+    padding-left: 7px;
+}
+
 @keyframes slide {
     0% {
         transform: translateY(0);

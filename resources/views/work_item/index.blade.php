@@ -47,13 +47,14 @@
                                 </div>
                             </div>
                             <div class="row mb-1">
-                                <div class="col-md-3">
-                                    <select class="select2 js-search-form col-sm-12"
-                                            name="creator"
+                                <div class="col-md-6">
+                                    <select class="select2 multiple js-search-form col-sm-12"
+                                            multiple="multiple"
+                                            name="creator[]"
                                             data-placeholder="Creator">
                                         <option></option>
                                         @foreach($engineers as $eng)
-                                            <option {{isset(request()->creator) && request()->creator == $eng['id'] ? 'selected' : ''}} value="{{$eng['id']}}">{{$eng['full_name']}}</option>
+                                            <option {{isset(request()->creator) && in_array($eng['id'],request()->creator) ? 'selected' : ''}} value="{{$eng['id']}}">{{$eng['full_name']}}</option>
                                         @endforeach
                                     </select>
                                 </div>

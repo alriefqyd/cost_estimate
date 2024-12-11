@@ -9,8 +9,8 @@ class EquipmentToolsServices
     public function getEquipmentTools($request,$isCount,$status){
         $order = $request->order;
         $sort =  $request->sort;
-        $filter = request(['q','category','status']);
-        if($isCount) $filter = request(['q','category']);
+        $filter = request(['q','category','status','creator']);
+        if($isCount) $filter = request(['q','category','creator']);
         $data = EquipmentTools::with(['equipmentToolsCategory','createdBy.profiles'])->filter($filter)
             ->when(isset($request->sort), function($query) use ($request,$order,$sort){
                 return $query->when($request->order == 'category', function($qq) use ($request,$order,$sort){
