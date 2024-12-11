@@ -7,6 +7,7 @@ use App\Imports\EquipmentToolsImport;
 use App\Models\EquipmentTools;
 use App\Models\EquipmentToolsCategory;
 use App\Models\MaterialCategory;
+use App\Models\User;
 use App\Services\EquipmentToolsServices;
 use Exception;
 use Illuminate\Http\Request;
@@ -37,12 +38,25 @@ class EquipmentToolsController extends Controller
         $reviewedEquipmentTools = $equipmentService->getEquipmentTools($request,true,EquipmentTools::REVIEWED)->count();
         $draftEquipmentTools = $equipmentService->getEquipmentTools($request,true,EquipmentTools::DRAFT)->count();
         $equipmentToolsCategory = EquipmentToolsCategory::select('id','description')->get();
+        $engineers = User::with('profiles') // Eager load the profile relationship
+        ->whereHas('profiles', function ($query) {
+            $query->where('position', 'design_civil_engineer')->orwhere('position', 'design_mechanical_engineer')
+                ->orwhere('position', 'design_architect_engineer')->orwhere('position', 'design_electrical_engineer')
+                ->orwhere('position', 'design_instrument_engineer')->orwhere('position', 'design_it_engineer');
+        })->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'full_name' => $user->profiles->full_name, // Access the related profile's full_name
+            ];
+        })->toArray();
+
 
         return view('equipment_tool.index',[
             'equipment_tools' => $equipmentTools,
             'draftEquipmentTools' => $draftEquipmentTools,
             'reviewedEquipmentTools' => $reviewedEquipmentTools,
-            'equipment_tools_category' => $equipmentToolsCategory
+            'equipment_tools_category' => $equipmentToolsCategory,
+            'engineers' => $engineers
         ]);
     }
 

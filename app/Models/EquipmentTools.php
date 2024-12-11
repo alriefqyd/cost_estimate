@@ -36,7 +36,13 @@ class EquipmentTools extends Model
         );
         $query->when($filters['status'] ?? false, fn($query,$q) =>
             $query->where('status',$q)
-        );
+        )->when($filters['creator'] ?? false, function($query, $creators) {
+            $query->where(function($qq) use ($creators) {
+                foreach ($creators as $creator) {
+                    $qq->orWhere('created_by', $creator);
+                }
+            });
+        });;
     }
 
     public function getAmount(){
