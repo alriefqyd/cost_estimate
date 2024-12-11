@@ -32,7 +32,7 @@
                 <div class="card">
                     <div class="mt-5 mb-4">
                         <form method="get" action="/tool-equipment">
-                            <div class="row mb-3">
+                            <div class="row">
                                 <div class="col-md-3">
                                     <select class="select2 col-sm-12 js-search-form"
                                             name="category"
@@ -43,12 +43,25 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-1">
+                                <div class="col-md-3">
                                     <input type="text" value="{{request()->q}}" name="q" placeholder="Man Power Code/Title" class="form-control js-search-form" style="height: 40px">
                                 </div>
-                                <div class="col-md-2 mb-1" >
+                                <div class="col-md-3" >
                                     <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
                                     <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
+                                </div>
+                            </div>
+                            <div class="row mt-2 mb-1">
+                                <div class="col-md-6">
+                                    <select class="select2 multiple js-search-form col-sm-12"
+                                            multiple="multiple"
+                                            name="creator[]"
+                                            data-placeholder="Creator">
+                                        <option></option>
+                                        @foreach($engineers as $eng)
+                                            <option {{isset(request()->creator) && in_array($eng['id'],request()->creator) ? 'selected' : ''}} value="{{$eng['id']}}">{{$eng['full_name']}}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                             <div class="row mb-4">
