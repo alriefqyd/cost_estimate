@@ -42,7 +42,7 @@ class EquipmentTools extends Model
                     $qq->orWhere('created_by', $creator);
                 }
             });
-        });;
+        });
     }
 
     public function getAmount(){

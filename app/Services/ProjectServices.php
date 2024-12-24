@@ -308,16 +308,12 @@ class ProjectServices
         $projects = Project::where('status', Project::PENDING_DISCIPLINE_APPROVAL)->get();
 
         foreach ($projects as $project) {
-            $approvers = [
-                'civil' => $project->civil_approval_status,
-                'mechanical' => $project->mechanical_approval_status,
-                'electrical' => $project->electrical_approval_status,
-                'instrument' => $project->instrument_approval_status
-            ];
-
-            foreach ($approvers as $discipline => $approvalStatus) {
-                if ($approvalStatus == 'PENDING') {
-                    $profile = Profile::where('user_id', $project->{$discipline . '_approver'})->first();
+            $datas = json_decode($project->estimate_discipline_status);
+            foreach ($datas as $data) {
+                if($data->status == "PUBLISH"){
+                    $discipline = explode('_', $data->position);
+                    $discipline = $discipline[2] . '_approver';
+                    $profile = Profile::where('user_id', $project->$discipline)->first();
                     $mail = $profile ? $profile->email : null;
                     if ($mail) {
                         Mail::to($mail)->send(new SendMail($project));

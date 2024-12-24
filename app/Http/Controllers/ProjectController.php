@@ -604,7 +604,9 @@ class ProjectController extends Controller
     }
 
     public function sendMailPreview(){
-        return view('emails.approverNotification');
+        $ps = new ProjectServices();
+        $ps->sendEmailRemainderToReviewer();
+//        return view('emails.approverNotification');
     }
 
 }
