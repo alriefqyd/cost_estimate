@@ -183,11 +183,12 @@ class EstimateAllDisciplineController extends Controller
                    return $item;
                 });
 
-                $projectServices->setStatusDraft($project);
+                //to make the status from approve to waiting approval if
+//                $projectServices->setStatusDraft($project);
 
                 $project->estimate_discipline_status = $statusEstimate;
                 if($request->estimateStatus == 'PUBLISH'){
-//                    $project->status = Project::PENDING_DISCIPLINE_APPROVAL;
+                    $project->status = Project::PENDING_DISCIPLINE_APPROVAL;
                     $projectServices->sendEmailToReviewer($project, $position);
                     $projectServices->setRejectedDisciplineToWaiting($project);
                 }
