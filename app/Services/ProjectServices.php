@@ -8,6 +8,7 @@ use App\Mail\SendMail;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Profile;
 use App\Models\Project;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -310,9 +311,10 @@ class ProjectServices
         foreach ($projects as $project) {
             $datas = json_decode($project->estimate_discipline_status);
             foreach ($datas as $data) {
-                if($data->status == "PUBLISH"){
-                    $discipline = explode('_', $data->position);
-                    $discipline = $discipline[2] . '_approver';
+                $discipline = explode('_', $data->position);
+                $diciplineReviewerStatus = $discipline[2] . '_approval_status';
+                $discipline = $discipline[2] . '_approver';
+                if($data->status == "PUBLISH" && $project->$diciplineReviewerStatus != "APPROVE"){
                     $profile = Profile::where('user_id', $project->$discipline)->first();
                     $mail = $profile ? $profile->email : null;
                     if ($mail) {
