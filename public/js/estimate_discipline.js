@@ -196,14 +196,15 @@ $(function(){
         saveEstimateDiscipline(_this.data('status'));
     });
 
-    $(document).ready(function() {
+    /* temporary disabled for conflict issue of version*/
+    /*$(document).ready(function() {
         // Auto-save every 5 minutes (300,000 milliseconds)
         if($('.js-save-estimate-discipline').length > 0){
             setInterval(function() {
                 saveEstimateDiscipline();
             }, 300000); // 300000 ms = 5 minutes
         }
-    });
+    });*/
 
     function countTotalPrice(){
         var data = getWorkItemList(false);
