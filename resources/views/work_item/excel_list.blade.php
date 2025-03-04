@@ -24,6 +24,8 @@
         <th colspan="5" style="background-color: #FFC000">LABOR</th>
         <th colspan="6" style="background-color: #FFC000">TOOLS AND EQUIPMENT</th>
         <th colspan="5" style="background-color: #FFC000">MATERIAL</th>
+        <th rowspan="2" style="background-color: #FFC000">STATUS</th>
+        <th rowspan="2" style="background-color: #FFC000">CREATED BY</th>
     </tr>
     <tr>
         <th style="background-color: #FFC000">Description</th>
@@ -72,6 +74,8 @@
             <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
             <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
             <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}">{{$mp->status}}</td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}">{{$mp->createdBy}}</td>
         </tr>
         @for($i=0; $i<$max; $i++)
             <tr>
@@ -96,6 +100,9 @@
                 <td style="border: 1px solid #000000;">{{isset($mp->materialList[$i]) ? $mp->materialList[$i]?->quantity : ''}}</td>
                 <td style="border: 1px solid #000000;">{{isset($mp->materialList[$i]) ? $mp->materialList[$i]?->unit_price : ''}}</td>
                 <td style="border: 1px solid #000000;">{{isset($mp->materialList[$i]) ? $mp->materialList[$i]?->amount : ''}}</td>
+                <td style="border: 1px solid #000000;"></td>
+                <td style="border: 1px solid #000000;"></td>
+            </tr>
         @endfor
     @endforeach
     </tbody>

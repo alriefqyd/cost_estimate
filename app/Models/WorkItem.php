@@ -133,4 +133,8 @@ class WorkItem extends Model
     public function isHaveManPowers(){
         return count($this->manPowers) > 0;
     }
+
+    public function createdBy(){
+        return $this->hasOne(Profile::class,'id','created_by');
+    }
 }

@@ -43,7 +43,7 @@ class WorkItemServices
         try {
             $processWorkItem = collect(); // Use a collection to store results
 
-            WorkItem::with(['manPowers', 'equipmentTools', 'materials', 'workItemTypes'])
+            WorkItem::with(['manPowers', 'equipmentTools', 'materials', 'workItemTypes','createdBy'])
                 ->chunk(100, function ($workItems) use ($processWorkItem) {
                     foreach ($workItems as $workItem) {
                         $manPowers = [];
@@ -86,6 +86,8 @@ class WorkItemServices
                         $workItemClass = new WorkItemClass();
                         $workItemClass->id = $workItem->id;
                         $workItemClass->code = $workItem->code;
+                        $workItemClass->status = $workItem->status;
+                        $workItemClass->createdBy = $workItem->createdBy?->full_name;
                         $workItemClass->workItemDescription = $workItem->description;
                         $workItemClass->volume = $workItem->volume;
                         $workItemClass->workItemType = $workItem->workItemTypes->title;

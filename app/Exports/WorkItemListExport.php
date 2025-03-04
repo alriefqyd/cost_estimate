@@ -57,7 +57,7 @@ class WorkItemListExport implements FromView, WithStyles, WithColumnWidths,
             ],
         ]);
 
-        $sheet->getStyle('A5:U6')->applyFromArray([
+        $sheet->getStyle('A5:W6')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'italic' => false,
@@ -68,7 +68,7 @@ class WorkItemListExport implements FromView, WithStyles, WithColumnWidths,
             ],
         ]);
 
-        $column = 'A5:U6';
+        $column = 'A5:W6';
         $sheet->getStyle($column)->applyFromArray([
             'borders' => [
                 'allBorders' => [
@@ -107,6 +107,7 @@ class WorkItemListExport implements FromView, WithStyles, WithColumnWidths,
             'T' => 25,
             'U' => 25,
             'V' => 25,
+            'W' => 25,
         ];
     }
 
