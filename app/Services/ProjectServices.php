@@ -53,6 +53,7 @@ class ProjectServices
         $data = $this->getDataEstimateDiscipline($project,$request);
         $result = $data->mapToGroups(function ($location) use ($data) {
             $projectClass = new ProjectClass();
+            $projectClass->id = $location->id;
             $projectClass->estimateVolume = $location->volume;
             $projectClass->disciplineTitle = $location?->wbss?->wbsDiscipline?->title;
             $projectClass->workItemIdentifier = $location?->wbss?->identifier;

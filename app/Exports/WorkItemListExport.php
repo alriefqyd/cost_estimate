@@ -57,7 +57,7 @@ class WorkItemListExport implements FromView, WithStyles, WithColumnWidths,
             ],
         ]);
 
-        $sheet->getStyle('A5:P6')->applyFromArray([
+        $sheet->getStyle('A5:U6')->applyFromArray([
             'font' => [
                 'bold' => true,
                 'italic' => false,
@@ -68,7 +68,7 @@ class WorkItemListExport implements FromView, WithStyles, WithColumnWidths,
             ],
         ]);
 
-        $column = 'A5:P6';
+        $column = 'A5:U6';
         $sheet->getStyle($column)->applyFromArray([
             'borders' => [
                 'allBorders' => [
@@ -101,14 +101,24 @@ class WorkItemListExport implements FromView, WithStyles, WithColumnWidths,
             'N' => 5,
             'O' => 25,
             'P' => 25,
+            'Q' => 50,
+            'R' => 10,
+            'S' => 5,
+            'T' => 25,
+            'U' => 25,
+            'V' => 25,
         ];
     }
 
     public function columnFormats(): array
     {
         return [
-            'I' => NumberFormat::FORMAT_CURRENCY_IDR,
-            'J' => NumberFormat::FORMAT_CURRENCY_IDR,
+            'I' => NumberFormat::FORMAT_CURRENCY_USD,
+            'O' => NumberFormat::FORMAT_CURRENCY_USD,
+            'P' => NumberFormat::FORMAT_CURRENCY_USD,
+            'J' => NumberFormat::FORMAT_CURRENCY_USD,
+            'T' => NumberFormat::FORMAT_CURRENCY_USD,
+            'U' => NumberFormat::FORMAT_CURRENCY_USD,
         ];
     }
 }

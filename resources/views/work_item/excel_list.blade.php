@@ -1,3 +1,4 @@
+
 <table>
     <tr>
         <td colspan="5">PT VALE INDONESIA, TBK</td>
@@ -22,6 +23,7 @@
         <th rowspan="2" style="background-color: #FFC000">UNIT</th>
         <th colspan="5" style="background-color: #FFC000">LABOR</th>
         <th colspan="6" style="background-color: #FFC000">TOOLS AND EQUIPMENT</th>
+        <th colspan="5" style="background-color: #FFC000">MATERIAL</th>
     </tr>
     <tr>
         <th style="background-color: #FFC000">Description</th>
@@ -36,44 +38,65 @@
         <th style="background-color: #FFC000">Qty</th>
         <th style="background-color: #FFC000">Unit Price</th>
         <th style="background-color: #FFC000">Amount</th>
+
+        <th style="background-color: #FFC000">Description</th>
+        <th style="background-color: #FFC000">Unit</th>
+        <th style="background-color: #FFC000">Qty</th>
+        <th style="background-color: #FFC000">Unit Price</th>
+        <th style="background-color: #FFC000">Amount</th>
     </tr>
     </thead>
     <tbody>
     @foreach($workItem as $mp)
+        @php($max = max($mp->numOfManPower, $mp->numOfEquipment, $mp->numOfMaterial))
+        @php($isNotEmpty = $mp->numOfManPower > 0 || $mp->numOfMaterial > 0 || $mp->numOfEquipment > 0)
         <tr>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}">{{$mp->code}}</td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}">{{$mp->workItemDescription}}</td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}">{{$mp->workItemType}}</td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}">{{$mp->volume}}</td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}">{{$mp->unit}}</td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
-            <td style="border: 1px solid #000000; {!! $mp->numOfManPower > 0 ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}">{{$mp->code}}</td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}">{{$mp->workItemDescription}}</td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}">{{$mp->workItemType}}</td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}">{{$mp->volume}}</td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}">{{$mp->unit}}</td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
+            <td style="border: 1px solid #000000; {!! $isNotEmpty ? 'background-color: #d9d9d9' : '' !!}"></td>
         </tr>
-        @foreach($mp->manPowerList as $m)
+        @for($i=0; $i<$max; $i++)
             <tr>
                 <td style="border: 1px solid #000000;"></td>
                 <td style="border: 1px solid #000000;"></td>
                 <td style="border: 1px solid #000000;"></td>
                 <td style="border: 1px solid #000000;"></td>
                 <td style="border: 1px solid #000000;"></td>
-                <td style="border: 1px solid #000000;">{{$m?->description}}</td>
-                <td style="border: 1px solid #000000;">{{$m?->unit}}</td>
-                <td style="border: 1px solid #000000;">{{str_replace(',','.',$m?->coef)}}</td>
-                <td style="border: 1px solid #000000;">{{$m->unit_price}}</td>
-                <td style="border: 1px solid #000000;">{{$m?->amount}}</td>
-                <td style="border: 1px solid #000000;">{{$m?->amount}}</td>
-                <td style="border: 1px solid #000000;">{{$m?->amount}}</td>
-                <td style="border: 1px solid #000000;">{{$m?->amount}}</td>
-            </tr>
-        @endforeach
+                <td style="border: 1px solid #000000;">{{isset($mp->manPowerList[$i]) ? $mp->manPowerList[$i]?->description : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->manPowerList[$i]) ? $mp->manPowerList[$i]?->unit : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->manPowerList[$i]) ? str_replace(',','.', $mp->manPowerList[$i]?->coef) : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->manPowerList[$i]) ? $mp->manPowerList[$i]?->unit_price : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->manPowerList[$i]) ? $mp->manPowerList[$i]?->amount: ''}}</td>
+                <td style="border: 1px solid #000000;">-</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->equipmentToolList[$i]) ? $mp->equipmentToolList[$i]?->description : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->equipmentToolList[$i]) ? $mp->equipmentToolList[$i]?->unit : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->equipmentToolList[$i]) ? $mp->equipmentToolList[$i]?->quantity : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->equipmentToolList[$i]) ? $mp->equipmentToolList[$i]?->unit_price : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->equipmentToolList[$i]) ? $mp->equipmentToolList[$i]?->amount : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->materialList[$i]) ? $mp->materialList[$i]?->description : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->materialList[$i]) ? $mp->materialList[$i]?->unit : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->materialList[$i]) ? $mp->materialList[$i]?->quantity : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->materialList[$i]) ? $mp->materialList[$i]?->unit_price : ''}}</td>
+                <td style="border: 1px solid #000000;">{{isset($mp->materialList[$i]) ? $mp->materialList[$i]?->amount : ''}}</td>
+        @endfor
     @endforeach
     </tbody>
 </table>

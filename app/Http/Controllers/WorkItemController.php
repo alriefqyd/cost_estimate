@@ -914,7 +914,7 @@ class WorkItemController extends Controller
             return Excel::download(new WorkItemExport(), 'Std_Work_Item.xlsx');
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            return response()->json('Import Failed : ' . $e->getMessage());
+            return response()->json('Export Failed : ' . $e->getMessage());
         }
     }
 
