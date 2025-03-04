@@ -40,7 +40,7 @@ class EquipmentToolsExport implements FromView, WithColumnFormatting,
         $columns = range('G', 'R');
 
         foreach ($columns as $column) {
-            $columnFormats[$column] = NumberFormat::FORMAT_CURRENCY_IDR;
+            $columnFormats[$column] = NumberFormat::FORMAT_CURRENCY_USD;
         }
 
         return $columnFormats;

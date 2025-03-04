@@ -31,7 +31,7 @@ class MaterialExport implements FromView, WithColumnFormatting, WithStyles,
     public function columnFormats(): array
     {
         return [
-            'G' => NumberFormat::FORMAT_CURRENCY_IDR
+            'G' => NumberFormat::FORMAT_CURRENCY_USD
         ];
 
     }
