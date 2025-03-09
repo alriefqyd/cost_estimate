@@ -131,8 +131,8 @@
                     <td style="background-color: #C4BD97"></td>
                     <td style="background-color: #C4BD97"></td>
                     <td colspan="4" style="background-color: #C4BD97;font-weight: bold">{{$key}}</td>
-                    <td colspan="" style="background-color: #C4BD97">{{number_format($costProject[$key]->totalWorkCost,2,',','.')}}</td>
-                    <td colspan="" style="background-color: #C4BD97">{{number_format(($costProject[$key]->totalWorkCost / $usdIdr),2,',','.')}}</td>
+                    <td colspan="" style="background-color: #C4BD97;text-align: right">{{number_format($costProject[$key]->totalWorkCost,2,',','.')}}</td>
+                    <td colspan="" style="background-color: #C4BD97;text-align: right">{{number_format(($costProject[$key]->totalWorkCost / $usdIdr),2,',','.')}}</td>
                 </tr>
             @endif
             @php($codeDiscipline = null);
@@ -144,9 +144,9 @@
                     <td style="background-color: #DDD9C4" colspan="">{{$alpha}}.{{$idNum++}}</td>
                     <td style="background-color: #DDD9C4"></td>
                     <td style="background-color: #DDD9C4" colspan="">{{$item?->disciplineTitle}}</td>
-                    <td style="background-color: #DDD9C4">{{number_format($costProject[$key]->disciplineLaborCost[$item->disciplineTitle],2,',','.')}}</td>
-                    <td style="background-color: #DDD9C4">{{number_format($costProject[$key]->disciplineToolCost[$item->disciplineTitle],2,',','.')}}</td>
-                    <td style="background-color: #DDD9C4">{{number_format($costProject[$key]->disciplineMaterialCost[$item->disciplineTitle],2,',','.')}}</td>
+                    <td style="background-color: #DDD9C4;text-align: right">{{number_format($costProject[$key]->disciplineLaborCost[$item->disciplineTitle],2,',','.')}}</td>
+                    <td style="background-color: #DDD9C4;text-align: right">{{number_format($costProject[$key]->disciplineToolCost[$item->disciplineTitle],2,',','.')}}</td>
+                    <td style="background-color: #DDD9C4;text-align: right">{{number_format($costProject[$key]->disciplineMaterialCost[$item->disciplineTitle],2,',','.')}}</td>
                     <td style="background-color: #DDD9C4"></td>
                     <td style="background-color: #DDD9C4"></td>
                 </tr>
@@ -158,9 +158,9 @@
                     <td style="background-color: #eceae0"></td>
                     <td style="background-color: #eceae0">{{$alpha}}.{{$idElement}}.{{$idElement2++}}</td>
                     <td style="background-color: #eceae0">{{$item?->workElementTitle}}</td>
-                    <td style="background-color: #eceae0">{{number_format($costProject[$key]->elementLaborCost[$item->workElementTitle],2,',','.')}}</td>
-                    <td style="background-color: #eceae0">{{number_format($costProject[$key]->elementToolCost[$item->workElementTitle],2,',','.')}}</td>
-                    <td style="background-color: #eceae0">{{number_format($costProject[$key]->elementMaterialCost[$item->workElementTitle],2,',','.')}}</td>
+                    <td style="background-color: #eceae0; text-align: right">{{number_format($costProject[$key]->elementLaborCost[$item->workElementTitle],2,',','.')}}</td>
+                    <td style="background-color: #eceae0; text-align: right">{{number_format($costProject[$key]->elementToolCost[$item->workElementTitle],2,',','.')}}</td>
+                    <td style="background-color: #eceae0; text-align: right">{{number_format($costProject[$key]->elementMaterialCost[$item->workElementTitle],2,',','.')}}</td>
                     <td style="background-color: #eceae0"></td>
                     <td style="background-color: #eceae0"></td>
                 </tr>
@@ -192,8 +192,8 @@
         <td style="background-color: #C4BD97"></td>
         <td style="background-color: #C4BD97"></td>
         <td style="background-color: #C4BD97"></td>
-        <td style="background-color: #C4BD97">{{number_format($project->getContingencyCost(),2,',','.')}}</td>
-        <td style="background-color: #C4BD97">{{number_format(($project->getContingencyCost() / $usdIdr),2,',','.')}}</td>
+        <td style="background-color: #C4BD97;text-align: right">{{number_format($project->getContingencyCost(),2,',','.')}}</td>
+        <td style="background-color: #C4BD97;text-align: right">{{number_format(($project->getContingencyCost() / $usdIdr),2,',','.')}}</td>
     </tr>
     <tr>
         <td style="background-color: #FFC000">{{chr(64 + sizeof($estimateAllDisciplines) + 2)}}</td>
@@ -203,8 +203,8 @@
         <td style="background-color: #FFC000"></td>
         <td style="background-color: #FFC000"></td>
         <td style="background-color: #FFC000"></td>
-        <td style="background-color: #FFC000">{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
-        <td style="background-color: #FFC000">{{number_format(($project->getTotalCostWithContingency() / $usdIdr) ,2,',','.')}}</td>
+        <td style="background-color: #FFC000;text-align: right">{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
+        <td style="background-color: #FFC000;text-align: right">{{number_format(($project->getTotalCostWithContingency() / $usdIdr) ,2,',','.')}}</td>
     </tr>
     </tbody>
 </table>
