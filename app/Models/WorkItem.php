@@ -135,6 +135,6 @@ class WorkItem extends Model
     }
 
     public function createdBy(){
-        return $this->hasOne(Profile::class,'id','created_by');
+        return $this->hasOne(User::class,'id','created_by');
     }
 }
