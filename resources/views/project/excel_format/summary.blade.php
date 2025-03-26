@@ -241,7 +241,7 @@
                 <td style="padding: 0 20px 0 20px ">{{$project->mechanical_approval_status}}</td>
             @endif
             @if(isset($project->designEngineerArchitect))
-                <td style="padding: 0 20px 0 20px ">{{$project->architecture_approval_status}}</td>
+                <td style="padding: 0 20px 0 20px ">{{$project->architect_approval_status}}</td>
             @endif
             @if(isset($project->designEngineerElectrical))
                 <td style="padding: 0 20px 0 20px ">{{$project->electrical_approval_status}}</td>
