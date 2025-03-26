@@ -219,7 +219,7 @@
             @if(isset($project->designEngineerMechanical))
                 <td style="padding: 0 20px 0 20px ">Mechanical Reviewer</td>
             @endif
-            @if(isset($project->designEngineerArchitecture))
+            @if(isset($project->designEngineerArchitect))
                 <td style="padding: 0 20px 0 20px ">Architecture Reviewer</td>
             @endif
             @if(isset($project->designEngineerElectrical))
@@ -240,7 +240,7 @@
             @if(isset($project->designEngineerMechanical))
                 <td style="padding: 0 20px 0 20px ">{{$project->mechanical_approval_status}}</td>
             @endif
-            @if(isset($project->designEngineerArchitecture))
+            @if(isset($project->designEngineerArchitect))
                 <td style="padding: 0 20px 0 20px ">{{$project->architecture_approval_status}}</td>
             @endif
             @if(isset($project->designEngineerElectrical))
@@ -260,7 +260,7 @@
             @if(isset($project->designEngineerMechanical))
                     <td style="border-top: solid 2px black">{{$project->reviewerMechanical?->profiles?->full_name}}</td>
             @endif
-            @if(isset($project->designEngineerArchitecture))
+            @if(isset($project->designEngineerArchitect))
                     <td style="border-top: solid 2px black">{{$project->reviewerArchitect?->profiles?->full_name}}</td>
             @endif
             @if(isset($project->designEngineerElectrical))
