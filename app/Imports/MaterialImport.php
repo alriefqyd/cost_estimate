@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Material;
 use App\Models\MaterialCategory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\Importable;
 use Maatwebsite\Excel\Concerns\RegistersEventListeners;
@@ -66,7 +67,7 @@ class MaterialImport implements ToModel, WithMapping, WithStartRow, WithBatchIns
             'rate' => $row[6] ?? '',
             'ref_material_number' => $row[7] ?? '',
             'remark' => $row[9] ?? '',
-            'status' => 'DRAFT',
+            'status' => 'REVIEWED',
             'created_at' => now(),
             'updated_at' => now(),
             'created_by' => $user,
@@ -88,7 +89,7 @@ class MaterialImport implements ToModel, WithMapping, WithStartRow, WithBatchIns
                     'rate' => $row['rate'] ?? '',
                     'ref_material_number' => $row['ref_material_number'] ?? '',
                     'remark' => $row['remark'] ?? '',
-                    'status' => 'DRAFT',
+                    'status' => 'REVIEWED',
                     'created_at' => now(),
                     'updated_at' => now(),
                     'created_by' => $row['remark'],
@@ -104,9 +105,30 @@ class MaterialImport implements ToModel, WithMapping, WithStartRow, WithBatchIns
         }
     }
 
-    public static function afterImport(AfterImport $event){
+    public static function afterImport(AfterImport $event)
+    {
         Log::info('AfterImport event fired');
+
         $importInstance = $event->getConcernable();
+
+        // Step 1: Delete materials not in the imported uniqueIdentifiers
+        $deletedMaterials = Material::whereNotIn('code', $importInstance->uniqueIdentifiers)->get();
+
+        // Step 2: Collect WorkItem IDs related to the deleted materials
+        $workItemIds = $deletedMaterials->pluck('work_item_id')->unique();
+
+        // Actually delete the materials now
         Material::whereNotIn('code', $importInstance->uniqueIdentifiers)->delete();
+
+        // Step 3: Check for each affected WorkItem if it has no more materials
+        foreach ($workItemIds as $workItemId) {
+            $remainingMaterialsCount = Material::where('work_item_id', $workItemId)->count();
+
+            if ($remainingMaterialsCount === 0) {
+                // Delete the WorkItem if no materials remain
+                WorkItem::where('id', $workItemId)->delete();
+            }
+        }
     }
+
 }
