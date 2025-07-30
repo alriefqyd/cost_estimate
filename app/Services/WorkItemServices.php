@@ -17,8 +17,10 @@ class WorkItemServices
         $filter = request(['q','category','status','creator']);
         if($isCount) $filter = request(['q','category','creator']);
         $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter($filter)
-            ->leftJoin('users','work_items.created_by','users.id')
-            ->leftJoin('profiles','users.id','profiles.user_id')
+            ->leftJoin('users', 'work_items.created_by', '=', 'users.id')
+            ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
+            ->leftJoin('users as reviewer_user', 'work_items.reviewed_by', '=', 'reviewer_user.id')
+            ->leftJoin('profiles as reviewer', 'reviewer_user.id', '=', 'reviewer.user_id')
             ->when(isset($request->sort), function($query) use ($request,$order,$sort) {
                 return $query->when($request->order == 'work_items.volume', function ($q) use ($request, $order, $sort) {
                     return $q->orderByRaw('CONVERT(work_items.volume, SIGNED)' . $sort);
@@ -33,8 +35,17 @@ class WorkItemServices
                 return $q->where('status', $status);
             })->when(!isset($request->sort), function($query) use ($request,$order){
                 return $query->orderBy('work_items.code','ASC');
-            })->select('work_items.code','work_items.description','work_items.id','work_item_types.title as category','work_items.volume','work_items.unit','work_items.status','profiles.full_name');
-
+            })->select(
+                'work_items.code',
+                'work_items.description',
+                'work_items.id',
+                'work_item_types.title as category',
+                'work_items.volume',
+                'work_items.unit',
+                'work_items.status',
+                'profiles.full_name as creator_name',
+                'reviewer.full_name as reviewer_name'
+            );
         return $workItem;
     }
 

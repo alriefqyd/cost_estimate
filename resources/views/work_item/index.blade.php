@@ -117,6 +117,9 @@
                                     <th class="text-left">
                                         Created By
                                     </th>
+                                    <th>
+                                        Reviewed By
+                                    </th>
                                     @can('delete', \App\Models\WorkItem::class)
                                         <th>
                                             Action
@@ -141,7 +144,8 @@
                                         <td class="min-w-65">{{$item->unit}}</td>
                                         <td class="min-w-120">{{number_format($item?->getTotalSum(),2,',','.')}}</td>
                                         <td class="min-w-90">{{$item->status}}</td>
-                                        <td class="">{{$item->full_name}}</td>
+                                        <td class="">{{$item->creator_name}}</td>
+                                        <td>{{$item->reviewer_name}}</td>
                                         @can('delete',App\Models\WorkItem::class)
                                             <td>
                                                 <a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
