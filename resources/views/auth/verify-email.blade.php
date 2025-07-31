@@ -1,7 +1,7 @@
 <x-guest-layout>
     <x-jet-authentication-card>
         <x-slot name="logo">
-            <x-jet-authentication-card-logo />
+            <img class="mb-1" src="{{asset('assets/images/Vale_logo.svg')}}">
         </x-slot>
 
         <div class="mb-4 text-sm text-gray-600">
