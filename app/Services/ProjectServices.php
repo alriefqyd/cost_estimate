@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Class\ProjectClass;
 use App\Class\ProjectTotalCostClass;
+use App\Http\Controllers\ProjectController;
 use App\Mail\SendMail;
+use App\Mail\SendNotifApproveCostEstimateToEngineer;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Profile;
 use App\Models\Project;
@@ -324,6 +326,22 @@ class ProjectServices
                     }
                 }
             }
+        }
+    }
+
+    public function sendEmailToEngineer(Project $project, Request $request){
+        $projectController = new ProjectController();
+        $attachment = $projectController->export($project, $request, true);
+
+        try {
+            foreach (Setting::DESIGN_ENGINEER_LIST_DB_COLUMN as $engineer) {
+                if(isset($project->$engineer)){
+                    $profile = Profile::where('user_id', $project->$engineer)->first();
+                    Mail::to($profile->email)->send(new SendNotifApproveCostEstimateToEngineer($project, $profile, $attachment));
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error sending email to engineer: ' . $e->getMessage());
         }
     }
 }

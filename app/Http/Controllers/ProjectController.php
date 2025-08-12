@@ -431,7 +431,7 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function export(Project $project, Request $request){
+    public function export(Project $project, Request $request, $isEmail = false){
         $projectServices = new ProjectServices();
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project, $request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
@@ -454,6 +454,7 @@ class ProjectController extends Controller
         ]) ->setPaper('A3', 'landscape');
 
         // Return the generated PDF
+        if($isEmail) return $pdf->output();
         return $pdf->download('summary-export.pdf');
     }
 
@@ -544,6 +545,10 @@ class ProjectController extends Controller
                 }
 
                 $projectServices->updateStatusProject($project);
+
+                if($project->status == "APPROVE"){
+                    $projectServices->sendEmailToEngineer($project, $request);
+                }
 
                 $newStatusDiscipline = $request->status;
                 $statusEstimate = collect(json_decode($project->estimate_discipline_status));
