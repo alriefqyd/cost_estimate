@@ -255,9 +255,9 @@ class ProjectServices
     }
 
     public function getResultCount($value,$factorial){
+        if(!$factorial) $factorial = 1;
         $factorial = (float) $factorial;
         if(!$value) return '';
-        if(!$factorial) $factorial = 1;
         $newValue = $value * $factorial;
         return number_format($newValue,2,',','.');
     }

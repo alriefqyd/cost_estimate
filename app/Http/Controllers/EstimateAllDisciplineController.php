@@ -147,9 +147,18 @@ class EstimateAllDisciplineController extends Controller
                     $estimateAllDiscipline->work_item_id = $item['workItem'];
                     $estimateAllDiscipline->volume = $item['vol'] > 0 ? $item['vol'] : 1;
                     $estimateAllDiscipline->project_id = isset($request->project_id) ? $request->project_id : $item['project_id'];
-                    $estimateAllDiscipline->labour_factorial = $item['labourFactorial'] > 0 ? (float) $item['labourFactorial'] : NULL;
-                    $estimateAllDiscipline->equipment_factorial = $item['equipmentFactorial'] > 0 ? (float) $item['equipmentFactorial'] : NULL;
-                    $estimateAllDiscipline->material_factorial = $item['materialFactorial'] > 0 ? (float) $item['materialFactorial'] : NULL;
+                    $estimateAllDiscipline->labour_factorial = isset($item['labourFactorial']) && $item['labourFactorial'] !== ''
+                        ? (float) $item['labourFactorial']
+                        : null;
+
+                    $estimateAllDiscipline->equipment_factorial = isset($item['equipmentFactorial']) && $item['equipmentFactorial'] !== ''
+                        ? (float) $item['equipmentFactorial']
+                        : null;
+
+                    $estimateAllDiscipline->material_factorial = isset($item['materialFactorial']) && $item['materialFactorial'] !== ''
+                        ? (float) $item['materialFactorial']
+                        : null;
+
                     $estimateAllDiscipline->labor_unit_rate =  $workItemController->strToFloat($item['labourUnitRate']);
                     $estimateAllDiscipline->labor_cost_total_rate = $workItemController->strToFloat($item['totalRateManPowers']) * $item['vol'];
                     $estimateAllDiscipline->tool_unit_rate =  $workItemController->strToFloat($item['equipmentUnitRate']);
