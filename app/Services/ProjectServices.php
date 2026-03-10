@@ -344,5 +344,16 @@ class ProjectServices
             Log::error('Error sending email to engineer: ' . $e->getMessage());
         }
     }
+
+    public function replicateEstimateDisciplineStatus($disciplineStatus){
+        $disciplineStatus = json_decode($disciplineStatus);
+        $newDisciplineStatus = [];
+        foreach ($disciplineStatus as $status) {
+            $newStatus = clone $status;
+            $newStatus->status = Project::PENDING;
+            $newDisciplineStatus[] = $newStatus;
+        }
+        return json_encode($newDisciplineStatus);
+    }
 }
 

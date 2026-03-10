@@ -273,4 +273,19 @@ class WorkBreakdownStructureController extends Controller
             DB::rollBack();
         }
     }
+
+    public function getWorkElementName(Request $request){
+        $workElement = WorkBreakdownStructure::where('id', $request->id)->first();
+        if($workElement){
+            return response()->json([
+                'status' => 200,
+                'data' => $workElement->title
+            ]);
+        } else {
+            return response()->json([
+                'status' => 404,
+                'message' => $request->id . " not found"
+            ]);
+        }
+    }
 }

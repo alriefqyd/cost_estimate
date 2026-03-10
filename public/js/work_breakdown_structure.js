@@ -103,6 +103,58 @@ $(function(){
         $('.js-modal-save-wbs').modal('show');
     });
 
+    function getWorkElementName(id, callback) {
+        $.ajax({
+            url: '/getWorkElementName',
+            type: 'GET',
+            data: {id:id},
+            success: function(result) {
+                if (result.status === 200) {
+                    callback(result.data);
+                } else {
+                    callback(null);
+                }
+            },
+            error: function(result) {
+                console.log(result);
+            }
+        });
+    }
+
+    function modifyData(data, callback){
+        let requests = [];
+        data.forEach(function(item){
+            if(item.children){
+                item.children.forEach(function(child){
+                    if(child.children){
+                        let req = new Promise(function(resolve){
+                            let i = 1;
+                            getWorkElementName(child.id, function(name){
+                                child.children.forEach(function(subChild){
+                                    if(!subChild.id || subChild.id.trim() === ""){
+                                        subChild.id = name + " WORK " + i;
+                                    }
+
+                                    if(!subChild.oldElement || subChild.oldElement.trim() === ""){
+                                        subChild.oldElement = name + " WORK " + i;
+                                    }
+                                    i++;
+                                });
+                                resolve();
+                            });
+                        });
+                        requests.push(req);
+                    }
+                });
+            }
+        });
+
+        Promise.all(requests).then(function(){
+            callback(data);
+        });
+
+    }
+
     $(document).on('click','.js-form-list-location-submit',function (e){
         $('.js-modal-save-wbs').modal('hide');
         $('#modal-loading').modal('show');
@@ -131,32 +183,32 @@ $(function(){
             }
         });
         var _data = _nestable.nestable('serialize');
-        var url = $('.js-form-wbs-estimate-discipline').data('url');
-        var id = $('.js-form-wbs-estimate-discipline').data('id');
-
-        $.ajax({
-            type:'post',
-            url: url,
-            data : {wbs:_data},
-            success:function(result){
-                if(result.status === 200){
-                    $('#modal-loading').modal('hide');
-                    notification('success',result.message);
-                    // return false
-                    $(window).off('beforeunload');
-                    setTimeout(function (){
-                        window.location.href = '/project/' + id;
-                    },2000);
-                } else {
-                    $('#modal-loading').modal('hide');
-                    console.log(result.message);
-                    notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error')
-                    _nestable.nestable('destroy');
-                    _nestable.removeClass('nestable-initialized');
-                    _nestable.removeAttr('data-action');
+        modifyData(_data, function(new_data){
+            var url = $('.js-form-wbs-estimate-discipline').data('url');
+            var id = $('.js-form-wbs-estimate-discipline').data('id');
+            
+            $.ajax({
+                type:'post',
+                url: url,
+                data : {wbs:new_data},
+                success:function(result){
+                    if(result.status === 200){
+                        $('#modal-loading').modal('hide');
+                        notification('success',result.message);
+                        $(window).off('beforeunload');
+                        setTimeout(function (){
+                            window.location.href = '/project/' + id;
+                        },2000);
+                    } else {
+                        $('#modal-loading').modal('hide');
+                        notification('danger','Error! Make sure all wbs data is filled until work element','fa fa-cross','Error')
+                        _nestable.nestable('destroy');
+                        _nestable.removeClass('nestable-initialized');
+                        _nestable.removeAttr('data-action');
+                    }
                 }
-            }
-        })
+            })
+        });
     })
 
     $('.js-chev-hide-content').on('click',function(){
