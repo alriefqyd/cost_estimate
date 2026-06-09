@@ -359,6 +359,11 @@
                             </div>
                             <div class="col-md-6 float-end">
                                 <div class="btn btn-primary js-fullscreen-detail mb-2 float-end">Maximize Table <i data-feather="maximize" style="width: 12px !important;"></i></div>
+                                @if($project->isAssignedReviewer())
+                                <button type="button" class="btn btn-outline-warning js-btn-annotate-toggle mb-2 float-end me-2">
+                                    <i class="fa fa-pencil-alt me-1"></i>Annotate
+                                </button>
+                                @endif
                             </div>
                             <div class="clearfix"></div>
                             <span class="js-fullscreen-table">

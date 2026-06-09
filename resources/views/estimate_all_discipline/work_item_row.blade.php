@@ -1,4 +1,4 @@
-<tr class="js-row-item-estimate">
+<tr class="js-row-item-estimate table-row-work-item">
     <td></td>
     <td class="js-column-identifier">
         <input type="hidden" readonly class="js-item-version"
@@ -92,8 +92,8 @@
                 </span>
             </div>
             <div class="d-inline-block float-end">
-                <i class="fa fa-minus-circle cursor-pointer font-danger js-delete-work-item"></i>
-                <i class="fa fa-plus-circle cursor-pointer font-success js-add-work-item-element"
+                <i class="fa fa-minus-circle cursor-pointer btn-remove-work-item js-delete-work-item"></i>
+                <i class="fa fa-plus-circle cursor-pointer btn-add-work-item js-add-work-item-element"
                    @if(isset($wbsId) && isset($workElement))
                         data-id="{{$wbsId}}" data-work-element="{{isset($workElement) ? $workElement : ''}}">
                    @else
@@ -131,7 +131,7 @@
             @endif
         </span>
         <span class="float-end f-w-550 f-15">
-            <i class="fa fa-exclamation-circle cursor-pointer
+            <i class="fa fa-info-circle cursor-pointer cost-info-icon
                 {{isset($item->workItemUnitRateTotalLaborCost) ? floatval($item->workItemUnitRateTotalLaborCost) > 0 ? 'd-block' : 'd-none' : ''}}
                 js-open-modal-detail js-work-item-man-power-cost-modal"
                data-type="man_power"
@@ -153,7 +153,7 @@
             @endif
         </span>
         <span class="float-end f-w-550 f-15">
-            <i class="fa fa-exclamation-circle cursor-pointer
+            <i class="fa fa-info-circle cursor-pointer cost-info-icon
                 @{{ isShowEquipment }}
                 {{isset($item) ? floatval($item->workItemUnitRateTotalToolCost) > 0 ? 'd-block' : 'd-none' : ''}}
                 js-open-modal-detail js-work-item-equipment-cost-modal"
@@ -176,7 +176,7 @@
             @endif
         </span>
         <span class="float-end f-w-550 f-15">
-            <i class="fa fa-exclamation-circle cursor-pointer
+            <i class="fa fa-info-circle cursor-pointer cost-info-icon
                 @{{ isShowMaterial }}
                 {{isset($item) ? floatval($item->workItemUnitRateTotalMaterialCost) > 0 ? 'd-block' : 'd-none' : ''}}
                 js-open-modal-detail js-work-item-material-cost-modal"
@@ -191,34 +191,34 @@
         </span>
     </td>
     <td class="min-w-80">
-        <input class="form-control js-input-labor_factorial"
+        <input class="form-control js-input-labor_factorial factorial-input"
                value=
                         @if(isset($item->workItemLaborFactorial))
                             "{{$item->workItemLaborFactorial}}"
                         @else
                             "@{{ laborFactorial }}"
                         @endif
-               placeholder="Labor Factorial" type="number">
+               placeholder="Lbr Fac" type="number">
     </td>
     <td class="min-w-80">
-        <input class="form-control js-input-equipment_factorial"
+        <input class="form-control js-input-equipment_factorial factorial-input"
                value=
                         @if(isset($item->workItemEquipmentFactorial))
                             "{{$item->workItemEquipmentFactorial}}"
                         @else
                             "@{{ equipmentFactorial }}"
                         @endif
-               placeholder="Equipment Factorial" type="number">
+               placeholder="Eqp Fac" type="number">
     </td>
     <td class="min-w-100">
-        <input class="form-control js-input-material_factorial"
+        <input class="form-control js-input-material_factorial factorial-input"
                value=
                         @if(isset($item->workItemMaterialFactorial))
                             "{{$item->workItemMaterialFactorial}}"
                         @else
                             "@{{ materialFactorial }}"
                         @endif
-               placeholder="Material Factorial" type="number" >
+               placeholder="Mat Fac" type="number">
     </td>
     <td class="js-total-work-item-rate">
         <span class="f-w-500 f-15">

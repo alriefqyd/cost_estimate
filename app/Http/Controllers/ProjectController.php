@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Exports\SummaryExport;
+use App\Mail\ReviewNoteNotification;
 use App\Models\Project;
+use App\Models\ProjectReviewNote;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\WbsLevel3;
@@ -16,6 +18,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 
 class ProjectController extends Controller
@@ -38,12 +41,12 @@ class ProjectController extends Controller
         $itEngineerList = $projectService->getDataEngineer('design_it_engineer');
         $architectEngineerList = $projectService->getDataEngineer('design_architect_engineer');
         $this->authorize('viewAny',$project);
-        $projectList = $projectService->getProjectsData($request)['projectList'];
+        $projectsData = $projectService->getProjectsData($request);
         $departments = $departmentController->getAllSubDepartment();
         return view('project.index',[
-            'projects' => $projectList,
-            'projectDraft' => $projectService->getProjectsData($request)['draft'],
-            'projectApprove' => $projectService->getProjectsData($request)['approve'],
+            'projects' => $projectsData['projectList'],
+            'projectDraft' => $projectsData['draft'],
+            'projectApprove' => $projectsData['approve'],
             'civilEngineerList' => $civilEngineerList,
             'mechanicalEngineerList' => $mechanicalEngineerList,
             'electricalEngineerList' => $electricalEngineerList,
@@ -115,6 +118,8 @@ class ProjectController extends Controller
                 'civil_approval_status' => isset($request->design_engineer_civil) ? Project::PENDING : '',
                 'electrical_approval_status' => isset($request->design_engineer_electrical) ? Project::PENDING : '',
                 'instrument_approval_status' => isset($request->design_engineer_instrument) ? Project::PENDING : '',
+                'it_approval_status' => isset($request->design_engineer_it) ? Project::PENDING : '',
+                'architect_approval_status' => isset($request->design_engineer_architect) ? Project::PENDING : '',
                 'mechanical_approver' => $request-> reviewer_mechanical,
                 'civil_approver' => $request-> reviewer_civil,
                 'electrical_approver' => $request-> reviewer_electrical,
@@ -331,13 +336,13 @@ class ProjectController extends Controller
         $wbs = WbsLevel3::with(['wbsDiscipline'])->where('project_id',$project->id)->get()->groupBy('title');
         $this->authorize('view',$project);
         $project = $project->load(['projectArea','projectEngineer', 'projectManager']);
+        $remark = $projectService->getRemarkDiscipline($project);
         $isReviewerCivil = $projectService->checkReviewer('civil',$project->civil_approver,$project->design_engineer_civil,sizeof($estimateDisciplines));
         $isReviewerMechanical = $projectService->checkReviewer('mechanical',$project->mechanical_approver,$project->design_engineer_mechanical,sizeof($estimateDisciplines));
         $isReviewerElectrical = $projectService->checkReviewer('electrical',$project->electrical_approver,$project->design_engineer_electrical,sizeof($estimateDisciplines));
         $isReviewerInstrument = $projectService->checkReviewer('instrument',$project->instrument_approver,$project->design_engineer_instrument,sizeof($estimateDisciplines));
         $isReviewerIt = $projectService->checkReviewer('instrument',$project->it_approver,$project->design_engineer_it,sizeof($estimateDisciplines));
         $isReviewerArchitect = $projectService->checkReviewer('architect',$project->architect_approver,$project->design_engineer_architect,sizeof($estimateDisciplines));
-        $remark = $projectService->getRemarkDiscipline($project);
 
         return view('project.detail',[
             'project' => $project,
@@ -547,6 +552,12 @@ class ProjectController extends Controller
 
                 $projectServices->updateStatusProject($project);
 
+                if ($request->status === Project::APPROVE) {
+                    ProjectReviewNote::where('project_id', $project->id)
+                        ->where('reviewer_id', auth()->id())
+                        ->delete();
+                }
+
                 if($project->status == "APPROVE"){
                     $projectServices->sendEmailToEngineer($project, $request);
                 }
@@ -613,6 +624,91 @@ class ProjectController extends Controller
         $ps = new ProjectServices();
         $ps->sendEmailRemainderToReviewer();
 //        return view('emails.approverNotification');
+    }
+
+    public function getAnnotations(Project $project)
+    {
+        if (!$project->isAssignedToProject()) {
+            return response()->json(['status' => 403, 'message' => 'Forbidden'], 403);
+        }
+        $notes = ProjectReviewNote::where('project_id', $project->id)
+            ->with('reviewer:id,user_name')
+            ->get(['id', 'note', 'mark_type', 'position_x', 'position_y', 'reviewer_id', 'created_at']);
+        return response()->json(['status' => 200, 'notes' => $notes]);
+    }
+
+    public function storeReviewNote(Project $project, Request $request)
+    {
+        if (!$project->isAssignedReviewer()) {
+            return response()->json(['status' => 403, 'message' => 'Forbidden'], 403);
+        }
+        try {
+            $isNew = !($request->has('id') && $request->id);
+
+            if (!$isNew) {
+                $note = ProjectReviewNote::findOrFail($request->id);
+                $note->update([
+                    'note'      => $request->note,
+                    'mark_type' => $request->mark_type ?? ProjectReviewNote::MARK_NOTE,
+                ]);
+            } else {
+                $note = ProjectReviewNote::create([
+                    'project_id'  => $project->id,
+                    'reviewer_id' => auth()->id(),
+                    'note'        => $request->note,
+                    'mark_type'   => $request->mark_type ?? ProjectReviewNote::MARK_NOTE,
+                    'position_x'  => $request->position_x,
+                    'position_y'  => $request->position_y,
+                ]);
+
+                $this->sendReviewNoteNotification($project, $note);
+            }
+
+            $note->load('reviewer:id,user_name');
+            return response()->json(['status' => 200, 'message' => 'Note saved', 'note' => $note]);
+        } catch (Exception $e) {
+            return response()->json(['status' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    public function deleteReviewNote(Project $project, ProjectReviewNote $note)
+    {
+        if (!$project->isAssignedReviewer()) {
+            return response()->json(['status' => 403, 'message' => 'Forbidden'], 403);
+        }
+        try {
+            $note->delete();
+            return response()->json(['status' => 200, 'message' => 'Note deleted']);
+        } catch (Exception $e) {
+            return response()->json(['status' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
+    private function sendReviewNoteNotification(Project $project, ProjectReviewNote $note)
+    {
+        try {
+            $reviewer     = auth()->user();
+            $reviewerName = $reviewer->profiles?->full_name ?? $reviewer->user_name;
+            $target       = $project->getTargetEngineersForReviewer($reviewer->id);
+
+            foreach ($target['engineers'] as $engineer) {
+                $email = $engineer->profiles?->email;
+                if (!$email) continue;
+
+                $engineerName = $engineer->profiles?->full_name ?? $engineer->user_name;
+                Mail::to($email)->send(new ReviewNoteNotification(
+                    $project,
+                    $engineerName,
+                    $reviewerName,
+                    $target['discipline'],
+                    $note->note
+                ));
+
+                Log::info("Review note notification sent to {$email} ({$target['discipline']}) for project {$project->project_title}");
+            }
+        } catch (Exception $e) {
+            Log::error('Review note notification failed: ' . $e->getMessage());
+        }
     }
 
 }

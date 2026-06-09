@@ -179,6 +179,9 @@ Route::post('/manPower/update-list/',[\App\Http\Controllers\ManPowerController::
 Route::post('/equipmentTools/update-list/',[\App\Http\Controllers\EquipmentToolsController::class,'updateList'])->middleware('auth');
 Route::post('/material/update-list/',[\App\Http\Controllers\MaterialController::class,'updateList'])->middleware('auth');
 Route::post('/project/{project:id}/update-remark',[\App\Http\Controllers\ProjectController::class,'updateRemark'])->middleware('auth');
+Route::get('/project/{project:id}/annotations',[\App\Http\Controllers\ProjectController::class,'getAnnotations'])->middleware('auth');
+Route::post('/project/{project:id}/review-note',[\App\Http\Controllers\ProjectController::class,'storeReviewNote'])->middleware('auth');
+Route::delete('/project/{project:id}/review-note/{note}',[\App\Http\Controllers\ProjectController::class,'deleteReviewNote'])->middleware('auth');
 Route::get('/getEstimateToSync',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getEstimateToSync'])->middleware('auth');
 
 Route::get('/generatequery/man-power-work-items', [\App\Http\Controllers\GeneratorQueryController::class,'manPowerWorkItems']);

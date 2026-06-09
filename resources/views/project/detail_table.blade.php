@@ -1,114 +1,221 @@
 @inject('workItemController','App\Http\Controllers\WorkItemController')
-<div class="table-responsive">
-    <table class="table table-bordered" style="border-color: black !important;">
-        <thead class="bg-primary">
-            <tr>
-                <th style="vertical-align : middle;" rowspan="2" class="text-center th-lg min-w-110">Location / Equipment</th>
-                <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-110 th-lg">Discipline</th>
-                <th style="vertical-align : middle;" rowspan="2" class="text-center min-w-110 th-lg">Work Element</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-300">Work Item</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-40">Vol</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center">Unit</th>
-                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Labour Cost (IDR)</th>
-                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Tool & Equipment (IDR)</th>
-                <th scope="col" style="vertical-align : middle;" colspan="2" class="text-center">Material Cost (IDR)</th>
-                <th scope="col" style="vertical-align : middle;" rowspan="2" class="text-center min-w-130">Total Work Cost (IDR)</th>
-                <th scope="col" style="vertical-align : middle;" colspan="3" class="text-center">Fac</th>
-            </tr>
-            <tr style="text-align: center">
-                <th style="vertical-align : middle;">
-                    Unit Rate
-                </th>
-                <th style="vertical-align : middle;" class="min-w-110">
-                    Total
-                </th>
-                <th style="vertical-align : middle;">
-                    Unit Rate
-                </th>
-                <th style="vertical-align : middle;" class="min-w-110">
-                    Total
-                </th>
-                <th style="vertical-align : middle;">
-                    Unit Rate
-                </th>
-                <th style="vertical-align : middle;" class="min-w-110">
-                    Total
-                </th>
-                <th scope="col" style="vertical-align : middle;" class="text-center min-w-65">Labor</th>
-                <th scope="col" style="vertical-align : middle;" class="text-center min-w-65">Tool</th>
-                <th style="vertical-align : middle;" class="text-center min-w-75">Material</th>
-            </tr>
-        </thead>
-        <tbody>
+@php
+    $grouped = [];
+    foreach ($estimateAllDisciplines as $locationKey => $items) {
+        foreach ($items as $item) {
+            $grouped[$locationKey][$item->disciplineTitle ?? 'Uncategorized'][$item->workElementTitle ?? 'Uncategorized'][] = $item;
+        }
+    }
 
-        @foreach($estimateAllDisciplines as $key => $value)
-            @php($previousDiscipline = null)
-            @php($previousWorkElement = null)
-            <tr style="background-color: #C5C5C7D0">
-                <td>{{$key}}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td>{{$costProject[$key]->totalLaborCost}}</td>
-                <td></td>
-                <td>{{$costProject[$key]->totalEquipmentCost}}</td>
-                <td></td>
-                <td>{{$costProject[$key]->totalMaterialCost}}</td>
-                <td>{{number_format($costProject[$key]->totalWorkCost,2,'.',',')}}</td>
-                <td></td>
-                <td></td>
-                <td></td>
-            </tr>
-            @foreach($value as $item)
-                @if($item->disciplineTitle != $previousDiscipline)
-                    <tr class="" style="background-color: #DEDEDED0">
-                        <td></td>
-                        <td colspan="">{{$item->disciplineTitle != $previousDiscipline ? $item->disciplineTitle : ''}}</td>
-                        <td colspan="14"></td>
-                    </tr>
-                @endif
-                @if($item->workElementTitle != $previousWorkElement)
-                    <tr class="" style="background-color: #EFEFEFD0">
-                        <td></td>
-                        <td></td>
-                        <td>{{$item->workElementTitle != $previousWorkElement ? $item->workElementTitle  : ''}}
-                        </td>
-                        <td colspan="13"></td>
-                    </tr>
-                @endif
-                <tr >
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>{{$item->workItemDescription}}</td>
-                    <td>{{$item->estimateVolume}}</td>
-                    <td>{{$item->workItemUnit}}</td>
-                    <td>{{$item->workItemUnitRateLaborCost}}</td>
-                    <td>{{number_format($item->workItemTotalLaborCost,2,',','.')}}</td>
-                    <td>{{$item->workItemUnitRateToolCost}}</td>
-                    <td>{{number_format($item->workItemTotalToolCost,2,',','.')}}</td>
-                    <td>{{$item->workItemUnitRateMaterialCost}}</td>
-                    <td>{{number_format($item->workItemTotalMaterialCost,2,',','.')}}</td>
-                    <td></td>
-                    <td>{{$item->workItemLaborFactorial}}</td>
-                    <td>{{$item->workItemEquipmentFactorial}}</td>
-                    <td>{{$item->workItemMaterialFactorial}}</td>
+    $disciplineTotals = [];
+    foreach ($grouped as $locationKey => $disciplineGroup) {
+        foreach ($disciplineGroup as $disciplineName => $workElementGroup) {
+            $labor = 0; $tool = 0; $material = 0; $total = 0;
+            foreach ($workElementGroup as $workItems) {
+                foreach ($workItems as $item) {
+                    $labor    += $item->workItemTotalLaborCost    ?? 0;
+                    $tool     += $item->workItemTotalToolCost     ?? 0;
+                    $material += $item->workItemTotalMaterialCost ?? 0;
+                    $total    += $item->workItemTotalCost         ?? 0;
+                }
+            }
+            $disciplineTotals[$locationKey][$disciplineName] = compact('labor','tool','material','total');
+        }
+    }
+
+@endphp
+
+{{-- Column-group toggles --}}
+<div class="d-flex gap-2 mb-2 flex-wrap">
+    <button type="button" class="btn btn-xs btn-outline-secondary js-toggle-col-group active"
+            data-group="unit-rate" title="Show / hide unit rate columns">
+        <i class="fa fa-eye-slash me-1"></i>Unit Rates
+    </button>
+    <button type="button" class="btn btn-xs btn-outline-secondary js-toggle-col-group active"
+            data-group="fac" title="Show / hide factorial columns">
+        <i class="fa fa-eye-slash me-1"></i>Factorials
+    </button>
+</div>
+
+<div class="table-page-flow js-detail-table-wrap" style="position:relative;">
+    <div class="table-custom table-container" style="position:relative;">
+        <table class="table table-custom js-full-estimate-table">
+            <thead class="bg-primary">
+                <tr>
+                    {{-- col 1 --}}
+                    <th class="bg-primary text-left" rowspan="2" style="min-width:110px;">Loc / Equip</th>
+                    {{-- col 2 --}}
+                    <th class="bg-primary text-left" rowspan="2" style="min-width:110px;">Discipline</th>
+                    {{-- col 3 --}}
+                    <th class="bg-primary text-left" rowspan="2" style="min-width:100px;">Work Element</th>
+                    {{-- col 4 --}}
+                    <th class="bg-primary text-left" rowspan="2" style="min-width:200px;">Work Item</th>
+                    {{-- col 5 --}}
+                    <th class="bg-primary text-left" rowspan="2" style="min-width:45px;">Vol</th>
+                    {{-- col 6 --}}
+                    <th class="bg-primary text-left" rowspan="2" style="min-width:45px;">Unit</th>
+                    {{-- cols 7-8: Labour --}}
+                    <th class="bg-primary text-center col-group-unit-rate" colspan="1">Labour</th>
+                    <th class="bg-primary text-center" colspan="1" style="min-width:110px;">Labour&nbsp;Total (IDR)</th>
+                    {{-- cols 9-10: Tool --}}
+                    <th class="bg-primary text-center col-group-unit-rate" colspan="1">Tool &amp; Equip</th>
+                    <th class="bg-primary text-center" colspan="1" style="min-width:110px;">Tool&nbsp;Total (IDR)</th>
+                    {{-- cols 11-12: Material --}}
+                    <th class="bg-primary text-center col-group-unit-rate" colspan="1">Material</th>
+                    <th class="bg-primary text-center" colspan="1" style="min-width:110px;">Mat.&nbsp;Total (IDR)</th>
+                    {{-- col 13 --}}
+                    <th class="bg-primary text-left" rowspan="2" style="min-width:120px;">Total Work Cost (IDR)</th>
+                    {{-- cols 14-16: Fac --}}
+                    <th class="bg-primary text-center col-group-fac" colspan="3">Fac</th>
                 </tr>
-                @php($previousDiscipline = $item->disciplineTitle)
-                @php($previousWorkElement = $item->workElementTitle)
-            @endforeach
-        @endforeach
-        <tr class="font-weight-bold" style="background-color: #C5C5C7D0">
-            <td colspan="12">CONTINGENCY {{$project->projectSettings?->contingency}} %</td>
-            <td colspan="4">{{number_format($project->getContingencyCost(),2,',','.')}}</td>
-        </tr>
-        <tr class="font-weight-bold" style="background-color: #C5C5C7D0">
-            <td colspan="12" >TOTAL</td>
-            <td colspan="4">{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
-        </tr>
-        </tbody>
-    </table>
+                <tr class="bg-primary">
+                    <th class="bg-primary col-group-unit-rate" style="min-width:100px;">Unit Rate (IDR)</th>
+                    <th class="bg-primary" style="min-width:110px;">Total (IDR)</th>
+                    <th class="bg-primary col-group-unit-rate" style="min-width:100px;">Unit Rate (IDR)</th>
+                    <th class="bg-primary" style="min-width:110px;">Total (IDR)</th>
+                    <th class="bg-primary col-group-unit-rate" style="min-width:100px;">Unit Rate (IDR)</th>
+                    <th class="bg-primary" style="min-width:110px;">Total (IDR)</th>
+                    <th class="bg-primary text-center col-group-fac" style="min-width:50px;">L</th>
+                    <th class="bg-primary text-center col-group-fac" style="min-width:50px;">T</th>
+                    <th class="bg-primary text-center col-group-fac" style="min-width:50px;">M</th>
+                </tr>
+            </thead>
+            <tbody class="js-table-body-detail">
+                @foreach($grouped as $locationKey => $disciplineGroup)
+                    <tr class="js-column-location table-row-location" style="background-color:#C5C5C7D0;">
+                        <td>
+                            <span class="float-start row-hierarchy-label">
+                                <i class="fa fa-map-marker-alt me-1" style="font-size:10px;opacity:0.6;"></i>
+                                {{ucwords(strtolower($locationKey))}}
+                            </span>
+                            <div class="d-inline-block float-end collapse-toggle">
+                                <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
+                                <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
+                            </div>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        {{-- unit-rate cols --}}
+                        <td class="col-group-unit-rate"></td>
+                        <td>@if(isset($costProject[$locationKey])){{$costProject[$locationKey]->totalLaborCost}}@endif</td>
+                        <td class="col-group-unit-rate"></td>
+                        <td>@if(isset($costProject[$locationKey])){{$costProject[$locationKey]->totalEquipmentCost}}@endif</td>
+                        <td class="col-group-unit-rate"></td>
+                        <td>@if(isset($costProject[$locationKey])){{$costProject[$locationKey]->totalMaterialCost}}@endif</td>
+                        <td class="f-w-700">@if(isset($costProject[$locationKey])){{number_format($costProject[$locationKey]->totalWorkCost,2,',','.')}}@endif</td>
+                        <td class="col-group-fac"></td>
+                        <td class="col-group-fac"></td>
+                        <td class="col-group-fac"></td>
+                    </tr>
+
+                    @foreach($disciplineGroup as $disciplineName => $workElementGroup)
+                        @php $dt = $disciplineTotals[$locationKey][$disciplineName] ?? null; @endphp
+                        <tr class="js-column-discipline table-row-discipline" style="background-color:#DEDEDED0;">
+                            <td></td>
+                            <td>
+                                <div class="d-flex align-items-start justify-content-between">
+                                    <span class="row-hierarchy-label">
+                                        <i class="fa fa-layer-group me-1" style="font-size:10px;opacity:0.6;"></i>
+                                        {{ucwords(strtolower($disciplineName))}}
+                                    </span>
+                                    <div class="collapse-toggle ms-2 flex-shrink-0">
+                                        <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
+                                        <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
+                                    </div>
+                                </div>
+                            </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td class="col-group-unit-rate"></td>
+                            <td class="text-end f-w-500">@if($dt){{number_format($dt['labor'],2,',','.')}}@endif</td>
+                            <td class="col-group-unit-rate"></td>
+                            <td class="text-end f-w-500">@if($dt){{number_format($dt['tool'],2,',','.')}}@endif</td>
+                            <td class="col-group-unit-rate"></td>
+                            <td class="text-end f-w-500">@if($dt){{number_format($dt['material'],2,',','.')}}@endif</td>
+                            <td class="text-end f-w-700">@if($dt){{number_format($dt['total'],2,',','.')}}@endif</td>
+                            <td class="col-group-fac"></td>
+                            <td class="col-group-fac"></td>
+                            <td class="col-group-fac"></td>
+                        </tr>
+
+                        @foreach($workElementGroup as $workElementName => $workItems)
+                            <tr class="js-column-work-element table-row-work-element" style="background-color:#EFEFEFD0;">
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <div class="d-flex align-items-start justify-content-between">
+                                        <span class="row-hierarchy-label">
+                                            <i class="fa fa-wrench me-1" style="font-size:10px;opacity:0.6;"></i>
+                                            {{$workElementName}}
+                                        </span>
+                                        <div class="collapse-toggle ms-2 flex-shrink-0">
+                                            <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
+                                            <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td></td><td></td><td></td>
+                                <td class="col-group-unit-rate"></td><td></td>
+                                <td class="col-group-unit-rate"></td><td></td>
+                                <td class="col-group-unit-rate"></td><td></td>
+                                <td></td>
+                                <td class="col-group-fac"></td>
+                                <td class="col-group-fac"></td>
+                                <td class="col-group-fac"></td>
+                            </tr>
+
+                            @foreach($workItems as $item)
+                                <tr class="table-row-work-item" data-estimate-id="{{$item->id}}">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td class="f-w-500">{{$item->workItemDescription}}</td>
+                                    <td>{{$item->estimateVolume}}</td>
+                                    <td>{{$item->workItemUnit}}</td>
+                                    <td class="col-group-unit-rate">{{$item->workItemUnitRateLaborCost}}</td>
+                                    <td class="text-end">{{number_format($item->workItemTotalLaborCost,2,',','.')}}</td>
+                                    <td class="col-group-unit-rate">{{$item->workItemUnitRateToolCost}}</td>
+                                    <td class="text-end">{{number_format($item->workItemTotalToolCost,2,',','.')}}</td>
+                                    <td class="col-group-unit-rate">{{$item->workItemUnitRateMaterialCost}}</td>
+                                    <td class="text-end">{{number_format($item->workItemTotalMaterialCost,2,',','.')}}</td>
+                                    <td class="f-w-500">{{$item->workItemTotalCostStr}}</td>
+                                    <td class="text-center col-group-fac">{{$item->workItemLaborFactorial}}</td>
+                                    <td class="text-center col-group-fac">{{$item->workItemEquipmentFactorial}}</td>
+                                    <td class="text-center col-group-fac">{{$item->workItemMaterialFactorial}}</td>
+                                </tr>
+                            @endforeach
+                        @endforeach
+                    @endforeach
+                @endforeach
+
+                <tr class="f-w-700 table-row-contingency">
+                    <td colspan="12">
+                        <span class="row-hierarchy-label">
+                            <i class="fa fa-percentage me-1" style="font-size:10px;opacity:0.7;"></i>
+                            Contingency {{$project->projectSettings?->contingency}}%
+                        </span>
+                    </td>
+                    <td colspan="4">{{number_format($project->getContingencyCost(),2,',','.')}}</td>
+                </tr>
+                <tr class="table-row-grand-total">
+                    <td colspan="12">
+                        <i class="fa fa-calculator me-1" style="font-size:11px;opacity:0.85;"></i>
+                        Grand Total
+                    </td>
+                    <td colspan="4">{{number_format($project->getTotalCostWithContingency(),2,',','.')}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        @if($project->isAssignedToProject())
+        <div class="annotation-layer js-annotation-layer"
+             data-project-id="{{$project->id}}"
+             data-readonly="{{ $project->isAssignedReviewer() ? '0' : '1' }}"></div>
+        @endif
+    </div>
 </div>

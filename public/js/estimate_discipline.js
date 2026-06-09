@@ -152,30 +152,33 @@ $(function(){
             data: _data,
             type: 'POST',
             success: function (data) {
-                if (data.status === 200) {
-                    if (document.fullscreenElement) {
-                        showNotification('.js-fullscreen-element', 'Your data was successfully saved');
-                    } else {
-                        notification('success', data.message);
-                    }
+                if (data.status == 200) {
                     $(window).off('beforeunload');
                     $('.js-version-project-estimate').val(data.version);
-                    $('.js-loading-save').addClass('d-none');
-                    $('.js-save-estimate-discipline').removeAttr('disabled');
                     $('.js-modal-confirm-publish').modal('hide');
+                    try {
+                        if (document.fullscreenElement) {
+                            showNotification('.js-fullscreen-element', 'Your data was successfully saved');
+                        } else {
+                            notification('success', data.message);
+                        }
+                    } catch (e) {}
                     if (status === "PUBLISH") {
                         setTimeout(function () {
                             window.location.href = "/project/" + _project_id;
                         }, 1000);
                     }
                 } else {
-                    notification('danger', data.message, 'fa fa-frown-o', 'Error');
+                    try { notification('danger', data.message, 'fa fa-frown-o', 'Error'); } catch (e) {}
                     if (data.sync) {
                         $('.js-btn-loading-sync').removeClass('d-none');
-                        $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
-                        _this.find('.js-loading-save').addClass('d-none');
                     }
                 }
+            },
+            complete: function () {
+                // Runs after success OR error — always restores the button UI
+                $('.js-loading-save').addClass('d-none');
+                $('.js-save-estimate-discipline').removeAttr('disabled');
             }
         });
     }
@@ -572,9 +575,8 @@ $(function(){
     });
 
 
-    $('.js-fullscreen').on('click', function () {
+    function enterFullscreen() {
         var _table = document.querySelector('.js-fullscreen-element');
-        var scrollLeft = _table.scrollLeft;
 
         // Remove rows with empty Select2 dropdowns
         $(_table).find('.select2').each(function () {
@@ -590,20 +592,38 @@ $(function(){
         // Go full screen
         _table.requestFullscreen();
         var _element_full_screen = $('.js-fullscreen-element');
-        _element_full_screen.css('background-color','#f4f7fb')
-        _element_full_screen.css('padding','0')
-        _element_full_screen.find('.table-overflow').css('height','92vh')
-        _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0.8em')
-        _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0.8em')
+        _element_full_screen.css('background-color','#f4f7fb');
+        _element_full_screen.css('padding','0');
+        _element_full_screen.find('.table-overflow').css('height','calc(92vh - 38px)');
+        _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0.8em');
+        _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0.8em');
         setWhiteBackground(_table);
+
+        // Update button state
+        $('.js-fullscreen i').removeClass('fa-expand').addClass('fa-compress');
+        $('.js-fullscreen-label').text('Exit Fullscreen');
+        $('.js-fullscreen-indicator').removeClass('d-none').addClass('d-flex');
 
         // Select2 repositioning code
         $(_table).find('.select2').each(function () {
             workItemSelectInit(this);
         });
 
-        // Scroll the table to the left
         _table.scrollLeft = 0;
+    }
+
+    function exitFullscreen() {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    }
+
+    $('.js-fullscreen').on('click', function () {
+        if (document.fullscreenElement) {
+            exitFullscreen();
+        } else {
+            enterFullscreen();
+        }
     });
 
 
@@ -618,13 +638,62 @@ $(function(){
     })
 
     $(document).on('fullscreenchange', function () {
-        // Check if the document is currently in fullscreen mode
         if (!document.fullscreenElement) {
             var _element_full_screen = $('.js-fullscreen-element');
-            _element_full_screen.css('padding-left','0.8em')
-            _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0')
-            _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0')
+            _element_full_screen.css('padding-left','0.8em');
+            _element_full_screen.find('.table-overflow').css('height','60vh');
+            _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0');
+            _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0');
             $('.js-manual-notify').remove();
+            // Reset button state
+            $('.js-fullscreen i').removeClass('fa-compress').addClass('fa-expand');
+            $('.js-fullscreen-label').text('Fullscreen');
+            $('.js-fullscreen-indicator').addClass('d-none').removeClass('d-flex');
+        }
+    });
+
+    // Collapse All — expand everything first (known state), then trigger each location's minimize
+    $('.js-btn-collapse-all').on('click', function (e) {
+        e.preventDefault();
+        var $tbody = $('.js-table-body-work-item-item');
+        // Silently restore all rows so every location row's minimize fires from a clean state
+        $tbody.children('tr').removeClass('d-none');
+        $tbody.find('.js-minimize').removeClass('d-none');
+        $tbody.find('.js-maximize').addClass('d-none');
+        // Now trigger the existing minimize handler on every location row
+        $tbody.find('.js-column-location .js-minimize').each(function () {
+            $(this).trigger('click');
+        });
+        $(this).addClass('d-none');
+        $('.js-btn-expand-all').removeClass('d-none');
+    });
+
+    // Expand All — trigger maximize on each collapsed location, then reset inner chevrons
+    $('.js-btn-expand-all').on('click', function (e) {
+        e.preventDefault();
+        var $tbody = $('.js-table-body-work-item-item');
+        // Trigger maximize on all location rows that are currently collapsed
+        $tbody.find('.js-column-location .js-maximize:not(.d-none)').each(function () {
+            $(this).trigger('click');
+        });
+        // Reset discipline / work-element chevrons (location maximize shows their rows but
+        // doesn't reset their own chevron state)
+        $tbody.find('.js-column-discipline .js-minimize, .js-column-work-element .js-minimize').removeClass('d-none');
+        $tbody.find('.js-column-discipline .js-maximize, .js-column-work-element .js-maximize').addClass('d-none');
+        $(this).addClass('d-none');
+        $('.js-btn-collapse-all').removeClass('d-none');
+    });
+
+    // Keyboard shortcut: F toggles fullscreen
+    $(document).on('keydown', function (e) {
+        var tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        if (e.key === 'f' || e.key === 'F') {
+            if (document.fullscreenElement) {
+                exitFullscreen();
+            } else {
+                enterFullscreen();
+            }
         }
     });
 
@@ -794,4 +863,315 @@ $(function(){
         },10)
 
     })
+
+    // ─── Detail table: Collapse All / Expand All ───────────────────────────────
+
+    $('.js-btn-collapse-all-detail').on('click', function (e) {
+        e.preventDefault();
+        var $tbody = $('.js-table-body-detail');
+        $tbody.children('tr').removeClass('d-none');
+        $tbody.find('.js-minimize').removeClass('d-none');
+        $tbody.find('.js-maximize').addClass('d-none');
+        $tbody.find('.js-column-location .js-minimize').each(function () {
+            $(this).trigger('click');
+        });
+        $(this).addClass('d-none');
+        $('.js-btn-expand-all-detail').removeClass('d-none');
+    });
+
+    $('.js-btn-expand-all-detail').on('click', function (e) {
+        e.preventDefault();
+        var $tbody = $('.js-table-body-detail');
+        $tbody.find('.js-column-location .js-maximize:not(.d-none)').each(function () {
+            $(this).trigger('click');
+        });
+        $tbody.find('.js-column-discipline .js-minimize, .js-column-work-element .js-minimize').removeClass('d-none');
+        $tbody.find('.js-column-discipline .js-maximize, .js-column-work-element .js-maximize').addClass('d-none');
+        $(this).addClass('d-none');
+        $('.js-btn-collapse-all-detail').removeClass('d-none');
+    });
+
+    // Detail page fullscreen: override the basic requestFullscreen with full toggle
+    $(document).on('click', '.js-fullscreen-detail', function () {
+        var _table = document.querySelector('.js-fullscreen-table');
+        if (!_table) return;
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+            $(this).find('i').removeClass('fa-compress').addClass('fa-expand');
+            $(this).find('span').text('Fullscreen');
+        } else {
+            _table.requestFullscreen().then(function () {
+                $('.js-fullscreen-table').css({
+                    'background-color': '#f4f7fb',
+                    'overflow-y': 'auto',
+                    'padding': '12px',
+                });
+            });
+            $(this).find('i').removeClass('fa-expand').addClass('fa-compress');
+        }
+    });
+
+    // ─── Free-form Annotation Overlay ─────────────────────────────────────────
+
+    var _annotateMode = false;
+    var _annotMarkColors = { note:'#6c757d', ok:'#198754', warning:'#ffc107', rejected:'#dc3545', question:'#0dcaf0' };
+
+    // Build an annotation bubble element — readOnly renders a non-editable view
+    function buildAnnotationBubble(noteId, text, markType, posX, posY, reviewerName, readOnly) {
+        var mark = markType || 'note';
+
+        var $bubble = $('<div class="annotation-bubble" tabindex="0"></div>')
+            .css({ left: posX + 'px', top: posY + 'px' })
+            .attr({ 'data-note-id': noteId || '', 'data-mark': mark });
+
+        var byHtml = reviewerName ? '<span class="annot-by">by ' + reviewerName + '</span>' : '';
+        var safeText = $('<div>').text(text || '').html();
+
+        if (readOnly) {
+            $bubble.addClass('annot-readonly').html(
+                '<div class="annot-header">' +
+                    '<span class="annot-dot-ro" style="background:' + (_annotMarkColors[mark] || '#6c757d') + '"></span>' +
+                    byHtml +
+                '</div>' +
+                '<div class="annot-body-ro">' + safeText + '</div>'
+            );
+        } else {
+            var dotsHtml = '';
+            $.each(_annotMarkColors, function(m, c) {
+                dotsHtml += '<span class="annot-dot' + (m === mark ? ' active' : '') +
+                            '" data-mark="' + m + '" style="background:' + c + '" title="' + m + '"></span>';
+            });
+
+            $bubble.html(
+                '<div class="annot-header">' +
+                    '<div class="annot-dots">' + dotsHtml + '</div>' +
+                    byHtml +
+                    '<button type="button" class="annot-close" title="Delete">&#x2715;</button>' +
+                '</div>' +
+                '<textarea class="annot-textarea" placeholder="Write your note here...">' + safeText + '</textarea>' +
+                '<div class="annot-footer">' +
+                    '<button type="button" class="annot-save-btn">Save</button>' +
+                '</div>'
+            );
+        }
+
+        return $bubble;
+    }
+
+    // Append a bubble to the layer and wire up its events using direct binding
+    function addBubbleToLayer($layer, noteId, text, markType, posX, posY, reviewerName) {
+        var readOnly = $layer.data('readonly') == '1';
+        var $bubble  = buildAnnotationBubble(noteId, text, markType, posX, posY, reviewerName, readOnly);
+        $layer.append($bubble);
+
+        // Read-only bubbles: just block propagation so clicking them doesn't create new ones
+        if (readOnly) {
+            $bubble.on('mousedown click', function(e) { e.stopPropagation(); });
+            return $bubble;
+        }
+
+        if (!noteId) {
+            setTimeout(function() { $bubble.find('.annot-textarea').focus(); }, 60);
+        }
+
+        // Drag — header acts as drag handle
+        $bubble.find('.annot-header').on('mousedown', function(e) {
+            if ($(e.target).hasClass('annot-close') || $(e.target).hasClass('annot-dot')) return;
+            e.preventDefault();
+            e.stopPropagation();
+            var startPageX = e.pageX;
+            var startPageY = e.pageY;
+            var startLeft  = parseFloat($bubble.css('left'))  || 0;
+            var startTop   = parseFloat($bubble.css('top'))   || 0;
+            $bubble.addClass('dragging');
+
+            $(document).on('mousemove.annotDrag', function(ev) {
+                $bubble.css({
+                    left: startLeft + (ev.pageX - startPageX) + 'px',
+                    top:  startTop  + (ev.pageY - startPageY) + 'px',
+                });
+            }).on('mouseup.annotDrag', function() {
+                $(document).off('mousemove.annotDrag mouseup.annotDrag');
+                $bubble.removeClass('dragging');
+            });
+        });
+
+        // Prevent click/mousedown on bubble from propagating to the layer
+        $bubble.on('mousedown click', function(e) { e.stopPropagation(); });
+
+        // Mark type dots — direct binding on each dot
+        $bubble.find('.annot-dot').on('click', function(e) {
+            e.stopPropagation();
+            var newMark = $(this).data('mark');
+            $bubble.attr('data-mark', newMark);
+            $bubble.find('.annot-dot').removeClass('active');
+            $(this).addClass('active');
+        });
+
+        // Save — direct binding on the save button
+        $bubble.find('.annot-save-btn').on('click', function(e) {
+            e.stopPropagation();
+            var $btn      = $(this);
+            var noteText  = $bubble.find('.annot-textarea').val().trim();
+            if (!noteText) {
+                $bubble.find('.annot-textarea').addClass('is-invalid');
+                return;
+            }
+            $bubble.find('.annot-textarea').removeClass('is-invalid');
+
+            var mark       = $bubble.attr('data-mark') || 'note';
+            var existingId = $bubble.attr('data-note-id') || '';
+            var projectId  = $layer.data('project-id');
+            var currentX   = parseFloat($bubble.css('left')) || 0;
+            var currentY   = parseFloat($bubble.css('top'))  || 0;
+
+            $btn.prop('disabled', true).text('Saving...');
+            $.ajax({
+                url:  '/project/' + projectId + '/review-note',
+                type: 'POST',
+                data: {
+                    id:         existingId || null,
+                    note:       noteText,
+                    mark_type:  mark,
+                    position_x: currentX,
+                    position_y: currentY,
+                    _token:     $('meta[name="csrf-token"]').attr('content'),
+                },
+                success: function(res) {
+                    if (res.status == 200) {
+                        $bubble.attr('data-note-id', res.note.id);
+                        $btn.text('Saved!');
+                        setTimeout(function() { $btn.text('Save'); }, 1500);
+                    } else {
+                        $btn.text('Failed!');
+                        setTimeout(function() { $btn.text('Save'); }, 2000);
+                    }
+                },
+                error: function() {
+                    $btn.text('Error!');
+                    setTimeout(function() { $btn.text('Save'); }, 2000);
+                },
+                complete: function() { $btn.prop('disabled', false); }
+            });
+        });
+
+        // Delete — direct binding on the close button
+        $bubble.find('.annot-close').on('click', function(e) {
+            e.stopPropagation();
+            var existingId = $bubble.attr('data-note-id') || '';
+            var projectId  = $layer.data('project-id');
+            if (existingId) {
+                $.ajax({
+                    url:  '/project/' + projectId + '/review-note/' + existingId,
+                    type: 'DELETE',
+                    data: { _token: $('meta[name="csrf-token"]').attr('content') },
+                    success: function(res) { if (res.status == 200) $bubble.remove(); }
+                });
+            } else {
+                $bubble.remove();
+            }
+        });
+
+        return $bubble;
+    }
+
+    // Toggle annotate mode
+    $(document).on('click', '.js-btn-annotate-toggle', function() {
+        _annotateMode = !_annotateMode;
+        var $btn   = $(this);
+        var $layer = $('.js-annotation-layer');
+
+        if (_annotateMode) {
+            $btn.removeClass('btn-outline-warning').addClass('btn-warning');
+            $layer.addClass('annotate-mode');
+            $btn.html('<i class="fa fa-pencil-alt me-1"></i>Done Annotating');
+        } else {
+            $btn.removeClass('btn-warning').addClass('btn-outline-warning');
+            $layer.removeClass('annotate-mode');
+            $btn.html('<i class="fa fa-pencil-alt me-1"></i>Annotate');
+        }
+    });
+
+    // Click on layer in annotate mode → create new bubble at click position
+    $(document).on('click', '.js-annotation-layer.annotate-mode', function(e) {
+        var $layer = $(this);
+        var x = e.pageX - $layer.offset().left;
+        var y = e.pageY - $layer.offset().top;
+        addBubbleToLayer($layer, null, '', 'note', x, y, null);
+    });
+
+    // Load existing annotations when the annotation layer is present
+    var $annotLayer = $('.js-annotation-layer');
+    if ($annotLayer.length) {
+        var _annotProjectId = $annotLayer.data('project-id');
+        $.ajax({
+            url:  '/project/' + _annotProjectId + '/annotations',
+            type: 'GET',
+            success: function(res) {
+                if (res.status == 200) {
+                    $.each(res.notes, function(i, note) {
+                        addBubbleToLayer(
+                            $annotLayer,
+                            note.id,
+                            note.note,
+                            note.mark_type,
+                            parseFloat(note.position_x) || 0,
+                            parseFloat(note.position_y) || 0,
+                            note.reviewer ? note.reviewer.user_name : ''
+                        );
+                    });
+                }
+            }
+        });
+    }
+
+    // ─── Column-group toggle (Unit Rates / Factorials) ───────────────────────
+
+    $(document).on('click', '.js-toggle-col-group', function () {
+        var $btn   = $(this);
+        var group  = $btn.data('group');
+        var hidden = $btn.hasClass('active');
+
+        // Mark columns hidden/visible
+        $('.col-group-' + group).toggleClass('col-group-hidden', hidden);
+
+        // Also hide the rowspan header th that spans the hidden cols
+        $btn.toggleClass('active', !hidden);
+        $btn.find('i').toggleClass('fa-eye-slash', !hidden).toggleClass('fa-eye', hidden);
+
+        fixStickyHeaderOffset();
+    });
+
+    // ─── JS sticky thead (translateY) — works inside overflow-x:auto container ──
+    function updateStickyThead() {
+        var $wrap   = $('.js-detail-table-wrap');
+        if (!$wrap.length) return;
+        var $thead  = $wrap.find('.js-full-estimate-table thead');
+        if (!$thead.length) return;
+
+        var navH      = $('.page-main-header').outerHeight() || 0;
+        var wrapTop   = $wrap.offset().top;
+        var wrapH     = $wrap.outerHeight();
+        var scrollTop = $(window).scrollTop();
+        var theadH    = $thead.outerHeight();
+        var shift     = scrollTop + navH - wrapTop;
+        var frozen    = shift > 0 && shift + theadH < wrapH;
+
+        if (frozen) {
+            $thead.css('transform', 'translateY(' + shift + 'px)');
+        } else {
+            $thead.css('transform', '');
+            shift = 0;
+        }
+
+        // Hide annotation bubbles whose position is behind the frozen header
+        var headerBottom = theadH + (frozen ? shift : 0);
+        $wrap.find('.annotation-bubble').each(function () {
+            var bubbleTop = parseFloat($(this).css('top')) || 0;
+            $(this).css('visibility', (frozen && bubbleTop < headerBottom) ? 'hidden' : '');
+        });
+    }
+    updateStickyThead();
+    $(window).on('scroll resize', updateStickyThead);
+
 });
