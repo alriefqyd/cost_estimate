@@ -356,6 +356,7 @@ class ProjectController extends Controller
     }
 
     public function duplicateProject(Project $project){
+        $projectServices = new ProjectServices();   
         DB::beginTransaction();
         try{
             $duplicateProject = $project->replicate();
@@ -368,7 +369,7 @@ class ProjectController extends Controller
             $duplicateProject->it_approval_status = ""; // Set a valid status
             $duplicateProject->architect_approval_status = ""; // Set a valid status
             $duplicateProject->remark = ""; // Set a valid status
-            $duplicateProject->estimate_discipline_status = "";
+            $duplicateProject->estimate_discipline_status = $projectServices->replicateEstimateDisciplineStatus($project->estimate_discipline_status);
 
             $duplicateProject->save();
 
@@ -431,7 +432,7 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function export(Project $project, Request $request){
+    public function export(Project $project, Request $request, $isEmail = false){
         $projectServices = new ProjectServices();
         $estimateDisciplines = $projectServices->getEstimateDisciplineByProject($project, $request);
         $costProjects = $projectServices->getAllProjectCost($project, $request);
@@ -454,6 +455,7 @@ class ProjectController extends Controller
         ]) ->setPaper('A3', 'landscape');
 
         // Return the generated PDF
+        if($isEmail) return $pdf->output();
         return $pdf->download('summary-export.pdf');
     }
 
@@ -544,6 +546,10 @@ class ProjectController extends Controller
                 }
 
                 $projectServices->updateStatusProject($project);
+
+                if($project->status == "APPROVE"){
+                    $projectServices->sendEmailToEngineer($project, $request);
+                }
 
                 $newStatusDiscipline = $request->status;
                 $statusEstimate = collect(json_decode($project->estimate_discipline_status));

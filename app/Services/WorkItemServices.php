@@ -17,8 +17,10 @@ class WorkItemServices
         $filter = request(['q','category','status','creator']);
         if($isCount) $filter = request(['q','category','creator']);
         $workItem = WorkItem::leftJoin('work_item_types','work_items.work_item_type_id','work_item_types.id')->filter($filter)
-            ->leftJoin('users','work_items.created_by','users.id')
-            ->leftJoin('profiles','users.id','profiles.user_id')
+            ->leftJoin('users', 'work_items.created_by', '=', 'users.id')
+            ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
+            ->leftJoin('users as reviewer_user', 'work_items.reviewed_by', '=', 'reviewer_user.id')
+            ->leftJoin('profiles as reviewer', 'reviewer_user.id', '=', 'reviewer.user_id')
             ->when(isset($request->sort), function($query) use ($request,$order,$sort) {
                 return $query->when($request->order == 'work_items.volume', function ($q) use ($request, $order, $sort) {
                     return $q->orderByRaw('CONVERT(work_items.volume, SIGNED)' . $sort);
@@ -33,62 +35,92 @@ class WorkItemServices
                 return $q->where('status', $status);
             })->when(!isset($request->sort), function($query) use ($request,$order){
                 return $query->orderBy('work_items.code','ASC');
-            })->select('work_items.code','work_items.description','work_items.id','work_item_types.title as category','work_items.volume','work_items.unit','work_items.status','profiles.full_name');
-
+            })->select(
+                'work_items.code',
+                'work_items.description',
+                'work_items.id',
+                'work_item_types.title as category',
+                'work_items.volume',
+                'work_items.unit',
+                'work_items.status',
+                'profiles.full_name as creator_name',
+                'reviewer.full_name as reviewer_name'
+            );
         return $workItem;
     }
 
-    public function getWorkItemList(){
-        try{
-            $workItemList = WorkItem::with(['manPowers','equipmentTools','materials','workItemTypes'])->get();
-            $processWorkItem = $workItemList->map(function($workItem){
+    public function getWorkItemList()
+    {
+        try {
+            $processWorkItem = collect(); // Use a collection to store results
 
-                $manPowers = [];
-                $equipments = [];
-                $materials = [];
+            WorkItem::with(['manPowers', 'equipmentTools', 'materials', 'workItemTypes','createdBy.profiles'])
+                ->chunk(100, function ($workItems) use ($processWorkItem) {
+                    foreach ($workItems as $workItem) {
+                        $manPowers = [];
+                        $equipments = [];
+                        $materials = [];
 
-                foreach($workItem->manPowers as $mp) {
-                    $subItem = new WorkItemRelationItemListClass();
-                    $subItem->id = $mp->id;
-                    $subItem->description = $mp->title;
-                    $subItem->unit = $mp->pivot->labor_unit;
-                    $subItem->coef = $mp->pivot->labor_coefisient;
-                    $subItem->amount = $mp->pivot->amount;
-                    $subItem->unit_price = $mp->overall_rate_hourly;
-                    array_push($manPowers,$subItem);
-                }
+                        foreach ($workItem->manPowers as $mp) {
+                            $subItem = new WorkItemRelationItemListClass();
+                            $subItem->id = $mp->id;
+                            $subItem->description = $mp->title;
+                            $subItem->unit = $mp->pivot->labor_unit;
+                            $subItem->coef = $mp->pivot->labor_coefisient;
+                            $subItem->unit_price = $mp->overall_rate_hourly;
+                            $subItem->amount = (float) $mp->pivot->labor_coefisient * $mp->overall_rate_hourly;
+                            array_push($manPowers, $subItem);
+                        }
 
-                foreach($workItem->equipmentTools as $et){
-                    $subItem = new WorkItemRelationItemListClass();
-                    $subItem->id = $et->id;
-                    $subItem->description = $et->description;
-                    $subItem->unit_price = $et->pivot->unit_price;
-                    $subItem->quantity = $et->pivot->quantity;
-                    $subItem->amount = $et->pivot->amount;
-                    array_push($equipments, $subItem);
-                }
+                        foreach ($workItem->equipmentTools as $et) {
+                            $subItem = new WorkItemRelationItemListClass();
+                            $subItem->id = $et->id;
+                            $subItem->description = $et->description;
+                            $subItem->unit = $et->pivot->unit;
+                            $subItem->unit_price = $et->pivot->unit_price;
+                            $subItem->quantity = $et->pivot->quantity;
+                            $subItem->amount = $et->pivot->amount;
+                            array_push($equipments, $subItem);
+                        }
 
-                $workItemClass = new WorkItemClass();
-                $workItemClass->id = $workItem->id;
-                $workItemClass->code = $workItem->code;
-                $workItemClass->workItemDescription = $workItem->description;
-                $workItemClass->volume = $workItem->volume;
-                $workItemClass->workItemType = $workItem->workItemTypes->title;
-                $workItemClass->workItemTypeId = $workItem->work_item_type_id;
-                $workItemClass->reviewedBy = $workItem->reviewed_by;
-                $workItemClass->manPowerList = $manPowers;
-                $workItemClass->equipmentToolList = $equipments;
-                $workItemClass->numOfManPower = count($manPowers);
-                $workItemClass->numOfEquipment = count($equipments);
+                        foreach ($workItem->materials as $et) {
+                            $subItem = new WorkItemRelationItemListClass();
+                            $subItem->id = $et->id;
+                            $subItem->description = $et->tool_equipment_description;
+                            $subItem->unit = $et->unit;
+                            $subItem->unit_price = $et->rate;
+                            $subItem->quantity = $et->pivot->quantity;
+                            $subItem->amount = $et->pivot->amount;
+                            array_push($materials, $subItem);
+                        }
 
-                return $workItemClass;
-            });
+                        $workItemClass = new WorkItemClass();
+                        $workItemClass->id = $workItem->id;
+                        $workItemClass->code = $workItem->code;
+                        $workItemClass->status = $workItem->status;
+                        $workItemClass->createdBy = $workItem->createdBy?->profiles?->full_name;
+                        $workItemClass->workItemDescription = $workItem->description;
+                        $workItemClass->volume = $workItem->volume;
+                        $workItemClass->workItemType = $workItem->workItemTypes->title;
+                        $workItemClass->workItemTypeId = $workItem->work_item_type_id;
+                        $workItemClass->reviewedBy = $workItem->reviewed_by;
+                        $workItemClass->manPowerList = $manPowers;
+                        $workItemClass->materialList = $materials;
+                        $workItemClass->equipmentToolList = $equipments;
+                        $workItemClass->numOfManPower = count($manPowers);
+                        $workItemClass->numOfEquipment = count($equipments);
+                        $workItemClass->numOfMaterial = count($materials);
+
+                        $processWorkItem->push($workItemClass);
+                    }
+                });
+
             return $processWorkItem;
-
         } catch (Exception $e) {
             return $e->getMessage();
         }
     }
+
 
     public function duplicateRelationWorkItem($newWorkItem, $parent){
         $manPowers = DB::table('man_powers_work_items')->where('work_item_id',$parent)->get();

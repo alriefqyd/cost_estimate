@@ -172,6 +172,7 @@ Route::get('/cost-estimate-summary/export/{project:id}',[\App\Http\Controllers\P
 Route::get('/cost-estimate-summary/exportCustom/{project:id}',[\App\Http\Controllers\ProjectController::class,'export'])->middleware('auth');
 Route::get('/getDisciplineList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getDisciplineList'])->middleware('auth');
 Route::get('/getWorkElementList',[\App\Http\Controllers\WorkBreakdownStructureController::class,'getWorkElementList'])->middleware('auth');
+Route::get('/getWorkElementName', [\App\Http\Controllers\WorkBreakdownStructureController::class,'getWorkElementName'])->middleware('auth');
 Route::post('/updateStatusWorkItem',[\App\Http\Controllers\WorkItemController::class,'updateStatusWorkItem'])->middleware('auth');
 Route::post('/workItem/update-list/',[\App\Http\Controllers\WorkItemController::class,'updateList'])->middleware('auth');
 Route::post('/manPower/update-list/',[\App\Http\Controllers\ManPowerController::class,'updateList'])->middleware('auth');
@@ -190,6 +191,3 @@ Route::get('/getReviewer', [\App\Http\Controllers\ApiController::class,'getRevie
 
 Route::get('/send-email',[\App\Http\Controllers\ProjectController::class,'sendMail']);
 Route::get('/send-email-preview',[\App\Http\Controllers\ProjectController::class,'sendMailPreview']);
-
-
-

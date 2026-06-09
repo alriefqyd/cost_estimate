@@ -20,4 +20,5 @@ class WorkItemClass
     public $equipmentToolList;
     public $materialList;
     public $reviewedBy;
+    public $createdBy;
 }
