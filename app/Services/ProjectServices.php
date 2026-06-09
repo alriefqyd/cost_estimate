@@ -4,7 +4,9 @@ namespace App\Services;
 
 use App\Class\ProjectClass;
 use App\Class\ProjectTotalCostClass;
+use App\Http\Controllers\ProjectController;
 use App\Mail\SendMail;
+use App\Mail\SendNotifApproveCostEstimateToEngineer;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Profile;
 use App\Models\Project;
@@ -53,6 +55,7 @@ class ProjectServices
         $data = $this->getDataEstimateDiscipline($project,$request);
         $result = $data->mapToGroups(function ($location) use ($data) {
             $projectClass = new ProjectClass();
+            $projectClass->id = $location->id;
             $projectClass->estimateVolume = $location->volume;
             $projectClass->disciplineTitle = $location?->wbss?->wbsDiscipline?->title;
             $projectClass->workItemIdentifier = $location?->wbss?->identifier;
@@ -252,9 +255,9 @@ class ProjectServices
     }
 
     public function getResultCount($value,$factorial){
+        if(!$factorial) $factorial = 1;
         $factorial = (float) $factorial;
         if(!$value) return '';
-        if(!$factorial) $factorial = 1;
         $newValue = $value * $factorial;
         return number_format($newValue,2,',','.');
     }
@@ -324,6 +327,33 @@ class ProjectServices
                 }
             }
         }
+    }
+
+    public function sendEmailToEngineer(Project $project, Request $request){
+        $projectController = new ProjectController();
+        $attachment = $projectController->export($project, $request, true);
+
+        try {
+            foreach (Setting::DESIGN_ENGINEER_LIST_DB_COLUMN as $engineer) {
+                if(isset($project->$engineer)){
+                    $profile = Profile::where('user_id', $project->$engineer)->first();
+                    Mail::to($profile->email)->send(new SendNotifApproveCostEstimateToEngineer($project, $profile, $attachment));
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error sending email to engineer: ' . $e->getMessage());
+        }
+    }
+
+    public function replicateEstimateDisciplineStatus($disciplineStatus){
+        $disciplineStatus = json_decode($disciplineStatus);
+        $newDisciplineStatus = [];
+        foreach ($disciplineStatus as $status) {
+            $newStatus = clone $status;
+            $newStatus->status = Project::PENDING;
+            $newDisciplineStatus[] = $newStatus;
+        }
+        return json_encode($newDisciplineStatus);
     }
 }
 

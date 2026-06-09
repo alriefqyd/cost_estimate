@@ -325,8 +325,8 @@
                         <div class="col-sm-12 col-lg-12 col-xl-12">
                             <div class="clearfix"></div>
                             <div class="col-md-6">
-{{--                                 @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE)--}}
-                                 @if(sizeof($estimateAllDisciplines) > 0)
+                                 @if(sizeof($estimateAllDisciplines) > 0 && $project->status == $projectModel::APPROVE)
+{{--                                 @if(sizeof($estimateAllDisciplines) > 0)--}}
                                     <div class="btn-group">
                                         <button type="button" class="js-btn-dropdown-dwd btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                             <span class="text-dwd"> Download Options</span>

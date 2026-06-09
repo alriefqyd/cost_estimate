@@ -862,7 +862,7 @@ class WorkItemController extends Controller
             $items = WorkItem::whereIn('id',$ids)->get();
 
             $items->each(function ($item){
-                $item->update(['status' => WorkItem::REVIEWED]);
+                $item->update(['status' => WorkItem::REVIEWED,'reviewed_by' => auth()->user()->id]);
             });
             DB::commit();
             return response()->json([
@@ -914,7 +914,7 @@ class WorkItemController extends Controller
             return Excel::download(new WorkItemExport(), 'Std_Work_Item.xlsx');
         } catch (Exception $e) {
             Log::info($e->getMessage());
-            return response()->json('Import Failed : ' . $e->getMessage());
+            return response()->json('Export Failed : ' . $e->getMessage());
         }
     }
 

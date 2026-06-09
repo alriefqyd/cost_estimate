@@ -18,6 +18,15 @@ class Setting extends Model
         'it' => 'IT'
     ];
 
+    public const DESIGN_ENGINEER_LIST_DB_COLUMN = [
+        'civil' => 'design_engineer_civil',
+        'mechanical' => 'design_engineer_mechanical',
+        'electrical' => 'design_engineer_electrical',
+        'instrument' => 'design_engineer_instrument',
+        'architect' => 'design_engineer_architect',
+        'it' => 'design_engineer_it',
+    ];
+
     public const DESIGN_ENGINEER_LIST_KEY = [
         'civil' => 'civil',
         'mechanical' => 'mechanical',
