@@ -26,7 +26,7 @@
 @endphp
 
 {{-- Column-group toggles --}}
-<div class="d-flex gap-2 mb-2 flex-wrap">
+<div class="d-flex gap-2 mb-2 flex-wrap" id="tour-col-toggles">
     <button type="button" class="btn btn-xs btn-outline-secondary js-toggle-col-group active"
             data-group="unit-rate" title="Show / hide unit rate columns">
         <i class="fa fa-eye-slash me-1"></i>Unit Rates
@@ -37,7 +37,7 @@
     </button>
 </div>
 
-<div class="table-page-flow js-detail-table-wrap" style="position:relative;">
+<div class="table-page-flow js-detail-table-wrap" id="tour-estimate-table" style="position:relative;">
     <div class="table-custom table-container" style="position:relative;">
         <table class="table table-custom js-full-estimate-table">
             <thead class="bg-primary">

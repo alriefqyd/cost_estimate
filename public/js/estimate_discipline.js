@@ -1117,7 +1117,7 @@ $(function(){
                             note.mark_type,
                             parseFloat(note.position_x) || 0,
                             parseFloat(note.position_y) || 0,
-                            note.reviewer ? note.reviewer.user_name : ''
+                            note.reviewer ? (note.reviewer.profiles ? note.reviewer.profiles.full_name : note.reviewer.user_name) : ''
                         );
                     });
                 }

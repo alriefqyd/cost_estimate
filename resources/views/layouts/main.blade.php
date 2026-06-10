@@ -121,9 +121,11 @@
 <script src="{{asset('/assets/js/slider/main.js')}}"></script>
 <script src="{{asset('/assets/js/tour/intro.js')}}"></script>
 <script src="{{asset('/assets/js/tour/intro-init.js')}}"></script>
+<script src="{{'/js/project_detail_tour.js'}}"></script>
 <script src="{{asset('/assets/js/tour-guide/tour-guide.js')}}"></script>
 {{--<script src="{{asset('/assets/js/tour/intro-init.js')}}"></script>--}}
 
+@stack('scripts')
 <!-- login js-->
 <!-- Plugin used-->
 </body>

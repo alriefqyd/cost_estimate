@@ -1504,3 +1504,35 @@ custom-checkbox:checked:before {
 .annotation-bubble[data-mark="warning"]  { background: #fffbe6; border-color: #ffe066; border-left-color: #ffc107; }
 .annotation-bubble[data-mark="rejected"] { background: #fff5f5; border-color: #f1aeb5; border-left-color: #dc3545; }
 .annotation-bubble[data-mark="question"] { background: #f0fbff; border-color: #9eeaf9; border-left-color: #0dcaf0; }
+
+/* Intro.js tour customisation — hide × but keep it when it becomes the Finish button on the last step */
+.introjs-skipbutton:not(.introjs-donebutton) { display: none !important; }
+
+.customTooltip.introjs-tooltip {
+    max-width: 440px;
+    font-size: 13px;
+    line-height: 1.65;
+}
+.customTooltip .introjs-tooltip-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2978ff;
+}
+.customTooltip .introjs-tooltiptext ul,
+.customTooltip .introjs-tooltiptext ol {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+.customTooltip .introjs-tooltipbuttons .introjs-button {
+    font-size: 12px;
+    padding: 4px 14px;
+}
+.customTooltip .introjs-tooltipbuttons .introjs-donebutton {
+    background: #ffd60a;
+    color: #1b4332;
+    border-color: #e5c200;
+    font-weight: 700;
+}
+.customTooltip .introjs-tooltipbuttons .introjs-donebutton:hover {
+    background: #e5c200;
+}

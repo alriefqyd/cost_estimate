@@ -634,7 +634,7 @@ class ProjectController extends Controller
             return response()->json(['status' => 403, 'message' => 'Forbidden'], 403);
         }
         $notes = ProjectReviewNote::where('project_id', $project->id)
-            ->with('reviewer:id,user_name')
+            ->with(['reviewer:id,user_name', 'reviewer.profiles:user_id,full_name'])
             ->get(['id', 'note', 'mark_type', 'position_x', 'position_y', 'reviewer_id', 'created_at']);
         return response()->json(['status' => 200, 'notes' => $notes]);
     }
