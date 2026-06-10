@@ -514,6 +514,28 @@ custom-checkbox:checked:before {
     height: 60vh;
 }
 
+/* Sticky header inside a container-scroll table */
+.table-overflow table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+}
+.table-overflow table thead tr:nth-child(2) th {
+    top: 0; /* overridden by JS */
+    z-index: 2;
+}
+
+/* Page-flow table: horizontal scroll only, vertical scrolls with the page */
+.table-page-flow {
+    position: relative;
+    overflow-x: auto;
+    overflow-y: clip; /* clip avoids coercion to auto, preserving sticky-to-page behavior */
+}
+.table-page-flow table thead {
+    position: relative;
+    z-index: 10;
+}
+
 .table-custom {
     width: 100%;
     border-collapse: collapse;
@@ -864,4 +886,653 @@ custom-checkbox:checked:before {
     100% {
         transform: scale(1);
     }
+}
+
+/* Project stepper */
+.project-stepper {
+    display: flex;
+    align-items: flex-start;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+    padding: 20px 32px;
+    margin-bottom: 20px;
+}
+
+.step-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.step-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: calc(50% + 18px);
+    right: calc(-50% + 18px);
+    height: 2px;
+    background: #dee2e6;
+    z-index: 0;
+}
+
+.step-item.complete:not(:last-child)::after {
+    background: #28a745;
+}
+
+.step-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    position: relative;
+    z-index: 1;
+    background: #dee2e6;
+    color: #6c757d;
+    transition: all .2s;
+}
+
+.step-item.complete .step-circle {
+    background: #28a745;
+    color: #fff;
+}
+
+.step-item.active .step-circle {
+    background: #3b7ddd;
+    color: #fff;
+    box-shadow: 0 0 0 5px rgba(59, 125, 221, .2);
+}
+
+.step-label {
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #adb5bd;
+    text-align: center;
+}
+
+.step-item.complete .step-label {
+    color: #28a745;
+}
+
+.step-item.active .step-label {
+    color: #3b7ddd;
+}
+
+.step-sub {
+    font-size: 10px;
+    color: #adb5bd;
+    text-align: center;
+    margin-top: 2px;
+}
+
+.step-item.active .step-sub {
+    color: #3b7ddd;
+}
+
+.step-item.complete .step-sub {
+    color: #6c757d;
+}
+
+/* Project detail — info grid */
+.project-info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.project-info-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+
+.project-info-label {
+    min-width: 130px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    flex-shrink: 0;
+}
+
+.project-info-value {
+    font-size: 14px;
+    color: #2b2b2b;
+}
+
+/* Project detail — status badge */
+.project-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.project-status-badge--draft     { background: #e9ecef; color: #495057; }
+.project-status-badge--approve   { background: #d4edda; color: #155724; }
+.project-status-badge--rejected  { background: #f8d7da; color: #721c24; }
+.project-status-badge--pending   { background: #fff3cd; color: #856404; }
+.project-status-badge--waiting   { background: #cce5ff; color: #004085; }
+.project-status-badge--reviewing { background: #d1ecf1; color: #0c5460; }
+
+/* Project detail — section divider */
+.project-section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 4px;
+}
+
+.project-section-divider::before,
+.project-section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #dee2e6;
+}
+
+.project-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+}
+
+/* Project detail — WBS location row */
+.wbs-location-row {
+    background-color: #f0f2f5;
+}
+
+.wbs-location-row td {
+    font-weight: 600;
+}
+
+/* ── Estimate table — toolbar & fullscreen ────────────────────────── */
+
+.estimate-fullscreen-bar {
+    background: #24695c;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    border-radius: 0;
+    padding: 6px 14px;
+}
+
+.kbd-esc {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border: none;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-family: inherit;
+}
+
+/* Fullscreen: smooth table-height transition */
+.table-overflow {
+    transition: height 0.2s ease;
+}
+
+/* ── Estimate All Discipline table — hierarchy UX ─────────────────── */
+
+/* Sticky header refinements */
+.table-custom thead th {
+    font-size: 11px !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600 !important;
+    padding: 10px 8px !important;
+    vertical-align: middle !important;
+    white-space: nowrap;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    color: #fff;
+}
+
+/* Level 1 — Location row: blue accent */
+.table-row-location {
+    border-left: 4px solid #3a6ea5 !important;
+}
+.table-row-location td:first-child {
+    padding-left: 10px;
+}
+
+/* Level 2 — Discipline row: green accent */
+.table-row-discipline {
+    border-left: 4px solid #24695c !important;
+}
+.table-row-discipline td:nth-child(2) {
+    padding-left: 16px;
+}
+
+/* Level 3 — Work Element row: amber accent */
+.table-row-work-element {
+    border-left: 4px solid #e0a800 !important;
+}
+.table-row-work-element td:nth-child(3) {
+    padding-left: 20px;
+}
+
+/* Level 4 — Work Item row: subtle hover */
+.table-row-work-item {
+    transition: background-color 0.12s ease;
+}
+.table-row-work-item:hover {
+    background-color: #f0f7f6 !important;
+}
+
+/* Contingency row */
+.table-row-contingency {
+    background-color: #f8f9fa !important;
+    border-top: 2px solid #dee2e6 !important;
+}
+
+/* Grand Total row: branded green */
+.table-row-grand-total {
+    background-color: #24695c !important;
+}
+.table-row-grand-total td {
+    color: #fff !important;
+    font-weight: 700;
+    font-size: 13px;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Hierarchy label typography */
+.row-hierarchy-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+/* Collapse / expand chevron button */
+.collapse-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    transition: background-color 0.15s;
+    cursor: pointer;
+}
+.collapse-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Info icon next to cost cells */
+.cost-info-icon {
+    font-size: 11px !important;
+    color: #6c757d;
+    transition: color 0.15s;
+}
+.cost-info-icon:hover {
+    color: #3a6ea5 !important;
+}
+
+/* Compact factorial inputs */
+.factorial-input {
+    font-size: 12px !important;
+    padding: 4px 6px !important;
+    height: 34px !important;
+    text-align: center;
+}
+
+/* Add work-item icon */
+.btn-add-work-item {
+    color: #24695c;
+    transition: color 0.15s, transform 0.15s;
+}
+.btn-add-work-item:hover {
+    color: #1a4e43;
+    transform: scale(1.15);
+}
+
+/* Remove work-item icon */
+.btn-remove-work-item {
+    color: #dc3545;
+    transition: color 0.15s, transform 0.15s;
+}
+.btn-remove-work-item:hover {
+    color: #a71d2a;
+    transform: scale(1.15);
+}
+
+/* ── Column group toggle ─────────────────────────────────────────── */
+
+.col-group-hidden { display: none !important; }
+
+/* Discipline approval badges — inline in estimate table discipline rows */
+.disc-approval-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+.disc-badge-approved  { background: #d4edda; color: #155724; }
+.disc-badge-rejected  { background: #f8d7da; color: #721c24; }
+.disc-badge-pending   { background: #fff3cd; color: #856404; }
+
+.btn-xs {
+    font-size: 11px;
+    padding: 3px 9px;
+    line-height: 1.4;
+    border-radius: 4px;
+}
+.js-toggle-col-group { opacity: 0.75; }
+.js-toggle-col-group.active { opacity: 1; }
+
+/* ── Summary / Detail two-panel estimate view ────────────────────── */
+
+.estimate-view-wrap { position: relative; }
+
+/* Summary table */
+.summary-estimate-table thead th { font-size: 12px; }
+.summary-location-header td {
+    background: #C5C5C7D0;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-bottom: none;
+}
+.summary-discipline-row td { font-size: 13px; padding: 10px 12px; }
+.summary-discipline-row { transition: background 0.12s; }
+.summary-discipline-row:hover { background: #e8f4f1 !important; cursor: pointer; }
+.summary-row-arrow { color: #aaa; transition: color 0.12s; }
+.summary-discipline-row:hover .summary-row-arrow { color: #24695c; }
+
+/* Detail panel */
+.estimate-detail-panel { }
+.detail-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0 12px;
+    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 12px;
+}
+.detail-breadcrumb {
+    font-size: 14px;
+    font-weight: 500;
+    color: #444;
+}
+.detail-subtotal-row td {
+    background: #e8f4f1;
+    border-top: 2px solid #24695c;
+    padding: 8px 12px;
+}
+
+/* ── Discipline Cost Summary Cards ───────────────────────────────── */
+
+.discipline-summary-wrap {
+    background: #f8f9fb;
+    border: 1px solid #e3e6ea;
+    border-radius: 8px;
+    padding: 12px 16px;
+}
+.discipline-summary-header {
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+}
+.discipline-summary-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.disc-card {
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-left: 4px solid #24695c;
+    border-radius: 6px;
+    padding: 10px 14px;
+    min-width: 170px;
+    flex: 1 1 170px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.disc-card-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 5px;
+}
+.disc-card-total {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a3c34;
+    margin-bottom: 6px;
+    line-height: 1.2;
+}
+.disc-card-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 10px;
+    color: #888;
+}
+.disc-card-breakdown span i {
+    width: 11px;
+    opacity: 0.6;
+}
+
+/* Inline discipline cost display inside the discipline table row */
+.disc-cost-inline {
+    margin-top: 3px;
+    line-height: 1.3;
+}
+.disc-cost-total {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #1a3c34;
+}
+.disc-cost-sub {
+    display: block;
+    font-size: 10px;
+    color: #888;
+    white-space: nowrap;
+}
+
+/* ── Free-form Annotation Overlay ────────────────────────────────── */
+
+/* Layer fills the table-container; invisible & click-through by default */
+.annotation-layer {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 20;
+}
+/* In annotate mode the layer captures clicks */
+.annotation-layer.annotate-mode {
+    pointer-events: all;
+    cursor: crosshair;
+}
+/* Bubbles are always interactive even when layer is not */
+.annotation-bubble {
+    pointer-events: all;
+}
+
+/* Annotation bubble — looks like a sticky note */
+.annotation-bubble {
+    position: absolute;
+    width: 200px;
+    background: #fffef7;
+    border: 1.5px solid #dee2e6;
+    border-left: 4px solid #6c757d;
+    border-radius: 6px;
+    box-shadow: 2px 4px 14px rgba(0,0,0,0.14);
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+    font-size: 12px;
+    transition: box-shadow 0.15s;
+}
+.annotation-bubble:focus,
+.annotation-bubble.dragging {
+    box-shadow: 2px 6px 20px rgba(0,0,0,0.22);
+    outline: none;
+}
+
+/* Header row: drag handle + dots + close */
+.annot-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 6px 4px;
+    cursor: grab;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    background: rgba(0,0,0,0.03);
+    border-radius: 5px 5px 0 0;
+    user-select: none;
+}
+.annot-header:active { cursor: grabbing; }
+
+/* Color-coded mark dots */
+.annot-dots { display: flex; gap: 4px; flex: 1; }
+.annot-dot {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    cursor: pointer;
+    opacity: 0.45;
+    transition: opacity 0.15s, transform 0.15s;
+    border: 1.5px solid rgba(0,0,0,0.1);
+}
+.annot-dot:hover  { opacity: 0.85; transform: scale(1.2); }
+.annot-dot.active { opacity: 1; transform: scale(1.25); border-color: rgba(0,0,0,0.25); }
+
+/* Reviewer name */
+.annot-by {
+    font-size: 10px;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 80px;
+}
+
+/* Close/delete button */
+.annot-close {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 11px;
+    line-height: 1;
+    padding: 0 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.annot-close:hover { color: #dc3545; }
+
+/* Text area */
+.annot-textarea {
+    border: none;
+    resize: none;
+    background: transparent;
+    padding: 7px 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    min-height: 70px;
+    outline: none;
+    flex: 1;
+}
+.annot-textarea.is-invalid { background: rgba(220,53,69,0.05); }
+
+/* Footer */
+.annot-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 3px 6px 5px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+}
+.annot-save-btn {
+    background: #24695c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 2px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.annot-save-btn:hover    { background: #1a4e43; }
+.annot-save-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+/* Read-only annotation bubble (visible to non-reviewer assigned users) */
+.annotation-bubble.annot-readonly { cursor: default; }
+.annotation-bubble.annot-readonly .annot-header { cursor: default; padding: 5px 8px; gap: 6px; }
+.annot-dot-ro {
+    display: inline-block;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(0,0,0,0.15);
+}
+.annot-body-ro {
+    padding: 6px 10px 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #333;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Mark-type theming via data-mark attribute — no inline JS styles needed */
+.annotation-bubble[data-mark="note"]     { background: #fffef7; border-color: #dee2e6; border-left-color: #6c757d; }
+.annotation-bubble[data-mark="ok"]       { background: #f0faf4; border-color: #a3cfbb; border-left-color: #198754; }
+.annotation-bubble[data-mark="warning"]  { background: #fffbe6; border-color: #ffe066; border-left-color: #ffc107; }
+.annotation-bubble[data-mark="rejected"] { background: #fff5f5; border-color: #f1aeb5; border-left-color: #dc3545; }
+.annotation-bubble[data-mark="question"] { background: #f0fbff; border-color: #9eeaf9; border-left-color: #0dcaf0; }
+
+/* Intro.js tour customisation — hide × but keep it when it becomes the Finish button on the last step */
+.introjs-skipbutton:not(.introjs-donebutton) { display: none !important; }
+
+.customTooltip.introjs-tooltip {
+    max-width: 440px;
+    font-size: 13px;
+    line-height: 1.65;
+}
+.customTooltip .introjs-tooltip-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2978ff;
+}
+.customTooltip .introjs-tooltiptext ul,
+.customTooltip .introjs-tooltiptext ol {
+    margin-top: 6px;
+    margin-bottom: 6px;
+}
+.customTooltip .introjs-tooltipbuttons .introjs-button {
+    font-size: 12px;
+    padding: 4px 14px;
+}
+.customTooltip .introjs-tooltipbuttons .introjs-donebutton {
+    background: #ffd60a;
+    color: #1b4332;
+    border-color: #e5c200;
+    font-weight: 700;
+}
+.customTooltip .introjs-tooltipbuttons .introjs-donebutton:hover {
+    background: #e5c200;
 }

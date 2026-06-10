@@ -234,6 +234,40 @@ class Project extends Model
         return (in_array(auth()->user()->profiles?->position, PROFILE::REVIEWER));
     }
 
+    public function isAssignedReviewer(){
+        $userId = auth()->id();
+        return in_array($userId, array_filter([
+            $this->project_manager,
+            $this->project_engineer,
+            $this->mechanical_approver,
+            $this->civil_approver,
+            $this->electrical_approver,
+            $this->instrument_approver,
+            $this->it_approver,
+            $this->architect_approver,
+        ]));
+    }
+
+    public function isAssignedToProject(){
+        $userId = auth()->id();
+        return in_array($userId, array_filter([
+            $this->project_manager,
+            $this->project_engineer,
+            $this->design_engineer_mechanical,
+            $this->design_engineer_civil,
+            $this->design_engineer_electrical,
+            $this->design_engineer_instrument,
+            $this->design_engineer_it,
+            $this->design_engineer_architect,
+            $this->mechanical_approver,
+            $this->civil_approver,
+            $this->electrical_approver,
+            $this->instrument_approver,
+            $this->it_approver,
+            $this->architect_approver,
+        ]));
+    }
+
     public function getTotalCostWithContingency(){
         $total = $this->getTotalCost();
         $contingency = $this->getContingencyCost();
@@ -327,6 +361,43 @@ class Project extends Model
     public function getProfileUser($user){
         $user = User::where('id', $user)->first();
         return $user->profiles ?? null;
+    }
+
+    /**
+     * Returns ['discipline' => string, 'engineers' => User[]] for the given reviewer user id.
+     * Discipline-specific approvers target only their paired engineer.
+     * PM / PE target all assigned design engineers.
+     */
+    public function getTargetEngineersForReviewer(int $reviewerId): array
+    {
+        $disciplineMap = [
+            'mechanical_approver' => ['col' => 'design_engineer_mechanical', 'label' => 'Mechanical'],
+            'civil_approver'      => ['col' => 'design_engineer_civil',      'label' => 'Civil'],
+            'electrical_approver' => ['col' => 'design_engineer_electrical', 'label' => 'Electrical'],
+            'instrument_approver' => ['col' => 'design_engineer_instrument', 'label' => 'Instrument'],
+            'it_approver'         => ['col' => 'design_engineer_it',         'label' => 'IT'],
+            'architect_approver'  => ['col' => 'design_engineer_architect',  'label' => 'Architecture'],
+        ];
+
+        foreach ($disciplineMap as $approverCol => $info) {
+            if ($this->$approverCol == $reviewerId && $this->{$info['col']}) {
+                $engineer = User::find($this->{$info['col']});
+                return [
+                    'discipline' => $info['label'],
+                    'engineers'  => $engineer ? [$engineer] : [],
+                ];
+            }
+        }
+
+        // PM or PE: notify all assigned design engineers
+        $allEngineers = [];
+        foreach (array_column($disciplineMap, 'col') as $col) {
+            if ($this->$col) {
+                $u = User::find($this->$col);
+                if ($u) $allEngineers[] = $u;
+            }
+        }
+        return ['discipline' => 'Project Manager / Engineer', 'engineers' => $allEngineers];
     }
 
     public function getStatusEstimateDiscipline($discipline){

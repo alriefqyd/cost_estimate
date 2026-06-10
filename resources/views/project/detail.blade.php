@@ -13,11 +13,48 @@
                         <li class="breadcrumb-item active">Project Detail</li>
                     </ol>
                 </div>
+                <div class="col-sm-6 text-end pt-2">
+                    <button type="button" id="js-start-tour" class="btn btn-outline-info btn-sm"
+                            data-is-reviewer="{{ $project->isAssignedReviewer() ? '1' : '0' }}">
+                        <i class="fa fa-question-circle me-1"></i> How to use this page
+                    </button>
+                </div>
             </div>
         </div>
     </div>
     <!-- Container-fluid starts-->
     <div class="container-fluid">
+        <div class="project-stepper" id="tour-stepper">
+            <div class="step-item complete">
+                <div class="step-circle"><i class="fa fa-check"></i></div>
+                <div class="step-label">Project Info</div>
+                <div class="step-sub">Completed</div>
+            </div>
+            <div class="step-item {{ $stepper->stepWbs }}">
+                <div class="step-circle"><i class="fa fa-sitemap"></i></div>
+                <div class="step-label">WBS Structure</div>
+                <div class="step-sub">
+                    @if($stepper->wbsCount > 0) {{ $stepper->wbsCount }} structure(s) defined
+                    @else Not created yet
+                    @endif
+                </div>
+            </div>
+            <div class="step-item {{ $stepper->stepEstimate }}">
+                <div class="step-circle"><i class="fa fa-calculator"></i></div>
+                <div class="step-label">Estimate</div>
+                <div class="step-sub">
+                    @if($stepper->stepWbs === 'active') Waiting for WBS
+                    @else {{ $stepper->estimateSublabel }}
+                    @endif
+                </div>
+            </div>
+            <div class="step-item {{ $stepper->stepApproval }}">
+                <div class="step-circle"><i class="fa fa-check-circle"></i></div>
+                <div class="step-label">Approval</div>
+                <div class="step-sub">{{ $stepper->approvalSublabel }}</div>
+            </div>
+        </div>
+
         <div class="row">
             @if(session('message'))
                 @include('flash')
@@ -41,7 +78,7 @@
                             @endcan
                         </div>
                     </div>
-                    <div class="card-body card-body-custom">
+                    <div class="card-body card-body-custom" id="tour-project-info">
                         <div class="col-sm-11 float-start" style="margin-left: 20px!important">
                             <input type="hidden" class="js-hidden-id-project" value="{{$project->id}}">
                             <table class="table">
@@ -109,13 +146,13 @@
 {{--                                        @endif--}}
                                     </td>
                                 </tr>
-                                <tr>
+                                <tr id="tour-design-engineer">
                                     <td colspan="3">
                                         <p class="font-weight-bold" style="color: black"> Design Engineer </p>
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>
+                                    <td id="tour-reviewer-icon">
                                         <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil && $project->getStatusEstimateDiscipline('design_engineer_civil') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil && $project->getStatusEstimateDiscipline('design_engineer_civil') ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
                                         Civil
                                         @if(isset($project->design_engineer_civil))
@@ -222,7 +259,7 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
-                    <div class="card-header card-header-custom pb-0">
+                    <div class="card-header card-header-custom pb-0" id="tour-wbs">
                         <div class="row">
                             <div class="col-md-6">
                                 <p class="float start">Work Breakdown Structure
@@ -359,6 +396,11 @@
                             </div>
                             <div class="col-md-6 float-end">
                                 <div class="btn btn-primary js-fullscreen-detail mb-2 float-end">Maximize Table <i data-feather="maximize" style="width: 12px !important;"></i></div>
+                                @if($project->isAssignedReviewer())
+                                <button type="button" class="btn btn-outline-warning js-btn-annotate-toggle mb-2 float-end me-2">
+                                    <i class="fa fa-pencil-alt me-1"></i>Annotate
+                                </button>
+                                @endif
                             </div>
                             <div class="clearfix"></div>
                             <span class="js-fullscreen-table">
@@ -394,4 +436,5 @@
 @include('layouts.loading')
 
 @endsection
+
 <!-- Container-fluid Ends-->
