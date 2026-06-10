@@ -10,8 +10,12 @@ return new class extends Migration
     {
         Schema::table('project_review_notes', function (Blueprint $table) {
             $table->unsignedBigInteger('estimate_discipline_id')->nullable()->change();
-            $table->decimal('position_x', 10, 2)->nullable()->after('mark_type');
-            $table->decimal('position_y', 10, 2)->nullable()->after('position_x');
+            if (!Schema::hasColumn('project_review_notes', 'position_x')) {
+                $table->decimal('position_x', 10, 2)->nullable()->after('mark_type');
+            }
+            if (!Schema::hasColumn('project_review_notes', 'position_y')) {
+                $table->decimal('position_y', 10, 2)->nullable()->after('position_x');
+            }
         });
     }
 

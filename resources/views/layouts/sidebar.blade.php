@@ -120,6 +120,12 @@
                         <label class="text-small cursor-pointer cursor-pointer-white">User Setting</label></a>
                     </li>
                     @endcan
+                    <li class="margin-sm cursor-pointer">
+                        <a class="nav-link menu-title cursor-pointer" href="/guide">
+                            <i data-feather="book-open"></i>
+                            <label class="text-small cursor-pointer cursor-pointer-white">User Guide</label>
+                        </a>
+                    </li>
                 </ul>
             </div>
         <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

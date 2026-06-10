@@ -26,10 +26,50 @@ $(function(){
         });
     }
 
+    var nestableOptions = {
+        maxDepth: 3,
+        data: function (item, source) {
+            return {
+                identifier: source.data('identifier')
+            };
+        }
+    };
+
+    function renumberWbs() {
+        $('.js-nestable-wbs').children('.dd-item').each(function (i) {
+            var $badge = $(this).children('.dd-handle').find('.wbs-order-badge');
+            if ($badge.length === 0) {
+                $(this).children('.dd-handle').prepend('<span class="wbs-order-badge">' + (i + 1) + '</span>');
+            } else {
+                $badge.text(i + 1);
+            }
+        });
+    }
+
+    function initNestable() {
+        var $nestable = $('.dd');
+
+        if ($nestable.data('nestable')) {
+            $nestable.nestable('destroy');
+            $nestable.removeClass('nestable-initialized');
+            $nestable.removeAttr('data-action');
+        }
+
+        $nestable.nestable(nestableOptions);
+
+        $nestable.off('change.wbs').on('change.wbs', function () {
+            renumberWbs();
+        });
+
+        renumberWbs();
+    }
+
     var _selectWorkElement = $('.js-select-work-element');
     _selectWorkElement.each(function () {
         workElementSelectInit(this);
     });
+
+    initNestable();
 
     $(document).on('click','.js-hide-location',function (){
         $(this).closest('.card').find('fieldset').addClass('d-none')
@@ -405,7 +445,7 @@ $(function(){
                     var _temp_location = Mustache.render(_template_location,_data)
                     $('.js-nestable-wbs').append(_temp_location)
 
-
+                    initNestable();
                     feather.replace()
                     $('.select2').select2()
                     _location_form.val('')
@@ -455,8 +495,23 @@ $(function(){
                         'showButton':_showButton,
                         'isSelect':_isSelect
                     }
-                    var _temp = Mustache.render(_template,_data)
-                    _parent.append(_temp)
+                                var _temp = Mustache.render(_template,_data)
+                    if(_this.attr('data-is-element') === 'true'){
+                        var $childList = _parent.children('ol.dd-list').first();
+                        if($childList.length === 0){
+                            $childList = $('<ol class="dd-list" data-idx="3"></ol>');
+                            _parent.append($childList);
+                        }
+                        $childList.append(_temp);
+                    } else {
+                        var $childList = _parent.children('ol.js-mustache-wbs-element').first();
+                        if($childList.length === 0){
+                            $childList = $('<ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2"></ol>');
+                            _parent.append($childList);
+                        }
+                        $childList.append(_temp);
+                    }
+                    initNestable();
                     bindBeforeUnloadEvent();
                     $('.select2').select2();
                     feather.replace()
@@ -500,6 +555,7 @@ $(function(){
         } else {
             _this.closest('.dd-item').remove();
         }
+        initNestable();
         bindBeforeUnloadEvent();
     });
 
@@ -569,6 +625,7 @@ $(function(){
         if(_child.length > 0){
             _child.remove();
         }
+        initNestable();
     });
 
     function bindBeforeUnloadEvent(){

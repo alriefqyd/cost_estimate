@@ -11,24 +11,22 @@ $(function(){
     /**
      * Project Form
      */
-    if(!localStorage.getItem('tour')){
+    if (!localStorage.getItem('ce_sidebar_tour_done')) {
         const tour = new tourguide.TourGuideClient({
             showStepNumbers: true,
             showPrevStep: true,
             showNextStep: true
         });
 
-        // Start the tour
         tour.start();
 
-        tour.onAfterStepChange(function (){
-            if(tour.activeStep === 2){
+        tour.onAfterStepChange(function () {
+            if (tour.activeStep === 2) {
                 $('.main-nav').removeClass('close_icon');
-                // Add your custom code here
             }
         });
 
-        localStorage.setItem('tour',true);
+        localStorage.setItem('ce_sidebar_tour_done', '1');
     }
 
     $('.js-add-project-form').validate({
@@ -131,12 +129,15 @@ $(function(){
                             color: '#ff9f89'
                         };
                     });
-
                 callback(_newdata);
             },
             error: function(err) {
                 console.error('Error fetching public holidays:', err);
-                callback([]); // Handle error gracefully with an empty array
+                callback([]);
+            },
+            complete: function() {
+                $('.js-component-calendar').find('.loader-box').addClass('d-none');
+                $('.js-legend').removeClass('d-none');
             }
         });
     }
@@ -223,11 +224,6 @@ $(function(){
         $('.fc-toolbar-title').text("Production Calendar " + currentYear);
     }
 
-    setTimeout(function (){
-        $('.js-component-calendar').find('.loader-box').addClass('d-none');
-        $('.js-legend').removeClass('d-none');
-        if($('.js-component-calendar').length > 0) initCalendar();
-    },500);
     function currencyFormat(_value){
 
         var number_string = _value.replace(/[^,\d]/g, '').toString(),

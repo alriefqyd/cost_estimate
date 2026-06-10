@@ -48,28 +48,53 @@
         <div class="col-sm-12">
             <div class="row">
                 <div class="card">
-                    <div class="col-sm-12 mt-5">
-                            <label class="float-start">Work Element List</label>
-                            <a href="/work-breakdown-structure/{{request()->id}}/work-element/create"><button class="btn btn-outline-primary float-end">Create New Work Element</button></a>
+                    <div class="col-sm-12 mt-5 d-flex align-items-center justify-content-between pe-3">
+                        <label class="float-start mb-0">Work Element List</label>
+                        <div class="d-flex gap-2">
+                            <button type="button"
+                                class="btn btn-outline-success btn-sm js-save-wbs-order d-none"
+                                data-url="/work-breakdown-structure/reorder-work-elements">
+                                <i class="fa fa-check me-1"></i> Save Order
+                            </button>
+                            @can('create',App\Models\WorkBreakdownStructure::class)
+                                <a href="/work-breakdown-structure/{{request()->id}}/work-element/create">
+                                    <button class="btn btn-outline-primary btn-sm" type="button">Create New Work Element</button>
+                                </a>
+                            @endcan
+                        </div>
                     </div>
                     <div class="col-sm-12 col-lg-12 col-xl-12 mt-4 mb-5">
                         <div class="table-responsive">
-                            <table class="table table-striped">
+                            <table class="table table-striped" id="js-wbs-element-table">
                                 <thead>
                                 <tr>
-                                    <th scope="col" class="text-left">Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="category"></i></th>
+                                    @can('update',App\Models\WorkBreakdownStructure::class)
+                                        <th scope="col" class="wbs-th-handle"></th>
+                                    @endcan
+                                    <th scope="col" class="wbs-th-order">#</th>
+                                    <th scope="col" class="text-left">Description</th>
                                     @can('delete',App\Models\WorkBreakdownStructure::class)
                                         <th scope="col" class="text-left">Action</th>
                                     @endcan
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="js-wbs-sortable-body">
                                 @foreach($wbs?->children as $item)
-                                    <tr>
-                                        <td class="min-w-200"><a href="/work-breakdown-structure/work-element/{{$item->id}}" class="font-weight-bold">{{$item->title}}</a></td>
+                                    <tr class="js-sortable-row uk-sortable-item" data-id="{{$item->id}}">
+                                        @can('update',App\Models\WorkBreakdownStructure::class)
+                                            <td class="js-sort-handle wbs-handle-cell">
+                                                <i class="fa fa-bars"></i>
+                                            </td>
+                                        @endcan
+                                        <td class="wbs-order-cell js-order-num">{{ $loop->iteration }}</td>
+                                        <td class="min-w-200 wbs-title-cell">
+                                            <a href="/work-breakdown-structure/work-element/{{$item->id}}" class="font-weight-bold">{{$item->title}}</a>
+                                        </td>
                                         @can('delete',App\Models\WorkBreakdownStructure::class)
-                                            <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
-                                               data-id="{{$item->id}}" class="text-danger js-delete-work-element">Delete</a></td>
+                                            <td>
+                                                <a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
+                                                   data-id="{{$item->id}}" class="text-danger js-delete-work-element">Delete</a>
+                                            </td>
                                         @endcan
                                     </tr>
                                 @endforeach

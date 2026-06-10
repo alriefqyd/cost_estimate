@@ -7,23 +7,24 @@
             <div class="col-md-12">
 
                 <div class="col-md-12 mb-5">
-                    <div class="input-group">
+                    <div class="input-group" id="tour-wbs-input">
                         <input class="form-control js-form-location" type="text" placeholder="Type Location Equipment!">
                         <button class="btn btn-success js-add-btn-wbs" disabled="disabled">+</button>
                     </div>
                 </div>
                 <div class="dd js-nestable-wbs-form" style="max-width: 100%" id="nestable">
-                    <div class="row">
+                    <div class="row" id="tour-wbs-headers">
                          <div class="col-md-1 text-12-custom">Loc/Equip</div>
                         <div class="col-md-1 text-12-custom">Discipline</div>
                         <div class="col-md-2 text-12-custom">Work Element</div>
                     </div>
-                <ol class="dd-list js-nestable-wbs js-get-idx" data-idx="1">
+                <ol class="dd-list js-nestable-wbs js-get-idx" data-idx="1" id="tour-wbs-tree">
                     @if(isset($existingWbs))
                        @foreach($existingWbs as $key => $value)
                             <li class="dd-item" data-id="{{$key}}">
                                 <div class="dd-handle">
-                                    <div class="float-start col-md-10 js-dd-title-text js-dd-loc-equipment" contenteditable="true">{{$key}}</div>
+                                    <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
+                                    <div class="float-start col-md-10 js-dd-title-text js-dd-loc-equipment dd-nodrag" contenteditable="true">{{$key}}</div>
                                     <div class="float-end">
                                         <span class="js-add-new-nestable-wbs" data-is-element="false">
                                            <i data-feather="plus-circle"></i>
@@ -33,10 +34,11 @@
                                         </span>
                                     </div>
                                 </div>
+                                <ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2">
                                 @foreach($value as $k => $discipline)
-                                    <ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2">
                                         <li class="dd-item" data-identifier="{{$discipline->first()['identifier']}}" data-id="{{$discipline->first()['disciplineId']}}">
                                             <div class="dd-handle">
+                                                <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
                                                 <div class="float-start col-md-10 js-dd-handle-edit">
                                                     <span class="js-dd-title">{{$k}}</span>
                                                 </div>
@@ -58,12 +60,13 @@
                                                   @endforeach
                                                 </select>
                                             </span>
+                                            <ol class="dd-list js-get-idx" data-idx="3">
                                             @foreach($discipline as $d)
-                                                <ol class="dd-list" data-idx="2">
                                                     <li class="dd-item" data-id="{{$d['title']}}" data-old-element="{{$d['title']}}">
                                                         <div class="dd-handle">
+                                                            <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
                                                             <div class="float-start col-md-10 cursor-text p-1 js-dd-handle-edit">
-                                                                <div class="js-dd-title-text js-dd-title-element" contenteditable="true">{{$d['title']}}</div>
+                                                                <div class="js-dd-title-text js-dd-title-element dd-nodrag" contenteditable="true">{{$d['title']}}</div>
                                                             </div>
                                                             <div class="float-end">
                                                                 <span class="cursor-pointer text-danger js-delete-wbs-discipline">
@@ -72,11 +75,11 @@
                                                             </div>
                                                         </div>
                                                     </li>
-                                                </ol>
                                             @endforeach
+                                            </ol>
                                         </li>
-                                    </ol>
                                 @endforeach
+                                </ol>
                             </li>
                            @endforeach
                     @endif
@@ -92,7 +95,7 @@
             <a class="" href="/project/{{$project->id}}/">
                 <div class="btn btn-danger">Cancel</div>
             </a>
-            <button class="btn btn-success js-save-wbs">
+            <button class="btn btn-success js-save-wbs" id="tour-wbs-save">
                 <div class="loader-box" style="height: auto">
                     Save <div style="margin-left:3px" class="loader-34 d-none"></div>
                 </div>
@@ -102,6 +105,10 @@
 </form>
 
 @include('layouts.loading')
+
+@push('scripts')
+<script src="{{ '/js/wbs_form_tour.js' }}"></script>
+@endpush
 
 <div class="modal fade js-modal-save-wbs" id="" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
