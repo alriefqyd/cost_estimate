@@ -12,13 +12,11 @@
                         <li class="breadcrumb-item active">Work Item list</li>
                     </ol>
                 </div>
-                @can('create',App\Models\WorkItem::class)
-                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                        <div class="select2-drpdwn-product select-options d-inline-block">
-                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/work-item/create"> Create New Work Item</a>
-                        </div>
-                    </div>
-                @endcan
+                <div class="col-md-6 col-sm-6 text-end d-flex justify-content-end align-items-center gap-2">
+                    @can('create', App\Models\WorkItem::class)
+                        <a class="btn btn-outline-primary" href="/work-item/create">Create New Work Item</a>
+                    @endcan
+                </div>
             </div>
         </div>
     </div>
@@ -59,7 +57,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row mb-5">
                                 <div class="col-md-6">
                                     <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                         <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
@@ -70,6 +68,14 @@
                                             {{$workItem::REVIEWED}} ({{$workItemReviewed}})
                                         </button>
                                     </div>
+                                </div>
+                                <div class="col-md-6">
+                                    @can('export', App\Models\WorkItem::class)
+                                        <button type="button" id="btn-export-work-item" class="btn btn-outline-success float-end m-1">
+                                            <span class="spinner-border spinner-border-sm d-none js-export-spinner" role="status" aria-hidden="true"></span>
+                                            <span class="js-export-text"><i class="fa fa-file-excel-o me-1"></i> Export Excel</span>
+                                        </button>
+                                    @endcan
                                 </div>
                             </div>
                             @if(auth()->user()->isWorkItemReviewer())
@@ -212,4 +218,5 @@
             </div>
         </div>
     @endcan
+
 @endsection

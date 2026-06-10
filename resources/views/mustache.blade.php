@@ -189,7 +189,7 @@
 </script>
 
 <script id="js-template-table-location_equipment" type="x-tmpl-mustache">
-    @include('estimate_all_discipline.location_mustache')
+    @include('estimate_all_discipline.location_mustache', ['wbs' => null, 'uniqueId' => null])
 </script>
 
 <script id="js-template-table-discipline_work-element" type="x-tmpl-mustache">

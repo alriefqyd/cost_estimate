@@ -120,6 +120,14 @@ class WorkItemPolicy
      * @param  \App\Models\workItem  $workItem
      * @return \Illuminate\Auth\Access\Response|bool
      */
+    public function export(User $user)
+    {
+        $user->load('roles');
+        return $user->roles->contains(function ($role) {
+            return $role->feature === 'work_item' && $role->action === 'export';
+        });
+    }
+
     public function restore(User $user, workItem $workItem)
     {
         //

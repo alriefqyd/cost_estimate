@@ -424,6 +424,37 @@ $(function(){
         })
     })
 
+    $('#btn-export-work-item').on('click', function () {
+        var _btn = $(this);
+        _btn.prop('disabled', true);
+        _btn.find('.js-export-spinner').removeClass('d-none');
+        _btn.find('.js-export-text').text('Exporting...');
+
+        $.ajax({
+            url: '/work-item/export',
+            method: 'GET',
+            xhrFields: { responseType: 'blob' },
+            success: function (blob) {
+                var url = window.URL.createObjectURL(blob);
+                var a   = document.createElement('a');
+                a.href     = url;
+                a.download = 'Std_Work_Item.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            },
+            error: function () {
+                notification('danger', 'Export failed. Please try again.', 'fa fa-frown-o', 'Error');
+            },
+            complete: function () {
+                _btn.prop('disabled', false);
+                _btn.find('.js-export-spinner').addClass('d-none');
+                _btn.find('.js-export-text').text('Export Excel');
+            }
+        });
+    });
+
     function errorSave(_this){
         notification('danger','Empty Data','fa fa-frown-o','Error');
         _this.removeAttr('disabled','disabled');
