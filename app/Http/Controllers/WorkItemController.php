@@ -909,7 +909,12 @@ class WorkItemController extends Controller
     }
 
     public function export(){
+        if (!auth()->user()->can('export', WorkItem::class)) {
+            abort(403);
+        }
         try {
+            set_time_limit(0);
+            ini_set('memory_limit', '-1');
             Log::info('Starting Export Work Items');
             return Excel::download(new WorkItemExport(), 'Std_Work_Item.xlsx');
         } catch (Exception $e) {

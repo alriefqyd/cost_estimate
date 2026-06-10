@@ -13,13 +13,11 @@
                         <li class="breadcrumb-item active">Tools Equipment list</li>
                     </ol>
                 </div>
-                @can('create',App\Models\EquipmentTools::class)
-                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                        <div class="select2-drpdwn-product select-options d-inline-block">
-                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/tool-equipment/create"> Create New Tools Equipment</a>
-                        </div>
-                    </div>
-                @endcan
+                <div class="col-md-6 col-sm-6 text-end d-flex justify-content-end align-items-center gap-2">
+                    @can('create', App\Models\EquipmentTools::class)
+                        <a class="btn btn-outline-primary" href="/tool-equipment/create">Create New Tools Equipment</a>
+                    @endcan
+                </div>
             </div>
         </div>
     </div>
@@ -33,6 +31,7 @@
                     <div class="mt-5 mb-4">
                         <form method="get" action="/tool-equipment">
                             <div class="row">
+                                <label>Filter By</label>
                                 <div class="col-md-3">
                                     <select class="select2 col-sm-12 js-search-form"
                                             name="category"
@@ -43,15 +42,13 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-3">
-                                    <input type="text" value="{{request()->q}}" name="q" placeholder="Man Power Code/Title" class="form-control js-search-form" style="height: 40px">
-                                </div>
-                                <div class="col-md-3" >
+                                <div class="col-md-3 mb-1">
+                                    <input type="text" value="{{request()->q}}" name="q" placeholder="Tools Equipment Code/Description" class="form-control js-search-form" style="height: 40px">
                                     <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
                                     <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                 </div>
                             </div>
-                            <div class="row mt-2 mb-1">
+                            <div class="row mb-1">
                                 <div class="col-md-6">
                                     <select class="select2 multiple js-search-form col-sm-12"
                                             multiple="multiple"
@@ -64,7 +61,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="row mb-4">
+                            <div class="row mb-5">
                                 <div class="col-md-6">
                                     <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
                                         <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
@@ -78,27 +75,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     @can('export', \App\Models\EquipmentTools::class)
-                                        <div class="btn btn-outline-success js-btn-export float-end m-1"
-                                             data-file-name="Tools equipment.xlsx"
-                                             data-url="/tool-equipment/export/">
-                                            <div class="float-start">
-                                                Export
-                                            </div>
-                                           <div class="float-end">
-                                               <div class="loader-box m-2 d-none" style="height:0px">
-                                                   <div class="loader-3"></div>
-                                               </div>
-                                           </div>
-                                        </div>
+                                        <button type="button" class="btn btn-outline-success js-btn-export float-end m-1"
+                                                data-file-name="Tools Equipment.xlsx"
+                                                data-url="/tool-equipment/export/">
+                                            <span class="spinner-border spinner-border-sm d-none js-export-spinner" role="status" aria-hidden="true"></span>
+                                            <span class="js-export-text"><i class="fa fa-file-excel-o me-1"></i> Export Excel</span>
+                                        </button>
                                     @endcan
                                     @can('import', \App\Models\EquipmentTools::class)
-                                        <div class="btn btn-outline-success float-end m-1 js-btn-import-equipment"
-                                             data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportEquipment">
-                                            Import
-                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
-                                                <div class="loader-34"></div>
-                                            </div>
-                                        </div>
+                                        <button type="button" class="btn btn-outline-success float-end m-1"
+                                                data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportEquipment">
+                                            <i class="fa fa-upload me-1"></i> Import
+                                        </button>
                                     @endcan
                                 </div>
                             </div>

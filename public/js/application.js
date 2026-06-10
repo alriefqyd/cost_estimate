@@ -402,18 +402,17 @@ $(function(){
     /*
     Export
      */
-    $('.js-btn-export').on('click',function(){
+    $('.js-btn-export').on('click', function () {
         var _this = $(this);
         var _file_name = _this.data('file-name');
         var _url = _this.data('url');
-        _this.addClass('disabled-div');
-        _this.find('.loader-box').removeClass('d-none');
+        _this.prop('disabled', true);
+        _this.find('.js-export-spinner').removeClass('d-none');
+        _this.find('.js-export-text').text('Exporting...');
         $.ajax({
-            url:_url,
-            method:'GET',
-            xhrFields: {
-                responseType: 'blob'
-            },
+            url: _url,
+            method: 'GET',
+            xhrFields: { responseType: 'blob' },
             success: function (data) {
                 var a = document.createElement('a');
                 var url = window.URL.createObjectURL(data);
@@ -423,10 +422,16 @@ $(function(){
                 a.click();
                 a.remove();
                 window.URL.revokeObjectURL(url);
-                _this.find('.loader-box').addClass('d-none');
-                _this.removeClass('disabled-div');
+            },
+            error: function () {
+                notification('danger', 'Export failed. Please try again.', 'fa fa-frown-o', 'Error');
+            },
+            complete: function () {
+                _this.prop('disabled', false);
+                _this.find('.js-export-spinner').addClass('d-none');
+                _this.find('.js-export-text').html('<i class="fa fa-file-excel-o me-1"></i> Export Excel');
             }
-        })
+        });
     })
 
     $('.js-form-import').submit(function(e){

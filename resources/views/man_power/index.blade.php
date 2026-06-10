@@ -12,13 +12,11 @@
                         <li class="breadcrumb-item active">Man Power list</li>
                     </ol>
                 </div>
-                @can('create',App\Models\ManPower::class)
-                    <div class="col-md-6 col-sm-6 text-end"><span class="f-w-600 m-r-5"></span>
-                        <div class="select2-drpdwn-product select-options d-inline-block">
-                            <div class="form-group mb-0 me-0"></div><a class="btn btn-outline-primary" href="/man-power/create"> Create New Man Power</a>
-                        </div>
-                    </div>
-                @endcan
+                <div class="col-md-6 col-sm-6 text-end d-flex justify-content-end align-items-center gap-2">
+                    @can('create', App\Models\ManPower::class)
+                        <a class="btn btn-outline-primary" href="/man-power/create">Create New Man Power</a>
+                    @endcan
+                </div>
             </div>
         </div>
     </div>
@@ -32,7 +30,8 @@
                     <div class="mt-5 mb-4">
                         <form method="get" action="/man-power">
                             <div class="row">
-                                <div class="col-md-2">
+                                <label>Filter By</label>
+                                <div class="col-md-3">
                                     <select class="select2 col-sm-12 js-search-form"
                                             name="skill_level"
                                             data-placeholder="Skill Level">
@@ -42,10 +41,8 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-4 mb-1">
+                                <div class="col-md-3 mb-1">
                                     <input type="text" value="{{request()->q}}" name="q" placeholder="Man Power Code/Title" class="form-control" style="height: 40px">
-                                </div>
-                                <div class="col-md-1 mb-1" >
                                     <input type="hidden" name="order" value="{{request()->order}}" class="js-filter-order">
                                     <input type="hidden" name="sort" value="{{request()->sort}}" class="js-filter-sort">
                                 </div>
@@ -64,27 +61,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     @can('export', \App\Models\ManPower::class)
-                                        <div class="btn btn-outline-success js-btn-export float-end m-1"
+                                        <button type="button" class="btn btn-outline-success js-btn-export float-end m-1"
                                                 data-file-name="Man Power.xlsx"
                                                 data-url="/man-power/export/">
-                                            <div class="float-start">
-                                                Export
-                                            </div>
-                                            <div class="float-end">
-                                                <div class="loader-box m-2 d-none" style="height:0px">
-                                                    <div class="loader-3"></div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                            <span class="spinner-border spinner-border-sm d-none js-export-spinner" role="status" aria-hidden="true"></span>
+                                            <span class="js-export-text"><i class="fa fa-file-excel-o me-1"></i> Export Excel</span>
+                                        </button>
                                     @endcan
                                     @can('import', \App\Models\ManPower::class)
-                                        <div class="btn btn-outline-success float-end m-1 js-btn-import-man-power"
+                                        <button type="button" class="btn btn-outline-success float-end m-1"
                                                 data-bs-toggle="modal" data-original-title="test" data-bs-target="#modalImportManPower">
-                                            Import
-                                            <div class="loader-box float-end d-none" style="height: 0px; width: 20px; margin-top: 9%">
-                                                <div class="loader-34"></div>
-                                            </div>
-                                        </div>
+                                            <i class="fa fa-upload me-1"></i> Import
+                                        </button>
                                     @endcan
                                 </div>
                             </div>
