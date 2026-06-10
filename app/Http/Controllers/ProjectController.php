@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Class\ProjectStepperData;
 use App\Exports\SummaryExport;
 use App\Mail\ReviewNoteNotification;
 use App\Models\Project;
@@ -345,18 +346,19 @@ class ProjectController extends Controller
         $isReviewerArchitect = $projectService->checkReviewer('architect',$project->architect_approver,$project->design_engineer_architect,sizeof($estimateDisciplines));
 
         return view('project.detail',[
-            'project' => $project,
-            'costProject' => $costProjects,
-            'wbs' => $wbs,
-            'remark' => $remark,
-            'estimateAllDisciplines' => $estimateDisciplines,
-            'isAuthorizeToReviewCivil' => $isReviewerCivil,
+            'project'                    => $project,
+            'costProject'                => $costProjects,
+            'wbs'                        => $wbs,
+            'remark'                     => $remark,
+            'estimateAllDisciplines'     => $estimateDisciplines,
+            'stepper'                    => ProjectStepperData::build($project, $wbs),
+            'isAuthorizeToReviewCivil'   => $isReviewerCivil,
             'isAuthorizeToReviewMechanical' => $isReviewerMechanical,
-            'isAuthorizeToReviewArchitect' => $isReviewerArchitect,
+            'isAuthorizeToReviewArchitect'  => $isReviewerArchitect,
             'isAuthorizeToReviewElectrical' => $isReviewerElectrical,
             'isAuthorizeToReviewInstrument' => $isReviewerInstrument,
-            'isAuthorizeToReviewIt' => $isReviewerIt,
-            'project_date' => Carbon::parse($project->created_at)->format('d-M-Y'),
+            'isAuthorizeToReviewIt'         => $isReviewerIt,
+            'project_date'               => Carbon::parse($project->created_at)->format('d-M-Y'),
         ]);
     }
 

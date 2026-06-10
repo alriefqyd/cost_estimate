@@ -18,6 +18,37 @@
     </div>
     <!-- Container-fluid starts-->
     <div class="container-fluid">
+        <div class="project-stepper">
+            <div class="step-item complete">
+                <div class="step-circle"><i class="fa fa-check"></i></div>
+                <div class="step-label">Project Info</div>
+                <div class="step-sub">Completed</div>
+            </div>
+            <div class="step-item {{ $stepper->stepWbs }}">
+                <div class="step-circle"><i class="fa fa-sitemap"></i></div>
+                <div class="step-label">WBS Structure</div>
+                <div class="step-sub">
+                    @if($stepper->wbsCount > 0) {{ $stepper->wbsCount }} structure(s) defined
+                    @else Not created yet
+                    @endif
+                </div>
+            </div>
+            <div class="step-item {{ $stepper->stepEstimate }}">
+                <div class="step-circle"><i class="fa fa-calculator"></i></div>
+                <div class="step-label">Estimate</div>
+                <div class="step-sub">
+                    @if($stepper->stepWbs === 'active') Waiting for WBS
+                    @else {{ $stepper->estimateSublabel }}
+                    @endif
+                </div>
+            </div>
+            <div class="step-item {{ $stepper->stepApproval }}">
+                <div class="step-circle"><i class="fa fa-check-circle"></i></div>
+                <div class="step-label">Approval</div>
+                <div class="step-sub">{{ $stepper->approvalSublabel }}</div>
+            </div>
+        </div>
+
         <div class="row">
             @if(session('message'))
                 @include('flash')
