@@ -8,7 +8,7 @@
                     <div class="dark-logo-wrapper"><a href=""><img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt=""></a></div>
                 </a>
             </div>
-            <div class="toggle-sidebar m-t-15"
+            <div class="toggle-sidebar m-t-15" id="tour-sidebar-toggle"
                  data-tg-scroll-margin="0"
                  data-tg-fixed
                  data-tg-order="2"
@@ -34,7 +34,7 @@
                     </div>
                 </div>
 
-                <li class="onhover-dropdown"
+                <li class="onhover-dropdown" id="tour-profile"
                     data-tg-scroll-margin="0"
                     data-tg-fixed
                     data-tg-order="3"

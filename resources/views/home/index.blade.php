@@ -21,7 +21,7 @@
         </div>
         @canAny(['viewAny','create'], App\Models\Project::class)
             @can('create', App\Models\Project::class)
-                <a href="/project/create" class="btn btn-primary btn-sm px-3" style="border-radius:8px; font-weight:600;">
+                <a href="/project/create" class="btn btn-primary btn-sm px-3 btn-pulse" style="border-radius:8px; font-weight:600;">
                     <i class="fa fa-plus me-1"></i> New Project
                 </a>
             @endcan

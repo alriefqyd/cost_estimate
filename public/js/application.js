@@ -11,24 +11,6 @@ $(function(){
     /**
      * Project Form
      */
-    if (!localStorage.getItem('ce_sidebar_tour_done')) {
-        const tour = new tourguide.TourGuideClient({
-            showStepNumbers: true,
-            showPrevStep: true,
-            showNextStep: true
-        });
-
-        tour.start();
-
-        tour.onAfterStepChange(function () {
-            if (tour.activeStep === 2) {
-                $('.main-nav').removeClass('close_icon');
-            }
-        });
-
-        localStorage.setItem('ce_sidebar_tour_done', '1');
-    }
-
     $('.js-add-project-form').validate({
         rules:{
             project_no : {

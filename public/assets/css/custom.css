@@ -2081,3 +2081,14 @@ custom-checkbox:checked:before {
     color: #374151;
     vertical-align: middle;
 }
+
+/* New Project button pulse */
+@keyframes ce-btn-pulse {
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(88,103,221,.55); }
+    50%  { transform: scale(1.07); box-shadow: 0 0 0 8px rgba(88,103,221,0); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(88,103,221,0); }
+}
+.btn-pulse {
+    animation: ce-btn-pulse 1.8s ease-in-out infinite;
+    transform-origin: center;
+}
