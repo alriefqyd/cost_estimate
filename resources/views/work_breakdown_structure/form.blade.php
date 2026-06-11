@@ -26,10 +26,10 @@
                                     <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
                                     <div class="float-start col-md-10 js-dd-title-text js-dd-loc-equipment dd-nodrag" contenteditable="true">{{$key}}</div>
                                     <div class="float-end">
-                                        <span class="js-add-new-nestable-wbs" data-is-element="false">
+                                        <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="false">
                                            <i data-feather="plus-circle"></i>
                                         </span>
-                                        <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                                        <span class="cursor-pointer text-danger js-delete-wbs-discipline dd-nodrag">
                                             <i data-feather="x"></i>
                                         </span>
                                     </div>
@@ -39,15 +39,15 @@
                                         <li class="dd-item" data-identifier="{{$discipline->first()['identifier']}}" data-id="{{$discipline->first()['disciplineId']}}">
                                             <div class="dd-handle">
                                                 <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
-                                                <div class="float-start col-md-10 js-dd-handle-edit">
-                                                    <span class="js-dd-title">{{$k}}</span>
+                                                <div class="float-start col-md-10 js-dd-handle-edit dd-nodrag">
+                                                    <span class="js-dd-title dd-nodrag">{{$k}}</span>
                                                 </div>
                                                 <div class="float-end">
-                                                    <span class="js-add-new-nestable-wbs" data-is-element="true">
+                                                    <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="true">
                                                         <i data-feather="plus-circle"></i>
                                                     </span>
 
-                                                    <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                                                    <span class="cursor-pointer text-danger js-delete-wbs-discipline dd-nodrag">
                                                         <i data-feather="x"></i>
                                                     </span>
                                                 </div>
@@ -69,7 +69,7 @@
                                                                 <div class="js-dd-title-text js-dd-title-element dd-nodrag" contenteditable="true">{{$d['title']}}</div>
                                                             </div>
                                                             <div class="float-end">
-                                                                <span class="cursor-pointer text-danger js-delete-wbs-discipline">
+                                                                <span class="cursor-pointer text-danger js-delete-wbs-discipline dd-nodrag">
                                                                     <i data-feather="x"></i>
                                                                 </span>
                                                             </div>

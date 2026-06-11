@@ -550,11 +550,7 @@ $(function(){
 
     $(document).on('click','.js-delete-wbs-discipline',function(){
         var _this = $(this);
-        if(!_this.closest('.dd-list').hasClass('js-nestable-wbs')){
-            _this.closest('.dd-list').remove();
-        } else {
-            _this.closest('.dd-item').remove();
-        }
+        _this.closest('.dd-item').remove();
         initNestable();
         bindBeforeUnloadEvent();
     });
