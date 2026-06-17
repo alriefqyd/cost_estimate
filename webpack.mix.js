@@ -9,6 +9,14 @@ mix.js('resources/js/app.js', 'public/js')
         require('tailwindcss'),
     ]);
 
+mix.options({
+    terser: {
+        terserOptions: {
+            ecma: 2020,
+        },
+    },
+});
+
 if (mix.inProduction()) {
     mix.version();
 }
