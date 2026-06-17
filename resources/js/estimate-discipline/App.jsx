@@ -27,7 +27,10 @@ function computeTotal(row) {
 }
 
 function computeGrandTotal(rows, contingencyPct) {
-    const sub  = rows.reduce((acc, r) => acc + computeTotal(r), 0)
+    const sub = rows.reduce((acc, r) => {
+        const stored = parseFloat(r.rowTotal)
+        return acc + (Number.isFinite(stored) ? stored : computeTotal(r))
+    }, 0)
     const cont = sub * (Number(contingencyPct) / 100 || 0)
     return { sub, cont, grand: sub + cont }
 }
@@ -93,7 +96,7 @@ export default function App({
 
     const {
         rows, connected, synced,
-        setField, setFields, addRow, removeRow, scheduleSave,
+        setField, setFields, addRow, removeRow, getRow, scheduleSave,
         contingency, setContingency,
         onlineUsers, lastRemoteEditor,
     } = useCollab(projectId, wsUrl, initRows, initContingency, {
@@ -114,7 +117,9 @@ export default function App({
     // ─── Autosave callback ────────────────────────────────────────────────────
 
     const handleCellChange = useCallback((uid, field, value) => {
-        setField(uid, field, value)
+        const currentRow = getRow(uid)
+        const updatedRow = { ...(currentRow || {}), [field]: value }
+        setFields(uid, { [field]: value, rowTotal: computeTotal(updatedRow) })
         setSaveStatus('saving')
         pendingRef.current += 1
 
@@ -130,12 +135,14 @@ export default function App({
                 if (pendingRef.current === 0) setSaveStatus('saved')
             }
         })
-    }, [setField, scheduleSave, projectId, userDiscipline])
+    }, [setFields, getRow, scheduleSave, projectId, userDiscipline])
 
     // ─── Batch cell change (work item selection — 6 fields in one Yjs tx) ───
 
     const handleBatchCellChange = useCallback((uid, fields) => {
-        setFields(uid, fields)
+        const currentRow = getRow(uid)
+        const updatedRow = { ...(currentRow || {}), ...fields }
+        setFields(uid, { ...fields, rowTotal: computeTotal(updatedRow) })
         setSaveStatus('saving')
         pendingRef.current += 1
         scheduleSave(uid, async (row) => {
@@ -150,7 +157,7 @@ export default function App({
                 if (pendingRef.current === 0) setSaveStatus('saved')
             }
         })
-    }, [setFields, scheduleSave, projectId, userDiscipline])
+    }, [setFields, getRow, scheduleSave, projectId, userDiscipline])
 
     // ─── Delete row ───────────────────────────────────────────────────────────
 
@@ -171,6 +178,7 @@ export default function App({
             ...rowData,
             uid,
             workScope: userDiscipline,
+            rowTotal:  computeTotal(rowData),
         }
         addRow(uid, newRow)
         setShowAddRow(false)
@@ -210,6 +218,7 @@ export default function App({
             equipmentFactorial:  1,
             materialFactorial:   1,
             workScope:           userDiscipline,
+            rowTotal:            0,
         }
         addRow(uid, newRow)
         setSaveStatus('saving')

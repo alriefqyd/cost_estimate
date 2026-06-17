@@ -969,6 +969,9 @@ select {
 .prose > :where(:last-child):not(:where([class~="not-prose"] *)) {
   margin-bottom: 0;
 }
+.visible {
+  visibility: visible;
+}
 .static {
   position: static;
 }
@@ -1111,11 +1114,14 @@ select {
 .-mt-px {
   margin-top: -1px;
 }
-.mr-6 {
-  margin-right: 1.5rem;
+.mt-auto {
+  margin-top: auto;
 }
 .mt-0 {
   margin-top: 0px;
+}
+.mr-6 {
+  margin-right: 1.5rem;
 }
 .block {
   display: block;
@@ -1627,6 +1633,9 @@ select {
 .text-right {
   text-align: right;
 }
+.align-middle {
+  vertical-align: middle;
+}
 .font-sans {
   font-family: Nunito, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
@@ -1812,6 +1821,10 @@ select {
 }
 .ring-opacity-5 {
   --tw-ring-opacity: 0.05;
+}
+.invert {
+  --tw-invert: invert(100%);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);

@@ -184,6 +184,7 @@ class EstimateAllDisciplineController extends Controller
                     'equipmentFactorial'  => (float) ($ed->equipment_factorial ?? 1),
                     'materialFactorial'   => (float) ($ed->material_factorial ?? 1),
                     'totalCost'           => (float) $projectServices->getTotalCostWorkItem($ed),
+                    'rowTotal'            => (float) ($ed->labor_cost_total_rate ?? 0) + (float) ($ed->tool_unit_rate_total ?? 0) + (float) ($ed->material_unit_rate_total ?? 0),
                     'workScope'           => $ed->work_scope ?? '',
                 ];
             })

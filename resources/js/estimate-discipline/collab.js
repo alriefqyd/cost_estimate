@@ -17,7 +17,7 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
     const ymetaRef    = useRef(null)
     const saveTimers  = useRef({})
 
-    const [rows, setRows]                      = useState([])
+    const [rows, setRows]                      = useState(() => initRows || [])
     const [connected, setConnected]            = useState(false)
     const [synced, setSynced]                  = useState(false)
     const [contingency, setContingencyState]   = useState(initContingency ?? 15)
@@ -88,28 +88,37 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
             if (!isSynced) return
             setSynced(true)
 
-            // Seed rows from DB only when the Yjs doc is empty (first user to connect)
-            if (yrows.size === 0 && initRows.length > 0) {
+            // On every page load sync, refresh all rows from DB so that stale Yjs
+            // LevelDB state never causes value drift vs the detail page. Rows edited
+            // through this form are autosaved to DB within 800 ms, so DB is always
+            // the authoritative source at page-load time.
+            if (initRows?.length > 0) {
                 ydoc.transact(() => {
                     initRows.forEach(row => {
-                        const yrow = new Y.Map()
-                        Object.entries(row).forEach(([k, v]) => {
-                            if (k !== 'uid') yrow.set(k, v)
-                        })
-                        yrows.set(row.uid, yrow)
+                        if (!row.uid) return
+                        const existing = yrows.get(row.uid)
+                        if (existing) {
+                            Object.entries(row).forEach(([k, v]) => {
+                                if (k !== 'uid') existing.set(k, v ?? '')
+                            })
+                        } else {
+                            const yrow = new Y.Map()
+                            Object.entries(row).forEach(([k, v]) => {
+                                if (k !== 'uid') yrow.set(k, v ?? '')
+                            })
+                            yrows.set(row.uid, yrow)
+                        }
                     })
                 }, 'init')
             }
 
-            // Seed contingency from DB only when ymeta is empty
-            if (!ymeta.has('contingency')) {
-                ydoc.transact(() => {
-                    ymeta.set('contingency', initContingency ?? 15)
-                }, 'init')
-            }
+            // Always update contingency from DB — DB is authoritative for this value
+            ydoc.transact(() => {
+                ymeta.set('contingency', initContingency ?? 15)
+            }, 'init')
 
             setRows(snapshot())
-            setContingencyState(ymeta.get('contingency') ?? initContingency ?? 15)
+            setContingencyState(initContingency ?? 15)
         })
 
         // React to row changes (local and remote)
