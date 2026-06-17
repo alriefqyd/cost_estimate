@@ -10,6 +10,7 @@ use App\Models\ProjectReviewNote;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\WbsLevel3;
+use App\Notifications\ReviewNoteAddedNotification;
 use App\Rules\DesignEngineerRule;
 use App\Rules\UniqueProject;
 use App\Services\ProjectServices;
@@ -707,6 +708,18 @@ class ProjectController extends Controller
                 ));
 
                 Log::info("Review note notification sent to {$email} ({$target['discipline']}) for project {$project->project_title}");
+
+                try {
+                    $engineer->notify(new ReviewNoteAddedNotification(
+                        $project->id,
+                        $project->project_no ?? '',
+                        $project->project_title,
+                        $target['discipline'],
+                        $reviewerName
+                    ));
+                } catch (Exception $e) {
+                    Log::error('DB notification failed (reviewNote): ' . $e->getMessage());
+                }
             }
         } catch (Exception $e) {
             Log::error('Review note notification failed: ' . $e->getMessage());

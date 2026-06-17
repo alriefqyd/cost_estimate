@@ -1,5 +1,5 @@
 <!-- Page Sidebar Start-->
-<header class="main-nav {{request()->segment(1) == "" ? "close_icon" : ""}}"
+<header class="main-nav {{request()->segment(1) == "" ? "close_icon" : ""}}" id="tour-sidebar-nav"
         data-tg-scroll-margin="0"
         data-tg-fixed
         data-tg-order="4"
@@ -15,8 +15,14 @@
                     <li class="sidebar-main-title">
 
                     </li>
+                    <li class="margin-sm cursor-pointer" id="tour-nav-dashboard">
+                        <a class="nav-link menu-title cursor-pointer" href="/">
+                            <i data-feather="home"></i>
+                            <label class="text-small cursor-pointer cursor-pointer-hover">Dashboard</label>
+                        </a>
+                    </li>
                     @canAny(['viewAny','update','create','delete','view'], App\Models\Project::class)
-                        <li class="js-menu-project-list margin-sm cursor-pointer"
+                        <li class="js-menu-project-list margin-sm cursor-pointer" id="tour-nav-estimate"
                             data-tg-scroll-margin="0"
                             data-tg-fixed
                             data-tg-tour="You can view the complete list of cost estimate projects and easily create new estimates by clicking this menu.">
@@ -30,7 +36,7 @@
                         $workItemPermissions = ['viewAny','update','create','delete','view'];
                     @endphp
                     @if (auth()->user()->canAny($workItemPermissions, App\Models\WorkItem::class) || auth()->user()->canAny($workItemPermissions, App\Models\WorkItemType::class))
-                        <li class="dropdown margin-sm cursor-pointer"
+                        <li class="dropdown margin-sm cursor-pointer" id="tour-nav-workitem"
                             data-tg-scroll-margin="0"
                             data-tg-fixed
                             data-tg-tour="You can view all work items and easily create new ones by clicking this menu."
@@ -58,7 +64,7 @@
                         </li>
                     @endif
                     @canAny(['viewAny','update','create','delete','view'], App\Models\ManPower::class)
-                        <li class="margin-sm"
+                        <li class="margin-sm" id="tour-nav-manpower"
                             data-tg-scroll-margin="0"
                             data-tg-fixed
                             data-tg-tour="You can view the complete list of manpower and create new entries by clicking this menu.">
@@ -69,7 +75,7 @@
                         </li>
                     @endCan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\EquipmentTools::class)
-                    <li class="dropdown margin-sm cursor-pointer"
+                    <li class="dropdown margin-sm cursor-pointer" id="tour-nav-tools"
                         data-tg-scroll-margin="0"
                         data-tg-fixed
                         data-tg-tour="You can view the complete list of tools & equipment and easily create new entries by clicking this menu.">
@@ -83,7 +89,7 @@
                     </li>
                     @endcan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\Material::class)
-                    <li class="dropdown margin-sm cursor-pointer"
+                    <li class="dropdown margin-sm cursor-pointer" id="tour-nav-material"
                         data-tg-scroll-margin="0"
                         data-tg-fixed
                         data-tg-tour="You can view the complete list of material and easily create new entries by clicking this menu.">
@@ -100,7 +106,7 @@
                     </li>
                     @endcan
                     @canAny(['viewAny','update','create','delete','view'], App\Models\WorkBreakdownStructure::class)
-                    <li class="margin-sm cursor-pointer"
+                    <li class="margin-sm cursor-pointer" id="tour-nav-wbs"
                         data-tg-scroll-margin="0"
                         data-tg-fixed
                         data-tg-tour="Manage the Work Breakdown Structure (WBS) through this menu.">
@@ -111,7 +117,7 @@
                     </li>
                     @endcan
                     @can('viewAny', App\Models\User::class)
-                    <li class="margin-sm cursor-pointer"
+                    <li class="margin-sm cursor-pointer" id="tour-nav-user"
                         data-tg-scroll-margin="0"
                         data-tg-fixed
                         data-tg-tour="Manage all users, authorities, and permissions by clicking this menu.">
@@ -120,6 +126,12 @@
                         <label class="text-small cursor-pointer cursor-pointer-white">User Setting</label></a>
                     </li>
                     @endcan
+                    <li class="margin-sm cursor-pointer">
+                        <a class="nav-link menu-title cursor-pointer" href="/guide">
+                            <i data-feather="book-open"></i>
+                            <label class="text-small cursor-pointer cursor-pointer-white">User Guide</label>
+                        </a>
+                    </li>
                 </ul>
             </div>
         <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

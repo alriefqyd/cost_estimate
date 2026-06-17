@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Survey;
+use App\Models\User;
 use App\Services\ProjectServices;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,10 @@ class SurveyController extends Controller
      */
     public function index()
     {
-        return view('survey.form');
+        $surveys = auth()->user()->can('viewAny', User::class)
+            ? Survey::with('user')->latest()->get()
+            : null;
+        return view('survey.form', compact('surveys'));
     }
 
     /**
@@ -60,7 +64,10 @@ class SurveyController extends Controller
             $projectService->message($e->getMessage(),'danger','fa fa-cross','danger');
         }
 
-        return view('survey.form');
+        $surveys = auth()->user()->can('viewAny', User::class)
+            ? Survey::with('user')->latest()->get()
+            : null;
+        return view('survey.form', compact('surveys'));
     }
 
     /**
