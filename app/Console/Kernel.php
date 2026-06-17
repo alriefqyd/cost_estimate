@@ -3,7 +3,6 @@
 namespace App\Console;
 
 use App\Http\Controllers\EstimateAllDisciplineController;
-use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\WorkBreakdownStructureController;
 use App\Services\ProjectServices;
@@ -38,9 +37,9 @@ class Kernel extends ConsoleKernel
         })->cron('00 03 * * *');
 
         $schedule->call(function() {
-            $projectController = new ProjectServices();
-            $projectController->sendEmailRemainderToReviewer();
-        })->cron('20 07 * * *');
+            $projectServices = new ProjectServices();
+            $projectServices->sendEmailRemainderToReviewer();
+        })->cron('00 08 * * *');
     }
 
     /**

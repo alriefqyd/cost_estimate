@@ -51,6 +51,32 @@ services:
         networks:
             - app-network
 
+    soketi:
+        image: quay.io/soketi/soketi:latest-16-alpine
+        container_name: soketi
+        ports:
+            - "6001:6001"
+            - "9601:9601"
+        environment:
+            SOKETI_DEFAULT_APP_ID: "cost_estimate"
+            SOKETI_DEFAULT_APP_KEY: "cost-estimate-key"
+            SOKETI_DEFAULT_APP_SECRET: "cost-estimate-secret"
+            SOKETI_DEFAULT_APP_MAX_CONNS: "100"
+        networks:
+            - app-network
+
+    collab:
+        image: node:20-alpine
+        container_name: collab-ws
+        working_dir: /app
+        command: sh -c "npm install && npm start"
+        ports:
+            - "1234:1234"
+        volumes:
+            - ./ws-server:/app
+        networks:
+            - app-network
+
     mailhog:
         image: mailhog/mailhog
         ports:
@@ -62,3 +88,4 @@ services:
 networks:
     app-network:
         driver: bridge
+

@@ -3,31 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Cassandra\Date;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use function PHPUnit\TestFixture\func;
+use Illuminate\Support\Facades\Http;
 
 class ApiController extends Controller
 {
-    public function getApi($url){
-
-        $response_json = file_get_contents($url);
-        if(false !== $response_json) {
-            try {
-                $response = json_decode($response_json);
-                if(isset($response)) {
-                    return $response;
-                }
-
+    public function getApi($url)
+    {
+        try {
+            $response = Http::timeout(10)->get($url);
+            if ($response->successful()) {
+                return $response->json();
             }
-            catch(Exception $e) {
-                return null;
-            }
-
+        } catch (Exception $e) {
+            report($e);
         }
-        return null;
+
+        return [];
     }
     /** USD API */
     public function getUsdRateApi(){
@@ -39,14 +33,14 @@ class ApiController extends Controller
         return null;
     }
 
-    public function getPublicHolidayApi(){
+    public function getPublicHolidayApi()
+    {
         $reqUrl = "https://api-harilibur.vercel.app/api?year=".date('Y');
         $data = $this->getApi($reqUrl);
-        $collection = collect($data)->map(function ($item) {
+
+        return collect(is_array($data) ? $data : [])->map(function ($item) {
             return (object) $item;
         });
-
-        return $collection;
     }
 
     public function getReviewer(Request $request){

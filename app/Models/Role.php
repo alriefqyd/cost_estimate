@@ -28,6 +28,8 @@ class Role extends Model
         'read_mechanical' => 'View All Mechanical Cost Estimate',
         'read_electrical' => 'View All Electrical Cost Estimate',
         'read_instrument' => 'View All Instrument Cost Estimate',
+        'read_it' => 'View All IT Cost Estimate',
+        'read_architect' => 'View All Architect Cost Estimate',
         'read_assignee' => 'View Cost Estimate Assignee',
         'review_civil_cost_estimate' => 'Review Civil Discipline Cost Estimates',
         'review_mechanical_cost_estimate' => 'Review Mechanical Discipline Cost Estimates',

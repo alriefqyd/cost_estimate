@@ -159,6 +159,23 @@ class Project extends Model
             $query->where('design_engineer_architect',$q);
         })->when($filters['sponsor'] ?? false, function($query, $q){
             $query->where('project_area_id', $q);
+        })->when($filters['my_reviews'] ?? false, function($query) {
+            $userId = auth()->id();
+            $query->where(function ($q) use ($userId) {
+                $q->where(function ($s) use ($userId) {
+                    $s->where('civil_approver', $userId)->where('civil_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('mechanical_approver', $userId)->where('mechanical_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('electrical_approver', $userId)->where('electrical_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('instrument_approver', $userId)->where('instrument_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('it_approver', $userId)->where('it_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('architect_approver', $userId)->where('architect_approval_status', Project::PENDING);
+                });
+            });
         });
     }
 
@@ -191,6 +208,10 @@ class Project extends Model
                 return $q->orwhereNotNull('design_engineer_mechanical');
             })->when($user->isAllCivilCostEstimateRole(), function ($q) use ($user) {
                 return $q->orwhereNotNull('design_engineer_civil');
+            })->when($user->isAllItCostEstimateRole(), function ($q) use ($user) {
+                return $q->orwhereNotNull('design_engineer_it');
+            })->when($user->isAllArchitectCostEstimateRole(), function ($q) use ($user) {
+                return $q->orwhereNotNull('design_engineer_architect');
             });
         });
     }
@@ -307,7 +328,7 @@ class Project extends Model
     public function getProjectDisciplineStatusApproval(){
         $list = [];
         foreach (self::APPROVAL_DISCIPLINE_LIST as $approval => $designEngineer){
-            if(isset($this->$designEngineer)
+            if(!empty($this->$designEngineer)
                 && $this->$approval != self::APPROVE){
                 array_push($list, self::DESIGN_ENGINEER_KEY_LIST[$designEngineer]);
             }

@@ -1,4 +1,7 @@
-<tr class="js-row-item-estimate table-row-work-item">
+<tr class="js-row-item-estimate table-row-work-item"
+    data-uid="@if(isset($item)){{ trim($item->unique_identifier ?? '') }}@else@{{ uniqueIdentifier }}@endif"
+    data-persisted="{{ isset($item) ? 'true' : 'false' }}"
+    data-work-scope="{{ isset($item) ? ($item->workScope ?? '') : '' }}">
     <td></td>
     <td class="js-column-identifier">
         <input type="hidden" readonly class="js-item-version"
@@ -10,13 +13,7 @@
                 @endif">
 
         <input type="hidden" readonly class="js-unique-identifier"
-           value="
-               @if(isset($item))
-                    {{$item->unique_identifier}}
-                @else
-                    @{{ uniqueIdentifier }}
-                @endif
-        ">
+           value="@if(isset($item)){{ trim($item->unique_identifier ?? '') }}@else@{{ uniqueIdentifier }}@endif">
     </td>
     <td class="min-w-150">
         @if(isset($item))
@@ -58,6 +55,7 @@
                 </select>
             </span>
             <div class="{{isset($item) ? '' : 'd-none'}} js-work-item-text cursor-pointer"
+                data-id="@if(isset($item)){{ $item->workItemId }}@else@{{ workItemId }}@endif"
                 data-total=
                     @if(isset($item->workItemTotalCost))
                           "{{$item->workItemTotalCost}}"

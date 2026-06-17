@@ -22,7 +22,7 @@
                             data-tg-tour="You can view the complete list of cost estimate projects and easily create new estimates by clicking this menu.">
                             <a class="nav-link menu-title cursor-pointer" href="/project">
                                 <i data-feather="layers"></i>
-                                <label class="text-small cursor-pointer cursor-pointer-hover" >Cost Estimate</label>
+                                <label class="text-small cursor-pointer cursor-pointer-hover">Cost Estimate</label>
                             </a>
                         </li>
                     @endCan

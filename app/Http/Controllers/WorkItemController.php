@@ -466,6 +466,66 @@ class WorkItemController extends Controller
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
+    /**
+     * Lean search endpoint for the React work-item search panel.
+     * Runs a single query with correlated subqueries — no relationship collections loaded.
+     */
+    public function searchWorkItemsLean(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $q = trim($request->input('q', ''));
+        if (strlen($q) < 2) {
+            return response()->json([]);
+        }
+
+        $userId     = auth()->id();
+        $isReviewer = auth()->user()->isWorkItemReviewer();
+        $like       = '%' . $q . '%';
+
+        $rows = DB::table('work_items as wi')
+            ->select([
+                'wi.id',
+                'wi.description',
+                'wi.unit',
+                'wi.status',
+                DB::raw('COALESCE((
+                    SELECT SUM(mp.overall_rate_hourly * mpwi.labor_coefisient)
+                    FROM man_powers_work_items mpwi
+                    JOIN man_powers mp ON mp.id = mpwi.man_power_id
+                    WHERE mpwi.work_item_id = wi.id
+                ), 0) AS labor_rate'),
+                DB::raw('COALESCE((
+                    SELECT SUM(et.local_rate * wiet.quantity)
+                    FROM work_items_equipment_tools wiet
+                    JOIN equipment_tools et ON et.id = wiet.equipment_tools_id
+                    WHERE wiet.work_item_id = wi.id
+                ), 0) AS equipment_rate'),
+                DB::raw('COALESCE((
+                    SELECT SUM(m.rate * wim.quantity)
+                    FROM work_items_materials wim
+                    JOIN materials m ON m.id = wim.materials_id
+                    WHERE wim.work_item_id = wi.id
+                ), 0) AS material_rate'),
+            ])
+            ->whereNull('wi.deleted_at')
+            ->where('wi.description', 'like', $like)
+            ->when(!$isReviewer, fn($q2) => $q2->where(function ($q3) use ($userId) {
+                $q3->where('wi.status', WorkItem::REVIEWED)
+                   ->orWhere('wi.created_by', $userId);
+            }))
+            ->orderByRaw("LOCATE(?, wi.description)", [$q])
+            ->limit(30)
+            ->get();
+
+        return response()->json($rows->map(fn($r) => [
+            'id'                    => $r->id,
+            'text'                  => $r->description . ' - (' . $r->status . ')',
+            'unit'                  => $r->unit,
+            'manPowersTotalRateInt' => (float) $r->labor_rate,
+            'equipmentToolsRateInt' => (float) $r->equipment_rate,
+            'materialsRateInt'      => (float) $r->material_rate,
+        ]));
+    }
+
     public function setWorkItems(Request $request){
         try{
             $workItem = $this->getWorkItems($request);

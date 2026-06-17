@@ -33,6 +33,7 @@ class ProjectClass
     public $work_element_id;
     public $unique_identifier;
     public $version;
+    public $workScope;
 
 
 }

@@ -4,9 +4,12 @@ namespace App\Services;
 
 use App\Class\ProjectClass;
 use App\Class\ProjectTotalCostClass;
-use App\Http\Controllers\ProjectController;
+use App\Exports\SummaryExport;
+use App\Mail\DisciplineApprovedMail;
+use App\Mail\ReviewerDailyReminderMail;
 use App\Mail\SendMail;
 use App\Mail\SendNotifApproveCostEstimateToEngineer;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\EstimateAllDiscipline;
 use App\Models\Profile;
 use App\Models\Project;
@@ -25,7 +28,7 @@ class ProjectServices
         $order = $request->order;
         $sort =  $request->sort;
 
-        $requestFilter = request(['q','status','civil','mechanical','electrical','instrument','sponsor','it','architect']);
+        $requestFilter = request(['q','status','civil','mechanical','electrical','instrument','sponsor','it','architect','my_reviews']);
 
         $projects = Project::with(['designEngineerMechanical.profiles','designEngineerCivil.profiles','designEngineerElectrical.profiles','designEngineerInstrument.profiles','designEngineerIt.profiles','designEngineerArchitect.profiles','projectArea','projectManager.profiles'])
             ->when(!auth()->user()->isViewAllCostEstimateRole(), function ($subQuery){
@@ -34,15 +37,34 @@ class ProjectServices
 
         $countDraft = clone $projects;
         $countApprove = clone $projects;
+        $countMyReviews = clone $projects;
 
         $projectList = $projects->filter($requestFilter, true)->orderBy('created_at', 'DESC')->paginate(20)->withQueryString();
         $countDraft = $countDraft->filter($requestFilter,false)->where('status',Project::DRAFT)->count();
         $countApprove = $countApprove->filter($requestFilter,false)->where('status',Project::APPROVE)->count();
 
+        $userId = auth()->id();
+        $countMyReviews = $countMyReviews->where(function ($q) use ($userId) {
+            $q->where(function ($s) use ($userId) {
+                $s->where('civil_approver', $userId)->where('civil_approval_status', Project::PENDING);
+            })->orWhere(function ($s) use ($userId) {
+                $s->where('mechanical_approver', $userId)->where('mechanical_approval_status', Project::PENDING);
+            })->orWhere(function ($s) use ($userId) {
+                $s->where('electrical_approver', $userId)->where('electrical_approval_status', Project::PENDING);
+            })->orWhere(function ($s) use ($userId) {
+                $s->where('instrument_approver', $userId)->where('instrument_approval_status', Project::PENDING);
+            })->orWhere(function ($s) use ($userId) {
+                $s->where('it_approver', $userId)->where('it_approval_status', Project::PENDING);
+            })->orWhere(function ($s) use ($userId) {
+                $s->where('architect_approver', $userId)->where('architect_approval_status', Project::PENDING);
+            });
+        })->count();
+
         return [
             'projectList' => $projectList,
             'draft' => $countDraft,
-            'approve' => $countApprove
+            'approve' => $countApprove,
+            'myReviews' => $countMyReviews,
         ];
     }
     /**
@@ -311,37 +333,124 @@ class ProjectServices
     public function sendEmailRemainderToReviewer() {
         $projects = Project::where('status', Project::PENDING_DISCIPLINE_APPROVAL)->get();
 
+        $disciplineApproverMap = [
+            'mechanical' => ['approver' => 'mechanical_approver', 'status_col' => 'mechanical_approval_status', 'label' => 'Mechanical'],
+            'civil'      => ['approver' => 'civil_approver',      'status_col' => 'civil_approval_status',      'label' => 'Civil'],
+            'electrical' => ['approver' => 'electrical_approver', 'status_col' => 'electrical_approval_status', 'label' => 'Electrical'],
+            'instrument' => ['approver' => 'instrument_approver', 'status_col' => 'instrument_approval_status', 'label' => 'Instrument'],
+            'it'         => ['approver' => 'it_approver',         'status_col' => 'it_approval_status',         'label' => 'IT'],
+            'architect'  => ['approver' => 'architect_approver',  'status_col' => 'architect_approval_status',  'label' => 'Architecture'],
+        ];
+
+        // Group pending disciplines by reviewer user_id
+        $reviewerMap = [];
         foreach ($projects as $project) {
             $datas = json_decode($project->estimate_discipline_status);
             foreach ($datas as $data) {
-                $discipline = explode('_', $data->position);
-                $diciplineReviewerStatus = $discipline[2] . '_approval_status';
-                $discipline = $discipline[2] . '_approver';
-                if($data->status == "PUBLISH" && $project->$diciplineReviewerStatus != "APPROVE"){
-                    $profile = Profile::where('user_id', $project->$discipline)->first();
-                    $mail = $profile ? $profile->email : null;
-                    if ($mail) {
-                        Mail::to($mail)->send(new SendMail($project));
-                        Log::info("Email reminder approval for project $project->project_title sent to: $mail for $discipline.");
+                $parts = explode('_', $data->position);
+                $disciplineKey = $parts[2] ?? null;
+                if (!$disciplineKey || !isset($disciplineApproverMap[$disciplineKey])) continue;
+
+                $approverCol = $disciplineApproverMap[$disciplineKey]['approver'];
+                $statusCol   = $disciplineApproverMap[$disciplineKey]['status_col'];
+                $label       = $disciplineApproverMap[$disciplineKey]['label'];
+                $approverId  = $project->$approverCol;
+
+                if ($data->status === 'PUBLISH' && $project->$statusCol !== Project::APPROVE && $approverId) {
+                    if (!isset($reviewerMap[$approverId])) {
+                        $reviewerMap[$approverId] = ['profile' => null, 'items' => []];
+                    }
+                    // Find existing entry for this project or create one
+                    $found = false;
+                    foreach ($reviewerMap[$approverId]['items'] as &$entry) {
+                        if ($entry['project']->id === $project->id) {
+                            $entry['disciplines'][] = $label;
+                            $found = true;
+                            break;
+                        }
+                    }
+                    unset($entry);
+                    if (!$found) {
+                        $reviewerMap[$approverId]['items'][] = [
+                            'project'     => $project,
+                            'disciplines' => [$label],
+                        ];
+                    }
+                    if (!$reviewerMap[$approverId]['profile']) {
+                        $reviewerMap[$approverId]['profile'] = Profile::where('user_id', $approverId)->first();
                     }
                 }
             }
         }
+
+        // Send one grouped email per reviewer
+        foreach ($reviewerMap as $reviewerId => $data) {
+            $profile = $data['profile'];
+            if (!$profile || !$profile->email) continue;
+            try {
+                Mail::to($profile->email)->send(new ReviewerDailyReminderMail($profile->full_name, $data['items']));
+                Log::info("Daily reminder sent to reviewer: {$profile->email} ({$profile->full_name}) — " . count($data['items']) . " project(s).");
+            } catch (\Exception $e) {
+                Log::error("Failed to send daily reminder to {$profile->email}: " . $e->getMessage());
+            }
+        }
     }
 
-    public function sendEmailToEngineer(Project $project, Request $request){
-        $projectController = new ProjectController();
-        $attachment = $projectController->export($project, $request, true);
+    public function sendDisciplineApprovedEmailToEngineer(Project $project, string $discipline): void
+    {
+        $disciplineToEngineerCol = [
+            'civil'       => 'design_engineer_civil',
+            'mechanical'  => 'design_engineer_mechanical',
+            'electrical'  => 'design_engineer_electrical',
+            'instrument'  => 'design_engineer_instrument',
+            'it'          => 'design_engineer_it',
+            'architect'   => 'design_engineer_architect',
+        ];
+
+        $key = strtolower($discipline);
+        $engineerCol = $disciplineToEngineerCol[$key] ?? null;
+        if (!$engineerCol || !$project->$engineerCol) return;
+
+        $profile = Profile::where('user_id', $project->$engineerCol)->first();
+        if (!$profile || !$profile->email) return;
 
         try {
-            foreach (Setting::DESIGN_ENGINEER_LIST_DB_COLUMN as $engineer) {
-                if(isset($project->$engineer)){
-                    $profile = Profile::where('user_id', $project->$engineer)->first();
-                    Mail::to($profile->email)->send(new SendNotifApproveCostEstimateToEngineer($project, $profile, $attachment));
+            Mail::to($profile->email)->send(new DisciplineApprovedMail($project, $profile->full_name, ucfirst($key)));
+            Log::info("Discipline approved ({$discipline}) email sent to: {$profile->email}");
+        } catch (\Exception $e) {
+            Log::error("Failed to send discipline approved email for {$discipline}: " . $e->getMessage());
+        }
+    }
+
+    public function sendEmailToEngineer(Project $project, Request $request)
+    {
+        Log::info("sendEmailToEngineer: triggered for project [{$project->id}] {$project->project_title}");
+
+        $excelData = null;
+        try {
+            $blankRequest = new Request();
+            $estimateDisciplines = $this->getEstimateDisciplineByProject($project, $blankRequest);
+            $costProjects = $this->getProjectTotalCost($estimateDisciplines);
+            $excelData = Excel::raw(
+                new SummaryExport($estimateDisciplines, $project, $costProjects),
+                \Maatwebsite\Excel\Excel::XLSX
+            );
+            Log::info("sendEmailToEngineer: Excel generated successfully for project [{$project->id}]");
+        } catch (\Exception $e) {
+            Log::error("sendEmailToEngineer: Excel generation failed for project [{$project->id}] — {$e->getMessage()} at {$e->getFile()}:{$e->getLine()}");
+        }
+
+        foreach (Setting::DESIGN_ENGINEER_LIST_DB_COLUMN as $engineer) {
+            if (!empty($project->$engineer)) {
+                $profile = Profile::where('user_id', $project->$engineer)->first();
+                if (!$profile || !$profile->email) continue;
+                try {
+                    Mail::to($profile->email)->send(new SendNotifApproveCostEstimateToEngineer($project, $profile, $excelData));
+                    Log::info("sendEmailToEngineer: all-approved email sent to {$profile->email}" . ($excelData ? ' (with Excel)' : ' (no attachment — Excel failed)'));
+                } catch (\Exception $e) {
+                    Log::error("sendEmailToEngineer: mail failed for {$profile->email} — {$e->getMessage()}");
                 }
             }
-        } catch (\Exception $e) {
-            Log::error('Error sending email to engineer: ' . $e->getMessage());
         }
     }
 

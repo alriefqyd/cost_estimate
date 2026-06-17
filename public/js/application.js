@@ -117,6 +117,12 @@ $(function(){
         $.ajax({
             url: '/getPublicHolidayApi',
             success: function(results) {
+                if (!Array.isArray(results)) {
+                    console.error('Unexpected public holiday API response:', results);
+                    callback([]);
+                    return;
+                }
+
                 const _newdata = results
                     .filter(function(item) {
                         return item.is_national_holiday === true;
@@ -142,7 +148,11 @@ $(function(){
     }
 
     function initCalendar(publicHolidays) {
+        publicHolidays = publicHolidays || [];
         var calendarEl = $('#calendar')[0]; // Get the DOM element
+        if (!calendarEl) {
+            return;
+        }
         var calendar = new FullCalendar.Calendar(calendarEl, {
             events: publicHolidays,
             initialView: 'multiMonthYear',
@@ -223,11 +233,14 @@ $(function(){
         $('.fc-toolbar-title').text("Production Calendar " + currentYear);
     }
 
-    setTimeout(function (){
-        $('.js-component-calendar').find('.loader-box').addClass('d-none');
-        $('.js-legend').removeClass('d-none');
-        if($('.js-component-calendar').length > 0) initCalendar();
-    },500);
+    // Hide loader and legend once calendar data has loaded.
+    // Calendar is initialized from the public holiday callback above.
+    // This avoids a second initCalendar() call with no data.
+    // setTimeout(function (){
+    //     $('.js-component-calendar').find('.loader-box').addClass('d-none');
+    //     $('.js-legend').removeClass('d-none');
+    //     if($('.js-component-calendar').length > 0) initCalendar();
+    // },500);
     function currencyFormat(_value){
 
         var number_string = _value.replace(/[^,\d]/g, '').toString(),
@@ -314,6 +327,16 @@ $(function(){
        var _data_value = _this.data('value');
         _this.siblings('.js-status-filter').val(_data_value);
         _this.closest('form').submit();
+    });
+
+    $('.js-btn-my-reviews').on('click', function(){
+        var $input = $(this).closest('form').find('.js-my-reviews-input');
+        if ($input.val()) {
+            $input.val('');
+        } else {
+            $input.val('1');
+        }
+        $(this).closest('form').submit();
     });
 
     var _count = 0;

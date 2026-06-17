@@ -10,16 +10,27 @@
         "production": "mix --production"
     },
     "devDependencies": {
+        "@babel/preset-react": "^7.29.7",
         "@tailwindcss/forms": "^0.5.0",
         "@tailwindcss/typography": "^0.5.0",
         "alpinejs": "^3.0.6",
         "axios": "^0.25",
         "browser-sync": "^2.29.1",
         "browser-sync-webpack-plugin": "^2.3.0",
+        "laravel-echo": "^2.3.7",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
         "postcss": "^8.1.14",
         "postcss-import": "^14.0.1",
+        "pusher-js": "^8.5.0",
         "tailwindcss": "^3.0.0"
+    },
+    "dependencies": {
+        "ag-grid-community": "^31.3.4",
+        "ag-grid-react": "^31.3.4",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "y-websocket": "^2.0.4",
+        "yjs": "^13.6.18"
     }
 }

@@ -144,6 +144,12 @@ class User extends Authenticatable
     public function isAllCivilCostEstimateRole(){
         return auth()->user()->roles->contains('name', Role::ACTION_COST_ESTIMATE['read_civil']);
     }
+    public function isAllItCostEstimateRole(){
+        return auth()->user()->roles->contains('name', Role::ACTION_COST_ESTIMATE['read_it']);
+    }
+    public function isAllArchitectCostEstimateRole(){
+        return auth()->user()->roles->contains('name', Role::ACTION_COST_ESTIMATE['read_architect']);
+    }
 
     /*
      * Function for checking role feature

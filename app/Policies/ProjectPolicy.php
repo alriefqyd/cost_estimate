@@ -29,6 +29,8 @@ class ProjectPolicy
             Role::ACTION_COST_ESTIMATE['read_assignee'],
             Role::ACTION_COST_ESTIMATE['read_civil'],
             Role::ACTION_COST_ESTIMATE['read_mechanical'],
+            Role::ACTION_COST_ESTIMATE['read_it'],
+            Role::ACTION_COST_ESTIMATE['read_architect'],
         ];
 
         return auth()->user()->roles->whereIn('name', $roleMapping)->isNotEmpty();
@@ -48,13 +50,14 @@ class ProjectPolicy
         }
 
         $roleMapping = [
-            'mechanical' => 'design_engineer_mechanical',
-            'civil' => 'design_engineer_civil',
-            'electrical' => 'design_engineer_electrical',
-            'instrument' => 'design_engineer_instrument',
-            'it' => 'design_engineer_it',
-            'project_manager' => 'project_manager',
-            'project_engineer' => 'project_engineer'
+            'mechanical'       => 'design_engineer_mechanical',
+            'civil'            => 'design_engineer_civil',
+            'electrical'       => 'design_engineer_electrical',
+            'instrument'       => 'design_engineer_instrument',
+            'it'               => 'design_engineer_it',
+            'architect'        => 'design_engineer_architect',
+            'project_manager'  => 'project_manager',
+            'project_engineer' => 'project_engineer',
         ];
 
 

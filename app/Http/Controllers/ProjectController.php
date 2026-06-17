@@ -48,6 +48,7 @@ class ProjectController extends Controller
             'projects' => $projectsData['projectList'],
             'projectDraft' => $projectsData['draft'],
             'projectApprove' => $projectsData['approve'],
+            'projectMyReviews' => $projectsData['myReviews'],
             'civilEngineerList' => $civilEngineerList,
             'mechanicalEngineerList' => $mechanicalEngineerList,
             'electricalEngineerList' => $electricalEngineerList,
@@ -553,14 +554,16 @@ class ProjectController extends Controller
                 }
 
                 $projectServices->updateStatusProject($project);
+                Log::info("updateStatus: project [{$project->id}] status after updateStatusProject = {$project->status}");
 
                 if ($request->status === Project::APPROVE) {
+                    $projectServices->sendDisciplineApprovedEmailToEngineer($project, $discipline);
                     ProjectReviewNote::where('project_id', $project->id)
                         ->where('reviewer_id', auth()->id())
                         ->delete();
                 }
 
-                if($project->status == "APPROVE"){
+                if ($project->status == "APPROVE") {
                     $projectServices->sendEmailToEngineer($project, $request);
                 }
 

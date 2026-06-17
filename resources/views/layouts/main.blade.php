@@ -107,6 +107,8 @@
 <script src="{{'/js/nestable.js'}}"></script>
 <script src="{{'/js/application.js'}}"></script>
 <script src="{{'/js/project.js'}}"></script>
+<script src="{{ asset('/js/realtime.js') }}"></script>
+<script src="{{'/js/collab.js'}}"></script>
 <script src="{{'/js/estimate_discipline.js'}}"></script>
 <script src="{{'/js/work_breakdown_structure.js'}}"></script>
 <script src="{{'/js/man_power.js'}}"></script>

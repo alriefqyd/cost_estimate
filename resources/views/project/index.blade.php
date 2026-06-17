@@ -114,14 +114,19 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
-                                <div class="btn-group btn-group-square " role="group" aria-label="Basic example">
+                            <div class="col-md-8">
+                                <div class="btn-group btn-group-square" role="group">
                                     <input type="hidden" name="status" value="{{request()->status}}" class="js-status-filter">
+                                    <input type="hidden" name="my_reviews" value="{{request()->my_reviews}}" class="js-my-reviews-input">
                                     @foreach(Project::getStatuses() as $status)
                                         <button class="btn btn-outline-light txt-dark {{request()->status == $status ? 'active' : ''}} js-btn-status" data-value="{{$status}}" type="button">
                                             {{$status}} ({{$status == Project::DRAFT ? $projectDraft : $projectApprove}})
                                         </button>
                                     @endforeach
+                                    <button type="button"
+                                        class="btn btn-outline-light txt-dark js-btn-my-reviews {{request()->my_reviews ? 'active' : ''}}">
+                                        Pending My Review ({{$projectMyReviews}})
+                                    </button>
                                 </div>
                             </div>
                         </div>

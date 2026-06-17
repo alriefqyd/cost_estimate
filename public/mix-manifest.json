@@ -1,4 +1,7 @@
 {
     "/js/app.js": "/js/app.js",
+    "/js/realtime.js": "/js/realtime.js",
+    "/js/collab.js": "/js/collab.js",
+    "/js/estimate-discipline.js": "/js/estimate-discipline.js",
     "/css/app.css": "/css/app.css"
 }
