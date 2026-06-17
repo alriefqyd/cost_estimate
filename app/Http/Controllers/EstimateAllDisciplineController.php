@@ -156,38 +156,39 @@ class EstimateAllDisciplineController extends Controller
         });
 
         $version = EstimateAllDiscipline::where('project_id', $project->id)->first('version');
+        $projectServices = new ProjectServices();
 
         // ── Flat rows for React ──────────────────────────────────────────────
-        $flatRows = [];
-        foreach ($wbs as $locationName => $disciplines) {
-            foreach ($disciplines as $disciplineName => $workElements) {
-                foreach ($workElements as $workElementName => $rows) {
-                    foreach ($rows as $item) {
-                        if (!isset($item->workItemId)) continue;
-                        $flatRows[] = [
-                            'uid'                 => $item->unique_identifier,
-                            'location'            => (string) $locationName,
-                            'discipline'          => (string) $disciplineName,
-                            'workElement'         => (string) ($workElementName ?? ''),
-                            'wbs_level3_id'       => $item->wbs_level3_id,
-                            'work_element_id'     => $item->work_element_id,
-                            'workItemId'          => $item->workItemId,
-                            'workItemDescription' => $item->workItemDescription ?? '',
-                            'volume'              => (float) ($item->estimateVolume ?? 1),
-                            'unit'                => $item->workItemUnit ?? '',
-                            'laborRate'           => (float) ($item->workItemUnitRateLaborCost ?? 0),
-                            'toolRate'            => (float) ($item->workItemUnitRateToolCost ?? 0),
-                            'materialRate'        => (float) ($item->workItemUnitRateMaterialCost ?? 0),
-                            'labourFactorial'     => (float) ($item->workItemLaborFactorial ?? 1),
-                            'equipmentFactorial'  => (float) ($item->workItemEquipmentFactorial ?? 1),
-                            'materialFactorial'   => (float) ($item->workItemMaterialFactorial ?? 1),
-                            'totalCost'           => (float) ($item->workItemTotalCost ?? 0),
-                            'workScope'           => $item->workScope ?? '',
-                        ];
-                    }
-                }
-            }
-        }
+        // Query directly from EstimateAllDiscipline to avoid key collisions in the
+        // nested WBS grouping (two WbsLevel3 rows with the same work_element FK
+        // under the same location+discipline would silently overwrite each other).
+        $flatRows = EstimateAllDiscipline::with(['workItems', 'wbss.disciplines', 'wbss.workElements'])
+            ->where('project_id', $project->id)
+            ->get()
+            ->map(function ($ed) use ($projectServices) {
+                return [
+                    'uid'                 => $ed->unique_identifier,
+                    'location'            => $ed->wbss?->title ?? '',
+                    'discipline'          => $ed->wbss?->disciplines?->title ?? '',
+                    'workElement'         => (string) ($ed->wbss?->work_element ?? ''),
+                    'wbs_level3_id'       => $ed->wbs_level3_id,
+                    'work_element_id'     => $ed->equipment_location_id,
+                    'workItemId'          => $ed->work_item_id,
+                    'workItemDescription' => $ed->workItems?->description ?? $ed->title ?? '',
+                    'volume'              => (float) ($ed->volume ?? 1),
+                    'unit'                => $ed->workItems?->unit ?? '',
+                    'laborRate'           => (float) ($ed->labor_unit_rate ?? 0),
+                    'toolRate'            => (float) ($ed->tool_unit_rate ?? 0),
+                    'materialRate'        => (float) ($ed->material_unit_rate ?? 0),
+                    'labourFactorial'     => (float) ($ed->labour_factorial ?? 1),
+                    'equipmentFactorial'  => (float) ($ed->equipment_factorial ?? 1),
+                    'materialFactorial'   => (float) ($ed->material_factorial ?? 1),
+                    'totalCost'           => (float) $projectServices->getTotalCostWorkItem($ed),
+                    'workScope'           => $ed->work_scope ?? '',
+                ];
+            })
+            ->values()
+            ->toArray();
 
         // ── WBS options for "Add Row" dialog ─────────────────────────────────
         $wbsOptions = WbsLevel3::with(['disciplines'])
