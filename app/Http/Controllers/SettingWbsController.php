@@ -46,13 +46,27 @@ class SettingWbsController extends Controller
         if(auth()->user()->cannot('viewAny',WorkBreakdownStructure::class)){
             return view('not_authorized');
         }
-        $wbs = WorkBreakdownStructure::with('children')->where('id',$request->id)->first();
+        $wbs = WorkBreakdownStructure::with(['children' => function ($q) {
+            $q->orderBy('sort_order')->orderBy('id');
+        }])->where('id',$request->id)->first();
         $discipline = WorkBreakdownStructure::with('parent')->where('level',2)->get();
         return view('setting_work_breakdown_structure.edit',[
             'wbs' => $wbs,
             'discipline' => $discipline,
             'isWorkElement' => false
         ]);
+    }
+
+    public function reorderWorkElements(Request $request)
+    {
+        if(auth()->user()->cannot('update', WorkBreakdownStructure::class)){
+            return response()->json(['status' => 403, 'message' => 'Unauthorized'], 403);
+        }
+        $ids = $request->input('ids', []);
+        foreach ($ids as $order => $id) {
+            WorkBreakdownStructure::where('id', $id)->update(['sort_order' => $order + 1]);
+        }
+        return response()->json(['status' => 200, 'message' => 'Order saved']);
     }
     public function editWorkElement(Request $request){
         if(auth()->user()->cannot('update',WorkBreakdownStructure::class)){

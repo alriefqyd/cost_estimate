@@ -11,6 +11,10 @@ class Survey extends Model
 
     protected $guarded = ['id'];
 
+    public function user(){
+        return $this->belongsTo(User::class, 'userId');
+    }
+
     public function createdBy(){
         return $this->hasOne(User::class,'created_by');
     }

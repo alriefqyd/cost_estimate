@@ -211,6 +211,76 @@
             </div>
         </div>
     </div>
+    @can('viewAny', App\Models\User::class)
+    @if($surveys && $surveys->count())
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header card-header-custom pb-0">
+                        <h6 class="mb-0"><i class="fa fa-comment me-2" style="color:#c62828;"></i> All Feedback Responses
+                            <span class="badge bg-secondary ms-2" style="font-size:11px;">{{ $surveys->count() }}</span>
+                        </h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped mb-0" style="font-size:13px;">
+                                <thead>
+                                    <tr style="background:#f4f6fb;">
+                                        <th>#</th>
+                                        <th>User</th>
+                                        <th>Usage</th>
+                                        <th>Performance</th>
+                                        <th>UX</th>
+                                        <th>Ease</th>
+                                        <th>Interface</th>
+                                        <th>Overall</th>
+                                        <th>Suggestions / Issues</th>
+                                        <th>Submitted</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($surveys as $i => $s)
+                                    @php $ans = json_decode($s->answer, true) ?? []; @endphp
+                                    <tr>
+                                        <td>{{ $i + 1 }}</td>
+                                        <td>
+                                            <div style="font-weight:600;">{{ $s->user?->profiles?->full_name ?? $s->user?->user_name ?? '—' }}</div>
+                                            <div style="font-size:11px;color:#9ca3af;">{{ $s->user?->email }}</div>
+                                        </td>
+                                        <td>{{ $ans['often'] ?? '—' }}</td>
+                                        <td>{{ $ans['performance'] ?? '—' }}</td>
+                                        <td>{{ $ans['user_experience'] ?? '—' }}</td>
+                                        <td>{{ $ans['ease'] ?? '—' }}</td>
+                                        <td>{{ $ans['interface'] ?? '—' }}</td>
+                                        <td>{{ $ans['overall'] ?? '—' }}</td>
+                                        <td style="max-width:280px;">
+                                            @if(!empty($ans['suggestion']))
+                                                <div><b>Suggestion:</b> {{ $ans['suggestion'] }}</div>
+                                            @endif
+                                            @if(!empty($ans['difficult_feature_text']))
+                                                <div><b>Difficult feature:</b> {{ $ans['difficult_feature_text'] }}</div>
+                                            @endif
+                                            @if(!empty($ans['missing_feature_text']))
+                                                <div><b>Missing feature:</b> {{ $ans['missing_feature_text'] }}</div>
+                                            @endif
+                                            @if(empty($ans['suggestion']) && empty($ans['difficult_feature_text']) && empty($ans['missing_feature_text']))
+                                                —
+                                            @endif
+                                        </td>
+                                        <td style="white-space:nowrap;">{{ $s->created_at->format('d M Y') }}</td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+    @endcan
 @endsection
     <!-- Container-fluid Ends-->
 
