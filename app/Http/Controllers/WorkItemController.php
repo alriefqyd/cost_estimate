@@ -769,35 +769,27 @@ class WorkItemController extends Controller
     }
 
     public function generateWorkItemCode(Request $request){
-        $workItem = WorkItem::select('code','work_item_type_id')->where('work_item_type_id', $request->id)->orderBy('code')->get();
+        $workItemType = WorkItemType::where('id', $request->id)->first();
 
-        if(count($workItem) < 1){
-            $workItemType = WorkItemType::where('id', $request->id)->first();
-            return response()->json([
-                'status' => 200,
-                'data' => $workItemType->code . "." . "01"
-            ]);
+        if (!$workItemType) {
+            return response()->json(['status' => 404]);
         }
 
-        $data = $workItem->filter(function ($item){
-            return (strpos($item->code, "A") === false);
-        })->pluck('code');
+        $prefix = $workItemType->code;
 
-        $suffix = "01";
-        $code = $this->getSuffix($workItem[0]->code)['prefix'];
-        foreach ($data as $key => $value){
-            $suffixWorkItem = $this->getSuffix($value);
-            if($suffix != $suffixWorkItem['suffix']){
-                break;
-            } else {
-                $suffix+=1;
-            }
-        }
+        // Cast the numeric part after the dot to an integer so MAX() is numeric,
+        // not lexicographic. This prevents "100" sorting before "11".
+        $maxSuffix = WorkItem::where('work_item_type_id', $request->id)
+            ->where('code', 'like', $prefix . '.%')
+            ->whereRaw("SUBSTRING(code, ?) REGEXP '^[0-9]+$'", [strlen($prefix) + 2])
+            ->selectRaw('MAX(CAST(SUBSTRING(code, ?) AS UNSIGNED)) as max_suffix', [strlen($prefix) + 2])
+            ->value('max_suffix');
 
+        $next = ($maxSuffix ?? 0) + 1;
 
         return response()->json([
             'status' => 200,
-            'data' => $code . '.' .str_pad($suffix, 2, '0', STR_PAD_LEFT),
+            'data'   => $prefix . '.' . str_pad($next, 2, '0', STR_PAD_LEFT),
         ]);
     }
 

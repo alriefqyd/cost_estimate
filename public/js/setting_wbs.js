@@ -1,4 +1,54 @@
 $(function(){
+
+    // ── WBS Work Element drag-to-reorder (UIkit2 sortable) ────
+    var $sortableBody = $('#js-wbs-sortable-body');
+    if ($sortableBody.length && typeof UIkit2 !== 'undefined') {
+        var sortable = UIkit2.sortable($sortableBody[0], {
+            animation  : 150,
+            handleClass: 'js-sort-handle'
+        });
+
+        function renumberRows() {
+            $sortableBody.find('.js-sortable-row').each(function (i) {
+                $(this).find('.js-order-num').text(i + 1);
+            });
+        }
+
+        $sortableBody.on('change.uk.sortable', function () {
+            renumberRows();
+            $('.js-save-wbs-order').removeClass('d-none');
+        });
+    }
+
+    $('.js-save-wbs-order').on('click', function () {
+        var $btn = $(this);
+        var ids  = [];
+        $('#js-wbs-sortable-body').find('.js-sortable-row').each(function () {
+            ids.push($(this).data('id'));
+        });
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i> Saving…');
+        $.ajax({
+            url  : $btn.data('url'),
+            type : 'POST',
+            data : { ids: ids, _token: $('meta[name="csrf-token"]').attr('content') },
+            success: function (res) {
+                if (res.status === 200) {
+                    notification('success', 'Order saved successfully');
+                    $btn.addClass('d-none').prop('disabled', false)
+                        .html('<i class="fa fa-check me-1"></i> Save Order');
+                } else {
+                    notification('danger', 'Failed to save order');
+                    $btn.prop('disabled', false).html('<i class="fa fa-check me-1"></i> Save Order');
+                }
+            },
+            error: function () {
+                notification('danger', 'Failed to save order');
+                $btn.prop('disabled', false).html('<i class="fa fa-check me-1"></i> Save Order');
+            }
+        });
+    });
+    // ── end drag-to-reorder ───────────────────────────────────
+
     var _idDelete = '';
     $('.js-delete-wbs').on('click', function(){
         _idDelete = $(this).data('id');

@@ -8,15 +8,33 @@
                     <div class="dark-logo-wrapper"><a href=""><img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt=""></a></div>
                 </a>
             </div>
-            <div class="toggle-sidebar m-t-15"
+            <div class="toggle-sidebar m-t-15" id="tour-sidebar-toggle"
                  data-tg-scroll-margin="0"
                  data-tg-fixed
                  data-tg-order="2"
                  data-tg-tour="To view all menus and features of the Cost Estimate web application, click the icon next to the Vale logo."><span style=""> <i class="status_toggle" data-feather="align-center"></i></span></div>
         </div>
         <div class="nav-right col pull-right right-menu p-0">
-            <div class="float-end mr-6">
-                <li class="onhover-dropdown"
+            <div class="float-end mr-6" style="display:flex; align-items:center; gap:8px;">
+
+                {{-- Notification Bell --}}
+                <div class="notif-bell-wrap" id="js-notif-wrap">
+                    <button class="notif-bell-btn" id="js-notif-btn" type="button" aria-label="Notifications">
+                        <i class="fa fa-bell-o"></i>
+                        <span class="notif-badge d-none" id="js-notif-badge">0</span>
+                    </button>
+                    <div class="notif-dropdown" id="js-notif-dropdown">
+                        <div class="notif-header">
+                            <span class="notif-title">Notifications</span>
+                            <button class="notif-mark-all" id="js-notif-mark-all" type="button">Mark all read</button>
+                        </div>
+                        <ul class="notif-list" id="js-notif-list">
+                            <li class="notif-empty">Loading…</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <li class="onhover-dropdown" id="tour-profile"
                     data-tg-scroll-margin="0"
                     data-tg-fixed
                     data-tg-order="3"

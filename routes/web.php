@@ -26,6 +26,13 @@ Route::middleware([
     'verified'
 ])->group(function () {
     Route::get('/', [\App\Http\Controllers\HomeController::class,'index'])->name('home.index')->middleware('auth');
+    Route::get('/guide', [\App\Http\Controllers\HomeController::class,'guide'])->name('guide')->middleware('auth');
+});
+
+Route::middleware('auth')->prefix('notifications')->group(function () {
+    Route::get('/',                                          [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/{id}/read',                               [\App\Http\Controllers\NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::post('/read-all',                                [\App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.readAll');
 });
 
 Route::get('/project',[\App\Http\Controllers\ProjectController::class,'index'])->middleware('auth');
@@ -149,6 +156,7 @@ Route::post('/work-breakdown-structure/work-element',[\App\Http\Controllers\Sett
 Route::post('/work-breakdown-structure/',[\App\Http\Controllers\SettingWbsController::class,'store'])->middleware('auth');
 Route::delete('/work-breakdown-structure/{id}',[\App\Http\Controllers\SettingWbsController::class,'delete'])->middleware('auth');
 Route::delete('/work-breakdown-structure/work-element/{id}',[\App\Http\Controllers\SettingWbsController::class,'deleteWorkElement'])->middleware('auth');
+Route::post('/work-breakdown-structure/reorder-work-elements',[\App\Http\Controllers\SettingWbsController::class,'reorderWorkElements'])->middleware('auth');
 
 Route::get('/user',[\App\Http\Controllers\UserController::class,'index'])->middleware('auth');
 Route::get('/user/create',[\App\Http\Controllers\UserController::class,'create'])->middleware('auth')->can('create',User::class);

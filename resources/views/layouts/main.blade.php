@@ -106,6 +106,8 @@
 <script src="{{'/js/getUrlSegment.js'}}"></script>
 <script src="{{'/js/nestable.js'}}"></script>
 <script src="{{'/js/application.js'}}"></script>
+<script src="{{'/js/home.js'}}"></script>
+<script src="{{'/js/notification_bell.js'}}"></script>
 <script src="{{'/js/project.js'}}"></script>
 <script src="{{ asset('/js/realtime.js') }}"></script>
 <script src="{{'/js/collab.js'}}"></script>

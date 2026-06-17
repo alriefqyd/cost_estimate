@@ -15,6 +15,8 @@ use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Setting;
 use App\Models\User;
+use App\Notifications\ProjectApprovedNotification;
+use App\Notifications\ProjectSubmittedForReviewNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -317,7 +319,8 @@ class ProjectServices
 
     public function sendEmailToReviewer(Project $project, $discipline){
         $approver = $discipline.'_approver';
-        $mail = $project->getProfileUser($project->$approver)?->email;
+        $approverUserId = $project->$approver;
+        $mail = $project->getProfileUser($approverUserId)?->email;
         if(isset($mail)) {
             try {
                 Mail::to($mail)->send(new SendMail($project));
@@ -326,7 +329,21 @@ class ProjectServices
                 Log::error($e->getMessage());
             }
         } else {
-            Log::warning("No email found for {$mail} reviewer in project ID: {$project->id}");
+            Log::warning("No email found for {$discipline} reviewer in project ID: {$project->id}");
+        }
+
+        try {
+            $approverUser = User::find($approverUserId);
+            if ($approverUser) {
+                $approverUser->notify(new ProjectSubmittedForReviewNotification(
+                    $project->id,
+                    $project->project_no ?? '',
+                    $project->project_title,
+                    $discipline
+                ));
+            }
+        } catch (\Exception $e) {
+            Log::error('DB notification failed (sendEmailToReviewer): ' . $e->getMessage());
         }
     }
 
@@ -451,6 +468,21 @@ class ProjectServices
                     Log::error("sendEmailToEngineer: mail failed for {$profile->email} — {$e->getMessage()}");
                 }
             }
+        }
+
+        try {
+            foreach (Setting::DESIGN_ENGINEER_LIST_DB_COLUMN as $engineer) {
+                if (!empty($project->$engineer)) {
+                    $engineerUser = User::find($project->$engineer);
+                    $engineerUser?->notify(new ProjectApprovedNotification(
+                        $project->id,
+                        $project->project_no ?? '',
+                        $project->project_title
+                    ));
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('DB notification failed (sendEmailToEngineer): ' . $e->getMessage());
         }
     }
 

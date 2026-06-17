@@ -294,32 +294,45 @@
                                 <p >There is no data to display</p>
                             </div>
                         @else
-                        <div class="col-lg-12 text-center">
-                            <div class="table-responsive table-striped">
-                                <table class="table table-bordered">
+                        <div class="col-lg-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered wbs-detail-table">
                                     <thead>
                                     <tr>
-                                        <td style="width:25%">Location/Equipment</td>
-                                        <td style="width:25%">Discipline</td>
-                                        <td style="width:50%">Work Element</td>
+                                        <th style="width:25%">Location / Equipment</th>
+                                        <th style="width:25%">Discipline</th>
+                                        <th style="width:50%">Work Element</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach($wbs as $key=>$value)
-                                        <tr>
-                                            <td>{{$key}}</td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-                                        @foreach($value as $wbs)
-                                            <tr>
-                                                <td>
-                                                </td>
-                                                <td>
-                                                    {{$wbs->wbsDiscipline?->title}}
-                                                </td>
-                                                <td>{{$wbs->work_element}}</td>
-                                            </tr>
+                                    @foreach($wbs as $location => $locationItems)
+                                        @php
+                                            $byDiscipline  = $locationItems->groupBy(fn($i) => $i->wbsDiscipline?->title ?? '-');
+                                            $locRowspan    = $locationItems->count();
+                                            $locFirst      = true;
+                                        @endphp
+                                        @foreach($byDiscipline as $discipline => $elements)
+                                            @php
+                                                $discRowspan = $elements->count();
+                                                $discFirst   = true;
+                                            @endphp
+                                            @foreach($elements as $element)
+                                                <tr>
+                                                    @if($locFirst)
+                                                        <td rowspan="{{ $locRowspan }}" class="wbs-cell-location align-middle">
+                                                            {{ $location }}
+                                                        </td>
+                                                        @php $locFirst = false; @endphp
+                                                    @endif
+                                                    @if($discFirst)
+                                                        <td rowspan="{{ $discRowspan }}" class="wbs-cell-discipline align-middle">
+                                                            {{ $discipline }}
+                                                        </td>
+                                                        @php $discFirst = false; @endphp
+                                                    @endif
+                                                    <td class="wbs-cell-element">{{ $element->work_element }}</td>
+                                                </tr>
+                                            @endforeach
                                         @endforeach
                                     @endforeach
                                     </tbody>

@@ -33,14 +33,21 @@ class ApiController extends Controller
         return null;
     }
 
-    public function getPublicHolidayApi()
-    {
-        $reqUrl = "https://api-harilibur.vercel.app/api?year=".date('Y');
-        $data = $this->getApi($reqUrl);
+    public function getPublicHolidayApi(){
+        $year    = date('Y');
+        $reqUrl  = "https://date.nager.at/api/v3/PublicHolidays/{$year}/ID";
+        $data    = $this->getApi($reqUrl);
 
-        return collect(is_array($data) ? $data : [])->map(function ($item) {
-            return (object) $item;
-        });
+        if (!$data) return collect([]);
+
+        return collect($data)
+            ->filter(fn($item) => in_array('Public', (array)($item->types ?? [])))
+            ->map(fn($item) => [
+                'holiday_date'       => $item->date,
+                'holiday_name'       => $item->localName,
+                'is_national_holiday'=> true,
+            ])
+            ->values();
     }
 
     public function getReviewer(Request $request){
