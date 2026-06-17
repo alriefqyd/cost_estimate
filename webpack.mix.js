@@ -1,4 +1,5 @@
 const mix = require('laravel-mix');
+const TerserPlugin = require('terser-webpack-plugin');
 
 mix.js('resources/js/app.js', 'public/js')
     .js('resources/js/realtime.js', 'public/js')
@@ -9,11 +10,15 @@ mix.js('resources/js/app.js', 'public/js')
         require('tailwindcss'),
     ]);
 
-mix.options({
-    terser: {
-        terserOptions: {
-            ecma: 2020,
-        },
+mix.webpackConfig({
+    optimization: {
+        minimizer: [
+            new TerserPlugin({
+                terserOptions: {
+                    ecma: 2020,
+                },
+            }),
+        ],
     },
 });
 
