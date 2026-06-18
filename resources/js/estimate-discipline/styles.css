@@ -55,12 +55,23 @@
     overflow: hidden;
     border: 1px solid var(--vale-border);
     box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.02);
+    /* Fixed height keeps AG Grid in domLayout="normal" so it manages its own
+       internal scroll. autoHeight + pinned-right columns causes a one-frame
+       height-sync race that makes the pinned column appear "broken" on every
+       rowData update. Fullscreen overrides this via the rule below. */
+    height: calc(100vh - 380px);
+    min-height: 420px;
 }
 
+/* Fullscreen: container is flex:1 so the grid fills remaining space */
+.estimate-react-root.est-fullscreen .estimate-grid-wrap {
+    height: auto;
+    min-height: 0;
+}
+
+/* With domLayout="normal" the header is sticky by AG Grid itself; remove the
+   CSS override that was only needed for autoHeight page-scroll mode. */
 .estimate-grid-wrap .ag-header {
-    position: sticky;
-    top: 0;
-    z-index: 10;
     box-shadow: 0 2px 8px rgba(27,76,67,0.3);
 }
 

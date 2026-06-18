@@ -563,7 +563,7 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
                             params.data.workScope !== userDiscipline,
                     }}
                     animateRows={false}
-                    domLayout={isFullscreen ? 'normal' : 'autoHeight'}
+                    domLayout="normal"
                 />
             </div>
 

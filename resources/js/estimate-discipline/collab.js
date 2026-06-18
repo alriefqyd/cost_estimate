@@ -11,11 +11,12 @@ function presenceColor(userId) {
 }
 
 export function useCollab(projectId, wsUrl, initRows, initContingency = 15, userInfo = {}) {
-    const docRef      = useRef(null)
-    const providerRef = useRef(null)
-    const yrowsRef    = useRef(null)
-    const ymetaRef    = useRef(null)
-    const saveTimers  = useRef({})
+    const docRef        = useRef(null)
+    const providerRef   = useRef(null)
+    const yrowsRef      = useRef(null)
+    const ymetaRef      = useRef(null)
+    const saveTimers    = useRef({})
+    const hasSyncedRef  = useRef(false)   // true after the first successful sync
 
     const [rows, setRows]                      = useState(() => initRows || [])
     const [connected, setConnected]            = useState(false)
@@ -88,24 +89,36 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
             if (!isSynced) return
             setSynced(true)
 
-            // On every page load sync, refresh all rows from DB so that stale Yjs
-            // LevelDB state never causes value drift vs the detail page. DB is always
-            // the authoritative source at page-load time.
+            // Track whether anything actually changed in Yjs so we can skip setRows
+            // when the sync is a no-op (e.g., normal WebSocket reconnect with unchanged data).
+            // Calling setRows on every reconnect gives AG Grid a new rowData reference,
+            // which triggers an autoHeight recalculation that briefly desynchronises the
+            // pinned-right column container — the visible "broken column" flash.
+            let rowsChanged = false
+
             ydoc.transact(() => {
                 const dbUids = new Set((initRows || []).map(r => r.uid).filter(Boolean))
 
                 // Remove Yjs rows that no longer exist in DB
                 yrows.forEach((_, uid) => {
-                    if (!dbUids.has(uid)) yrows.delete(uid)
+                    if (!dbUids.has(uid)) {
+                        yrows.delete(uid)
+                        rowsChanged = true
+                    }
                 })
 
-                // Upsert all DB rows into Yjs
+                // Upsert DB rows — skip fields that are already at the correct value
                 ;(initRows || []).forEach(row => {
                     if (!row.uid) return
                     const existing = yrows.get(row.uid)
                     if (existing) {
                         Object.entries(row).forEach(([k, v]) => {
-                            if (k !== 'uid') existing.set(k, v ?? '')
+                            if (k === 'uid') return
+                            const next = v ?? ''
+                            if (existing.get(k) !== next) {
+                                existing.set(k, next)
+                                rowsChanged = true
+                            }
                         })
                     } else {
                         const yrow = new Y.Map()
@@ -113,30 +126,35 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
                             if (k !== 'uid') yrow.set(k, v ?? '')
                         })
                         yrows.set(row.uid, yrow)
+                        rowsChanged = true
                     }
                 })
             }, 'init')
 
-            // Always update contingency from DB — DB is authoritative for this value
+            const dbContingency = initContingency ?? 15
             ydoc.transact(() => {
-                ymeta.set('contingency', initContingency ?? 15)
+                if (ymeta.get('contingency') !== dbContingency) {
+                    ymeta.set('contingency', dbContingency)
+                }
             }, 'init')
 
-            setRows(snapshot())
-            setContingencyState(initContingency ?? 15)
+            // First sync: always initialise React state (server may have sent state
+            // before our 'init' transaction ran, so React state could be stale).
+            // Subsequent syncs (reconnects): only re-render if Yjs data actually changed.
+            if (!hasSyncedRef.current || rowsChanged) {
+                setRows(snapshot())
+            }
+            hasSyncedRef.current = true
+            // Functional form avoids a re-render when value is already correct
+            setContingencyState(prev => (prev !== dbContingency ? dbContingency : prev))
         })
 
-        // React to row changes (local and remote)
+        // React to row changes (local and remote).
+        // Skip 'init'-origin transactions — the sync handler calls setRows itself
+        // after the transaction, so triggering it here too causes a double render.
         yrows.observeDeep((events, transaction) => {
+            if (transaction.origin === 'init') return
             setRows(snapshot())
-
-            if (!transaction.local) return
-            events.forEach(event => {
-                const uid = event.path[0]
-                if (!uid || typeof uid !== 'string') return
-                clearTimeout(saveTimers.current[uid])
-                saveTimers.current[uid] = uid
-            })
         })
 
         // React to meta changes from OTHER clients only
