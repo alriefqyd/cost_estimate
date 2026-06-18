@@ -225,6 +225,22 @@
     font-size: 11px;
 }
 
+.grid-group-chevron {
+    flex-shrink: 0;
+    font-size: 10px;
+    opacity: 0.6;
+    width: 10px;
+    text-align: center;
+}
+
+.grid-group-collapsible {
+    cursor: pointer;
+    user-select: none;
+}
+.grid-group-collapsible:hover {
+    opacity: 0.85;
+}
+
 .grid-group-label {
     flex: 1;
     overflow: hidden;

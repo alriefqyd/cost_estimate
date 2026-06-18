@@ -110,6 +110,22 @@ class EstimateAllDisciplineController extends Controller
                 $row->saveQuietly();
             });
 
+        // Backfill null or empty work_scope from the WBS discipline relationship.
+        // Old rows created before work_scope was enforced may be missing this field,
+        // causing autosave and destroyRow to silently fail (WHERE work_scope = ? finds nothing).
+        EstimateAllDiscipline::where('project_id', $project->id)
+            ->where(function ($q) {
+                $q->whereNull('work_scope')->orWhere('work_scope', '');
+            })
+            ->with('wbss.disciplines')
+            ->each(function ($row) {
+                $disc = strtolower($row->wbss?->disciplines?->title ?? '');
+                if ($disc) {
+                    $row->work_scope = $disc;
+                    $row->saveQuietly();
+                }
+            });
+
         // Fix duplicate unique_identifiers — keep the first occurrence (lowest id), re-assign the rest
         $seen = [];
         EstimateAllDiscipline::where('project_id', $project->id)
@@ -266,6 +282,19 @@ class EstimateAllDisciplineController extends Controller
                     ->first();
             }
 
+            if (!$row && $uniqueIdentifier) {
+                // Last resort: find by uid alone — handles rows whose work_scope differs
+                // from $position (e.g. old rows created before work_scope was normalised,
+                // or rows belonging to a scope that was renamed). Stamp the correct
+                // work_scope so future lookups succeed without this fallback.
+                $row = EstimateAllDiscipline::where('project_id', $project->id)
+                    ->where('unique_identifier', $uniqueIdentifier)
+                    ->first();
+                if ($row) {
+                    $row->work_scope = $position;
+                }
+            }
+
             $isNew = !$row;
             if ($isNew) {
                 $row = new EstimateAllDiscipline();
@@ -322,9 +351,16 @@ class EstimateAllDisciplineController extends Controller
 
         DB::beginTransaction();
         try {
+            // Primary delete: exact work_scope match.
+            // Also catches rows with empty/null work_scope (old data before scope was enforced).
+            // The uid is a UUID so this cannot accidentally delete rows from another project.
             EstimateAllDiscipline::where('project_id', $project->id)
-                ->where('work_scope', $position)
                 ->where('unique_identifier', $uniqueIdentifier)
+                ->where(function ($q) use ($position) {
+                    $q->where('work_scope', $position)
+                      ->orWhereNull('work_scope')
+                      ->orWhere('work_scope', '');
+                })
                 ->delete();
 
             try {

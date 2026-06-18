@@ -174,10 +174,16 @@ export default function App({
 
     const handleDeleteRow = useCallback(async (uid) => {
         removeRow(uid)
+        setSaveStatus('saving')
+        pendingRef.current += 1
         try {
             await api.deleteRow(projectId, uid)
         } catch (e) {
+            setSaveStatus('error')
             console.error('Delete failed:', e)
+        } finally {
+            pendingRef.current -= 1
+            if (pendingRef.current === 0) setSaveStatus('saved')
         }
     }, [removeRow, projectId])
 

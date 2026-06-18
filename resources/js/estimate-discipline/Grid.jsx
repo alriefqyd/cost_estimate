@@ -36,7 +36,11 @@ const DISC_COLORS = {
 function LocCellRenderer({ data, context }) {
     if (!data) return null
     if (data._type === 'h-loc') return (
-        <div className="grid-group-row grid-group-row-loc">
+        <div
+            className="grid-group-row grid-group-row-loc grid-group-collapsible"
+            onClick={() => context.toggleCollapsed?.(data._rowId)}
+        >
+            <i className={`fa fa-chevron-${data._isCollapsed ? 'right' : 'down'} grid-group-chevron`} />
             <i className="fa fa-map-marker-alt grid-group-icon" />
             <span className="grid-group-label">{data._label}</span>
         </div>
@@ -60,10 +64,14 @@ function LocCellRenderer({ data, context }) {
     return null
 }
 
-function DisCellRenderer({ data }) {
+function DisCellRenderer({ data, context }) {
     if (!data) return null
     if (data._type === 'h-dis') return (
-        <div className="grid-group-row grid-group-row-dis">
+        <div
+            className="grid-group-row grid-group-row-dis grid-group-collapsible"
+            onClick={() => context.toggleCollapsed?.(data._rowId)}
+        >
+            <i className={`fa fa-chevron-${data._isCollapsed ? 'right' : 'down'} grid-group-chevron`} />
             <i className="fa fa-layer-group grid-group-icon" />
             <span className="grid-group-label">{data._label}</span>
         </div>
@@ -83,10 +91,14 @@ function DisCellRenderer({ data }) {
 function WeCellRenderer({ data, context }) {
     if (!data) return null
     if (data._type === 'h-we') return (
-        <div className="grid-group-row grid-group-row-we">
+        <div
+            className="grid-group-row grid-group-row-we grid-group-collapsible"
+            onClick={() => context.toggleCollapsed?.(data._rowId)}
+        >
+            <i className={`fa fa-chevron-${data._isCollapsed ? 'right' : 'down'} grid-group-chevron`} />
             <i className="fa fa-wrench grid-group-icon" />
             <span className="grid-group-label">{data._label}</span>
-            {!context.isReadOnly && (
+            {!context.isReadOnly && !data._isCollapsed && (
                 <button
                     className="grid-add-btn"
                     title="Add work item to this group"
@@ -108,7 +120,10 @@ function WeCellRenderer({ data, context }) {
 
 function WorkItemCellRenderer({ value, data, context }) {
     if (!data || data._type !== 'data') return null
-    const canEdit = !data.workScope || data.workScope === context.userDiscipline
+    const disc = data.workScope || data.discipline || ''
+    const canEdit = disc
+        ? disc.toLowerCase() === context.userDiscipline?.toLowerCase()
+        : false
     return (
         <div
             className={`wi-cell ${canEdit ? 'wi-cell-editable' : 'wi-cell-readonly'}`}
@@ -186,6 +201,16 @@ NumberCellEditor.displayName = 'NumberCellEditor'
 export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadOnly, isFullscreen, onCellChange, onBatchCellChange, onDeleteRow, onAddRowInline }) {
     const gridRef = useRef(null)
     const [wiSearchUid, setWiSearchUid] = useState(null)
+    const [collapsed, setCollapsed] = useState(new Set())
+
+    const toggleCollapsed = useCallback((rowId) => {
+        setCollapsed(prev => {
+            const next = new Set(prev)
+            if (next.has(rowId)) next.delete(rowId)
+            else next.add(rowId)
+            return next
+        })
+    }, [])
 
     // Build a lookup from wbs_level3_id → { location, workElement } using fresh DB data.
     // This bypasses any stale values cached in the Yjs document.
@@ -235,35 +260,47 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
             const disKey = `h-dis:${loc}|${disc}`
             const weKey  = `h-we:${loc}|${disc}|${we}`
 
+            const locCollapsed = collapsed.has(locKey)
+            const disCollapsed = collapsed.has(disKey)
+            const weCollapsed  = collapsed.has(weKey)
+
             if (!seen.has(locKey)) {
                 seen.add(locKey)
-                result.push({ _rowId: locKey, _type: 'h-loc', _label: loc, _depth: 0 })
+                result.push({ _rowId: locKey, _type: 'h-loc', _label: loc, _depth: 0, _isCollapsed: locCollapsed })
             }
             if (!seen.has(disKey)) {
                 seen.add(disKey)
-                result.push({
-                    _rowId:           disKey,
-                    _type:            'h-dis',
-                    _label:           disc,
-                    _depth:           1,
-                    _disciplineTotal: disciplineTotals[`${loc}|${disc}`] || 0,
-                })
+                if (!locCollapsed) {
+                    result.push({
+                        _rowId:           disKey,
+                        _type:            'h-dis',
+                        _label:           disc,
+                        _depth:           1,
+                        _isCollapsed:     disCollapsed,
+                        _disciplineTotal: disciplineTotals[`${loc}|${disc}`] || 0,
+                    })
+                }
             }
             if (!seen.has(weKey)) {
                 seen.add(weKey)
-                result.push({
-                    _rowId:           weKey,
-                    _type:            'h-we',
-                    _label:           we,
-                    _depth:           2,
-                    _wbs_level3_id:   row.wbs_level3_id,
-                    _work_element_id: row.work_element_id,
-                    location:         loc,
-                    discipline:       disc,
-                    workElement:      we,
-                })
+                if (!locCollapsed && !disCollapsed) {
+                    result.push({
+                        _rowId:           weKey,
+                        _type:            'h-we',
+                        _label:           we,
+                        _depth:           2,
+                        _isCollapsed:     weCollapsed,
+                        _wbs_level3_id:   row.wbs_level3_id,
+                        _work_element_id: row.work_element_id,
+                        location:         loc,
+                        discipline:       disc,
+                        workElement:      we,
+                    })
+                }
             }
-            result.push({ ...row, _rowId: row.uid, _type: 'data', _depth: 3, location: loc, discipline: disc, workElement: we })
+            if (!locCollapsed && !disCollapsed && !weCollapsed) {
+                result.push({ ...row, _rowId: row.uid, _type: 'data', _depth: 3, location: loc, discipline: disc, workElement: we })
+            }
         })
 
         if (isReadOnly) return result
@@ -290,12 +327,17 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
             }
         }
         return finalResult
-    }, [rows, wbsById, isReadOnly])
+    }, [rows, wbsById, isReadOnly, collapsed])
 
-    const canEdit = useCallback(
-        data => !isReadOnly && data?._type === 'data' && (!data.workScope || data.workScope === userDiscipline),
-        [isReadOnly, userDiscipline]
-    )
+    const canEdit = useCallback(data => {
+        if (isReadOnly || data?._type !== 'data') return false
+        // Primary check: explicit workScope set by the new React feature
+        if (data.workScope) return data.workScope === userDiscipline
+        // Fallback: infer ownership from the WBS discipline (old rows before workScope was stored)
+        if (data.discipline) return data.discipline.toLowerCase() === userDiscipline?.toLowerCase()
+        // No ownership info at all — treat as unowned/not editable
+        return false
+    }, [isReadOnly, userDiscipline])
 
     const columnDefs = useMemo(() => [
         // ─── Hierarchy columns ───────────────────────────────────────────────
@@ -492,11 +534,12 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
     const context = useMemo(() => ({
         userDiscipline,
         isReadOnly,
+        toggleCollapsed,
         openWorkItemSearch: uid => setWiSearchUid(uid),
         openAddRow: (wbs3Id, workElId, rowMeta) => {
             if (onAddRowInline) onAddRowInline(wbs3Id, workElId, rowMeta)
         },
-    }), [userDiscipline, isReadOnly, onAddRowInline])
+    }), [userDiscipline, isReadOnly, toggleCollapsed, onAddRowInline])
 
     const handleWorkItemSelected = useCallback(item => {
         if (!wiSearchUid) return

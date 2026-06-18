@@ -68,17 +68,9 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
         const provider = new WebsocketProvider(wsUrl, `estimate-${projectId}`, ydoc)
         providerRef.current = provider
 
-        // Set local presence (name + discipline + colour)
-        if (userInfo.userId) {
-            provider.awareness.setLocalStateField('user', {
-                userId:     userInfo.userId,
-                name:       userInfo.name || 'Unknown',
-                discipline: userInfo.discipline || '',
-                color:      presenceColor(userInfo.userId),
-            })
-        }
-
-        // Build presence list whenever any client joins/leaves/updates
+        // Build presence list whenever any client joins/leaves/updates.
+        // Registered BEFORE setLocalStateField so the 'change' event from our own
+        // state is captured and the local user appears immediately.
         const syncPresence = () => {
             const users = []
             provider.awareness.getStates().forEach((state, clientId) => {
@@ -90,7 +82,6 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
                     })
                 }
             })
-            // Put the current user first, then sort the rest by name
             users.sort((a, b) => {
                 if (a.isLocal) return -1
                 if (b.isLocal) return 1
@@ -99,6 +90,19 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
             setOnlineUsers(users)
         }
         provider.awareness.on('change', syncPresence)
+
+        // Set local presence after registering the listener so the 'change' event is captured.
+        if (userInfo.userId) {
+            provider.awareness.setLocalStateField('user', {
+                userId:     userInfo.userId,
+                name:       userInfo.name || 'Unknown',
+                discipline: userInfo.discipline || '',
+                color:      presenceColor(userInfo.userId),
+            })
+        }
+        // Seed once immediately to handle reconnects where setLocalStateField may
+        // not fire a new 'change' if the value is identical.
+        syncPresence()
 
         provider.on('status', ({ status }) => {
             setConnected(status === 'connected')
