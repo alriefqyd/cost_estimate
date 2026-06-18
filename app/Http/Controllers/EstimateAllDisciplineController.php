@@ -115,22 +115,6 @@ class EstimateAllDisciplineController extends Controller
                 $row->saveQuietly();
             });
 
-        // Backfill null or empty work_scope from the WBS discipline relationship.
-        // Old rows created before work_scope was enforced may be missing this field,
-        // causing autosave and destroyRow to silently fail (WHERE work_scope = ? finds nothing).
-        EstimateAllDiscipline::where('project_id', $project->id)
-            ->where(function ($q) {
-                $q->whereNull('work_scope')->orWhere('work_scope', '');
-            })
-            ->with('wbss.disciplines')
-            ->each(function ($row) {
-                $disc = strtolower($row->wbss?->disciplines?->title ?? '');
-                if ($disc) {
-                    $row->work_scope = $disc;
-                    $row->saveQuietly();
-                }
-            });
-
         // Fix duplicate unique_identifiers — keep the first occurrence (lowest id), re-assign the rest
         $seen = [];
         EstimateAllDiscipline::where('project_id', $project->id)
@@ -295,15 +279,12 @@ class EstimateAllDisciplineController extends Controller
                 }
 
                 if (!$row && $uniqueIdentifier) {
-                    // Last resort: find by uid alone — handles rows whose work_scope differs
-                    // from $position (e.g. old rows created before work_scope was normalised).
-                    // Stamp the correct work_scope so future lookups succeed without this fallback.
+                    // Last resort: find by uid alone — handles old rows that have no
+                    // work_scope set. Do NOT stamp work_scope; empty-scope rows are
+                    // intentionally editable by all disciplines.
                     $row = EstimateAllDiscipline::where('project_id', $project->id)
                         ->where('unique_identifier', $uniqueIdentifier)
                         ->first();
-                    if ($row) {
-                        $row->work_scope = $position;
-                    }
                 }
             }
 
