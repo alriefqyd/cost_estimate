@@ -16,15 +16,14 @@ return new class extends Migration
         Schema::table('estimate_all_disciplines', function (Blueprint $table) {
             // NULL  = legacy / unowned row → editable by any discipline.
             // Set   = owned row → editable only by that user's discipline (work_scope).
+            // No FK constraint intentionally — avoids full-table index build on large datasets.
             $table->unsignedBigInteger('scope_owner_id')->nullable()->after('work_scope');
-            $table->foreign('scope_owner_id')->references('id')->on('users')->nullOnDelete();
         });
     }
 
     public function down()
     {
         Schema::table('estimate_all_disciplines', function (Blueprint $table) {
-            $table->dropForeign(['scope_owner_id']);
             $table->dropColumn('scope_owner_id');
         });
     }
