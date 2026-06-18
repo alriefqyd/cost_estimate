@@ -120,10 +120,7 @@ function WeCellRenderer({ data, context }) {
 
 function WorkItemCellRenderer({ value, data, context }) {
     if (!data || data._type !== 'data') return null
-    const disc = data.workScope || data.discipline || ''
-    const canEdit = disc
-        ? disc.toLowerCase() === context.userDiscipline?.toLowerCase()
-        : false
+    const canEdit = !data.workScope || data.workScope === context.userDiscipline
     return (
         <div
             className={`wi-cell ${canEdit ? 'wi-cell-editable' : 'wi-cell-readonly'}`}
@@ -329,15 +326,10 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
         return finalResult
     }, [rows, wbsById, isReadOnly, collapsed])
 
-    const canEdit = useCallback(data => {
-        if (isReadOnly || data?._type !== 'data') return false
-        // Primary check: explicit workScope set by the new React feature
-        if (data.workScope) return data.workScope === userDiscipline
-        // Fallback: infer ownership from the WBS discipline (old rows before workScope was stored)
-        if (data.discipline) return data.discipline.toLowerCase() === userDiscipline?.toLowerCase()
-        // No ownership info at all — treat as unowned/not editable
-        return false
-    }, [isReadOnly, userDiscipline])
+    const canEdit = useCallback(
+        data => !isReadOnly && data?._type === 'data' && (!data.workScope || data.workScope === userDiscipline),
+        [isReadOnly, userDiscipline]
+    )
 
     const columnDefs = useMemo(() => [
         // ─── Hierarchy columns ───────────────────────────────────────────────
