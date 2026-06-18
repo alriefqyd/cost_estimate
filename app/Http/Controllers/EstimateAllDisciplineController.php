@@ -179,18 +179,6 @@ class EstimateAllDisciplineController extends Controller
         $version = EstimateAllDiscipline::where('project_id', $project->id)->first('version');
         $projectServices = new ProjectServices();
 
-        // ── One-time cleanup: clear work_scope stamped by the now-removed backfill ──
-        // Rows created before the React feature launch (2026-06-11) are legacy rows
-        // that should be editable by any discipline. The old backfill wrongly assigned
-        // them a work_scope, locking them to one discipline. This update is a no-op
-        // once all affected rows are cleared (subsequent loads touch 0 rows).
-        EstimateAllDiscipline::where('project_id', $project->id)
-            ->whereDate('created_at', '<', '2026-06-11')
-            ->where(function ($q) {
-                $q->whereNotNull('work_scope')->where('work_scope', '!=', '');
-            })
-            ->update(['work_scope' => null]);
-
         // ── Flat rows for React ──────────────────────────────────────────────
         // Query directly from EstimateAllDiscipline to avoid key collisions in the
         // nested WBS grouping (two WbsLevel3 rows with the same work_element FK
@@ -219,6 +207,7 @@ class EstimateAllDisciplineController extends Controller
                     'totalCost'           => (float) $projectServices->getTotalCostWorkItem($ed),
                     'rowTotal'            => (float) ($ed->labor_cost_total_rate ?? 0) + (float) ($ed->tool_unit_rate_total ?? 0) + (float) ($ed->material_unit_rate_total ?? 0),
                     'workScope'           => $ed->work_scope ?? '',
+                    'scopeOwned'          => !is_null($ed->scope_owner_id),
                 ];
             })
             ->values()
@@ -275,8 +264,8 @@ class EstimateAllDisciplineController extends Controller
                     ->first()
                 : null;
 
-            // Enforce ownership: if the row has a work_scope, only that discipline (or admin) may edit it
-            if ($row && $row->work_scope && !$this->isAdmin() && $row->work_scope !== $position) {
+            // Ownership check: scope_owner_id set = owned row; only that discipline (or admin) may edit
+            if ($row && $row->scope_owner_id && !$this->isAdmin() && $row->work_scope !== $position) {
                 DB::rollBack();
                 return response()->json(['status' => 403, 'message' => 'Not authorized to edit this item']);
             }
@@ -285,9 +274,17 @@ class EstimateAllDisciplineController extends Controller
             if ($isNew) {
                 $row = new EstimateAllDiscipline();
                 $row->project_id            = $project->id;
-                $row->work_scope            = $position;
                 $row->wbs_level3_id         = $request->wbs_level3;
                 $row->equipment_location_id = $request->work_element;
+                // Always fill work_scope; derive from WBS discipline when user has no discipline (e.g. admin)
+                if ($position) {
+                    $row->work_scope      = $position;
+                    $row->scope_owner_id  = auth()->id();
+                } else {
+                    $wbs = \App\Models\WbsLevel3::with('disciplines')->find($request->wbs_level3);
+                    $row->work_scope      = strtolower($wbs?->disciplines?->title ?? '');
+                    $row->scope_owner_id  = null; // admin rows are unowned → editable by all
+                }
             }
             // Always stamp the uid (assigns one to migrated old rows)
             $row->unique_identifier = $uniqueIdentifier;
@@ -341,8 +338,8 @@ class EstimateAllDisciplineController extends Controller
                 ->where('unique_identifier', $uniqueIdentifier)
                 ->first();
 
-            // Owned rows (work_scope set) can only be deleted by that discipline or admin
-            if ($row && $row->work_scope && !$this->isAdmin() && $row->work_scope !== $position) {
+            // Owned rows (scope_owner_id set) can only be deleted by that discipline or admin
+            if ($row && $row->scope_owner_id && !$this->isAdmin() && $row->work_scope !== $position) {
                 DB::rollBack();
                 return response()->json(['status' => 403, 'message' => 'Not authorized to delete this item']);
             }
