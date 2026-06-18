@@ -1157,3 +1157,45 @@
     margin-left: 6px;
     font-weight: 500;
 }
+
+/* ─── Fullscreen toggle button ─────────────────────────────────────────────── */
+
+.est-btn-fullscreen {
+    background: none;
+    color: var(--vale-text);
+    border-color: var(--vale-border);
+    padding: 6px 10px;
+}
+.est-btn-fullscreen:hover {
+    background: var(--vale-page-bg);
+    color: var(--vale-primary);
+    border-color: #b3d9d3;
+}
+
+/* ─── Fullscreen mode ──────────────────────────────────────────────────────── */
+
+.estimate-react-root.est-fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    background: var(--vale-page-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 10px;
+    gap: 8px;
+}
+
+.estimate-react-root.est-fullscreen .est-toolbar,
+.estimate-react-root.est-fullscreen .est-disc-stats,
+.estimate-react-root.est-fullscreen .est-published-banner,
+.estimate-react-root.est-fullscreen .est-totals {
+    flex-shrink: 0;
+    margin: 0 !important;
+}
+
+.estimate-react-root.est-fullscreen .estimate-grid-wrap {
+    flex: 1 1 0;
+    min-height: 0;
+    border-radius: 10px;
+}

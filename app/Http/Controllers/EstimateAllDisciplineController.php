@@ -100,12 +100,28 @@ class EstimateAllDisciplineController extends Controller
                 }
             });
 
-        // Backfill any DB rows that were saved before unique_identifier was introduced
+        // Backfill null or empty-string unique_identifiers
         EstimateAllDiscipline::where('project_id', $project->id)
-            ->whereNull('unique_identifier')
+            ->where(function ($q) {
+                $q->whereNull('unique_identifier')->orWhere('unique_identifier', '');
+            })
             ->each(function ($row) {
                 $row->unique_identifier = (string) Str::uuid();
                 $row->saveQuietly();
+            });
+
+        // Fix duplicate unique_identifiers — keep the first occurrence (lowest id), re-assign the rest
+        $seen = [];
+        EstimateAllDiscipline::where('project_id', $project->id)
+            ->whereNotNull('unique_identifier')
+            ->orderBy('id')
+            ->each(function ($row) use (&$seen) {
+                if (isset($seen[$row->unique_identifier])) {
+                    $row->unique_identifier = (string) Str::uuid();
+                    $row->saveQuietly();
+                } else {
+                    $seen[$row->unique_identifier] = true;
+                }
             });
 
         $wbs = WbsLevel3::with(['workElements', 'estimateDisciplines.wbss.workElements', 'estimateDisciplines.workitems'])

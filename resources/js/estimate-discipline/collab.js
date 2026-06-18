@@ -89,28 +89,33 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
             setSynced(true)
 
             // On every page load sync, refresh all rows from DB so that stale Yjs
-            // LevelDB state never causes value drift vs the detail page. Rows edited
-            // through this form are autosaved to DB within 800 ms, so DB is always
+            // LevelDB state never causes value drift vs the detail page. DB is always
             // the authoritative source at page-load time.
-            if (initRows?.length > 0) {
-                ydoc.transact(() => {
-                    initRows.forEach(row => {
-                        if (!row.uid) return
-                        const existing = yrows.get(row.uid)
-                        if (existing) {
-                            Object.entries(row).forEach(([k, v]) => {
-                                if (k !== 'uid') existing.set(k, v ?? '')
-                            })
-                        } else {
-                            const yrow = new Y.Map()
-                            Object.entries(row).forEach(([k, v]) => {
-                                if (k !== 'uid') yrow.set(k, v ?? '')
-                            })
-                            yrows.set(row.uid, yrow)
-                        }
-                    })
-                }, 'init')
-            }
+            ydoc.transact(() => {
+                const dbUids = new Set((initRows || []).map(r => r.uid).filter(Boolean))
+
+                // Remove Yjs rows that no longer exist in DB
+                yrows.forEach((_, uid) => {
+                    if (!dbUids.has(uid)) yrows.delete(uid)
+                })
+
+                // Upsert all DB rows into Yjs
+                ;(initRows || []).forEach(row => {
+                    if (!row.uid) return
+                    const existing = yrows.get(row.uid)
+                    if (existing) {
+                        Object.entries(row).forEach(([k, v]) => {
+                            if (k !== 'uid') existing.set(k, v ?? '')
+                        })
+                    } else {
+                        const yrow = new Y.Map()
+                        Object.entries(row).forEach(([k, v]) => {
+                            if (k !== 'uid') yrow.set(k, v ?? '')
+                        })
+                        yrows.set(row.uid, yrow)
+                    }
+                })
+            }, 'init')
 
             // Always update contingency from DB — DB is authoritative for this value
             ydoc.transact(() => {

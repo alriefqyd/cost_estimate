@@ -27,10 +27,7 @@ function computeTotal(row) {
 }
 
 function computeGrandTotal(rows, contingencyPct) {
-    const sub = rows.reduce((acc, r) => {
-        const stored = parseFloat(r.rowTotal)
-        return acc + (Number.isFinite(stored) ? stored : computeTotal(r))
-    }, 0)
+    const sub = rows.reduce((acc, r) => acc + computeTotal(r), 0)
     const cont = sub * (Number(contingencyPct) / 100 || 0)
     return { sub, cont, grand: sub + cont }
 }
@@ -91,6 +88,7 @@ export default function App({
     const [publishing, setPublishing]     = useState(false)
     const [publishStatus, setPublishStatus] = useState(initPublishStatus)
     const [remoteToast, setRemoteToast]   = useState(null)
+    const [isFullscreen, setIsFullscreen] = useState(false)
     const pendingRef    = useRef(0)
     const toastTimerRef = useRef(null)
 
@@ -104,6 +102,19 @@ export default function App({
         name:       userName,
         discipline: userDiscipline,
     })
+
+    // ─── Fullscreen ───────────────────────────────────────────────────────────
+
+    useEffect(() => {
+        document.body.style.overflow = isFullscreen ? 'hidden' : ''
+        if (!isFullscreen) return
+        const onKey = (e) => { if (e.key === 'Escape') setIsFullscreen(false) }
+        document.addEventListener('keydown', onKey)
+        return () => {
+            document.removeEventListener('keydown', onKey)
+            document.body.style.overflow = ''
+        }
+    }, [isFullscreen])
 
     // ─── Remote change toast ──────────────────────────────────────────────────
 
@@ -283,7 +294,7 @@ export default function App({
     })[userDiscipline?.toLowerCase()] ?? 'est-discipline-default'
 
     return (
-        <div className="estimate-react-root">
+        <div className={`estimate-react-root${isFullscreen ? ' est-fullscreen' : ''}`}>
             {/* ── Toolbar ───────────────────────────────────────────────── */}
             <div className="est-toolbar">
                 <div className="est-toolbar-left">
@@ -355,6 +366,13 @@ export default function App({
                             Add Row
                         </button>
                     )}
+                    <button
+                        className="est-btn est-btn-fullscreen"
+                        onClick={() => setIsFullscreen(f => !f)}
+                        title={isFullscreen ? 'Exit fullscreen (Esc)' : 'Fullscreen'}
+                    >
+                        <i className={`fa ${isFullscreen ? 'fa-compress' : 'fa-expand'}`} />
+                    </button>
                 </div>
             </div>
 
@@ -398,6 +416,7 @@ export default function App({
                 wbsOptions={wbsOptions}
                 userDiscipline={userDiscipline}
                 isReadOnly={publishStatus === 'PUBLISH'}
+                isFullscreen={isFullscreen}
                 onCellChange={handleCellChange}
                 onBatchCellChange={handleBatchCellChange}
                 onDeleteRow={handleDeleteRow}

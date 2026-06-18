@@ -183,7 +183,7 @@ NumberCellEditor.displayName = 'NumberCellEditor'
 
 // ─── Main Grid component ──────────────────────────────────────────────────────
 
-export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadOnly, onCellChange, onBatchCellChange, onDeleteRow, onAddRowInline }) {
+export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadOnly, isFullscreen, onCellChange, onBatchCellChange, onDeleteRow, onAddRowInline }) {
     const gridRef = useRef(null)
     const [wiSearchUid, setWiSearchUid] = useState(null)
 
@@ -563,7 +563,7 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
                             params.data.workScope !== userDiscipline,
                     }}
                     animateRows={false}
-                    domLayout="autoHeight"
+                    domLayout={isFullscreen ? 'normal' : 'autoHeight'}
                 />
             </div>
 

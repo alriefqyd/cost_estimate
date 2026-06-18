@@ -230,16 +230,19 @@ class Project extends Model
 
     public function getTotalCost(){
         try{
-            $labor = $this->estimateAllDisciplines->sum('labor_cost_total_rate');
-            $tool = $this->estimateAllDisciplines->sum('tool_unit_rate_total');
-            $material = $this->estimateAllDisciplines->sum('material_unit_rate_total');
-
-            $total =  $labor + $tool + $material;
+            $total = $this->estimateAllDisciplines->sum(function($ed) {
+                $lf  = (float) ($ed->labour_factorial    ?? 1) ?: 1;
+                $ef  = (float) ($ed->equipment_factorial ?? 1) ?: 1;
+                $mf  = (float) ($ed->material_factorial  ?? 1) ?: 1;
+                $vol = (float) ($ed->volume ?? 1);
+                return ((float) ($ed->labor_unit_rate    ?? 0) * $lf
+                      + (float) ($ed->tool_unit_rate     ?? 0) * $ef
+                      + (float) ($ed->material_unit_rate ?? 0) * $mf) * $vol;
+            });
             return $total;
         } catch(Exception $e){
             return 0;
         }
-
     }
 
     public function getContingencyCost(){
