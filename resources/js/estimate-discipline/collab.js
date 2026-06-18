@@ -46,6 +46,25 @@ export function useCollab(projectId, wsUrl, initRows, initContingency = 15, user
     }, [yrows])
 
     useEffect(() => {
+        // Seed yrows immediately from DB rows so that addRow / setFields / removeRow
+        // work even before the WebSocket sync completes. Without this, mutations on
+        // existing rows silently fail on slow connections (yrows is empty → get/delete
+        // return undefined) and adding a row clears all displayed rows (snapshot only
+        // returns the single new entry). The sync handler will correct/overwrite Yjs
+        // state once the server responds, so this is safe.
+        if (yrows.size === 0 && initRows?.length) {
+            ydoc.transact(() => {
+                initRows.forEach(row => {
+                    if (!row.uid) return
+                    const yrow = new Y.Map()
+                    Object.entries(row).forEach(([k, v]) => {
+                        if (k !== 'uid') yrow.set(k, v ?? '')
+                    })
+                    yrows.set(row.uid, yrow)
+                })
+            }, 'init')
+        }
+
         const provider = new WebsocketProvider(wsUrl, `estimate-${projectId}`, ydoc)
         providerRef.current = provider
 
