@@ -120,7 +120,7 @@ function WeCellRenderer({ data, context }) {
 
 function WorkItemCellRenderer({ value, data, context }) {
     if (!data || data._type !== 'data') return null
-    const canEdit = !data.workScope || data.workScope === context.userDiscipline
+    const canEdit = context.isAdmin || !data.workScope || data.workScope === context.userDiscipline
     return (
         <div
             className={`wi-cell ${canEdit ? 'wi-cell-editable' : 'wi-cell-readonly'}`}
@@ -195,7 +195,7 @@ NumberCellEditor.displayName = 'NumberCellEditor'
 
 // ─── Main Grid component ──────────────────────────────────────────────────────
 
-export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadOnly, isFullscreen, onCellChange, onBatchCellChange, onDeleteRow, onAddRowInline }) {
+export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadOnly, isAdmin, isFullscreen, onCellChange, onBatchCellChange, onDeleteRow, onAddRowInline }) {
     const gridRef = useRef(null)
     const [wiSearchUid, setWiSearchUid] = useState(null)
     const [collapsed, setCollapsed] = useState(new Set())
@@ -327,8 +327,8 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
     }, [rows, wbsById, isReadOnly, collapsed])
 
     const canEdit = useCallback(
-        data => !isReadOnly && data?._type === 'data' && (!data.workScope || data.workScope === userDiscipline),
-        [isReadOnly, userDiscipline]
+        data => !isReadOnly && data?._type === 'data' && (isAdmin || !data.workScope || data.workScope === userDiscipline),
+        [isReadOnly, isAdmin, userDiscipline]
     )
 
     const columnDefs = useMemo(() => [
@@ -526,12 +526,13 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
     const context = useMemo(() => ({
         userDiscipline,
         isReadOnly,
+        isAdmin,
         toggleCollapsed,
         openWorkItemSearch: uid => setWiSearchUid(uid),
         openAddRow: (wbs3Id, workElId, rowMeta) => {
             if (onAddRowInline) onAddRowInline(wbs3Id, workElId, rowMeta)
         },
-    }), [userDiscipline, isReadOnly, toggleCollapsed, onAddRowInline])
+    }), [userDiscipline, isReadOnly, isAdmin, toggleCollapsed, onAddRowInline])
 
     const handleWorkItemSelected = useCallback(item => {
         if (!wiSearchUid) return

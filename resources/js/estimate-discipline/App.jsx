@@ -81,6 +81,7 @@ export default function App({
     contingency: initContingency,
     canPublish,
     publishStatus: initPublishStatus,
+    isAdmin,
 }) {
     const [saveStatus, setSaveStatus]     = useState('saved')
     const [showAddRow, setShowAddRow]     = useState(false)
@@ -421,7 +422,8 @@ export default function App({
                 rows={rows}
                 wbsOptions={wbsOptions}
                 userDiscipline={userDiscipline}
-                isReadOnly={publishStatus === 'PUBLISH'}
+                isReadOnly={publishStatus === 'PUBLISH' && !isAdmin}
+                isAdmin={isAdmin}
                 isFullscreen={isFullscreen}
                 onCellChange={handleCellChange}
                 onBatchCellChange={handleBatchCellChange}

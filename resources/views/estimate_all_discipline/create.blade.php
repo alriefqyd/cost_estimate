@@ -11,6 +11,7 @@
             'wbsOptions'     => $wbsOptions->toArray(),
             'contingency'    => optional($project->projectSettings)->contingency ?? 15,
             'canPublish'     => $project->isDesignEngineer(),
+            'isAdmin'        => $isAdmin,
             'publishStatus'  => $publishStatus,
         ];
     @endphp

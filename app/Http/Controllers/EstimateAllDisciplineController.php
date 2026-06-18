@@ -28,6 +28,11 @@ class EstimateAllDisciplineController extends Controller
         return $parts[1] ?? '';
     }
 
+    private function isAdmin(): bool
+    {
+        return auth()->user()->profiles?->position === 'administrator';
+    }
+
     private function buildBroadcastPayload(EstimateAllDiscipline $row): array
     {
         $projectServices = new ProjectServices();
@@ -79,7 +84,7 @@ class EstimateAllDisciplineController extends Controller
 
     public function create(Project $project, Request $request)
     {
-        if (!$project->isDesignEngineer()) {
+        if (!$project->isDesignEngineer() && !$this->isAdmin()) {
             abort(403);
         }
 
@@ -250,12 +255,13 @@ class EstimateAllDisciplineController extends Controller
             'wsUrl'                 => env('COLLAB_WS_URL', 'ws://localhost:1234'),
             'userDiscipline'        => $discipline,
             'userName'              => auth()->user()->profiles?->full_name ?? auth()->user()->name,
+            'isAdmin'               => $this->isAdmin(),
         ]);
     }
 
     public function autosave(Project $project, Request $request): JsonResponse
     {
-        if (!$project->isDesignEngineer()) {
+        if (!$project->isDesignEngineer() && !$this->isAdmin()) {
             return response()->json(['status' => 403, 'message' => "Not authorized"]);
         }
 
@@ -266,32 +272,38 @@ class EstimateAllDisciplineController extends Controller
         try {
             $uniqueIdentifier = trim($request->unique_identifier ?? '');
 
-            $row = EstimateAllDiscipline::where('project_id', $project->id)
-                ->where('work_scope', $position)
-                ->where('unique_identifier', $uniqueIdentifier)
-                ->first();
-
-            if (!$row) {
-                // Migrate an old row that has no unique_identifier yet (pre-rewrite data)
-                $row = EstimateAllDiscipline::where('project_id', $project->id)
-                    ->where('work_scope', $position)
-                    ->whereNull('unique_identifier')
-                    ->where('wbs_level3_id', $request->wbs_level3)
-                    ->where('equipment_location_id', $request->work_element)
-                    ->where('work_item_id', $request->workItem)
-                    ->first();
-            }
-
-            if (!$row && $uniqueIdentifier) {
-                // Last resort: find by uid alone — handles rows whose work_scope differs
-                // from $position (e.g. old rows created before work_scope was normalised,
-                // or rows belonging to a scope that was renamed). Stamp the correct
-                // work_scope so future lookups succeed without this fallback.
+            if ($this->isAdmin() && $uniqueIdentifier) {
+                // Admin: look up by uid only — no work_scope restriction, no scope stamping
                 $row = EstimateAllDiscipline::where('project_id', $project->id)
                     ->where('unique_identifier', $uniqueIdentifier)
                     ->first();
-                if ($row) {
-                    $row->work_scope = $position;
+            } else {
+                $row = EstimateAllDiscipline::where('project_id', $project->id)
+                    ->where('work_scope', $position)
+                    ->where('unique_identifier', $uniqueIdentifier)
+                    ->first();
+
+                if (!$row) {
+                    // Migrate an old row that has no unique_identifier yet (pre-rewrite data)
+                    $row = EstimateAllDiscipline::where('project_id', $project->id)
+                        ->where('work_scope', $position)
+                        ->whereNull('unique_identifier')
+                        ->where('wbs_level3_id', $request->wbs_level3)
+                        ->where('equipment_location_id', $request->work_element)
+                        ->where('work_item_id', $request->workItem)
+                        ->first();
+                }
+
+                if (!$row && $uniqueIdentifier) {
+                    // Last resort: find by uid alone — handles rows whose work_scope differs
+                    // from $position (e.g. old rows created before work_scope was normalised).
+                    // Stamp the correct work_scope so future lookups succeed without this fallback.
+                    $row = EstimateAllDiscipline::where('project_id', $project->id)
+                        ->where('unique_identifier', $uniqueIdentifier)
+                        ->first();
+                    if ($row) {
+                        $row->work_scope = $position;
+                    }
                 }
             }
 
@@ -342,7 +354,7 @@ class EstimateAllDisciplineController extends Controller
 
     public function destroyRow(Project $project, string $uniqueIdentifier): JsonResponse
     {
-        if (!$project->isDesignEngineer()) {
+        if (!$project->isDesignEngineer() && !$this->isAdmin()) {
             return response()->json(['status' => 403, 'message' => "Not authorized"]);
         }
 
@@ -351,17 +363,19 @@ class EstimateAllDisciplineController extends Controller
 
         DB::beginTransaction();
         try {
-            // Primary delete: exact work_scope match.
-            // Also catches rows with empty/null work_scope (old data before scope was enforced).
-            // The uid is a UUID so this cannot accidentally delete rows from another project.
-            EstimateAllDiscipline::where('project_id', $project->id)
-                ->where('unique_identifier', $uniqueIdentifier)
-                ->where(function ($q) use ($position) {
+            $query = EstimateAllDiscipline::where('project_id', $project->id)
+                ->where('unique_identifier', $uniqueIdentifier);
+
+            if (!$this->isAdmin()) {
+                // Non-admin: only delete own scope or unowned rows
+                $query->where(function ($q) use ($position) {
                     $q->where('work_scope', $position)
                       ->orWhereNull('work_scope')
                       ->orWhere('work_scope', '');
-                })
-                ->delete();
+                });
+            }
+
+            $query->delete();
 
             try {
                 broadcast(new EstimateRowDeleted($project->id, $uniqueIdentifier));
