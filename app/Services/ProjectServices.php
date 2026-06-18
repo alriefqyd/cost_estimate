@@ -248,20 +248,10 @@ class ProjectServices
     }
 
     public function checkReviewer($discipline, $approver, $designEngineer, $sizeEstimateDiscipline){
-        $user = new User();
-        $isReviewer = $user->isDisciplineReviewer($discipline);
-
-        if(isset($designEngineer)
-            && $sizeEstimateDiscipline > 0
-            && $isReviewer){
-            return true;
-        }
-
-        if($approver == auth()->user()->id && $isReviewer){
-            return true;
-        }
-
-        return false;
+        // Only the specifically assigned reviewer for this discipline can click the approve icon.
+        // The previous broad role-check (any role-holder with estimates) allowed engineers
+        // who happened to share a reviewer role to click it — wrong behavior.
+        return isset($approver) && $approver == auth()->user()->id;
     }
 
     public function getRemarkDiscipline(Project $project){

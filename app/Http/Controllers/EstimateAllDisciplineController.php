@@ -268,37 +268,12 @@ class EstimateAllDisciplineController extends Controller
         try {
             $uniqueIdentifier = trim($request->unique_identifier ?? '');
 
-            if ($this->isAdmin() && $uniqueIdentifier) {
-                // Admin: look up by uid only — no work_scope restriction, no scope stamping
-                $row = EstimateAllDiscipline::where('project_id', $project->id)
+            // Find by uid — no work_scope restriction (all users can edit any row)
+            $row = $uniqueIdentifier
+                ? EstimateAllDiscipline::where('project_id', $project->id)
                     ->where('unique_identifier', $uniqueIdentifier)
-                    ->first();
-            } else {
-                $row = EstimateAllDiscipline::where('project_id', $project->id)
-                    ->where('work_scope', $position)
-                    ->where('unique_identifier', $uniqueIdentifier)
-                    ->first();
-
-                if (!$row) {
-                    // Migrate an old row that has no unique_identifier yet (pre-rewrite data)
-                    $row = EstimateAllDiscipline::where('project_id', $project->id)
-                        ->where('work_scope', $position)
-                        ->whereNull('unique_identifier')
-                        ->where('wbs_level3_id', $request->wbs_level3)
-                        ->where('equipment_location_id', $request->work_element)
-                        ->where('work_item_id', $request->workItem)
-                        ->first();
-                }
-
-                if (!$row && $uniqueIdentifier) {
-                    // Last resort: find by uid alone — handles old rows that have no
-                    // work_scope set. Do NOT stamp work_scope; empty-scope rows are
-                    // intentionally editable by all disciplines.
-                    $row = EstimateAllDiscipline::where('project_id', $project->id)
-                        ->where('unique_identifier', $uniqueIdentifier)
-                        ->first();
-                }
-            }
+                    ->first()
+                : null;
 
             $isNew = !$row;
             if ($isNew) {
@@ -351,24 +326,14 @@ class EstimateAllDisciplineController extends Controller
             return response()->json(['status' => 403, 'message' => "Not authorized"]);
         }
 
-        $position = $this->getUserDiscipline();
         $uniqueIdentifier = trim($uniqueIdentifier);
 
         DB::beginTransaction();
         try {
-            $query = EstimateAllDiscipline::where('project_id', $project->id)
-                ->where('unique_identifier', $uniqueIdentifier);
-
-            if (!$this->isAdmin()) {
-                // Non-admin: only delete own scope or unowned rows
-                $query->where(function ($q) use ($position) {
-                    $q->where('work_scope', $position)
-                      ->orWhereNull('work_scope')
-                      ->orWhere('work_scope', '');
-                });
-            }
-
-            $query->delete();
+            // No work_scope restriction — any design engineer or admin can delete any row
+            EstimateAllDiscipline::where('project_id', $project->id)
+                ->where('unique_identifier', $uniqueIdentifier)
+                ->delete();
 
             try {
                 broadcast(new EstimateRowDeleted($project->id, $uniqueIdentifier));

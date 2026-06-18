@@ -120,7 +120,7 @@ function WeCellRenderer({ data, context }) {
 
 function WorkItemCellRenderer({ value, data, context }) {
     if (!data || data._type !== 'data') return null
-    const canEdit = context.isAdmin || !data.workScope || data.workScope === context.userDiscipline
+    const canEdit = !context.isReadOnly
     return (
         <div
             className={`wi-cell ${canEdit ? 'wi-cell-editable' : 'wi-cell-readonly'}`}
@@ -327,8 +327,8 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
     }, [rows, wbsById, isReadOnly, collapsed])
 
     const canEdit = useCallback(
-        data => !isReadOnly && data?._type === 'data' && (isAdmin || !data.workScope || data.workScope === userDiscipline),
-        [isReadOnly, isAdmin, userDiscipline]
+        data => !isReadOnly && data?._type === 'data',
+        [isReadOnly]
     )
 
     const columnDefs = useMemo(() => [

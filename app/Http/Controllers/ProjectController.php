@@ -527,6 +527,13 @@ class ProjectController extends Controller
                 $column = $discipline.'_approval_status';
                 $oldStatusDiscipline = $project->$column;
 
+                // Only the specifically assigned reviewer for this discipline may approve/reject
+                $approverColumn = $discipline . '_approver';
+                if ($project->$approverColumn != auth()->id()) {
+                    DB::rollBack();
+                    return response()->json(['status' => 403, 'message' => 'Not authorized to approve this discipline']);
+                }
+
                 switch ($request->discipline) {
                     case Setting::DESIGN_ENGINEER_LIST['civil']:
                         $project->civil_approval_status = $request->status;
