@@ -179,6 +179,18 @@ class EstimateAllDisciplineController extends Controller
         $version = EstimateAllDiscipline::where('project_id', $project->id)->first('version');
         $projectServices = new ProjectServices();
 
+        // ── One-time cleanup: clear work_scope stamped by the now-removed backfill ──
+        // Rows created before the React feature launch (2026-06-11) are legacy rows
+        // that should be editable by any discipline. The old backfill wrongly assigned
+        // them a work_scope, locking them to one discipline. This update is a no-op
+        // once all affected rows are cleared (subsequent loads touch 0 rows).
+        EstimateAllDiscipline::where('project_id', $project->id)
+            ->whereDate('created_at', '<', '2026-06-11')
+            ->where(function ($q) {
+                $q->whereNotNull('work_scope')->where('work_scope', '!=', '');
+            })
+            ->update(['work_scope' => null]);
+
         // ── Flat rows for React ──────────────────────────────────────────────
         // Query directly from EstimateAllDiscipline to avoid key collisions in the
         // nested WBS grouping (two WbsLevel3 rows with the same work_element FK
