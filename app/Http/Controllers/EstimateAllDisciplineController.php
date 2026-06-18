@@ -268,12 +268,18 @@ class EstimateAllDisciplineController extends Controller
         try {
             $uniqueIdentifier = trim($request->unique_identifier ?? '');
 
-            // Find by uid — no work_scope restriction (all users can edit any row)
+            // Find by uid
             $row = $uniqueIdentifier
                 ? EstimateAllDiscipline::where('project_id', $project->id)
                     ->where('unique_identifier', $uniqueIdentifier)
                     ->first()
                 : null;
+
+            // Enforce ownership: if the row has a work_scope, only that discipline (or admin) may edit it
+            if ($row && $row->work_scope && !$this->isAdmin() && $row->work_scope !== $position) {
+                DB::rollBack();
+                return response()->json(['status' => 403, 'message' => 'Not authorized to edit this item']);
+            }
 
             $isNew = !$row;
             if ($isNew) {
@@ -326,11 +332,21 @@ class EstimateAllDisciplineController extends Controller
             return response()->json(['status' => 403, 'message' => "Not authorized"]);
         }
 
+        $position         = $this->getUserDiscipline();
         $uniqueIdentifier = trim($uniqueIdentifier);
 
         DB::beginTransaction();
         try {
-            // No work_scope restriction — any design engineer or admin can delete any row
+            $row = EstimateAllDiscipline::where('project_id', $project->id)
+                ->where('unique_identifier', $uniqueIdentifier)
+                ->first();
+
+            // Owned rows (work_scope set) can only be deleted by that discipline or admin
+            if ($row && $row->work_scope && !$this->isAdmin() && $row->work_scope !== $position) {
+                DB::rollBack();
+                return response()->json(['status' => 403, 'message' => 'Not authorized to delete this item']);
+            }
+
             EstimateAllDiscipline::where('project_id', $project->id)
                 ->where('unique_identifier', $uniqueIdentifier)
                 ->delete();
