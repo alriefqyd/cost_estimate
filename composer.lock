@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "05338d436f097ab6a0a2fafbce3d04b8",
+    "content-hash": "3adb963d6d605f091a094e7c4f45571b",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -5111,6 +5111,76 @@
                 }
             ],
             "time": "2023-02-07T16:14:23+00:00"
+        },
+        {
+            "name": "romanzipp/laravel-queue-monitor",
+            "version": "5.4.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/romanzipp/Laravel-Queue-Monitor.git",
+                "reference": "2c894ec7ac8bc56c760ff8e935d58bc988f299c9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/romanzipp/Laravel-Queue-Monitor/zipball/2c894ec7ac8bc56c760ff8e935d58bc988f299c9",
+                "reference": "2c894ec7ac8bc56c760ff8e935d58bc988f299c9",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "ext-mbstring": "*",
+                "illuminate/database": ">=5.5",
+                "illuminate/queue": ">=5.5",
+                "illuminate/support": ">=5.5",
+                "nesbot/carbon": "^2.0|^3.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "doctrine/dbal": "^3.1|^4.2",
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "laravel/framework": ">=5.5",
+                "mockery/mockery": "^1.3.2",
+                "orchestra/testbench": ">=3.8",
+                "phpstan/phpstan": "^0.12.99|^1.0|^2.1",
+                "phpunit/phpunit": ">=8.5.23",
+                "romanzipp/php-cs-fixer-config": "^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "romanzipp\\QueueMonitor\\Providers\\QueueMonitorProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "romanzipp\\QueueMonitor\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "romanzipp",
+                    "email": "ich@ich.wtf",
+                    "homepage": "https://ich.wtf"
+                }
+            ],
+            "description": "Queue Monitoring for Laravel Database Job Queue",
+            "support": {
+                "issues": "https://github.com/romanzipp/Laravel-Queue-Monitor/issues",
+                "source": "https://github.com/romanzipp/Laravel-Queue-Monitor/tree/5.4.5"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/romanzipp",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-12-20T09:07:14+00:00"
         },
         {
             "name": "sabberworm/php-css-parser",
