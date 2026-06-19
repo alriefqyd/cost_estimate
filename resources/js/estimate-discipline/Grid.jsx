@@ -554,7 +554,7 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
 
     return (
         <>
-            <div className="ag-theme-alpine estimate-grid-wrap">
+            <div className="ag-theme-alpine estimate-grid-wrap" id="tour-est-grid">
                 <AgGridReact
                     ref={gridRef}
                     rowData={displayRows}

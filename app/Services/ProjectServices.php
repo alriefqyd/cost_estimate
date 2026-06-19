@@ -98,6 +98,7 @@ class ProjectServices
             $projectClass->workItemMaterialFactorial = $location?->material_factorial;
             $projectClass->workItemTotalCostStr = number_format($this->getTotalCostWorkItem($location),2);
             $projectClass->workItemTotalCost = $this->getTotalCostWorkItem($location);
+            $projectClass->workScope = $location->work_scope;
 
             return [
                 $location->wbss?->title => $projectClass,

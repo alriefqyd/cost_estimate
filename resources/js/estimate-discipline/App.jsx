@@ -303,7 +303,7 @@ export default function App({
     return (
         <div className={`estimate-react-root${isFullscreen ? ' est-fullscreen' : ''}`}>
             {/* ── Toolbar ───────────────────────────────────────────────── */}
-            <div className="est-toolbar">
+            <div className="est-toolbar" id="tour-est-toolbar">
                 <div className="est-toolbar-left">
                     <span className={`est-discipline-badge ${disciplineBadgeClass}`}>
                         {userDiscipline?.charAt(0).toUpperCase() + userDiscipline?.slice(1)}
@@ -350,6 +350,7 @@ export default function App({
                 <div className="est-toolbar-right">
                     {canPublish && publishStatus !== 'PUBLISH' && (
                         <button
+                            id="tour-est-publish-btn"
                             className="est-btn est-btn-publish"
                             onClick={() => setShowPublishModal(true)}
                             disabled={publishing || saveStatus === 'saving'}
@@ -366,6 +367,7 @@ export default function App({
                     )}
                     {publishStatus !== 'PUBLISH' && (
                         <button
+                            id="tour-est-add-btn"
                             className="est-btn est-btn-add"
                             onClick={() => setShowAddRow(true)}
                         >
@@ -385,7 +387,7 @@ export default function App({
 
             {/* ── Discipline stat cards ─────────────────────────────── */}
             {Object.keys(byDiscipline).length > 0 && (
-                <div className="est-disc-stats">
+                <div className="est-disc-stats" id="tour-est-disc-stats">
                     {Object.entries(byDiscipline)
                         .sort(([a], [b]) => a.localeCompare(b))
                         .map(([disc, total]) => {
@@ -432,7 +434,7 @@ export default function App({
             />
 
             {/* ── Totals footer ────────────────────────────────────────── */}
-            <div className="est-totals mb-5">
+            <div className="est-totals mb-5" id="tour-est-totals">
                 <div className="est-contingency">
                     <label className="est-contingency-label">Contingency</label>
                     <div className="est-contingency-input-wrap">

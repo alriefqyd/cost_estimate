@@ -28,6 +28,9 @@
                     </ol>
                 </div>
                 <div class="col-sm-6 text-end pt-2 mt-5 mb-5">
+                    <button type="button" id="js-start-est-tour" class="btn btn-outline-info btn-sm me-2">
+                        <i class="fa fa-question-circle me-1"></i> How to use this page
+                    </button>
                     <a href="/project/{{ $project->id }}" class="btn btn-outline-secondary btn-sm">
                         <i class="fa fa-arrow-left me-1"></i> Back to Project
                     </a>
@@ -73,4 +76,5 @@
 
 @push('scripts')
 <script src="{{ asset('js/estimate-discipline.js') }}"></script>
+<script src="{{ asset('js/estimate_discipline_tour.js') }}"></script>
 @endpush
