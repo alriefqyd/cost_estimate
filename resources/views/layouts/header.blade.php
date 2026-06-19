@@ -42,7 +42,7 @@
 
                     {{-- Trigger --}}
                     <button class="hdr-profile-trigger" type="button" aria-label="Account menu">
-                        @customDirective()
+                        <div class="hdr-avatar hdr-avatar--sm">@customDirective()</div>
                         <span class="hdr-profile-name">{{ auth()->user()->profiles?->full_name ?? auth()->user()->name }}</span>
                         <i class="fa fa-chevron-down hdr-profile-chevron"></i>
                     </button>
@@ -52,7 +52,7 @@
 
                         {{-- Identity block --}}
                         <div class="hdr-pd-identity">
-                            <div class="hdr-pd-avatar">@customDirective()</div>
+                            <div class="hdr-avatar hdr-avatar--md">@customDirective()</div>
                             <div class="hdr-pd-info">
                                 <span class="hdr-pd-fullname">{{ auth()->user()->profiles?->full_name ?? auth()->user()->name }}</span>
                                 <span class="hdr-pd-role">{{ auth()->user()->profiles?->getPosition() ?? '—' }}</span>
@@ -97,13 +97,23 @@
                         }
                         .hdr-profile-trigger:hover { background: rgba(36,105,92,0.07); }
 
-                        /* avatar in trigger — small */
-                        .hdr-profile-trigger img {
-                            width: 32px !important;
-                            height: 32px !important;
-                            object-fit: cover;
+                        /* avatar container — clips img to perfect circle regardless of inline styles */
+                        .hdr-avatar {
                             border-radius: 50%;
+                            overflow: hidden;
                             flex-shrink: 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        .hdr-avatar--sm { width: 32px; height: 32px; }
+                        .hdr-avatar--md { width: 40px; height: 40px; }
+                        .hdr-avatar img {
+                            width: 100% !important;
+                            height: 100% !important;
+                            object-fit: cover;
+                            display: block;
+                            border-radius: 0 !important;
                         }
 
                         .hdr-profile-name {
@@ -153,13 +163,6 @@
                         }
 
                         .hdr-pd-avatar { flex-shrink: 0; }
-                        /* avatar in dropdown — slightly larger */
-                        .hdr-pd-avatar img {
-                            width: 40px !important;
-                            height: 40px !important;
-                            object-fit: cover;
-                            border-radius: 50%;
-                        }
 
                         .hdr-pd-info {
                             display: flex;
