@@ -15,3 +15,6 @@ yarn-error.log
 
 # MySQL Docker data volume — never commit live database files
 /mysql/data/
+
+# Webpack-generated license extraction files
+/public/js/*.LICENSE.txt
