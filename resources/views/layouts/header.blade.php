@@ -97,6 +97,15 @@
                         }
                         .hdr-profile-trigger:hover { background: rgba(36,105,92,0.07); }
 
+                        /* avatar in trigger — small */
+                        .hdr-profile-trigger img {
+                            width: 32px !important;
+                            height: 32px !important;
+                            object-fit: cover;
+                            border-radius: 50%;
+                            flex-shrink: 0;
+                        }
+
                         .hdr-profile-name {
                             font-size: 0.82rem;
                             font-weight: 600;
@@ -144,6 +153,13 @@
                         }
 
                         .hdr-pd-avatar { flex-shrink: 0; }
+                        /* avatar in dropdown — slightly larger */
+                        .hdr-pd-avatar img {
+                            width: 40px !important;
+                            height: 40px !important;
+                            object-fit: cover;
+                            border-radius: 50%;
+                        }
 
                         .hdr-pd-info {
                             display: flex;
