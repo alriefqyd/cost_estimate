@@ -1537,8 +1537,6 @@ custom-checkbox:checked:before {
     background: #e5c200;
 }
 
-<<<<<<< HEAD
-
 /* ══════════════════════════════════════════════════════════════════════════
    Estimate Discipline — real-time collaboration styles
    ══════════════════════════════════════════════════════════════════════════ */
@@ -2611,4 +2609,192 @@ custom-checkbox:checked:before {
 .btn-pulse {
     animation: ce-btn-pulse 1.8s ease-in-out infinite;
     transform-origin: center;
+}
+
+/* ============================================================
+   Dark Mode Toggle Button
+   ============================================================ */
+.dark-toggle-btn {
+    position: relative;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    color: #6b7280;
+    transition: background .15s, color .15s;
+    padding: 0;
+    flex-shrink: 0;
+}
+.dark-toggle-btn:hover { background: rgba(0,0,0,.06); color: #f59e0b; }
+
+.dark-toggle-icon--dark  { display: none; }
+body.dark-only .dark-toggle-icon--light { display: none; }
+body.dark-only .dark-toggle-icon--dark  { display: inline; }
+
+/* ============================================================
+   Dark Mode — custom component overrides
+   Theme palette: body #202938 | card/surface #111727 |
+   border rgba(36,105,92,.2) | text rgba(255,255,255,.7)
+   ============================================================ */
+
+/* Toggle button */
+body.dark-only .dark-toggle-btn { color: rgba(255,255,255,.5); }
+body.dark-only .dark-toggle-btn:hover { background: rgba(255,255,255,.06); color: #f59e0b; }
+
+/* Header profile trigger */
+body.dark-only .hdr-profile-trigger:hover { background: rgba(255,255,255,.06); }
+body.dark-only .hdr-profile-name    { color: rgba(255,255,255,.7); }
+body.dark-only .hdr-profile-chevron { color: rgba(255,255,255,.4); }
+
+/* Profile dropdown */
+body.dark-only .hdr-profile-dropdown {
+    background: #111727;
+    border-color: rgba(36,105,92,.2);
+    box-shadow: 0 8px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(36,105,92,.15);
+}
+body.dark-only .hdr-pd-fullname  { color: #fff; }
+body.dark-only .hdr-pd-role      { color: rgba(255,255,255,.5); }
+body.dark-only .hdr-pd-divider   { background: rgba(36,105,92,.2); }
+body.dark-only .hdr-pd-item      { color: rgba(255,255,255,.7); }
+body.dark-only .hdr-pd-item:hover { background: rgba(36,105,92,.15); color: #24695c; }
+body.dark-only .hdr-pd-item-icon  { color: rgba(255,255,255,.4); }
+body.dark-only .hdr-pd-item:hover .hdr-pd-item-icon { color: #24695c; }
+body.dark-only .hdr-pd-logout:hover { background: rgba(220,38,38,.12); color: #f87171; }
+body.dark-only .hdr-pd-logout:hover .hdr-pd-item-icon { color: #f87171; }
+
+/* Notification bell */
+body.dark-only .notif-bell-btn { color: rgba(255,255,255,.5); }
+body.dark-only .notif-bell-btn:hover { background: rgba(255,255,255,.06); color: rgba(255,255,255,.9); }
+body.dark-only .notif-bell-btn.has-unread { color: #24695c; }
+
+/* Notification dropdown */
+body.dark-only .notif-dropdown  { background: #111727; box-shadow: 0 8px 32px rgba(0,0,0,.5), 0 0 0 1px rgba(36,105,92,.15); }
+body.dark-only .notif-header    { border-bottom-color: rgba(36,105,92,.2); }
+body.dark-only .notif-title     { color: #fff; }
+body.dark-only .notif-mark-all  { color: #24695c; }
+body.dark-only .notif-item      { border-bottom-color: rgba(36,105,92,.15); }
+body.dark-only .notif-item:hover { background: rgba(255,255,255,.04); }
+body.dark-only .notif-item.unread { background: rgba(36,105,92,.1); }
+body.dark-only .notif-msg       { color: rgba(255,255,255,.7); }
+body.dark-only .notif-item.unread .notif-msg { color: #fff; }
+body.dark-only .notif-time      { color: rgba(255,255,255,.35); }
+body.dark-only .notif-empty     { color: rgba(255,255,255,.35); }
+
+/* Dashboard KPI / section cards */
+body.dark-only .kpi-card  { background: #111727; box-shadow: 1px 1px 2px 1px rgba(29,28,28,.08); border: 1px solid rgba(36,105,92,.2); }
+body.dark-only .kpi-value { color: #fff; }
+body.dark-only .kpi-label { color: rgba(255,255,255,.5); }
+body.dark-only .db-card   { background: #111727; box-shadow: 1px 1px 2px 1px rgba(29,28,28,.08); border: 1px solid rgba(36,105,92,.2); }
+body.dark-only .db-card-header { border-bottom-color: rgba(36,105,92,.2); }
+body.dark-only .db-card-header h6 { color: #fff; }
+body.dark-only .db-greeting h4    { color: #fff; }
+body.dark-only .db-greeting p     { color: rgba(255,255,255,.5); }
+body.dark-only .proj-table thead tr { background: #202938; }
+body.dark-only .proj-table th  { color: rgba(255,255,255,.4); border-bottom-color: rgba(36,105,92,.2); }
+body.dark-only .proj-table td  { color: rgba(255,255,255,.7); border-bottom-color: rgba(36,105,92,.15); }
+body.dark-only .proj-table tbody tr:hover td { background: rgba(255,255,255,.03); }
+
+/* Project stepper */
+body.dark-only .project-stepper        { background: #111727; }
+body.dark-only .project-info-value     { color: rgba(255,255,255,.7); }
+body.dark-only .project-info-label     { color: rgba(255,255,255,.4); }
+body.dark-only .step-item:not(:last-child)::after { background: rgba(36,105,92,.2); }
+
+/* Discipline cost cards */
+body.dark-only .discipline-summary-wrap { background: #202938; border-color: rgba(36,105,92,.2); }
+body.dark-only .disc-card       { background: #111727; border-color: rgba(36,105,92,.2); }
+body.dark-only .disc-card-total { color: #fff; }
+body.dark-only .disc-card-name  { color: rgba(255,255,255,.5); }
+body.dark-only .disc-card-breakdown { color: rgba(255,255,255,.35); }
+
+/* Approval modal */
+body.dark-only .adm-modal   { background: #111727; }
+body.dark-only .adm-body    { background: #111727; }
+body.dark-only .adm-footer  { background: #111727; }
+body.dark-only .adm-status-card { background: #202938; border-color: rgba(36,105,92,.2); }
+body.dark-only .adm-status-card:hover { background: rgba(36,105,92,.1); border-color: rgba(36,105,92,.4); }
+body.dark-only .adm-status-label { color: rgba(255,255,255,.7); }
+body.dark-only .adm-btn-cancel { background: #202938; color: rgba(255,255,255,.6); border-color: rgba(36,105,92,.2); }
+body.dark-only .adm-btn-cancel:hover { background: rgba(255,255,255,.06); }
+
+/* User guide */
+body.dark-only .guide-section    { background: #111727; }
+body.dark-only .guide-section p  { color: rgba(255,255,255,.7); }
+body.dark-only .guide-section-header { border-bottom-color: rgba(36,105,92,.2); }
+body.dark-only .guide-nav-card   { background: #111727; }
+body.dark-only .guide-nav-header { background: #202938; color: rgba(255,255,255,.4); border-bottom-color: rgba(36,105,92,.2); }
+body.dark-only .guide-nav-link   { color: rgba(255,255,255,.6); }
+body.dark-only .guide-nav-link:hover, body.dark-only .guide-nav-link.active { background: rgba(36,105,92,.1); color: #24695c; border-left-color: #24695c; }
+body.dark-only .guide-highlight  { background: #202938; color: rgba(255,255,255,.7); }
+body.dark-only .guide-step       { background: #202938; color: rgba(255,255,255,.7); }
+body.dark-only .guide-table th   { color: rgba(255,255,255,.4); border-bottom-color: rgba(36,105,92,.2); }
+body.dark-only .guide-table td   { color: rgba(255,255,255,.7); border-bottom-color: rgba(36,105,92,.15); }
+body.dark-only .guide-table thead tr { background: #202938; }
+body.dark-only .guide-table tbody tr:hover td { background: rgba(255,255,255,.03); }
+
+/* WBS */
+body.dark-only .wbs-detail-table th { background: #202938; color: rgba(36,105,92,.9); }
+body.dark-only .wbs-cell-location   { background: rgba(36,105,92,.15); color: rgba(255,255,255,.8); border-right-color: rgba(36,105,92,.3) !important; }
+body.dark-only .wbs-cell-discipline { background: rgba(36,105,92,.08); color: rgba(36,105,92,.9); border-right-color: rgba(36,105,92,.2) !important; }
+
+/* ============================================================
+   Dark Mode — text readability fixes
+   Override hardcoded dark colours that don't adapt to dark bg
+   ============================================================ */
+
+/* Form labels */
+body.dark-only .form-label-black { color: rgba(255,255,255,.7) !important; }
+body.dark-only .form-label       { color: rgba(255,255,255,.7) !important; }
+body.dark-only label             { color: rgba(255,255,255,.7); }
+
+/* General content text with hardcoded dark colors */
+body.dark-only .project-info-value  { color: rgba(255,255,255,.7); }
+body.dark-only .detail-breadcrumb   { color: rgba(255,255,255,.7); }
+body.dark-only .est-page-project-name { color: rgba(255,255,255,.85); }
+body.dark-only .est-page-project-label { color: rgba(255,255,255,.4); }
+
+/* Tables — general td/th already handled by theme but override specifics */
+body.dark-only .table th  { color: rgba(255,255,255,.7) !important; }
+body.dark-only .table td  { color: rgba(255,255,255,.7); }
+body.dark-only .table-custom th { color: rgba(255,255,255,.85) !important; }
+
+/* Cards with hardcoded bg */
+body.dark-only .wbs-location-row    { background-color: rgba(255,255,255,.04) !important; }
+body.dark-only .wbs-location-row td { color: rgba(255,255,255,.85); }
+
+/* Status badges — keep their own colours, just ensure bg contrast */
+body.dark-only .project-status-badge--draft     { background: rgba(73,80,87,.4);   color: #ced4da; }
+body.dark-only .project-status-badge--approve   { background: rgba(21,87,36,.4);   color: #75e89d; }
+body.dark-only .project-status-badge--rejected  { background: rgba(114,28,36,.4);  color: #f5a9ae; }
+body.dark-only .project-status-badge--pending   { background: rgba(133,100,4,.4);  color: #ffd96a; }
+body.dark-only .project-status-badge--waiting   { background: rgba(0,64,133,.4);   color: #85bfff; }
+body.dark-only .project-status-badge--reviewing { background: rgba(12,84,96,.4);   color: #6dd3e3; }
+
+/* Select2 */
+body.dark-only .select2-container--default .select2-selection--single { background-color: #202938; border-color: rgba(36,105,92,.3); color: rgba(255,255,255,.7); }
+body.dark-only .select2-container--default .select2-selection--single .select2-selection__rendered { color: rgba(255,255,255,.7); }
+body.dark-only .select2-container--default .select2-selection--multiple { background-color: #202938 !important; border-color: rgba(36,105,92,.3) !important; }
+body.dark-only .select2-dropdown { background-color: #111727; border-color: rgba(36,105,92,.2); }
+body.dark-only .select2-container--default .select2-results__option { color: rgba(255,255,255,.7); }
+body.dark-only .select2-container--default .select2-results__option--highlighted { background-color: rgba(36,105,92,.3); color: #fff; }
+
+/* Inputs & textareas */
+body.dark-only .form-control { background-color: #202938; border-color: rgba(36,105,92,.3); color: rgba(255,255,255,.7); }
+body.dark-only .form-control:focus { background-color: #202938; border-color: rgba(36,105,92,.6); color: rgba(255,255,255,.9); }
+body.dark-only .form-control::placeholder { color: rgba(255,255,255,.25); }
+
+/* Card header divider */
+body.dark-only .card .card-header-custom { border-bottom-color: rgba(36,105,92,.2); color: rgba(255,255,255,.7); }
+
+/* Logo pill — white background so the light logo stays legible on dark header */
+body.dark-only .page-main-header .dark-logo-wrapper img {
+    background: rgba(255,255,255,0.92);
+    border-radius: 6px;
+    padding: 3px 8px;
 }

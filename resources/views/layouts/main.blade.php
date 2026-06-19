@@ -13,6 +13,7 @@
        data-tg-fixed
        data-tg-order="1"
        data-tg-tour="Welcome to the Cost Estimate Web Application! Follow this tour to understand its features.">
+<script>if(localStorage.getItem('dark')==='dark-only'){document.body.className='dark-only';}</script>
 <!-- Loader starts-->
 <div class="loader-wrapper">
     <div class="theme-loader">

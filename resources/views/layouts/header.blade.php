@@ -4,8 +4,12 @@
         <div class="main-header-left">
             <div class="float-start">
                 <a href="/">
-                    <img class="img-fluid onhover-dropdown" style src="{{asset('/assets/images/logo-vale-256.png')}}" alt="">
-                    <div class="dark-logo-wrapper"><a href=""><img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt=""></a></div>
+                    <div class="logo-wrapper">
+                        <img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt="">
+                    </div>
+                    <div class="dark-logo-wrapper">
+                        <img class="img-fluid" src="{{asset('/assets/images/logo-vale-256.png')}}" alt="">
+                    </div>
                 </a>
             </div>
             <div class="toggle-sidebar m-t-15" id="tour-sidebar-toggle"
@@ -16,6 +20,12 @@
         </div>
         <div class="nav-right col pull-right right-menu p-0">
             <div class="float-end mr-6" style="display:flex; align-items:center; gap:8px;">
+
+                {{-- Dark mode toggle --}}
+                <button class="dark-toggle-btn" id="js-dark-toggle" type="button" aria-label="Toggle dark mode">
+                    <i class="fa fa-moon-o dark-toggle-icon--light"></i>
+                    <i class="fa fa-sun-o dark-toggle-icon--dark"></i>
+                </button>
 
                 {{-- Notification Bell --}}
                 <div class="notif-bell-wrap" id="js-notif-wrap">
@@ -242,4 +252,14 @@
         </div>
     </div>
 </div>
+<script>
+(function(){
+    var btn = document.getElementById('js-dark-toggle');
+    if(!btn) return;
+    btn.addEventListener('click', function(){
+        var isDark = document.body.classList.toggle('dark-only');
+        isDark ? localStorage.setItem('dark','dark-only') : localStorage.removeItem('dark');
+    });
+})();
+</script>
 <!-- Page Header Ends                              -->
