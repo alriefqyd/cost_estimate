@@ -72,7 +72,7 @@
                         <div class="hdr-pd-divider"></div>
 
                         {{-- Nav items --}}
-                        <a class="hdr-pd-item" href="{{ route('profile.show') }}">
+                        <a class="hdr-pd-item" href="/user/{{ auth()->user()->id }}">
                             <i class="fa fa-user-circle hdr-pd-item-icon"></i>
                             My Profile
                         </a>

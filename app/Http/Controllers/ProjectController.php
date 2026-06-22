@@ -224,6 +224,25 @@ class ProjectController extends Controller
 
         DB::beginTransaction();
         try {
+            // Capture old reviewer IDs and which disciplines are already published before any changes
+            $disciplineApproverMap = [
+                'design_engineer_civil'        => ['approver' => 'civil_approver',        'discipline' => 'civil',        'label' => 'Civil'],
+                'design_engineer_mechanical'   => ['approver' => 'mechanical_approver',   'discipline' => 'mechanical',   'label' => 'Mechanical'],
+                'design_engineer_electrical'   => ['approver' => 'electrical_approver',   'discipline' => 'electrical',   'label' => 'Electrical'],
+                'design_engineer_instrument'   => ['approver' => 'instrument_approver',   'discipline' => 'instrument',   'label' => 'Instrument'],
+                'design_engineer_it'           => ['approver' => 'it_approver',           'discipline' => 'it',           'label' => 'IT'],
+                'design_engineer_architect'    => ['approver' => 'architect_approver',    'discipline' => 'architect',    'label' => 'Architecture'],
+            ];
+            $oldReviewers = [];
+            foreach ($disciplineApproverMap as $posKey => $info) {
+                $col = $info['approver'];
+                $oldReviewers[$posKey] = $project->$col;
+            }
+            $publishedPositions = collect(json_decode($project->estimate_discipline_status ?? '[]'))
+                ->where('status', 'PUBLISH')
+                ->pluck('position')
+                ->toArray();
+
            $project->project_no =  $request->project_no;
            $project->project_title = $request->project_title;
            $project->project_sponsor = $request->project_sponsor;
@@ -275,6 +294,27 @@ class ProjectController extends Controller
             $project->save();
 
            DB::commit();
+
+            // Send emails when a reviewer is changed on a discipline that is already published
+            $newReviewerRequestMap = [
+                'design_engineer_civil'        => $request->reviewer_civil,
+                'design_engineer_mechanical'   => $request->reviewer_mechanical,
+                'design_engineer_electrical'   => $request->reviewer_electrical,
+                'design_engineer_instrument'   => $request->reviewer_instrument,
+                'design_engineer_it'           => $request->reviewer_it,
+                'design_engineer_architect'    => $request->reviewer_architect,
+            ];
+            foreach ($disciplineApproverMap as $posKey => $info) {
+                $oldId = $oldReviewers[$posKey];
+                $newId = $newReviewerRequestMap[$posKey];
+                if (!in_array($posKey, $publishedPositions) || $oldId == $newId || !$newId) continue;
+
+                if ($oldId) {
+                    $newReviewerName = $project->getProfileUser($newId)?->full_name ?? '';
+                    $projectService->sendEmailReviewerReassigned($project, (int) $oldId, $info['label'], $newReviewerName);
+                }
+                $projectService->sendEmailToReviewer($project, $info['discipline']);
+            }
 
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('project/'.$project->id);

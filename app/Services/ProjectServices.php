@@ -7,6 +7,7 @@ use App\Class\ProjectTotalCostClass;
 use App\Exports\SummaryExport;
 use App\Mail\DisciplineApprovedMail;
 use App\Mail\ReviewerDailyReminderMail;
+use App\Mail\ReviewerReassignedMail;
 use App\Mail\SendMail;
 use App\Mail\SendNotifApproveCostEstimateToEngineer;
 use Maatwebsite\Excel\Facades\Excel;
@@ -335,6 +336,19 @@ class ProjectServices
             }
         } catch (\Exception $e) {
             Log::error('DB notification failed (sendEmailToReviewer): ' . $e->getMessage());
+        }
+    }
+
+    public function sendEmailReviewerReassigned(Project $project, int $oldReviewerUserId, string $disciplineLabel, string $newReviewerName): void
+    {
+        $mail = $project->getProfileUser($oldReviewerUserId)?->email;
+        if ($mail) {
+            try {
+                Mail::to($mail)->send(new ReviewerReassignedMail($project, $disciplineLabel, $newReviewerName));
+                Log::info("Reviewer reassignment email sent to old reviewer: {$mail}");
+            } catch (\Exception $e) {
+                Log::error("ReviewerReassignedMail failed for {$mail}: " . $e->getMessage());
+            }
         }
     }
 
