@@ -1,0 +1,10 @@
+{
+  "name": "estimate-ws-server",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "HOST=0.0.0.0 PORT=1234 node node_modules/y-websocket/bin/server.cjs"
+  },
+  "dependencies": {
+    "y-websocket": "^2.0.4"
+  }
+}

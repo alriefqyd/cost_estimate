@@ -1,0 +1,257 @@
+/* ── Estimate grid overrides ──────────────────────────────────────────────── */
+
+.estimate-grid-wrap {
+    width: 100%;
+    min-height: 200px;
+}
+
+/* AG Grid cells */
+.estimate-grid-wrap .ag-cell {
+    line-height: 40px;
+    padding: 0 8px;
+    font-size: 13px;
+}
+
+.estimate-grid-wrap .ag-header-cell {
+    font-size: 12px;
+    font-weight: 600;
+    background: #2b6cb0;
+    color: #fff;
+}
+
+.estimate-grid-wrap .ag-header-cell:hover {
+    background: #2563a8;
+}
+
+.estimate-grid-wrap .cell-readonly {
+    background: #f8f9fa !important;
+    color: #6c757d;
+}
+
+.estimate-grid-wrap .cell-editable {
+    cursor: cell;
+}
+
+.estimate-grid-wrap .cell-total {
+    font-weight: 600;
+    background: #edf4ff !important;
+}
+
+.estimate-grid-wrap .row-readonly .ag-cell {
+    background: #fafaf8 !important;
+}
+
+/* Group rows */
+.grid-group-row {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    font-size: 13px;
+    gap: 6px;
+}
+
+.grid-group-icon {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+.grid-group-label {
+    font-weight: 600;
+}
+
+.grid-add-btn {
+    margin-left: 6px;
+    padding: 0 6px;
+    background: #0d6efd;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.grid-add-btn:hover {
+    background: #0b5ed7;
+}
+
+/* Delete row button */
+.btn-delete-row {
+    background: none;
+    border: none;
+    color: #dc3545;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    line-height: 1;
+}
+
+.btn-delete-row:hover {
+    background: #ffeaea;
+}
+
+/* Work item cell */
+.wi-cell {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 6px;
+    overflow: hidden;
+}
+
+.wi-cell-editable {
+    cursor: pointer;
+}
+
+.wi-cell-editable:hover .wi-cell-edit-hint {
+    opacity: 0.5;
+}
+
+.wi-cell-edit-hint {
+    opacity: 0;
+    font-size: 11px;
+    transition: opacity .15s;
+    flex-shrink: 0;
+}
+
+.wi-cell-readonly {
+    cursor: default;
+    opacity: 0.75;
+}
+
+.discipline-badge-sm {
+    font-size: 10px;
+    background: #6c757d;
+    color: #fff;
+    border-radius: 3px;
+    padding: 1px 4px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+}
+
+/* ── Work item search overlay ─────────────────────────────────────────────── */
+
+.wi-search-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 10vh;
+    background: rgba(0, 0, 0, .35);
+}
+
+.wi-search-panel {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.2);
+    width: min(540px, 95vw);
+    overflow: hidden;
+}
+
+.wi-search-header {
+    display: flex;
+    align-items: center;
+    padding: 10px 12px;
+    border-bottom: 1px solid #dee2e6;
+    gap: 8px;
+}
+
+.wi-search-input {
+    flex: 1;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    padding: 7px 12px;
+    font-size: 14px;
+    outline: none;
+}
+
+.wi-search-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13,110,253,.15);
+}
+
+.wi-search-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.wi-search-close:hover { background: #f0f0f0; }
+
+.wi-search-results {
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.wi-search-hint {
+    padding: 14px 16px;
+    color: #6c757d;
+    font-size: 13px;
+    text-align: center;
+}
+
+.wi-search-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    gap: 10px;
+    transition: background .1s;
+}
+
+.wi-search-item:hover { background: #f0f7ff; }
+
+.wi-search-item-name {
+    font-size: 13px;
+    flex: 1;
+}
+
+.wi-search-item-unit {
+    font-size: 11px;
+    background: #e9ecef;
+    border-radius: 3px;
+    padding: 1px 6px;
+    flex-shrink: 0;
+    color: #495057;
+}
+
+/* ── Autosave status ──────────────────────────────────────────────────────── */
+
+.autosave-saving { color: #0d6efd; }
+.autosave-saved  { color: #198754; }
+.autosave-error  { color: #dc3545; }
+
+/* ── Connection dot ───────────────────────────────────────────────────────── */
+
+.connection-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+.connection-connected    { background: #198754; }
+.connection-disconnected { background: #dc3545; }
+.connection-connecting   { background: #fd7e14; animation: pulse .9s infinite; }
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .35; }
+}
+
+/* ── Flash animation for remote cell updates ─────────────────────────────── */
+
+.ag-cell-data-changed {
+    background-color: #fff3cd !important;
+    transition: background-color .6s;
+}

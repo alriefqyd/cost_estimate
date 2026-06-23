@@ -60,11 +60,16 @@ Route::get('/project/{project:id}/estimate-discipline/create',[\App\Http\Control
 Route::get('/project/{project:id}/estimate-discipline/create/{discipline}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'create'])->middleware('auth')->can('create',App\Models\EstimateAllDiscipline::class);
 Route::post('/project/{project:id}/estimate-discipline/store',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth');
 Route::post('/project/{project:id}/estimate-discipline/update',[\App\Http\Controllers\EstimateAllDisciplineController::class,'update'])->middleware('auth');
+Route::post('/project/{project:id}/estimate-discipline/autosave',[\App\Http\Controllers\EstimateAllDisciplineController::class,'autosave'])->middleware('auth');
+Route::post('/project/{project:id}/estimate-discipline/publish',[\App\Http\Controllers\EstimateAllDisciplineController::class,'publish'])->middleware('auth');
+Route::post('/project/{project:id}/estimate-discipline/contingency',[\App\Http\Controllers\EstimateAllDisciplineController::class,'saveContingency'])->middleware('auth');
+Route::delete('/project/{project:id}/estimate-discipline/row/{uniqueIdentifier}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'destroyRow'])->middleware('auth');
 Route::post('/project/update-status/{project:id}/',[\App\Http\Controllers\ProjectController::class,'updateStatus'])->middleware('auth');
 Route::get('/project/getProjectDisciplineStatus/{project:id}/',[\App\Http\Controllers\ProjectController::class,'getProjectDisciplineStatus'])->middleware('auth');
 
 Route::post('/workElement/{project:id}',[\App\Http\Controllers\WorkElementController::class,'store'])->middleware('auth');
 Route::get('/getWorkItems',[\App\Http\Controllers\WorkItemController::class,'setWorkItems'])->name('getWorkItem')->middleware('auth');
+Route::get('/work-items/search',[\App\Http\Controllers\WorkItemController::class,'searchWorkItemsLean'])->middleware('auth');
 Route::get('/getWorkElement',[\App\Http\Controllers\WorkElementController::class,'setWorkElements'])->name('getWorkElement');
 Route::get('/getItemAdditional/{type}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getItemAdditional'])->name('getItemAdditional');
 
@@ -158,6 +163,7 @@ Route::get('/user/create',[\App\Http\Controllers\UserController::class,'create']
 Route::post('/user',[\App\Http\Controllers\UserController::class,'store'])->middleware('auth')->can('create',User::class);
 Route::get('/user/{user:id}',[\App\Http\Controllers\UserController::class,'edit'])->middleware('auth');
 Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'update'])->middleware('auth');
+Route::delete('/user/{user:id}',[\App\Http\Controllers\UserController::class,'destroy'])->middleware('auth');
 
 
 Route::get('/survey',[\App\Http\Controllers\SurveyController::class,'index'])->middleware('auth');

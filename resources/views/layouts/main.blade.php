@@ -13,6 +13,7 @@
        data-tg-fixed
        data-tg-order="1"
        data-tg-tour="Welcome to the Cost Estimate Web Application! Follow this tour to understand its features.">
+<script>if(localStorage.getItem('dark')==='dark-only'){document.body.className='dark-only';}</script>
 <!-- Loader starts-->
 <div class="loader-wrapper">
     <div class="theme-loader">
@@ -109,6 +110,8 @@
 <script src="{{'/js/home.js'}}"></script>
 <script src="{{'/js/notification_bell.js'}}"></script>
 <script src="{{'/js/project.js'}}"></script>
+<script src="{{ asset('/js/realtime.js') }}"></script>
+<script src="{{'/js/collab.js'}}"></script>
 <script src="{{'/js/estimate_discipline.js'}}"></script>
 <script src="{{'/js/work_breakdown_structure.js'}}"></script>
 <script src="{{'/js/man_power.js'}}"></script>
@@ -117,6 +120,7 @@
 <script src="{{'/js/material.js'}}"></script>
 <script src="{{'/js/material_category.js'}}"></script>
 <script src="{{'/js/work_item.js'}}"></script>
+<script src="{{'/js/user.js'}}"></script>
 <script src="{{'/js/setting_wbs.js'}}"></script>
 <script src="{{asset('/assets/js/slider/popper.js')}}"></script>
 <script src="{{asset('/assets/js/slider/owl.carousel.min.js')}}"></script>

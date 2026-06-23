@@ -49,6 +49,7 @@ class ProjectController extends Controller
             'projects' => $projectsData['projectList'],
             'projectDraft' => $projectsData['draft'],
             'projectApprove' => $projectsData['approve'],
+            'projectMyReviews' => $projectsData['myReviews'],
             'civilEngineerList' => $civilEngineerList,
             'mechanicalEngineerList' => $mechanicalEngineerList,
             'electricalEngineerList' => $electricalEngineerList,
@@ -223,6 +224,25 @@ class ProjectController extends Controller
 
         DB::beginTransaction();
         try {
+            // Capture old reviewer IDs and which disciplines are already published before any changes
+            $disciplineApproverMap = [
+                'design_engineer_civil'        => ['approver' => 'civil_approver',        'discipline' => 'civil',        'label' => 'Civil'],
+                'design_engineer_mechanical'   => ['approver' => 'mechanical_approver',   'discipline' => 'mechanical',   'label' => 'Mechanical'],
+                'design_engineer_electrical'   => ['approver' => 'electrical_approver',   'discipline' => 'electrical',   'label' => 'Electrical'],
+                'design_engineer_instrument'   => ['approver' => 'instrument_approver',   'discipline' => 'instrument',   'label' => 'Instrument'],
+                'design_engineer_it'           => ['approver' => 'it_approver',           'discipline' => 'it',           'label' => 'IT'],
+                'design_engineer_architect'    => ['approver' => 'architect_approver',    'discipline' => 'architect',    'label' => 'Architecture'],
+            ];
+            $oldReviewers = [];
+            foreach ($disciplineApproverMap as $posKey => $info) {
+                $col = $info['approver'];
+                $oldReviewers[$posKey] = $project->$col;
+            }
+            $publishedPositions = collect(json_decode($project->estimate_discipline_status ?? '[]'))
+                ->where('status', 'PUBLISH')
+                ->pluck('position')
+                ->toArray();
+
            $project->project_no =  $request->project_no;
            $project->project_title = $request->project_title;
            $project->project_sponsor = $request->project_sponsor;
@@ -274,6 +294,27 @@ class ProjectController extends Controller
             $project->save();
 
            DB::commit();
+
+            // Send emails when a reviewer is changed on a discipline that is already published
+            $newReviewerRequestMap = [
+                'design_engineer_civil'        => $request->reviewer_civil,
+                'design_engineer_mechanical'   => $request->reviewer_mechanical,
+                'design_engineer_electrical'   => $request->reviewer_electrical,
+                'design_engineer_instrument'   => $request->reviewer_instrument,
+                'design_engineer_it'           => $request->reviewer_it,
+                'design_engineer_architect'    => $request->reviewer_architect,
+            ];
+            foreach ($disciplineApproverMap as $posKey => $info) {
+                $oldId = $oldReviewers[$posKey];
+                $newId = $newReviewerRequestMap[$posKey];
+                if (!in_array($posKey, $publishedPositions) || $oldId == $newId || !$newId) continue;
+
+                if ($oldId) {
+                    $newReviewerName = $project->getProfileUser($newId)?->full_name ?? '';
+                    $projectService->sendEmailReviewerReassigned($project, (int) $oldId, $info['label'], $newReviewerName);
+                }
+                $projectService->sendEmailToReviewer($project, $info['discipline']);
+            }
 
             $projectService->message('Data was successfully saved','success','fa fa-check','Success');
             return redirect('project/'.$project->id);
@@ -526,6 +567,13 @@ class ProjectController extends Controller
                 $column = $discipline.'_approval_status';
                 $oldStatusDiscipline = $project->$column;
 
+                // Only the specifically assigned reviewer for this discipline may approve/reject
+                $approverColumn = $discipline . '_approver';
+                if ($project->$approverColumn != auth()->id()) {
+                    DB::rollBack();
+                    return response()->json(['status' => 403, 'message' => 'Not authorized to approve this discipline']);
+                }
+
                 switch ($request->discipline) {
                     case Setting::DESIGN_ENGINEER_LIST['civil']:
                         $project->civil_approval_status = $request->status;
@@ -554,14 +602,16 @@ class ProjectController extends Controller
                 }
 
                 $projectServices->updateStatusProject($project);
+                Log::info("updateStatus: project [{$project->id}] status after updateStatusProject = {$project->status}");
 
                 if ($request->status === Project::APPROVE) {
+                    $projectServices->sendDisciplineApprovedEmailToEngineer($project, $discipline);
                     ProjectReviewNote::where('project_id', $project->id)
                         ->where('reviewer_id', auth()->id())
                         ->delete();
                 }
 
-                if($project->status == "APPROVE"){
+                if ($project->status == "APPROVE") {
                     $projectServices->sendEmailToEngineer($project, $request);
                 }
 
