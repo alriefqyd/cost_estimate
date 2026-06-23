@@ -83,14 +83,6 @@
             line-height: 1.25;
         }
 
-        .lp-brand-sub {
-            color: rgba(255,255,255,0.6);
-            font-size: 0.9rem;
-            line-height: 1.65;
-            max-width: 270px;
-            margin: 0 auto 40px;
-        }
-
         .lp-brand-divider {
             width: 40px;
             height: 3px;
@@ -321,8 +313,7 @@
         <div class="lp-brand-content">
             <img class="lp-brand-logo" src="{{ asset('assets/images/Vale_logo.svg') }}" alt="Vale">
             <div class="lp-brand-title">Cost Estimate<br>Management</div>
-            <div class="lp-brand-sub">Plan, estimate, and track engineering project costs with accuracy and confidence.</div>
-            <div class="lp-brand-divider"></div>
+<div class="lp-brand-divider"></div>
             <div class="lp-brand-pills">
                 <span class="lp-brand-pill">Civil</span>
                 <span class="lp-brand-pill">Mechanical</span>
@@ -391,20 +382,6 @@
     </div>
 
 <script src="{{ asset('/assets/js/jquery-3.5.1.min.js') }}"></script>
-<script>
-    // Toggle password visibility
-    $('.js-show-hide-password').on('click', function () {
-        var $input = $('#password');
-        $input.attr('type', $input.attr('type') === 'password' ? 'text' : 'password');
-        $(this).toggleClass('fa-eye fa-eye-slash');
-    });
-
-    // Submit spinner
-    $('form').on('submit', function () {
-        var $btn = $(this).find('.lp-btn');
-        $btn.addClass('loading').find('.lp-spinner').show();
-        $btn.contents().filter(function () { return this.nodeType === 3; }).last().replaceWith('Signing in…');
-    });
-</script>
+<script src="{{ asset('/js/login.js') }}"></script>
 </body>
 </html>

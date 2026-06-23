@@ -120,6 +120,7 @@
 <script src="{{'/js/material.js'}}"></script>
 <script src="{{'/js/material_category.js'}}"></script>
 <script src="{{'/js/work_item.js'}}"></script>
+<script src="{{'/js/user.js'}}"></script>
 <script src="{{'/js/setting_wbs.js'}}"></script>
 <script src="{{asset('/assets/js/slider/popper.js')}}"></script>
 <script src="{{asset('/assets/js/slider/owl.carousel.min.js')}}"></script>

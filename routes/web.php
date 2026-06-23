@@ -163,6 +163,7 @@ Route::get('/user/create',[\App\Http\Controllers\UserController::class,'create']
 Route::post('/user',[\App\Http\Controllers\UserController::class,'store'])->middleware('auth')->can('create',User::class);
 Route::get('/user/{user:id}',[\App\Http\Controllers\UserController::class,'edit'])->middleware('auth');
 Route::put('/user/{user:id}',[\App\Http\Controllers\UserController::class,'update'])->middleware('auth');
+Route::delete('/user/{user:id}',[\App\Http\Controllers\UserController::class,'destroy'])->middleware('auth');
 
 
 Route::get('/survey',[\App\Http\Controllers\SurveyController::class,'index'])->middleware('auth');

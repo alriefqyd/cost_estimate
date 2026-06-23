@@ -63,8 +63,10 @@
                                         <td class="min-w-200">{{$item->profiles?->full_name}}</td>
                                         <td class="min-w-200">{{$item->profiles?->email}}</td>
                                         <td class="min-w-200">{{$item->profiles?->getPosition()}}</td>
+                                        @can('delete', $item)
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationUser"
-                                               data-id="{{$item->id}}" class="text-danger js-delete-user">Delete</a></td>
+                                               data-id="{{$item->id}}" class="text-danger js-delete-user-modal">Delete</a></td>
+                                        @endcan
                                     </tr>
                                 @endforeach
                                 </tbody>
@@ -88,21 +90,24 @@
         @endif
     </div>
 
-    {{--<div class="modal fade js-modal-delete-wbs" id="deleteConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Delete WBS</h5>
-                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this item?
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-success" type="button" data-bs-dismiss="modal">Close</button>
-                    <button class="btn btn-danger js-delete-confirmation-wbs" type="button">Delete</button>
+    @can('delete', App\Models\User::class)
+        <div class="modal fade js-modal-delete-user" id="deleteConfirmationUser" tabindex="-1" role="dialog" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteUserModalLabel">Delete User</h5>
+                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this user?
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-danger js-delete-user" type="button">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>--}}
+    @endcan
 @endsection
+

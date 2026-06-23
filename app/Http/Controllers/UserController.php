@@ -214,6 +214,25 @@ class UserController extends Controller
         }
     }
 
+    public function destroy(User $user)
+    {
+        if (auth()->user()->cannot('delete', $user)) {
+            return response()->json(['status' => 403, 'message' => "You're not authorized"]);
+        }
+
+        DB::beginTransaction();
+        try {
+            $user->profiles()->delete();
+            $user->roles()->detach();
+            $user->delete();
+            DB::commit();
+            return response()->json(['status' => 200, 'message' => 'User successfully deleted']);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json(['status' => 500, 'message' => $e->getMessage()]);
+        }
+    }
+
     public function message($message, $type, $icon, $status){
         Session::flash('message', $message);
         Session::flash('type', $type);
