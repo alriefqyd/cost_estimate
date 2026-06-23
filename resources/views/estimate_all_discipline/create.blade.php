@@ -1,46 +1,80 @@
 @extends('layouts.main')
 @section('main')
+    @php
+        $initData = [
+            'projectId'      => $project->id,
+            'userId'         => auth()->user()->id,
+            'userName'       => auth()->user()->profiles?->full_name ?? auth()->user()->name,
+            'userDiscipline' => $userDiscipline,
+            'wsUrl'          => $wsUrl,
+            'rows'           => $flatRows,
+            'wbsOptions'     => $wbsOptions->toArray(),
+            'contingency'    => optional($project->projectSettings)->contingency ?? 15,
+            'canPublish'     => $project->isDesignEngineer(),
+            'isAdmin'        => $isAdmin,
+            'publishStatus'  => $publishStatus,
+        ];
+    @endphp
+
     <div class="container-fluid">
         <div class="page-header">
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-6">
                     <h4>Estimate Discipline</h4>
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item">project</li>
-                        <li class="breadcrumb-item active">New Estimate Discipline</li>
+                        <li class="breadcrumb-item"><a href="/project">Project List</a></li>
+                        <li class="breadcrumb-item"><a href="/project/{{ $project->id }}">Project Detail</a></li>
+                        <li class="breadcrumb-item active">Estimate Discipline</li>
                     </ol>
+                </div>
+                <div class="col-sm-6 text-end pt-2 mt-5 mb-5">
+                    <button type="button" id="js-start-est-tour" class="btn btn-outline-info btn-sm me-2">
+                        <i class="fa fa-question-circle me-1"></i> How to use this page
+                    </button>
+                    <a href="/project/{{ $project->id }}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa fa-arrow-left me-1"></i> Back to Project
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Container-fluid starts-->
+
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-body p-3">
-                        <h6 class="float-start">Project : {{$project->project_title}}</h6>
+                <div class="card est-page-header-card">
+                    <div class="card-body est-page-header-body">
+                        <div class="est-page-project-info">
+                            <span class="est-page-project-label">Project</span>
+                            <span class="est-page-project-name">{{ $project->project_title }}</span>
+                        </div>
                         @if($project->wbsLevel3s())
-                            <a href="/project/{{$project->id}}/wbs/edit">
-                                <button class="float-end btn btn-primary">
-                                    Work Breakdown Structure
-                                </button>
+                            <a href="/project/{{ $project->id }}/wbs/edit" class="est-wbs-btn">
+                                <i class="fa fa-sitemap"></i>
+                                Work Breakdown Structure
                             </a>
                         @endif
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row">
-            @if($errors->any())
+
+        @if($errors->any())
+            <div class="row">
                 <div class="col-md-12 alert alert-danger">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </div>
-            @endif
-        </div>
-        @include('estimate_all_discipline.form')
+            </div>
+        @endif
+
+        <script>window.__ESTIMATE_INIT__ = @json($initData);</script>
+        <div id="estimate-react-root" class="col-sm-12 px-0"></div>
     </div>
 @endsection
-<!-- Container-fluid Ends-->
+
+@push('scripts')
+<script src="{{ asset('js/estimate-discipline.js') }}"></script>
+<script src="{{ asset('js/estimate_discipline_tour.js') }}"></script>
+@endpush

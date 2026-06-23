@@ -425,20 +425,35 @@
             </div>
         </div>
 
-        <div data-id="{{$project->id}}" class="modal bd-example-modal-lg js-modal-approve-discipline fade" id="approveModalDiscipline" tabindex="-1" role="dialog" aria-labelledby="approveModalDiscipline" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Update  By Discipline</h5>
-                        <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div data-id="{{$project->id}}"
+             class="modal fade js-modal-approve-discipline"
+             id="approveModalDiscipline"
+             tabindex="-1"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered adm-dialog">
+                <div class="modal-content adm-modal">
+                    <div class="adm-header">
+                        <button class="adm-close-btn" type="button" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="fa fa-times"></i>
+                        </button>
+                        <div class="adm-icon-ring">
+                            <i class="fa fa-user-check adm-header-icon"></i>
+                        </div>
+                        <h5 class="adm-title">Discipline Approval</h5>
+                        <p class="adm-subtitle">Review and update the approval status for this discipline estimate</p>
                     </div>
-                    <div class="modal-body text-center">
+                    <div class="adm-body">
+                        <div class="loading-spinner adm-loading-wrap">
+                            <div class="adm-spinner"></div>
+                            <p class="adm-loading-text">Loading discipline data...</p>
+                        </div>
                         <span class="js-form-approval"></span>
-                        <div class="loading-spinner mb-2">
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-success js-btn-approve-discipline-cost-estimate" type="button">Update</button>
+                    <div class="adm-footer">
+                        <button class="adm-btn adm-btn-cancel" type="button" data-bs-dismiss="modal">Cancel</button>
+                        <button class="adm-btn adm-btn-update js-btn-approve-discipline-cost-estimate" type="button">
+                            <i class="fa fa-check me-1"></i> Update Status
+                        </button>
                     </div>
                 </div>
             </div>

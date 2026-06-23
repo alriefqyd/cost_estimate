@@ -190,7 +190,8 @@ $("#left-arrow").click(function () {
 
         var link = $(this).attr("href");
         if(link){
-            if (current.indexOf(link) != -1) {
+            var isMatch = (link === '/') ? (current === '/') : (current.indexOf(link) !== -1);
+            if (isMatch) {
                 $(this).parents().children('a').addClass('active');
                 $(this).parents().parents().children('ul').css('display', 'block');
                 $(this).addClass('active');

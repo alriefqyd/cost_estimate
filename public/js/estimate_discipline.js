@@ -1,870 +1,786 @@
 /**
- * Save Estimate All Discipline in Work Breakdown Structure Js in work item section (Java doc with work items)
+ * Estimate Discipline — real-time collaborative editor
+ *
+ * Auto-saves every row on change (debounced 800 ms).
+ * Broadcasts changes via Laravel Echo / Soketi so all discipline engineers
+ * see live updates without refreshing.
  */
-$(function(){
+$(function () {
+
+    // ─── Config ────────────────────────────────────────────────────────────────
+
+    var AUTOSAVE_DELAY       = 800;   // ms after last keystroke before saving
+    var $form                = $('.js-form-estimate-discipline');
+    var projectId            = $form.data('project-id') || $form.data('id');
+    var currentUserId        = parseInt($form.data('user-id')) || 0;
+    var currentUserDiscipline = $form.data('user-discipline') || '';
+    var saveQueue            = {};    // keyed by unique_identifier — pending debounce timers
+    var pendingCount         = 0;     // rows currently being saved
+
+    // ─── Helpers ───────────────────────────────────────────────────────────────
+
+    function generateId() {
+        if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+        return Math.random().toString(36).substring(2, 15) +
+               Math.random().toString(36).substring(2, 15);
+    }
+
+    function toCurrency(val) {
+        if (typeof val !== 'number' || isNaN(val)) return '';
+        var parts       = val.toFixed(2).split('.');
+        var integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        return integerPart + ',' + parts[1];
+    }
+
+    function removeCurrency(val) {
+        if (val == null || val === '') return 0;
+        return val.toString().replaceAll('.', '').replaceAll(',', '.');
+    }
+
+    function removeBlankSpace(str) {
+        return str.replace(/\s/g, '');
+    }
+
+    // ─── Autosave status ───────────────────────────────────────────────────────
+
+    function showStatus(state, msg) {
+        var icons  = { saving: 'fa-spinner fa-spin', saved: 'fa-check-circle', error: 'fa-exclamation-circle' };
+        var labels = { saving: 'Saving…', saved: 'All changes saved', error: msg || 'Error saving' };
+        var $els   = $('.js-autosave-status, .js-autosave-status-fs');
+        $els.attr('class', function (_, c) {
+            return c.replace(/autosave-\S+/g, '') + ' autosave-status autosave-' + state;
+        });
+        $els.html('<i class="fa ' + icons[state] + ' me-1"></i>' + labels[state]);
+        // Disable publish while saving — be defensive about multiple button variants
+        var disabled = state === 'saving';
+        $('.js-btn-publish').each(function () {
+            try { $(this).prop('disabled', disabled).attr('aria-disabled', disabled); } catch (e) {}
+        });
+    }
+
+    function trackPending(delta) {
+        pendingCount = Math.max(0, pendingCount + delta);
+        showStatus(pendingCount > 0 ? 'saving' : 'saved');
+    }
+
+    // ─── Collect row payload ───────────────────────────────────────────────────
+
+    function collectRowData($row) {
+        var uid           = ($row.find('.js-unique-identifier').val() || '').trim();
+        var $select       = $row.find('.js-select-work-items');
+        var $textDiv      = $row.find('.js-work-item-text');
+        // Read work item ID: try Select2/native select first, fall back to data-id on the text div
+        var workItem      = $select.val() || ($select[0] && $select[0].value) || $textDiv.data('id') || '';
+        var workItemText  = $select.find('option:selected').text().replace(/ - \(REVIEWED\)| - \(DRAFT\)/, '');
+        if (!workItemText) {
+            workItemText = $textDiv.find('span').text().replace(/ - \(REVIEWED\)| - \(DRAFT\)/, '');
+        }
+        var vol           = $row.find('.js-input-vol').val() || 1;
+        var labourFac     = $row.find('.js-input-labor_factorial').val();
+        var equipFac      = $row.find('.js-input-equipment_factorial').val();
+        var matFac        = $row.find('.js-input-material_factorial').val();
+        // Rates: select carries them after a fresh selection; text div carries them for existing rows
+        var labourRate    = $select.attr('data-cost-man-power') || $textDiv.attr('data-cost-man-power') || 0;
+        var equipRate     = $select.attr('data-cost-tools')     || $textDiv.attr('data-cost-tools')     || 0;
+        var matRate       = $select.attr('data-cost-material')  || $textDiv.attr('data-cost-material')  || 0;
+        var manPowerTotal = removeBlankSpace($row.find('.js-work-item-man-power-cost').text());
+        var equipTotal    = removeBlankSpace($row.find('.js-work-item-equipment-cost').text());
+        var matTotal      = removeBlankSpace($row.find('.js-work-item-material-cost').text());
+        var wbs3          = $row.find('.js-wbs_level3_id').val();
+        var workEl        = $row.find('.js-work_element_id').val();
+
+        return {
+            unique_identifier:   uid,
+            workItem:            workItem,
+            workItemText:        workItemText,
+            vol:                 vol,
+            labourFactorial:     labourFac,
+            equipmentFactorial:  equipFac,
+            materialFactorial:   matFac,
+            labourUnitRate:      labourRate,
+            equipmentUnitRate:   equipRate,
+            materialUnitRate:    matRate,
+            totalRateManPowers:  removeCurrency(manPowerTotal),
+            totalRateEquipments: removeCurrency(equipTotal),
+            totalRateMaterials:  removeCurrency(matTotal),
+            wbs_level3:          wbs3,
+            work_element:        workEl,
+            _token:              $('meta[name="csrf-token"]').attr('content'),
+        };
+    }
+
+    // ─── Single-row autosave ───────────────────────────────────────────────────
+
+    function autosaveRow($row) {
+        // Skip rows that belong to a different discipline (read-only from this user's POV)
+        var rowScope = $row.attr('data-work-scope');
+        if (rowScope && currentUserDiscipline && rowScope !== currentUserDiscipline) return;
+
+        var uid = ($row.find('.js-unique-identifier').val() || '').trim();
+        if (!uid) {
+            // Old DB row without unique_identifier — assign one so it becomes broadcastable
+            generateUniqueIdentifier($row);
+            uid = $row.find('.js-unique-identifier').val();
+            if (!uid) return;
+        }
+
+        clearTimeout(saveQueue[uid]);
+        saveQueue[uid] = setTimeout(function () {
+            var payload = collectRowData($row);
+            if (!payload.workItem) {
+                delete saveQueue[uid];
+                return; // row has no work item selected yet
+            }
+
+            trackPending(+1);
+            $row.find('.js-row-save-indicator').addClass('saving');
+
+            var request = $.ajax({
+                url:      '/project/' + projectId + '/estimate-discipline/autosave',
+                type:     'POST',
+                dataType: 'json',
+                timeout:  10000,
+
+                data:     payload,
+                success: function (res) {
+                    if (res.status === 200) {
+                        $row.attr('data-persisted', 'true');
+                        $row.find('.js-row-save-indicator').removeClass('saving').addClass('saved');
+                        setTimeout(function () { $row.find('.js-row-save-indicator').removeClass('saved'); }, 1500);
+                        // Broadcast to other users via Yjs CRDT
+                        if (window.EstimateCollab && res.payload) {
+                            window.EstimateCollab.setRow(res.uid, res.payload);
+                        }
+                    } else {
+                        showStatus('error');
+                    }
+                },
+                error: function () { showStatus('error'); }
+            });
+            request.always(function () {
+                trackPending(-1);
+                delete saveQueue[uid];
+            });
+        }, AUTOSAVE_DELAY);
+    }
+
+    // Flush all pending debounces immediately (called before Publish)
+    function flushAllPending() {
+        $form.find('.js-row-item-estimate').each(function () {
+            var uid = ($(this).find('.js-unique-identifier').val() || '').trim();
+            if (saveQueue[uid]) {
+                clearTimeout(saveQueue[uid]);
+                delete saveQueue[uid];
+                autosaveRowNow($(this));
+            }
+        });
+    }
+
+    function autosaveRowNow($row) {
+        var rowScope = $row.attr('data-work-scope');
+        if (rowScope && currentUserDiscipline && rowScope !== currentUserDiscipline) return;
+
+        var payload = collectRowData($row);
+        if (!payload.workItem) return;
+        trackPending(+1);
+        $.ajax({
+            url:      '/project/' + projectId + '/estimate-discipline/autosave',
+            type:     'POST',
+            dataType: 'json',
+            timeout:  10000,
+            data:     payload,
+            success: function (res) {
+                if (res.status === 200) $row.attr('data-persisted', 'true');
+            }
+        }).always(function () { trackPending(-1); });
+    }
+
+    // ─── Delete row ────────────────────────────────────────────────────────────
+
+    $(document).on('click', '.js-delete-work-item', function () {
+        var $row       = $(this).closest('tr');
+        var uid        = ($row.find('.js-unique-identifier').val() || '').trim();
+        var persisted  = $row.attr('data-persisted') === 'true';
+
+        clearTimeout(saveQueue[uid]);
+        delete saveQueue[uid];
+        $row.remove();
+        bindBeforeUnloadEvent();
+        setContingencyTotal();
+
+        if (persisted && uid) {
+            $.ajax({
+                url:     '/project/' + projectId + '/estimate-discipline/row/' + uid,
+                type:    'DELETE',
+                data:    { _token: $('meta[name="csrf-token"]').attr('content') },
+                success: function () {
+                    // Broadcast deletion to other users via Yjs
+                    if (window.EstimateCollab) {
+                        window.EstimateCollab.removeRow(uid);
+                    }
+                },
+            });
+        }
+    });
+
+    // ─── Add row ───────────────────────────────────────────────────────────────
+
+    $(document).on('click', '.js-add-work-item-element', function () {
+        var _this    = $(this);
+        var template = $('#js-template-table-work_item_column').html();
+        var uid      = generateId();
+        var data     = {
+            wbsLevel3:        _this.data('id'),
+            workElement:      _this.data('work-element'),
+            uniqueIdentifier: uid,
+        };
+        var $temp = $(Mustache.render(template, data));
+        $temp.attr('data-uid', uid).attr('data-persisted', 'false');
+
+        if (_this.hasClass('.js-button-work-element')) {
+            $temp.insertAfter(_this.closest('.js-column-work-element'));
+        } else {
+            $temp.insertAfter(_this.closest('tr'));
+        }
+        workItemSelectInit($temp.find('.js-select-work-items'));
+        setWhiteBackground(document.querySelector('.table-overflow'));
+        bindBeforeUnloadEvent();
+        setContingencyTotal();
+        checkInputVol();
+    });
+
+    // ─── Work item select ──────────────────────────────────────────────────────
+
     var workItemSelected = null;
     $('.js-select-work-items').select2();
-    $(document).on('select2:select','.js-select-work-items', function(e){
-        var _this = $(this);
-        var _parent_row = _this.closest('tr');
-        var selectedOption = e.params.data;
-        var _text = selectedOption.text;
-        _text = _text.replace(/ - \(REVIEWED\)| - \(DRAFT\)/, "");
-        var _unitVol = selectedOption.unit;
-        var _totalRateManPowerStr = selectedOption.manPowersTotalRate;
-        var _totalRateEquipmentStr = selectedOption.equipmentToolsRate;
-        var _totalRateMaterialStr = selectedOption.materialsRate;
-        var _totalRateWorkItem = selectedOption.totalWorkItemRate;
-        var _totalRateWorkItemStr = selectedOption.totalWorkItemRateStr;
-        var _totalRateManPower = selectedOption.manPowersTotalRateInt;
-        var _totalRateEquipment = selectedOption.equipmentToolsRateInt;
-        var _totalRateMaterial = selectedOption.materialsRateInt;
-        workItemSelected = selectedOption;
-        var _column = _this.closest('td');
-        var _text_column = _column.find('.js-work-item-text');
-        var $select2 = _this.data('select2').$container;
-        var $tableResponsive = $select2.closest('.table-responsive');
-        var tableResponsiveWidth = $tableResponsive.width();
-        var select2Offset = $select2.offset();
-        var select2Width = $select2.outerWidth();
 
-        // Calculate if the dropdown is going to go beyond the right edge of the container
-        if (select2Offset.left + select2Width > tableResponsiveWidth) {
+    $(document).on('select2:select', '.js-select-work-items', function (e) {
+        var _this          = $(this);
+        var $row           = _this.closest('tr');
+        var selectedOption = e.params.data;
+        var text           = selectedOption.text.replace(/ - \(REVIEWED\)| - \(DRAFT\)/, '');
+        workItemSelected   = selectedOption;
+
+        // Reposition dropdown if it overflows
+        var $select2      = _this.data('select2').$container;
+        var $tableRes     = $select2.closest('.table-responsive');
+        var offset        = $select2.offset();
+        if (offset.left + $select2.outerWidth() > $tableRes.width()) {
             $select2.addClass('select2-repositioned');
         } else {
             $select2.removeClass('select2-repositioned');
         }
 
-        _this.attr('data-cost-man-power', _totalRateManPower);
-        _this.attr('data-cost-tools', _totalRateEquipment);
-        _this.attr('data-cost-material', _totalRateMaterial);
+        _this.attr('data-cost-man-power', selectedOption.manPowersTotalRateInt || 0);
+        _this.attr('data-cost-tools',     selectedOption.equipmentToolsRateInt  || 0);
+        _this.attr('data-cost-material',  selectedOption.materialsRateInt       || 0);
 
-        countTotalWorkItem(_this,selectedOption);
-        _text_column.find('span').text(_text);
-        _text_column.removeClass('d-none');
-        _this.select2('destroy'); // Destroy the Select2 instance
-        _this.hide(); // Hide the element
-        _parent_row.find('.js-vol-result-ajax').text(_unitVol);
-        _parent_row.find('.js-work-item-text').attr('data-total',_totalRateWorkItem);
-        _parent_row.find('.js-work-item-man-power-cost').text(_totalRateManPowerStr);
-        _parent_row.find('.js-work-item-equipment-cost').text(_totalRateEquipmentStr);
-        _parent_row.find('.js-work-item-material-cost').text(_totalRateMaterialStr);
-        _parent_row.find('.js-input-vol').removeAttr('disabled');
-        _parent_row.find('.js-input-vol').val('');
-        _parent_row.find('.js-input-labor_factorial').val('');
-        _parent_row.find('.js-input-equipment_factorial').val('');
-        _parent_row.find('.js-input-material_factorial').val('');
-        generateUniqueIdentifier(_parent_row);
+        countTotalWorkItem(_this, selectedOption);
 
-        if(_totalRateManPower > 0) {
-            _parent_row.find('.js-work-item-man-power-cost-modal').removeClass('d-none');
-            _parent_row.find('.js-work-item-man-power-cost-modal').data('id',selectedOption.id);
-        } else {
-            _parent_row.find('.js-work-item-man-power-cost-modal').addClass('d-none');
-        }
-        if(_totalRateMaterial > 0) {
-            _parent_row.find('.js-work-item-material-cost-modal').removeClass('d-none');
-            _parent_row.find('.js-work-item-material-cost-modal').data('id',selectedOption.id);
-        } else {
-            _parent_row.find('.js-work-item-material-cost-modal').addClass('d-none');
-        }
-        if(_totalRateEquipment > 0) {
-            _parent_row.find('.js-work-item-equipment-cost-modal').removeClass('d-none');
-            _parent_row.find('.js-work-item-equipment-cost-modal').data('id',selectedOption.id);
-        } else {
-            _parent_row.find('.js-work-item-equipment-cost-modal').addClass('d-none');
-        }
+        var $col = _this.closest('td');
+        $col.find('.js-work-item-text').find('span').text(text).end().removeClass('d-none');
+        _this.select2('destroy').hide();
+
+        $row.find('.js-vol-result-ajax').text(selectedOption.unit || '');
+        $row.find('.js-work-item-text').attr('data-total', selectedOption.totalWorkItemRate || 0);
+        $row.find('.js-work-item-man-power-cost').text(selectedOption.manPowersTotalRate || '');
+        $row.find('.js-work-item-equipment-cost').text(selectedOption.equipmentToolsRate  || '');
+        $row.find('.js-work-item-material-cost').text(selectedOption.materialsRate        || '');
+        $row.find('.js-input-vol').removeAttr('disabled').val('');
+        $row.find('.js-input-labor_factorial, .js-input-equipment_factorial, .js-input-material_factorial').val('');
+
+        toggleInfoIcon($row, '.js-work-item-man-power-cost-modal', selectedOption.manPowersTotalRateInt,   selectedOption.id);
+        toggleInfoIcon($row, '.js-work-item-material-cost-modal',  selectedOption.materialsRateInt,         selectedOption.id);
+        toggleInfoIcon($row, '.js-work-item-equipment-cost-modal', selectedOption.equipmentToolsRateInt,   selectedOption.id);
+
         bindBeforeUnloadEvent();
         setContingencyTotal();
+        autosaveRow($row); // autosaveRow generates a UID if the row doesn't have one yet
     });
 
-    $(document).on('click','.js-work-item-text',function(){
-        var _this = $(this);
-        var _parent = _this.closest('td');
-        var _select2 = _parent.find('.js-select-work-items');
-        _select2.closest('span').removeClass('d-none');
-        _select2.trigger('select2:open');
-        workItemSelectInit(_select2);
-        _this.addClass('d-none');
-    });
-
-    $(document).on('click','.js-delete-work-item', function(){
-        var _this = $(this);
-        var _parent = _this.closest('tr');
-        _parent.remove();
-        bindBeforeUnloadEvent();
-        setContingencyTotal();
-    });
-
-    var workItemSelectInit = function (el) {
-        var _this = $(el);
-        if (_this.data("select2")) _this.select2("destroy");
-        _this.closest('table').siblings();
-        var dropdown_parent = ''
-        if (document.fullscreenElement) {
-            dropdown_parent = $('.js-fullscreen-element');
+    function toggleInfoIcon($row, selector, rate, id) {
+        var $icon = $row.find(selector);
+        if (parseFloat(rate) > 0) {
+            $icon.removeClass('d-none').data('id', id);
+        } else {
+            $icon.addClass('d-none');
         }
+    }
 
+    function workItemSelectInit(el) {
+        var _this          = $(el);
+        if (_this.data('select2')) _this.select2('destroy');
+        var dropdownParent = document.fullscreenElement ? $('.js-fullscreen-element') : '';
         _this.select2({
             minimumInputLength: 3,
-            dropdownParent: dropdown_parent,
-            placeholder: "Please Select Work Item",
-            allowClear: true,
-            width: '100%',
+            dropdownParent:     dropdownParent,
+            placeholder:        'Please Select Work Item',
+            allowClear:         true,
+            width:              '100%',
             ajax: {
-                url: _this.data('url'),
-                data: function (params) {
-                    return {
-                        q: params.term
-                    }
-                },
-                processResults: function (resp) {
-                    // _dataAdvanceWorkItem = resp;
-                    return {
-                        results: resp
-                    }
-                },
-            }
-        });
-    }
-
-
-    function saveEstimateDiscipline(status = '') {
-        var _this = $('.js-save-estimate-discipline');
-        var _form = $('.js-form-estimate-discipline');
-        var _project_id = _form.data('id');
-        var _url = '/project/' + _project_id + '/estimate-discipline/store';
-
-        var _version = _form.find('.js-version-project-estimate').val();
-        var _array_estimate_disciplines = getWorkItemList(false);
-        var _contingency = _form.find('.js-input-contingency').val();
-
-        var _data = {
-            'work_items': JSON.stringify(_array_estimate_disciplines),
-            'project_id': _project_id,
-            'version': _version,
-            'contingency': _contingency,
-            'estimateStatus': status || _this.data('status')
-        };
-
-        $.ajax({
-            url: _url,
-            data: _data,
-            type: 'POST',
-            success: function (data) {
-                if (data.status == 200) {
-                    $(window).off('beforeunload');
-                    $('.js-version-project-estimate').val(data.version);
-                    $('.js-modal-confirm-publish').modal('hide');
-                    try {
-                        if (document.fullscreenElement) {
-                            showNotification('.js-fullscreen-element', 'Your data was successfully saved');
-                        } else {
-                            notification('success', data.message);
-                        }
-                    } catch (e) {}
-                    if (status === "PUBLISH") {
-                        setTimeout(function () {
-                            window.location.href = "/project/" + _project_id;
-                        }, 1000);
-                    }
-                } else {
-                    try { notification('danger', data.message, 'fa fa-frown-o', 'Error'); } catch (e) {}
-                    if (data.sync) {
-                        $('.js-btn-loading-sync').removeClass('d-none');
-                    }
+                url:            _this.data('url') || '/getWorkItems',
+                delay:          250,
+                cache:          true,
+                data:           function (p) { return { q: p.term }; },
+                processResults: function (resp) { return { results: resp || [] }; },
+                transport: function (params, success, failure) {
+                    // Use jQuery AJAX but ensure failure resolves to empty results
+                    var request = $.ajax(params);
+                    request.then(function (data) { success(data); }).fail(function () { success([]); });
+                    return request;
                 }
             },
-            complete: function () {
-                // Runs after success OR error — always restores the button UI
-                $('.js-loading-save').addClass('d-none');
-                $('.js-save-estimate-discipline').removeAttr('disabled');
-            }
         });
     }
 
-    $('.js-save-estimate-discipline').on('click', function (e) {
-        e.preventDefault();
-
-        var _this = $(this);
-
-        _this.attr('disabled', 'disabled');
-        _this.find('.js-loading-save').removeClass('d-none');
-
-        if (_this.data('status') === 'MODAL') {
-            $('.js-modal-confirm-publish').modal('show');
-            return false;
-        }
-
-        saveEstimateDiscipline(_this.data('status'));
+    $(document).on('click', '.js-work-item-text', function () {
+        var $parent  = $(this).closest('td');
+        var $select2 = $parent.find('.js-select-work-items');
+        $select2.closest('span').removeClass('d-none');
+        $select2.trigger('select2:open');
+        workItemSelectInit($select2);
+        $(this).addClass('d-none');
     });
 
-    /* temporary disabled for conflict issue of version*/
-    /*$(document).ready(function() {
-        // Auto-save every 5 minutes (300,000 milliseconds)
-        if($('.js-save-estimate-discipline').length > 0){
-            setInterval(function() {
-                saveEstimateDiscipline();
-            }, 300000); // 300000 ms = 5 minutes
+    // ─── Input change → autosave ───────────────────────────────────────────────
+
+    $(document).on('change keyup', '.js-input-vol', function () {
+        var $row = $(this).closest('tr');
+        countTotalWorkItem($(this), workItemSelected);
+        bindBeforeUnloadEvent();
+        setContingencyTotal();
+        checkInputVol();
+        autosaveRow($row);
+    });
+
+    $(document).on('change keyup', '.js-input-labor_factorial, .js-input-equipment_factorial, .js-input-material_factorial', function () {
+        var $row = $(this).closest('tr');
+        countTotalWorkItem($(this), workItemSelected);
+        setContingencyTotal();
+        bindBeforeUnloadEvent();
+        autosaveRow($row);
+    });
+
+    // ─── Contingency auto-save ─────────────────────────────────────────────────
+
+    var contingencyTimer;
+    $('.js-input-contingency').on('keyup change', function () {
+        setContingencyTotal();
+        clearTimeout(contingencyTimer);
+        var val = $(this).val();
+        contingencyTimer = setTimeout(function () {
+            $.post('/project/' + projectId + '/estimate-discipline/contingency', {
+                contingency: val,
+                _token: $('meta[name="csrf-token"]').attr('content'),
+            });
+        }, 1000);
+    });
+
+    // ─── Publish ───────────────────────────────────────────────────────────────
+
+    $('.js-btn-publish').on('click', function (e) {
+        e.preventDefault();
+        if (pendingCount > 0) {
+            // Wait for pending saves before opening modal
+            var check = setInterval(function () {
+                if (pendingCount === 0) {
+                    clearInterval(check);
+                    $('.js-modal-confirm-publish').modal('show');
+                }
+            }, 200);
+            return;
         }
-    });*/
+        $('.js-modal-confirm-publish').modal('show');
+    });
 
-    function countTotalPrice(){
-        var data = getWorkItemList(false);
-        data = data.map(function (item){
-            var total = parseFloat(item.totalRateManPowers) + parseFloat(item.totalRateMaterials) + parseFloat(item.totalRateEquipments)
-            total = total * parseFloat(item.vol);
-           return total;
+    $(document).on('click', '.js-confirm-publish', function () {
+        var $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin me-1"></i>Publishing…');
+
+        $.ajax({
+            url:  '/project/' + projectId + '/estimate-discipline/publish',
+            type: 'POST',
+            data: {
+                contingency: $('.js-input-contingency').val(),
+                _token:      $('meta[name="csrf-token"]').attr('content'),
+            },
+            success: function (data) {
+                if (data.status === 200) {
+                    $(window).off('beforeunload');
+                    $('.js-modal-confirm-publish').modal('hide');
+                    try { notification('success', data.message); } catch (e) {}
+                    setTimeout(function () { window.location.href = '/project/' + projectId; }, 1000);
+                } else {
+                    try { notification('danger', data.message, 'fa fa-frown-o', 'Error'); } catch (e) {}
+                    $btn.prop('disabled', false).html('<i class="fa fa-paper-plane me-1"></i>Publish');
+                }
+            },
+            error: function () {
+                $btn.prop('disabled', false).html('<i class="fa fa-paper-plane me-1"></i>Publish');
+            },
         });
+    });
 
-        var total = data.reduce(function(accumulator, currentValue) {
-            return accumulator + currentValue;
-        }, 0);
+    // ─── Counting / display helpers ────────────────────────────────────────────
 
+    function countTotalPrice() {
+        var total = 0;
+        $form.find('.js-row-item-estimate').each(function () {
+            var $row  = $(this);
+            var vol   = parseFloat($row.find('.js-input-vol').val()) || 1;
+            var $sel  = $row.find('.js-select-work-items');
+            var $txt  = $row.find('.js-work-item-text');
+            var lf    = parseFloat($row.find('.js-input-labor_factorial').val())     || 1;
+            var ef    = parseFloat($row.find('.js-input-equipment_factorial').val()) || 1;
+            var mf    = parseFloat($row.find('.js-input-material_factorial').val())  || 1;
+            var lRate = parseFloat($sel.attr('data-cost-man-power') || $txt.attr('data-cost-man-power')) || 0;
+            var eRate = parseFloat($sel.attr('data-cost-tools')     || $txt.attr('data-cost-tools'))     || 0;
+            var mRate = parseFloat($sel.attr('data-cost-material')  || $txt.attr('data-cost-material'))  || 0;
+            total += (lRate * lf + eRate * ef + mRate * mf) * vol;
+        });
         return total;
     }
 
-    function setContingencyTotal(){
-        var _total = countTotalPrice()
-        var _contingency = $('.js-input-contingency').val()
-        _contingency = parseFloat(_contingency) / 100
-        _contingency = parseFloat(_total) * _contingency
-        var totalCostEstimate = _contingency + _total
-
-        $('.js-work-item-total-contingency').text(toCurrency(_contingency));
-        $('.js-total-cost-estimate').text(toCurrency(totalCostEstimate));
+    function setContingencyTotal() {
+        var total      = countTotalPrice();
+        var contingPct = parseFloat($('.js-input-contingency').val()) / 100 || 0;
+        var conting    = total * contingPct;
+        $('.js-work-item-total-contingency').text(toCurrency(conting));
+        $('.js-total-cost-estimate').text(toCurrency(conting + total));
     }
 
-    function getWorkItemList(isSync){
-        var _form = $('.js-form-estimate-discipline');
-        var _work_items = _form.find('.js-select-work-items');
-        var _array_estimate_disciplines = [];
+    function countTotalWorkItem($el, obj) {
+        var $row  = $el.closest('tr');
+        var vol   = parseFloat($row.find('.js-input-vol').val()) || 1;
+        var $sel  = $row.find('.js-select-work-items');
+        var $txt  = $row.find('.js-work-item-text');
+        var lRate = parseFloat($sel.attr('data-cost-man-power') || $txt.attr('data-cost-man-power')) || 0;
+        var eRate = parseFloat($sel.attr('data-cost-tools')     || $txt.attr('data-cost-tools'))     || 0;
+        var mRate = parseFloat($sel.attr('data-cost-material')  || $txt.attr('data-cost-material'))  || 0;
+        var lf    = parseFloat($row.find('.js-input-labor_factorial').val())     || 1;
+        var ef    = parseFloat($row.find('.js-input-equipment_factorial').val()) || 1;
+        var mf    = parseFloat($row.find('.js-input-material_factorial').val())  || 1;
 
-        $.each(_work_items, function (){
-            var _work_item = $(this).val();
-            var _material_price_total = 0;
-            var _material_unit = 0;
-            var _tool_price_total = 0;
-            var _tool_unit = 0;
-            var _man_power_unit = 0;
-            var _man_power_total = 0;
-
-            if(isSync){
-                $.ajax({
-                    url: "/getWorkItemPrice/" + _work_item,
-                    async:false,
-                    success:function (result) {
-                        if (result.status === 200){
-                            var _data = result.data;
-                            _material_price_total = _data.materials.reduce(function (accumulator, value){
-                                var _rate = parseFloat(value.rate);
-                                var _qty = parseFloat(value.pivot.quantity);
-                                var _total = _rate * _qty
-                                return accumulator + _total
-                            }, 0);
-
-                            _tool_price_total = _data.equipment_tools.reduce(function (accumulator, value){
-                                var _rate = parseFloat(value.local_rate);
-                                var _qty = parseFloat(value.pivot.quantity);
-                                var _total = _rate * _qty
-                                return accumulator + _total
-                            },0)
-
-                            _man_power_total = _data.man_powers.reduce(function (accumulator, value){
-                                var _rate = parseFloat(value.overall_rate_hourly);
-                                var _qty = parseFloat(value.pivot.labor_coefisient);
-                                var _total = _rate * _qty
-                                return accumulator + _total
-                            },0)
-
-                            _material_unit = _data.materials.map(function (item){
-                                return parseFloat(item.rate) * item.pivot.quantity;
-                            });
-
-                            _tool_unit = _data.equipment_tools.map(function (item){
-                                return parseFloat(item.local_rate) * item.pivot.quantity;
-                            })
-
-                            _man_power_unit = _data.man_powers.map(function (item){
-                                return parseFloat(item.overall_rate_hourly) * item.pivot.labor_coefisient
-                            })
-                        }
-                    },
-                })
-            }
-            var _parent = $(this).closest('tr');
-            var _work_item_text = _parent.find('.js-select-work-items option:selected').text();
-            var _vol = _parent.find('.js-input-vol').val();
-            var _unit = _parent.find('.js-vol-result-ajax').text();
-            var template = $('#js-template-work-item').html();
-            var _labour_factorial = _parent.find('.js-input-labor_factorial').val();
-            var _equipment_factorial = _parent.find('.js-input-equipment_factorial').val();
-            var _material_factorial = _parent.find('.js-input-material_factorial').val();
-            var templateModal = $('#js-template-modal-work-item').html();
-            var _labor_cost_total_rate = _parent.find('.js-work-item-man-power-cost').text();
-            var _labor_unit_rate = _parent.find('.js-select-work-items').attr('data-cost-man-power');
-            var _tool_unit_rate_total = _parent.find('.js-work-item-equipment-cost').text();
-            var _tool_unit_rate = _parent.find('.js-select-work-items').attr('data-cost-tools');
-            var _material_unit_rate = _parent.find('.js-select-work-items').attr('data-cost-material');
-            var _material_unit_rate_total = _parent.find('.js-work-item-material-cost').text();
-            _labor_cost_total_rate = removeBlankSpace(_labor_cost_total_rate)
-            _tool_unit_rate_total = removeBlankSpace(_tool_unit_rate_total)
-            _material_unit_rate_total = removeBlankSpace(_material_unit_rate_total)
-            var _wbs_level3_id = _parent.find('.js-wbs_level3_id').val();
-            var _work_element_id = _parent.find('.js-work_element_id').val();
-            _labor_cost_total_rate = removeCurrency(_labor_cost_total_rate)
-            _tool_unit_rate_total = removeCurrency(_tool_unit_rate_total)
-            _material_unit_rate_total = removeCurrency(_material_unit_rate_total)
-
-            var _idx = _parent.find('.js-unique-identifier').val();
-            var _version = _parent.find('.js-item-version').val();
-
-            if(isSync){
-                _material_unit_rate_total = _material_price_total;
-                _material_unit_rate = _material_unit
-                _tool_unit_rate_total = _tool_price_total;
-                _tool_unit_rate = _tool_unit
-                _labor_cost_total_rate = _man_power_total
-                _labor_unit_rate = _man_power_unit
-            }
-
-            var _data = {
-                "idx": _idx,
-                "workItem":_work_item,
-                "workItemText":_work_item_text,
-                "vol":_vol ? _vol : 1,
-                "unit":_unit,
-                "totalRateManPowers":_labor_cost_total_rate,
-                "totalRateEquipments":_tool_unit_rate_total,
-                "totalRateMaterials":_material_unit_rate_total,
-                "workItemId":_work_item,
-                "labourFactorial": _labour_factorial,
-                "equipmentFactorial":_equipment_factorial,
-                "materialFactorial":_material_factorial,
-                "labourUnitRate":_labor_unit_rate,
-                "materialUnitRate":_material_unit_rate,
-                "equipmentUnitRate":_tool_unit_rate,
-                "wbs_level3":_wbs_level3_id,
-                "work_element":_work_element_id,
-                "version" : _version
-            }
-            _array_estimate_disciplines.push(_data);
-        })
-
-        return _array_estimate_disciplines;
+        $row.find('.js-total-work-item-rate span').text(toCurrency((lRate * lf + eRate * ef + mRate * mf) * vol));
+        $row.find('.js-work-item-man-power-cost').text(toCurrency(lRate * lf));
+        $row.find('.js-work-item-equipment-cost').text(toCurrency(eRate * ef));
+        $row.find('.js-work-item-material-cost').text(toCurrency(mRate * mf));
     }
 
-    function generateUniqueIdentifier(_parent){
-        var _idx;
-        var val = _parent.find('.js-unique-identifier').val();
-        if (val !== "" && val !== null) {
-            _idx = val;
-        } else {
-            _idx = generateId();
-        }
-
-        _parent.find('.js-unique-identifier').val(_idx)
-    }
-
-    function showNotification(element, message) {
-        var notificationElement = $('<div data-notify="container" class="col-xs-11 col-sm-4 js-manual-notify alert alert-success notify-alert animated fadeIn" role="alert" data-notify-position="top-right" style="display: inline-block; margin: 0px auto; position: fixed; transition: all 0.5s ease-in-out 0s; z-index: 1031; top: 20px; right: 20px;" data-closing="true">')
-            .text(message)
-            .appendTo($(element));
-
-        notificationElement.notify({
-            type: 'info',
-            placement: {
-                from: 'top',
-                align: 'center'
-            },
-            animate: {
-                enter: 'animated fadeInDown',
-                exit: 'animated fadeOutUp'
-            },
-            showDuration: 10000, // Set the show duration to 10 seconds (10,000 milliseconds)
-            hideDuration: 1000   // Set the hide duration to 1 second (1,000 milliseconds)
+    function checkInputVol() {
+        $('.js-input-vol').each(function () {
+            $(this).css('background-color', $(this).val() === '' ? '#f3ca63' : 'transparent');
         });
-
     }
 
-    $('.js-input-contingency').on('keyup change', function (){
-       setContingencyTotal();
-    });
-
-    $(document).on('click','.js-add-work-item-element',function(){
-        var _this = $(this)
-        var _template = $('#js-template-table-work_item_column').html()
-        var _data = {
-            'wbsLevel3' : _this.data('id'),
-            'workElement' : _this.data('work-element'),
-            'uniqueIdentifier' : generateId(),
+    function generateUniqueIdentifier($row) {
+        var $uid = $row.find('.js-unique-identifier');
+        if (!$uid.val().trim()) {
+            var id = generateId();
+            $uid.val(id);
+            $row.attr('data-uid', id);
         }
-        var _temp =  $(Mustache.render(_template,_data));
-        if(_this.hasClass('.js-button-work-element')){
-            _temp.insertAfter(_this.closest('.js-column-work-element'));
-        } else {
-            _temp.insertAfter(_this.closest('tr'));
-        }
-        var _select2 = _temp.find('.js-select-work-items');
-        workItemSelectInit(_select2)
-        setWhiteBackground(document.querySelector('.table-overflow'));
-        bindBeforeUnloadEvent()
-        setContingencyTotal();
-        checkInputVol()
-    });
-
-    $(document).on('change keyup','.js-input-vol', function(){
-        var _this = $(this);
-        var _parent_row = _this.closest('tr');
-        countTotalWorkItem(_this, workItemSelected);
-        getWorkItemList(false)
-        bindBeforeUnloadEvent();
-        setContingencyTotal()
-        checkInputVol()
-    });
-
-    function checkInputVol(){
-        var _input_vol = $('.js-input-vol')
-        $.each(_input_vol, function (index, item){
-            var _this = $(this);
-            if(_this.val() == ''){
-                _this.css('background-color', '#f3ca63');
-            } else {
-                _this.css('background-color','transparent');
-            }
-        })
     }
 
-    $(document).on('change keyup','.js-input-labor_factorial, .js-input-equipment_factorial, .js-input-material_factorial', function(){
-        var _this = $(this);
-        countTotalWorkItem(_this, workItemSelected);
-        setContingencyTotal()
-        bindBeforeUnloadEvent();
-    });
+    // ─── Work item detail modal ────────────────────────────────────────────────
 
-    $(document).on('click','.js-minimize',function(){
-        var _this = $(this);
-        var _parent = _this.closest('tr')
-        var _next_parent = _this.closest('tr').nextAll('tr')
-
-        _this.addClass('d-none')
-        _this.siblings('.js-maximize').removeClass('d-none')
-        // generateStrippedTable(_this.closest('table'))
-        _next_parent.each(function(){
-            if(_parent.hasClass('js-column-work-element')){
-                if($(this).hasClass('js-column-work-element')
-                || $(this).hasClass('js-column-discipline')
-                || $(this).hasClass('js-column-location')){
-                    return false;
-                }
-            }
-            if(_parent.hasClass('js-column-discipline')){
-                if($(this).hasClass('js-column-discipline')
-                || $(this).hasClass('js-column-location')){
-                    return false;
-                }
-            }
-            if(_parent.hasClass('js-column-location')){
-                if($(this).hasClass('js-column-location')){
-                    return false;
-                }
-            }
-            $(this).addClass('d-none')
-        })
-    })
-
-    $(document).on('click','.js-maximize',function(){
-        var _this = $(this);
-        var _parent = _this.closest('tr')
-        var _next_parent = _this.closest('tr').nextAll('tr')
-
-        _this.addClass('d-none')
-        _this.siblings('.js-minimize').removeClass('d-none')
-
-        // generateStrippedTable(_this.closest('table'))
-        _next_parent.each(function(){
-
-            if(_parent.hasClass('js-column-work-element')){
-                if($(this).hasClass('js-column-work-element')
-                    || $(this).hasClass('js-column-discipline')
-                    || $(this).hasClass('js-column-location')){
-                    return false;
-                }
-            }
-            if(_parent.hasClass('js-column-discipline')){
-                if($(this).hasClass('js-column-discipline')
-                    || $(this).hasClass('js-column-location')){
-                    return false;
-                }
-            }
-            if(_parent.hasClass('js-column-location')){
-                if($(this).hasClass('js-column-location')){
-                    return false;
-                }
-            }
-
-            $(this).removeClass('d-none')
-        })
-    })
-
-    function countTotalWorkItem(_this, obj){
-        var _parent = _this.closest('tr');
-        var _vol = _parent.find('.js-input-vol').val();
-        var _select_work_item = _parent.find('.js-select-work-items');
-        var _man_power_rate = _select_work_item.attr('data-cost-man-power');
-        var _equipment_rate = _select_work_item.attr('data-cost-tools');
-        var _material_rate = _select_work_item.attr('data-cost-material');
-        _man_power_rate = _man_power_rate ? _man_power_rate : 0 ;
-        _equipment_rate = _equipment_rate ? _equipment_rate : 0;
-        _material_rate = _material_rate ? _material_rate : 0;
-
-        var _man_power_factorial = _parent.find('.js-input-labor_factorial').val();
-        var _equipment_factorial = _parent.find('.js-input-equipment_factorial').val();
-        var _material_factorial = _parent.find('.js-input-material_factorial').val();
-
-        if(_vol == '') _vol = 1;
-        if(_man_power_factorial == '') _man_power_factorial = 1;
-        if(_equipment_factorial == '') _equipment_factorial = 1;
-        if(_material_factorial == '') _material_factorial = 1;
-
-        var _total_man_power_rate = (_man_power_rate * _man_power_factorial);
-        var _total_equipment_rate = (_equipment_rate * _equipment_factorial);
-        var _total_material_rate = (_material_rate * _material_factorial);
-
-        var _total_man_power_rate_vol = _total_man_power_rate * _vol;
-        var _total_equipment_rate_vol = _total_equipment_rate * _vol;
-        var _total_material_rate_vol = _total_material_rate * _vol;
-
-        var _total = _total_man_power_rate_vol + _total_equipment_rate_vol + _total_material_rate_vol;
-
-        _parent.find('.js-total-work-item-rate').find('span').text(toCurrency(_total));
-        _parent.find('.js-work-item-man-power-cost').text(toCurrency(_total_man_power_rate))
-        _parent.find('.js-work-item-equipment-cost').text(toCurrency(_total_equipment_rate))
-        _parent.find('.js-work-item-material-cost').text(toCurrency(_total_material_rate))
-    }
-
-    $(document).on('click','.js-open-modal-detail', function(e){
+    $(document).on('click', '.js-open-modal-detail', function (e) {
         $('#modal-loading').modal('show');
-        var _this = $(this);
-        var _id = _this.data('id');
-        var _template = $('#js-template-modal-detail-estimate').html();
-        var _type = _this.data('type');
-
+        var id       = $(this).data('id');
+        var type     = $(this).data('type');
+        var template = $('#js-template-modal-detail-estimate').html();
         $.ajax({
-            url:'/getDetailWorkItem',
-            data: {
-                'id' : _id,
-                'type' : _type
-            },
-            success:function (item){
-                if(item.status === 200){
-                   var _temp = Mustache.render(_template,item.data)
-                   $('.js-modal-detail-estimate-template').append(_temp)
-                   $('#workItemDetailModal').modal('show');
+            url:  '/getDetailWorkItem',
+            data: { id: id, type: type },
+            success: function (item) {
+                if (item.status === 200) {
+                    $('.js-modal-detail-estimate-template').append(Mustache.render(template, item.data));
+                    $('#workItemDetailModal').modal('show');
                 }
             },
-            complete: function() {
-                // Hide loading modal after AJAX request is complete
-                $('#modal-loading').modal('hide');
-            }
-        })
-    })
-
-    $(document).on('hidden.bs.modal','#workItemDetailModal',function(){
-        $(this).remove();
+            complete: function () { $('#modal-loading').modal('hide'); },
+        });
     });
 
+    $(document).on('hidden.bs.modal', '#workItemDetailModal', function () { $(this).remove(); });
 
-    function enterFullscreen() {
-        var _table = document.querySelector('.js-fullscreen-element');
+    // ─── Collapse / Expand ────────────────────────────────────────────────────
 
-        // Remove rows with empty Select2 dropdowns
-        $(_table).find('.select2').each(function () {
-            var _val = $(this).val();
-            var _label = $(this).closest('td').find('.js-work-item-text').find('span').text();
-            if (_val === null || _val === '') {
-                if (_label.trim().length < 1) {
-                    this.closest('tr').remove();
-                }
-            }
+    $(document).on('click', '.js-minimize', function () {
+        var $parent = $(this).closest('tr');
+        $(this).addClass('d-none').siblings('.js-maximize').removeClass('d-none');
+        $parent.nextAll('tr').each(function () {
+            if (shouldStop($parent, $(this))) return false;
+            $(this).addClass('d-none');
         });
+    });
 
-        // Go full screen
-        _table.requestFullscreen();
-        var _element_full_screen = $('.js-fullscreen-element');
-        _element_full_screen.css('background-color','#f4f7fb');
-        _element_full_screen.css('padding','0');
-        _element_full_screen.find('.table-overflow').css('height','calc(92vh - 38px)');
-        _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0.8em');
-        _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0.8em');
-        setWhiteBackground(_table);
-
-        // Update button state
-        $('.js-fullscreen i').removeClass('fa-expand').addClass('fa-compress');
-        $('.js-fullscreen-label').text('Exit Fullscreen');
-        $('.js-fullscreen-indicator').removeClass('d-none').addClass('d-flex');
-
-        // Select2 repositioning code
-        $(_table).find('.select2').each(function () {
-            workItemSelectInit(this);
+    $(document).on('click', '.js-maximize', function () {
+        var $parent = $(this).closest('tr');
+        $(this).addClass('d-none').siblings('.js-minimize').removeClass('d-none');
+        $parent.nextAll('tr').each(function () {
+            if (shouldStop($parent, $(this))) return false;
+            $(this).removeClass('d-none');
         });
+    });
 
-        _table.scrollLeft = 0;
+    function shouldStop($parent, $sibling) {
+        if ($parent.hasClass('js-column-work-element')) {
+            return $sibling.hasClass('js-column-work-element') || $sibling.hasClass('js-column-discipline') || $sibling.hasClass('js-column-location');
+        }
+        if ($parent.hasClass('js-column-discipline')) {
+            return $sibling.hasClass('js-column-discipline') || $sibling.hasClass('js-column-location');
+        }
+        if ($parent.hasClass('js-column-location')) {
+            return $sibling.hasClass('js-column-location');
+        }
+        return false;
     }
 
-    function exitFullscreen() {
-        if (document.fullscreenElement) {
-            document.exitFullscreen();
-        }
-    }
-
-    $('.js-fullscreen').on('click', function () {
-        if (document.fullscreenElement) {
-            exitFullscreen();
-        } else {
-            enterFullscreen();
-        }
-    });
-
-
-    $(document).on('click','.js-fullscreen-detail',function(){
-        var _table = document.querySelector('.js-fullscreen-table');
-        _table.requestFullscreen();
-
-        var _element = $('.js-fullscreen-table')
-        _element.css('background-color','#f4f7fb')
-        _element.css('font-size','10px !important');
-        _element.css('overflow-y','auto');
-    })
-
-    $(document).on('fullscreenchange', function () {
-        if (!document.fullscreenElement) {
-            var _element_full_screen = $('.js-fullscreen-element');
-            _element_full_screen.css('padding-left','0.8em');
-            _element_full_screen.find('.table-overflow').css('height','60vh');
-            _element_full_screen.find('.js-btn-cancel-estimate-form').css('margin-right','0');
-            _element_full_screen.find('.js-save-estimate-discipline').css('margin-right','0');
-            $('.js-manual-notify').remove();
-            // Reset button state
-            $('.js-fullscreen i').removeClass('fa-compress').addClass('fa-expand');
-            $('.js-fullscreen-label').text('Fullscreen');
-            $('.js-fullscreen-indicator').addClass('d-none').removeClass('d-flex');
-        }
-    });
-
-    // Collapse All — expand everything first (known state), then trigger each location's minimize
     $('.js-btn-collapse-all').on('click', function (e) {
         e.preventDefault();
         var $tbody = $('.js-table-body-work-item-item');
-        // Silently restore all rows so every location row's minimize fires from a clean state
         $tbody.children('tr').removeClass('d-none');
         $tbody.find('.js-minimize').removeClass('d-none');
         $tbody.find('.js-maximize').addClass('d-none');
-        // Now trigger the existing minimize handler on every location row
-        $tbody.find('.js-column-location .js-minimize').each(function () {
-            $(this).trigger('click');
-        });
+        $tbody.find('.js-column-location .js-minimize').each(function () { $(this).trigger('click'); });
         $(this).addClass('d-none');
         $('.js-btn-expand-all').removeClass('d-none');
     });
 
-    // Expand All — trigger maximize on each collapsed location, then reset inner chevrons
     $('.js-btn-expand-all').on('click', function (e) {
         e.preventDefault();
         var $tbody = $('.js-table-body-work-item-item');
-        // Trigger maximize on all location rows that are currently collapsed
-        $tbody.find('.js-column-location .js-maximize:not(.d-none)').each(function () {
-            $(this).trigger('click');
-        });
-        // Reset discipline / work-element chevrons (location maximize shows their rows but
-        // doesn't reset their own chevron state)
+        $tbody.find('.js-column-location .js-maximize:not(.d-none)').each(function () { $(this).trigger('click'); });
         $tbody.find('.js-column-discipline .js-minimize, .js-column-work-element .js-minimize').removeClass('d-none');
         $tbody.find('.js-column-discipline .js-maximize, .js-column-work-element .js-maximize').addClass('d-none');
         $(this).addClass('d-none');
         $('.js-btn-collapse-all').removeClass('d-none');
     });
 
-    // Keyboard shortcut: F toggles fullscreen
+    // ─── Fullscreen ────────────────────────────────────────────────────────────
+
+    function enterFullscreen() {
+        var table = document.querySelector('.js-fullscreen-element');
+        $( table).find('.select2').each(function () {
+            var val   = $(this).val();
+            var label = $(this).closest('td').find('.js-work-item-text span').text();
+            if ((val === null || val === '') && label.trim().length < 1) {
+                this.closest('tr').remove();
+            }
+        });
+        table.requestFullscreen();
+        var $el = $('.js-fullscreen-element');
+        $el.css({ 'background-color': '#f4f7fb', padding: '0' });
+        $el.find('.table-overflow').css('height', 'calc(92vh - 38px)');
+        setWhiteBackground(table);
+        $('.js-fullscreen i').removeClass('fa-expand').addClass('fa-compress');
+        $('.js-fullscreen-label').text('Exit Fullscreen');
+        $('.js-fullscreen-indicator').removeClass('d-none').addClass('d-flex');
+        $( table).find('.js-select-work-items').each(function () { workItemSelectInit(this); });
+        table.scrollLeft = 0;
+    }
+
+    function exitFullscreen() {
+        if (document.fullscreenElement) document.exitFullscreen();
+    }
+
+    $('.js-fullscreen').on('click', function () {
+        document.fullscreenElement ? exitFullscreen() : enterFullscreen();
+    });
+
+    $(document).on('fullscreenchange', function () {
+        if (!document.fullscreenElement) {
+            var $el = $('.js-fullscreen-element');
+            $el.css({ 'padding-left': '0.8em' });
+            $el.find('.table-overflow').css('height', '60vh');
+            $('.js-manual-notify').remove();
+            $('.js-fullscreen i').removeClass('fa-compress').addClass('fa-expand');
+            $('.js-fullscreen-label').text('Fullscreen');
+            $('.js-fullscreen-indicator').addClass('d-none').removeClass('d-flex');
+        }
+    });
+
     $(document).on('keydown', function (e) {
         var tag = (e.target.tagName || '').toLowerCase();
         if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
         if (e.key === 'f' || e.key === 'F') {
-            if (document.fullscreenElement) {
-                exitFullscreen();
-            } else {
-                enterFullscreen();
-            }
+            document.fullscreenElement ? exitFullscreen() : enterFullscreen();
         }
     });
 
-    setInterval(function(){
-        if(document.fullscreenElement){
-            $(document).find('.js-manual-notify').addClass('fadeOut');
-        }
-    },6000)
+    setInterval(function () {
+        if (document.fullscreenElement) $('.js-manual-notify').addClass('fadeOut');
+    }, 6000);
 
-    function setWhiteBackground(_table){
-        // Find all elements with the class "js-row-item-estimate" that are descendants of _table
-        const elements = _table.querySelectorAll('.js-row-item-estimate');
-        // Loop through the matched elements and set the background color for each of them
-        elements.forEach(element => {
-            element.style.backgroundColor = 'white';
+    function setWhiteBackground(table) {
+        (table || document).querySelectorAll('.js-row-item-estimate').forEach(function (el) {
+            el.style.backgroundColor = 'white';
         });
     }
 
-    function removeCurrency($val){
-        if($val == null || $val == '') return 0;
-        $val = $val.toString().replaceAll(".", "")
-        $val = $val.replaceAll(",",'.');
-        return $val
+    // ─── Real-time: update a row in the DOM from a broadcast payload ──────────
+
+    function updateRowInDOM(payload) {
+        var uid    = (payload.uniqueIdentifier || '').trim();
+        var $row   = $('[data-uid="' + uid + '"]');
+
+        if ($row.length === 0) {
+            // Row added by another user — find the correct work-element section
+            var $section = $('.js-column-work-element[data-wbs-level3-id="' + payload.wbs_level3_id + '"]');
+            if ($section.length) {
+                var template = $('#js-template-table-work_item_column').html();
+                var tplData  = buildTemplateData(payload);
+                var $newRow  = $(Mustache.render(template, tplData));
+                $newRow.attr('data-uid', uid).attr('data-persisted', 'true').attr('data-work-scope', payload.workScope);
+
+                // Insert after the last work-item in this section, not after the header
+                var $lastInSection = $section
+                    .nextUntil('.js-column-work-element, .js-column-discipline, .js-column-location')
+                    .filter('.js-row-item-estimate')
+                    .last();
+                ($lastInSection.length ? $lastInSection : $section).after($newRow);
+
+                postInsertRow($newRow, payload);
+                flashRow($newRow);
+                setContingencyTotal();
+            }
+            return;
+        }
+
+        // Existing row — patch the cells that can change
+        $row.find('.js-input-vol').val(payload.volume);
+        $row.find('.js-vol-result-ajax').text(payload.unit || '');
+        $row.find('.js-work-item-man-power-cost').text(payload.laborUnitRateTotalStr || '');
+        $row.find('.js-work-item-equipment-cost').text(payload.toolUnitRateTotalStr  || '');
+        $row.find('.js-work-item-material-cost').text(payload.materialUnitRateTotalStr || '');
+        $row.find('.js-input-labor_factorial').val(payload.labourFactorial || '');
+        $row.find('.js-input-equipment_factorial').val(payload.equipmentFactorial || '');
+        $row.find('.js-input-material_factorial').val(payload.materialFactorial || '');
+        $row.find('.js-total-work-item-rate span').text(payload.totalCostStr || '');
+        $row.find('.js-work-item-text span').text(payload.workItemDescription || '');
+        $row.attr('data-work-scope', payload.workScope);
+        // Keep unit rates in sync so local recalculations remain accurate
+        $row.find('.js-select-work-items')
+            .attr('data-cost-man-power', payload.laborUnitRate)
+            .attr('data-cost-tools',     payload.toolUnitRate)
+            .attr('data-cost-material',  payload.materialUnitRate);
+        $row.find('.js-work-item-text')
+            .attr('data-cost-man-power', payload.laborUnitRate)
+            .attr('data-cost-tools',     payload.toolUnitRate)
+            .attr('data-cost-material',  payload.materialUnitRate);
+
+        showEditedBy($row, payload.userName);
+        flashRow($row);
+        setContingencyTotal();
     }
 
-    function convertDBCurrency($val){
-        if($val == null || $val == '') return 0;
-        $val = $val.toString().replaceAll(".", "")
-        $val = $val.replaceAll(",", ".")
-        return $val
+    function removeRowFromDOM(uid) {
+        var $row = $('[data-uid="' + uid + '"]');
+        $row.addClass('row-removing');
+        setTimeout(function () { $row.remove(); setContingencyTotal(); }, 300);
     }
 
-    function toCurrency(val) {
-        if (typeof val !== 'number' || isNaN(val)) return '';
-
-        const parts = val.toFixed(2).toString().split('.');
-        const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        const decimalPart = parts[1];
-
-        return `${integerPart},${decimalPart}`;
+    function flashRow($row) {
+        $row.addClass('row-flash');
+        setTimeout(function () { $row.removeClass('row-flash'); }, 1200);
     }
 
-    function generateId(){
-        return Math.random().toString(36).substring(2,9);
+    function showEditedBy($row, name) {
+        var $badge = $row.find('.js-edited-by-badge');
+        if (!$badge.length) {
+            $badge = $('<span class="edited-by-badge js-edited-by-badge"></span>');
+            $row.find('td:first').append($badge);
+        }
+        $badge.text(name).fadeIn(150);
+        clearTimeout($row.data('editedByTimer'));
+        $row.data('editedByTimer', setTimeout(function () { $badge.fadeOut(400); }, 3000));
     }
 
-    function removeBlankSpace(str){
-        return str.replace(/\s/g, "")
+    function buildTemplateData(payload) {
+        var lf = payload.labourFactorial    || 1;
+        var ef = payload.equipmentFactorial || 1;
+        var mf = payload.materialFactorial  || 1;
+        return {
+            wbsLevel3:          payload.wbs_level3_id,
+            workElement:        payload.work_element_id,
+            uniqueIdentifier:   payload.uniqueIdentifier,
+            workItemId:         payload.workItemId,
+            workItemDescription: payload.workItemDescription,
+            workItemVolume:     payload.volume,
+            unit:               payload.unit,
+            manPowerCostStr:    payload.laborUnitRateTotalStr,
+            equipmentCostStr:   payload.toolUnitRateTotalStr,
+            materialCostStr:    payload.materialUnitRateTotalStr,
+            manPowerCost:       payload.laborUnitRate * lf,
+            equipmentCost:      payload.toolUnitRate  * ef,
+            materialCost:       payload.materialUnitRate * mf,
+            manPowerCostRate:   payload.laborUnitRate,
+            equipmentCostRate:  payload.toolUnitRate,
+            materialCostRate:   payload.materialUnitRate,
+            laborFactorial:     lf,
+            equipmentFactorial: ef,
+            materialFactorial:  mf,
+            total:              payload.totalCostStr,
+            isShowMaterial:     payload.materialUnitRate  > 0 ? 'd-block' : 'd-none',
+            isShowEquipment:    payload.toolUnitRate      > 0 ? 'd-block' : 'd-none',
+            itemVersion:        1,
+        };
     }
 
-    $('.js-btn-loading-sync').on('click', function(){
-        $('#modal-loading').modal('show');
-        setTimeout(function (){
-            var _this = $(this)
-            var _loading = _this.find('.js-loading-sync')
-            var _form = $('.js-form-estimate-discipline');
-            var _project_id = _form.data('id');
-            var _version = $('.js-version-project-estimate').val();
-            var _currentWorkItem = getWorkItemList(true);
+    function postInsertRow($row, payload) {
+        var $sel = $row.find('.js-select-work-items');
+        $sel.closest('.js-select2-select-work-item-temp').addClass('d-none');
+        $row.find('.js-work-item-text').removeClass('d-none');
+        $row.find('.js-input-vol').removeAttr('disabled');
+        workItemSelectInit($sel);
+        setWhiteBackground(document.querySelector('.table-overflow'));
+    }
 
-            $.ajax({
-                url: '/getEstimateToSync',
-                type:'GET',
-                data:
-                    {
-                        project_id:_project_id,
-                        current_version:_version,
-                        estimate_sync:_currentWorkItem
-                    },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') // Include CSRF token
-                },
-                success:function(result){
-                    if(result.status == 200){
-                        var _data_sync = result.data;
+    // ─── Real-time: connection + presence ─────────────────────────────────────
 
-                        var _existingEstimate = _data_sync['existingEstimate'];
-                        var _conflictEstimate = _data_sync['itemToMerge'];
+    function setConnectionDot(state) {
+        var $dot = $('.js-connection-dot');
+        $dot.attr('class', 'js-connection-dot connection-dot connection-' + state);
+        var titles = { connected: 'Real-time connected', disconnected: 'Disconnected — changes may not sync', connecting: 'Connecting…' };
+        $dot.attr('title', titles[state] || state);
+    }
 
-                        var groupedByWbsLevel3 = {};
-                        var _version_db = _data_sync['version'];
-                        var _version_form = $('.js-version-project-estimate').val()
-                        var _template = $('#js-template-table-work_item_column').html();
+    // ─── Real-time: Yjs CRDT via y-websocket ─────────────────────────────────
+    //
+    // window.EstimateCollab is provided by collab.js (compiled bundle).
+    // It uses Yjs for conflict-free real-time sync, replacing the old
+    // Soketi / Laravel Echo broadcast layer.
 
-                        // if(_version_db != _version_form){
-                        var _array_join = [..._existingEstimate, ..._conflictEstimate];
-                        $.each(_array_join, function(index, estimateItem) {
-                            var wbsLevel3 = estimateItem.wbsLevel3Id;
+    if (projectId && window.EstimateCollab) {
+        var wsUrl = $form.data('ws-url') || 'ws://localhost:1234';
 
-                            if (!groupedByWbsLevel3[wbsLevel3]) {
-                                groupedByWbsLevel3[wbsLevel3] = [];
-                            }
+        window.EstimateCollab
+            .connect(projectId, wsUrl)
 
-                            groupedByWbsLevel3[wbsLevel3].push(estimateItem);
-                            // Code to be executed for each element in the collection
-                        });
+        window.EstimateCollab.onStatus(function (status) {
+            setConnectionDot(
+                status === 'connected'   ? 'connected'   :
+                status === 'connecting'  ? 'connecting'  : 'disconnected'
+            );
+        });
 
-                        $('.js-row-item-estimate').remove();
+        window.EstimateCollab.onRowChange(function (type, uid, payload) {
+            uid = (uid || '').trim();
+            if (type === 'deleted') {
+                removeRowFromDOM(uid);
+            } else if (type === 'changed' && payload) {
+                payload.uniqueIdentifier = (payload.uniqueIdentifier || uid).trim();
+                updateRowInDOM(payload);
+            }
+        });
 
-                        $.each(groupedByWbsLevel3, function (index, item){
-                            $.each(item,function (idx,itm){
-                                var _labor_factorial = parseFloat(itm.laborFactorial ?? 1)
-                                var _equipment_factorial = parseFloat(itm.equipmentFactorial ?? 1)
-                                var _material_factorial = parseFloat(itm.materialFactorial ?? 1)
+        setConnectionDot('connecting');
+    } else {
+        setConnectionDot('disconnected');
+    }
 
-                                var _man_power_cost_rate = itm.workItemManPowerCost
-                                var _equipment_cost_rate = itm.workItemEquipmentCost
-                                var _material_cost_rate = itm.workItemMaterialCost
-
-                                var _man_power_cost = _man_power_cost_rate * _labor_factorial
-                                var _equipment_cost = _equipment_cost_rate * _equipment_factorial
-                                var _material_cost = _material_cost_rate * _material_factorial
-
-                                var _data = {
-                                    'wbsLevel3' : itm.wbsLevel3Id,
-                                    'workItemDescription' : itm.workItemDescription,
-                                    'workItemVolume': itm.workItemVolume,
-                                    'uniqueIdentifier' : itm.uniqueIdentifier,
-                                    'workItemId' : itm.workItemId,
-                                    'manPowerCost' : _man_power_cost,
-                                    'isShowMaterial' : _material_cost > 0 ? 'd-block' : 'd-none',
-                                    'isShowEquipment' : _equipment_cost > 0 ? 'd-block' : 'd-none',
-                                    'equipmentCost': _equipment_cost,
-                                    'materialCost': _material_cost,
-                                    'manPowerCostRate' : _man_power_cost_rate,
-                                    'equipmentCostRate': _equipment_cost_rate,
-                                    'materialCostRate': _material_cost_rate,
-                                    'manPowerCostStr' : toCurrency(_man_power_cost),
-                                    'equipmentCostStr': toCurrency(_equipment_cost),
-                                    'materialCostStr': toCurrency(_material_cost),
-                                    'total' : itm.total,
-                                    'unit' : itm.unit,
-                                    'equipmentFactorial' : _equipment_factorial,
-                                    'laborFactorial' : _labor_factorial,
-                                    'materialFactorial': _material_factorial,
-                                    'itemVersion' : itm.version
-                                }
-
-                                var _temp =  $(Mustache.render(_template,_data));
-                                var _trow = $('.js-column-work-element[data-wbs-level3-id="'+ itm.wbsLevel3Id +'"]')
-                                _temp.insertAfter($(_trow));
-                                setTimeout(function (){
-                                    $('.js-work-item-text').removeClass('d-none');
-                                    var _select2 = $('.js-select-work-items')
-                                    $('.select2-container').addClass('d-none');
-                                    workItemSelectInit(_select2);
-                                    _select2.closest('.js-select2-select-work-item-temp').addClass('d-none');
-                                    $('.js-input-vol').removeAttr('disabled');
-                                },500)
-                            });
-
-                        })
-                        $('.js-version-project-estimate').val(_version_db);
-
-                        // }
-
-                        setContingencyTotal();
-                        $('#modal-loading').modal('hide');
-                        $('.js-save-estimate-discipline').removeAttr('disabled','disabled');
-
-                    } else {
-                        $('#modal-loading').modal('hide');
-                        console.log(result.message)
-                    }
-                }
-            })
-        },10)
-
-    })
-
-    // ─── Detail table: Collapse All / Expand All ───────────────────────────────
+    // ─── Detail table collapse/expand (project detail view) ──────────────────
 
     $('.js-btn-collapse-all-detail').on('click', function (e) {
         e.preventDefault();
@@ -872,9 +788,7 @@ $(function(){
         $tbody.children('tr').removeClass('d-none');
         $tbody.find('.js-minimize').removeClass('d-none');
         $tbody.find('.js-maximize').addClass('d-none');
-        $tbody.find('.js-column-location .js-minimize').each(function () {
-            $(this).trigger('click');
-        });
+        $tbody.find('.js-column-location .js-minimize').each(function () { $(this).trigger('click'); });
         $(this).addClass('d-none');
         $('.js-btn-expand-all-detail').removeClass('d-none');
     });
@@ -882,205 +796,160 @@ $(function(){
     $('.js-btn-expand-all-detail').on('click', function (e) {
         e.preventDefault();
         var $tbody = $('.js-table-body-detail');
-        $tbody.find('.js-column-location .js-maximize:not(.d-none)').each(function () {
-            $(this).trigger('click');
-        });
+        $tbody.find('.js-column-location .js-maximize:not(.d-none)').each(function () { $(this).trigger('click'); });
         $tbody.find('.js-column-discipline .js-minimize, .js-column-work-element .js-minimize').removeClass('d-none');
         $tbody.find('.js-column-discipline .js-maximize, .js-column-work-element .js-maximize').addClass('d-none');
         $(this).addClass('d-none');
         $('.js-btn-collapse-all-detail').removeClass('d-none');
     });
 
-    // Detail page fullscreen: override the basic requestFullscreen with full toggle
     $(document).on('click', '.js-fullscreen-detail', function () {
-        var _table = document.querySelector('.js-fullscreen-table');
-        if (!_table) return;
+        var table = document.querySelector('.js-fullscreen-table');
+        if (!table) return;
         if (document.fullscreenElement) {
             document.exitFullscreen();
-            $(this).find('i').removeClass('fa-compress').addClass('fa-expand');
-            $(this).find('span').text('Fullscreen');
+            $(this).find('i').removeClass('fa-compress').addClass('fa-expand').end().find('span').text('Fullscreen');
         } else {
-            _table.requestFullscreen().then(function () {
-                $('.js-fullscreen-table').css({
-                    'background-color': '#f4f7fb',
-                    'overflow-y': 'auto',
-                    'padding': '12px',
-                });
+            table.requestFullscreen().then(function () {
+                $('.js-fullscreen-table').css({ 'background-color': '#f4f7fb', 'overflow-y': 'auto', padding: '12px' });
             });
             $(this).find('i').removeClass('fa-expand').addClass('fa-compress');
         }
     });
 
-    // ─── Free-form Annotation Overlay ─────────────────────────────────────────
+    // ─── Column-group toggle ───────────────────────────────────────────────────
 
-    var _annotateMode = false;
-    var _annotMarkColors = { note:'#6c757d', ok:'#198754', warning:'#ffc107', rejected:'#dc3545', question:'#0dcaf0' };
+    $(document).on('click', '.js-toggle-col-group', function () {
+        var group  = $(this).data('group');
+        var hidden = $(this).hasClass('active');
+        $('.col-group-' + group).toggleClass('col-group-hidden', hidden);
+        $(this).toggleClass('active', !hidden)
+               .find('i').toggleClass('fa-eye-slash', !hidden).toggleClass('fa-eye', hidden);
+        fixStickyHeaderOffset && fixStickyHeaderOffset();
+    });
 
-    // Build an annotation bubble element — readOnly renders a non-editable view
+    // ─── JS sticky thead ──────────────────────────────────────────────────────
+
+    function updateStickyThead() {
+        var $wrap  = $('.js-detail-table-wrap');
+        if (!$wrap.length) return;
+        var $thead = $wrap.find('.js-full-estimate-table thead');
+        if (!$thead.length) return;
+        var navH     = $('.page-main-header').outerHeight() || 0;
+        var wrapTop  = $wrap.offset().top;
+        var wrapH    = $wrap.outerHeight();
+        var scrollT  = $(window).scrollTop();
+        var theadH   = $thead.outerHeight();
+        var shift    = scrollT + navH - wrapTop;
+        var frozen   = shift > 0 && shift + theadH < wrapH;
+        $thead.css('transform', frozen ? 'translateY(' + shift + 'px)' : '');
+        var headerBottom = theadH + (frozen ? shift : 0);
+        $wrap.find('.annotation-bubble').each(function () {
+            var top = parseFloat($(this).css('top')) || 0;
+            $(this).css('visibility', (frozen && top < headerBottom) ? 'hidden' : '');
+        });
+    }
+
+    updateStickyThead();
+    $(window).on('scroll resize', updateStickyThead);
+
+    // ─── Annotation overlay (unchanged) ───────────────────────────────────────
+
+    var _annotateMode  = false;
+    var _annotMarkColors = { note: '#6c757d', ok: '#198754', warning: '#ffc107', rejected: '#dc3545', question: '#0dcaf0' };
+
     function buildAnnotationBubble(noteId, text, markType, posX, posY, reviewerName, readOnly) {
-        var mark = markType || 'note';
-
+        var mark    = markType || 'note';
         var $bubble = $('<div class="annotation-bubble" tabindex="0"></div>')
             .css({ left: posX + 'px', top: posY + 'px' })
             .attr({ 'data-note-id': noteId || '', 'data-mark': mark });
-
-        var byHtml = reviewerName ? '<span class="annot-by">by ' + reviewerName + '</span>' : '';
+        var byHtml   = reviewerName ? '<span class="annot-by">by ' + reviewerName + '</span>' : '';
         var safeText = $('<div>').text(text || '').html();
-
         if (readOnly) {
             $bubble.addClass('annot-readonly').html(
-                '<div class="annot-header">' +
-                    '<span class="annot-dot-ro" style="background:' + (_annotMarkColors[mark] || '#6c757d') + '"></span>' +
-                    byHtml +
-                '</div>' +
-                '<div class="annot-body-ro">' + safeText + '</div>'
-            );
+                '<div class="annot-header"><span class="annot-dot-ro" style="background:' + (_annotMarkColors[mark] || '#6c757d') + '"></span>' + byHtml + '</div>' +
+                '<div class="annot-body-ro">' + safeText + '</div>');
         } else {
             var dotsHtml = '';
-            $.each(_annotMarkColors, function(m, c) {
-                dotsHtml += '<span class="annot-dot' + (m === mark ? ' active' : '') +
-                            '" data-mark="' + m + '" style="background:' + c + '" title="' + m + '"></span>';
+            $.each(_annotMarkColors, function (m, c) {
+                dotsHtml += '<span class="annot-dot' + (m === mark ? ' active' : '') + '" data-mark="' + m + '" style="background:' + c + '" title="' + m + '"></span>';
             });
-
             $bubble.html(
-                '<div class="annot-header">' +
-                    '<div class="annot-dots">' + dotsHtml + '</div>' +
-                    byHtml +
-                    '<button type="button" class="annot-close" title="Delete">&#x2715;</button>' +
-                '</div>' +
+                '<div class="annot-header"><div class="annot-dots">' + dotsHtml + '</div>' + byHtml +
+                '<button type="button" class="annot-close" title="Delete">&#x2715;</button></div>' +
                 '<textarea class="annot-textarea" placeholder="Write your note here...">' + safeText + '</textarea>' +
-                '<div class="annot-footer">' +
-                    '<button type="button" class="annot-save-btn">Save</button>' +
-                '</div>'
-            );
+                '<div class="annot-footer"><button type="button" class="annot-save-btn">Save</button></div>');
         }
-
         return $bubble;
     }
 
-    // Append a bubble to the layer and wire up its events using direct binding
     function addBubbleToLayer($layer, noteId, text, markType, posX, posY, reviewerName) {
         var readOnly = $layer.data('readonly') == '1';
         var $bubble  = buildAnnotationBubble(noteId, text, markType, posX, posY, reviewerName, readOnly);
         $layer.append($bubble);
-
-        // Read-only bubbles: just block propagation so clicking them doesn't create new ones
-        if (readOnly) {
-            $bubble.on('mousedown click', function(e) { e.stopPropagation(); });
-            return $bubble;
-        }
-
-        if (!noteId) {
-            setTimeout(function() { $bubble.find('.annot-textarea').focus(); }, 60);
-        }
-
-        // Drag — header acts as drag handle
-        $bubble.find('.annot-header').on('mousedown', function(e) {
+        if (readOnly) { $bubble.on('mousedown click', function (e) { e.stopPropagation(); }); return $bubble; }
+        if (!noteId) setTimeout(function () { $bubble.find('.annot-textarea').focus(); }, 60);
+        $bubble.find('.annot-header').on('mousedown', function (e) {
             if ($(e.target).hasClass('annot-close') || $(e.target).hasClass('annot-dot')) return;
-            e.preventDefault();
-            e.stopPropagation();
-            var startPageX = e.pageX;
-            var startPageY = e.pageY;
-            var startLeft  = parseFloat($bubble.css('left'))  || 0;
-            var startTop   = parseFloat($bubble.css('top'))   || 0;
+            e.preventDefault(); e.stopPropagation();
+            var sx = e.pageX, sy = e.pageY;
+            var sl = parseFloat($bubble.css('left')) || 0, st = parseFloat($bubble.css('top')) || 0;
             $bubble.addClass('dragging');
-
-            $(document).on('mousemove.annotDrag', function(ev) {
-                $bubble.css({
-                    left: startLeft + (ev.pageX - startPageX) + 'px',
-                    top:  startTop  + (ev.pageY - startPageY) + 'px',
-                });
-            }).on('mouseup.annotDrag', function() {
+            $(document).on('mousemove.annotDrag', function (ev) {
+                $bubble.css({ left: sl + (ev.pageX - sx) + 'px', top: st + (ev.pageY - sy) + 'px' });
+            }).on('mouseup.annotDrag', function () {
                 $(document).off('mousemove.annotDrag mouseup.annotDrag');
                 $bubble.removeClass('dragging');
             });
         });
-
-        // Prevent click/mousedown on bubble from propagating to the layer
-        $bubble.on('mousedown click', function(e) { e.stopPropagation(); });
-
-        // Mark type dots — direct binding on each dot
-        $bubble.find('.annot-dot').on('click', function(e) {
+        $bubble.on('mousedown click', function (e) { e.stopPropagation(); });
+        $bubble.find('.annot-dot').on('click', function (e) {
             e.stopPropagation();
             var newMark = $(this).data('mark');
             $bubble.attr('data-mark', newMark);
             $bubble.find('.annot-dot').removeClass('active');
             $(this).addClass('active');
         });
-
-        // Save — direct binding on the save button
-        $bubble.find('.annot-save-btn').on('click', function(e) {
+        $bubble.find('.annot-save-btn').on('click', function (e) {
             e.stopPropagation();
             var $btn      = $(this);
             var noteText  = $bubble.find('.annot-textarea').val().trim();
-            if (!noteText) {
-                $bubble.find('.annot-textarea').addClass('is-invalid');
-                return;
-            }
+            if (!noteText) { $bubble.find('.annot-textarea').addClass('is-invalid'); return; }
             $bubble.find('.annot-textarea').removeClass('is-invalid');
-
             var mark       = $bubble.attr('data-mark') || 'note';
             var existingId = $bubble.attr('data-note-id') || '';
-            var projectId  = $layer.data('project-id');
-            var currentX   = parseFloat($bubble.css('left')) || 0;
-            var currentY   = parseFloat($bubble.css('top'))  || 0;
-
-            $btn.prop('disabled', true).text('Saving...');
+            var pId        = $layer.data('project-id');
+            var cx         = parseFloat($bubble.css('left')) || 0;
+            var cy         = parseFloat($bubble.css('top'))  || 0;
+            $btn.prop('disabled', true).text('Saving…');
             $.ajax({
-                url:  '/project/' + projectId + '/review-note',
-                type: 'POST',
-                data: {
-                    id:         existingId || null,
-                    note:       noteText,
-                    mark_type:  mark,
-                    position_x: currentX,
-                    position_y: currentY,
-                    _token:     $('meta[name="csrf-token"]').attr('content'),
+                url: '/project/' + pId + '/review-note', type: 'POST',
+                data: { id: existingId || null, note: noteText, mark_type: mark, position_x: cx, position_y: cy, _token: $('meta[name="csrf-token"]').attr('content') },
+                success: function (res) {
+                    if (res.status == 200) { $bubble.attr('data-note-id', res.note.id); $btn.text('Saved!'); setTimeout(function () { $btn.text('Save'); }, 1500); }
+                    else { $btn.text('Failed!'); setTimeout(function () { $btn.text('Save'); }, 2000); }
                 },
-                success: function(res) {
-                    if (res.status == 200) {
-                        $bubble.attr('data-note-id', res.note.id);
-                        $btn.text('Saved!');
-                        setTimeout(function() { $btn.text('Save'); }, 1500);
-                    } else {
-                        $btn.text('Failed!');
-                        setTimeout(function() { $btn.text('Save'); }, 2000);
-                    }
-                },
-                error: function() {
-                    $btn.text('Error!');
-                    setTimeout(function() { $btn.text('Save'); }, 2000);
-                },
-                complete: function() { $btn.prop('disabled', false); }
+                error: function () { $btn.text('Error!'); setTimeout(function () { $btn.text('Save'); }, 2000); },
+                complete: function () { $btn.prop('disabled', false); },
             });
         });
-
-        // Delete — direct binding on the close button
-        $bubble.find('.annot-close').on('click', function(e) {
+        $bubble.find('.annot-close').on('click', function (e) {
             e.stopPropagation();
             var existingId = $bubble.attr('data-note-id') || '';
-            var projectId  = $layer.data('project-id');
+            var pId        = $layer.data('project-id');
             if (existingId) {
-                $.ajax({
-                    url:  '/project/' + projectId + '/review-note/' + existingId,
-                    type: 'DELETE',
+                $.ajax({ url: '/project/' + pId + '/review-note/' + existingId, type: 'DELETE',
                     data: { _token: $('meta[name="csrf-token"]').attr('content') },
-                    success: function(res) { if (res.status == 200) $bubble.remove(); }
-                });
-            } else {
-                $bubble.remove();
-            }
+                    success: function (res) { if (res.status == 200) $bubble.remove(); } });
+            } else { $bubble.remove(); }
         });
-
         return $bubble;
     }
 
-    // Toggle annotate mode
-    $(document).on('click', '.js-btn-annotate-toggle', function() {
+    $(document).on('click', '.js-btn-annotate-toggle', function () {
         _annotateMode = !_annotateMode;
         var $btn   = $(this);
         var $layer = $('.js-annotation-layer');
-
         if (_annotateMode) {
             $btn.removeClass('btn-outline-warning').addClass('btn-warning');
             $layer.addClass('annotate-mode');
@@ -1092,86 +961,26 @@ $(function(){
         }
     });
 
-    // Click on layer in annotate mode → create new bubble at click position
-    $(document).on('click', '.js-annotation-layer.annotate-mode', function(e) {
+    $(document).on('click', '.js-annotation-layer.annotate-mode', function (e) {
         var $layer = $(this);
-        var x = e.pageX - $layer.offset().left;
-        var y = e.pageY - $layer.offset().top;
-        addBubbleToLayer($layer, null, '', 'note', x, y, null);
+        addBubbleToLayer($layer, null, '', 'note', e.pageX - $layer.offset().left, e.pageY - $layer.offset().top, null);
     });
 
-    // Load existing annotations when the annotation layer is present
     var $annotLayer = $('.js-annotation-layer');
     if ($annotLayer.length) {
-        var _annotProjectId = $annotLayer.data('project-id');
         $.ajax({
-            url:  '/project/' + _annotProjectId + '/annotations',
+            url:  '/project/' + $annotLayer.data('project-id') + '/annotations',
             type: 'GET',
-            success: function(res) {
+            success: function (res) {
                 if (res.status == 200) {
-                    $.each(res.notes, function(i, note) {
-                        addBubbleToLayer(
-                            $annotLayer,
-                            note.id,
-                            note.note,
-                            note.mark_type,
-                            parseFloat(note.position_x) || 0,
-                            parseFloat(note.position_y) || 0,
-                            note.reviewer ? (note.reviewer.profiles ? note.reviewer.profiles.full_name : note.reviewer.user_name) : ''
-                        );
+                    $.each(res.notes, function (i, note) {
+                        addBubbleToLayer($annotLayer, note.id, note.note, note.mark_type,
+                            parseFloat(note.position_x) || 0, parseFloat(note.position_y) || 0,
+                            note.reviewer ? (note.reviewer.profiles ? note.reviewer.profiles.full_name : note.reviewer.user_name) : '');
                     });
                 }
-            }
+            },
         });
     }
-
-    // ─── Column-group toggle (Unit Rates / Factorials) ───────────────────────
-
-    $(document).on('click', '.js-toggle-col-group', function () {
-        var $btn   = $(this);
-        var group  = $btn.data('group');
-        var hidden = $btn.hasClass('active');
-
-        // Mark columns hidden/visible
-        $('.col-group-' + group).toggleClass('col-group-hidden', hidden);
-
-        // Also hide the rowspan header th that spans the hidden cols
-        $btn.toggleClass('active', !hidden);
-        $btn.find('i').toggleClass('fa-eye-slash', !hidden).toggleClass('fa-eye', hidden);
-
-        fixStickyHeaderOffset();
-    });
-
-    // ─── JS sticky thead (translateY) — works inside overflow-x:auto container ──
-    function updateStickyThead() {
-        var $wrap   = $('.js-detail-table-wrap');
-        if (!$wrap.length) return;
-        var $thead  = $wrap.find('.js-full-estimate-table thead');
-        if (!$thead.length) return;
-
-        var navH      = $('.page-main-header').outerHeight() || 0;
-        var wrapTop   = $wrap.offset().top;
-        var wrapH     = $wrap.outerHeight();
-        var scrollTop = $(window).scrollTop();
-        var theadH    = $thead.outerHeight();
-        var shift     = scrollTop + navH - wrapTop;
-        var frozen    = shift > 0 && shift + theadH < wrapH;
-
-        if (frozen) {
-            $thead.css('transform', 'translateY(' + shift + 'px)');
-        } else {
-            $thead.css('transform', '');
-            shift = 0;
-        }
-
-        // Hide annotation bubbles whose position is behind the frozen header
-        var headerBottom = theadH + (frozen ? shift : 0);
-        $wrap.find('.annotation-bubble').each(function () {
-            var bubbleTop = parseFloat($(this).css('top')) || 0;
-            $(this).css('visibility', (frozen && bubbleTop < headerBottom) ? 'hidden' : '');
-        });
-    }
-    updateStickyThead();
-    $(window).on('scroll resize', updateStickyThead);
 
 });

@@ -223,6 +223,8 @@
                 <div class="float-start col-md-10">
                     @{{ text }}
                 </div>
+                <div class="float-end dd-nodrag">
+                    <span class="js-add-new-nestable-wbs" data-is-element="false">
                 <div class="float-end">
                     <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="false">
                        <i data-feather="plus-circle"></i>
@@ -234,6 +236,15 @@
              </div>
 
              <ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2">
+                <li class="dd-item" data-id="@{{id}}">
+                    <div class="dd-handle">
+                        <div class="float-start col-md-10 js-dd-handle-edit">
+                            <span class="js-dd-title dd-nodrag">@{{title}}</span>
+                        </div>
+                        <div class="float-end dd-nodrag">
+                            <span class="js-add-new-nestable-wbs" data-is-element="true">
+                                <i data-feather="plus-circle"></i>
+                            </span>
                 @{{#dataList}}
                     <li class="dd-item" data-id="@{{id}}">
                         <div class="dd-handle">
@@ -279,7 +290,7 @@
                 @{{ /isSelect }}
 
                 </div>
-                <div class="float-end">
+                <div class="float-end dd-nodrag">
                     @{{ #showButton }}
                         <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="true">
                             <i data-feather="plus-circle"></i>
@@ -415,49 +426,55 @@
 </script>
 
 <script id="js-template-modal-update-status-project" type="x-templ-mustache">
-    <div class="row js-row-form-status m-b-20">
+    <div class="js-row-form-status adm-form-wrap">
         <input type="hidden" class="js-modal-discipline" value="@{{ discipline }}">
-        <div class="col-md-4">
-            <label class="checkbox-rect" for="checkbox-discipline-pending">
-                <input id="checkbox-discipline-pending"
-                       @{{ #isPending }}
-                        checked="checked"
-                       @{{ /isPending }}
+
+        <div class="adm-status-grid">
+            <label class="adm-status-card adm-status-pending">
+                <input class="js-checkbox-discipline-status"
+                       type="radio"
+                       name="checkbox-discipline"
                        value="{{\App\Models\Project::PENDING}}"
+                       @{{ #isPending }}checked="checked"@{{ /isPending }}>
+                <div class="adm-status-inner">
+                    <i class="fa fa-clock adm-status-icon"></i>
+                    <span class="adm-status-label">Pending</span>
+                </div>
+            </label>
+
+            <label class="adm-status-card adm-status-approve">
+                <input class="js-checkbox-discipline-status"
+                       type="radio"
                        name="checkbox-discipline"
-                       class="js-checkbox-discipline-status" type="radio">
-                <div class="radio-container"></div>
-                Pending
+                       value="{{\App\Models\Project::APPROVE}}"
+                       @{{ #isApprove }}checked="checked"@{{ /isApprove }}>
+                <div class="adm-status-inner">
+                    <i class="fa fa-check-circle adm-status-icon"></i>
+                    <span class="adm-status-label">Approved</span>
+                </div>
+            </label>
+
+            <label class="adm-status-card adm-status-reject">
+                <input class="js-checkbox-discipline-status"
+                       type="radio"
+                       name="checkbox-discipline"
+                       value="{{\App\Models\Project::REJECTED}}"
+                       @{{ #isRejected }}checked="checked"@{{ /isRejected }}>
+                <div class="adm-status-inner">
+                    <i class="fa fa-times-circle adm-status-icon"></i>
+                    <span class="adm-status-label">Rejected</span>
+                </div>
             </label>
         </div>
-        <div class="col-md-4">
-            <label class="checkbox-rect" for="checkbox-discipline-approved">
-                <input id="checkbox-discipline-approved"
-                    @{{ #isApprove }}
-                        checked="checked"
-                    @{{ /isApprove }}
-                        value="{{\App\Models\Project::APPROVE}}"
-                       name="checkbox-discipline"
-                       class="js-checkbox-discipline-status" type="radio">
-                <div class="radio-container"></div>
-                Approved
+
+        <div class="js-form-remark-rejected adm-remark-wrap @{{ ^isRejected }}d-none@{{ /isRejected }}">
+            <label class="adm-remark-label">
+                <i class="fa fa-comment-alt me-1"></i> Rejection Remark
             </label>
-        </div>
-        <div class="col-md-4">
-            <label class="checkbox-rect" for="checkbox-discipline-rejected">
-                <input id="checkbox-discipline-rejected"
-                @{{ #isRejected }}
-                    checked="checked"
-                @{{ /isRejected }}
-                        value="{{\App\Models\Project::REJECTED}}"
-                       name="checkbox-discipline"
-                       class="js-checkbox-discipline-status" type="radio">
-                <div class="radio-container"></div>
-                Rejected
-            </label>
-        </div>
-        <div class="form-group js-form-remark-rejected mt-3 @{{ ^isRejected }} d-none @{{ /isRejected }}">
-            <textarea class="form-control js-remark-project" id="summernote" rows="5" name="remark">@{{ remark }}</textarea>
+            <textarea class="form-control js-remark-project adm-remark-textarea"
+                      rows="4"
+                      name="remark"
+                      placeholder="Provide a reason for rejection...">@{{ remark }}</textarea>
         </div>
     </div>
 </script>

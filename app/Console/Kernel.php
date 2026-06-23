@@ -2,45 +2,17 @@
 
 namespace App\Console;
 
-use App\Http\Controllers\EstimateAllDisciplineController;
-use App\Http\Controllers\ProjectController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\WorkBreakdownStructureController;
-use App\Services\ProjectServices;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
-    /**
-     * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
-     */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-
-        $schedule->call(function (){
-            $settingController = new SettingController();
-            $settingController->updateCurrencyUsd();
-        })->cron('00 07 * * *');
-
-        $schedule->call(function (){
-            $wbsController = new WorkBreakdownStructureController();
-            $wbsController->deleteWbsLevel3MoreOneMonth();
-        })->daily();
-
-        $schedule->call(function (){
-            $estimateController = new EstimateAllDisciplineController();
-            $estimateController->deleteEstimateDisciplineMoreOneMonth();
-        })->cron('00 03 * * *');
-
-        $schedule->call(function() {
-            $projectController = new ProjectServices();
-            $projectController->sendEmailRemainderToReviewer();
-        })->cron('20 07 * * *');
+        $schedule->command('app:update-currency-usd')->cron('00 07 * * *');
+        $schedule->command('app:delete-old-wbs')->daily();
+        $schedule->command('app:delete-old-estimates')->cron('00 03 * * *');
+        $schedule->command('app:send-reviewer-reminders')->cron('00 08 * * *');
     }
 
     /**

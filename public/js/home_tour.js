@@ -100,16 +100,32 @@
         $('.main-nav').addClass('close_icon');
     }
 
+    // Fixed elements (header/nav) create stacking contexts at z-index 8/9.
+    // This isolates their children from the introjs overlay (z-index 999999),
+    // making highlighted elements appear blank. Setting z-index to 'auto'
+    // removes the stacking context so children can escape above the overlay.
+    function releaseFixedStacking() {
+        $('.page-main-header, header.main-nav').css('z-index', 'auto');
+    }
+
+    function restoreFixedStacking() {
+        $('.page-main-header').css('z-index', '');
+        $('header.main-nav').css('z-index', '');
+    }
+
     function startTour() {
         expandSidebar();
+        releaseFixedStacking();
 
         introJs()
             .oncomplete(function () {
                 collapseSidebar();
+                restoreFixedStacking();
                 localStorage.setItem('ce_home_tour_done', '1');
             })
             .onexit(function () {
                 collapseSidebar();
+                restoreFixedStacking();
                 localStorage.setItem('ce_home_tour_done', '1');
             })
             .onbeforechange(function (targetEl) {

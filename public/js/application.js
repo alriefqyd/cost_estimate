@@ -97,6 +97,12 @@ $(function(){
         $.ajax({
             url: '/getPublicHolidayApi',
             success: function(results) {
+                if (!Array.isArray(results)) {
+                    console.error('Unexpected public holiday API response:', results);
+                    callback([]);
+                    return;
+                }
+
                 const _newdata = results
                     .filter(function(item) {
                         return item.is_national_holiday === true;
@@ -125,7 +131,11 @@ $(function(){
     }
 
     function initCalendar(publicHolidays) {
+        publicHolidays = publicHolidays || [];
         var calendarEl = $('#calendar')[0]; // Get the DOM element
+        if (!calendarEl) {
+            return;
+        }
         var calendar = new FullCalendar.Calendar(calendarEl, {
             events: publicHolidays,
             initialView: 'multiMonthYear',
@@ -292,6 +302,16 @@ $(function(){
        var _data_value = _this.data('value');
         _this.siblings('.js-status-filter').val(_data_value);
         _this.closest('form').submit();
+    });
+
+    $('.js-btn-my-reviews').on('click', function(){
+        var $input = $(this).closest('form').find('.js-my-reviews-input');
+        if ($input.val()) {
+            $input.val('');
+        } else {
+            $input.val('1');
+        }
+        $(this).closest('form').submit();
     });
 
     var _count = 0;
@@ -477,6 +497,6 @@ $(function(){
       if(_this.hasClass('show')){
           _this.siblings('.dropdown-menu').removeClass('show')
       };
-    })
+    });
 
 });

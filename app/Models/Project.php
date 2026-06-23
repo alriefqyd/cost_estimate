@@ -159,6 +159,23 @@ class Project extends Model
             $query->where('design_engineer_architect',$q);
         })->when($filters['sponsor'] ?? false, function($query, $q){
             $query->where('project_area_id', $q);
+        })->when($filters['my_reviews'] ?? false, function($query) {
+            $userId = auth()->id();
+            $query->where(function ($q) use ($userId) {
+                $q->where(function ($s) use ($userId) {
+                    $s->where('civil_approver', $userId)->where('civil_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('mechanical_approver', $userId)->where('mechanical_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('electrical_approver', $userId)->where('electrical_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('instrument_approver', $userId)->where('instrument_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('it_approver', $userId)->where('it_approval_status', Project::PENDING);
+                })->orWhere(function ($s) use ($userId) {
+                    $s->where('architect_approver', $userId)->where('architect_approval_status', Project::PENDING);
+                });
+            });
         });
     }
 
@@ -191,6 +208,10 @@ class Project extends Model
                 return $q->orwhereNotNull('design_engineer_mechanical');
             })->when($user->isAllCivilCostEstimateRole(), function ($q) use ($user) {
                 return $q->orwhereNotNull('design_engineer_civil');
+            })->when($user->isAllItCostEstimateRole(), function ($q) use ($user) {
+                return $q->orwhereNotNull('design_engineer_it');
+            })->when($user->isAllArchitectCostEstimateRole(), function ($q) use ($user) {
+                return $q->orwhereNotNull('design_engineer_architect');
             });
         });
     }
@@ -209,16 +230,19 @@ class Project extends Model
 
     public function getTotalCost(){
         try{
-            $labor = $this->estimateAllDisciplines->sum('labor_cost_total_rate');
-            $tool = $this->estimateAllDisciplines->sum('tool_unit_rate_total');
-            $material = $this->estimateAllDisciplines->sum('material_unit_rate_total');
-
-            $total =  $labor + $tool + $material;
+            $total = $this->estimateAllDisciplines->sum(function($ed) {
+                $lf  = (float) ($ed->labour_factorial    ?? 1) ?: 1;
+                $ef  = (float) ($ed->equipment_factorial ?? 1) ?: 1;
+                $mf  = (float) ($ed->material_factorial  ?? 1) ?: 1;
+                $vol = (float) ($ed->volume ?? 1);
+                return ((float) ($ed->labor_unit_rate    ?? 0) * $lf
+                      + (float) ($ed->tool_unit_rate     ?? 0) * $ef
+                      + (float) ($ed->material_unit_rate ?? 0) * $mf) * $vol;
+            });
             return $total;
         } catch(Exception $e){
             return 0;
         }
-
     }
 
     public function getContingencyCost(){
@@ -307,7 +331,7 @@ class Project extends Model
     public function getProjectDisciplineStatusApproval(){
         $list = [];
         foreach (self::APPROVAL_DISCIPLINE_LIST as $approval => $designEngineer){
-            if(isset($this->$designEngineer)
+            if(!empty($this->$designEngineer)
                 && $this->$approval != self::APPROVE){
                 array_push($list, self::DESIGN_ENGINEER_KEY_LIST[$designEngineer]);
             }

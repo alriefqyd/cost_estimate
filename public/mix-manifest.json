@@ -1,4 +1,7 @@
 {
-    "/js/app.js": "/js/app.js",
-    "/css/app.css": "/css/app.css"
+    "/js/app.js": "/js/app.js?id=f7a111de313e86ca8ec4f7d883e517bf",
+    "/js/realtime.js": "/js/realtime.js?id=b2cd6285f99c061f1706a737b904cf91",
+    "/js/collab.js": "/js/collab.js?id=1a83b926d96b78762e6d037390682266",
+    "/js/estimate-discipline.js": "/js/estimate-discipline.js?id=038c698a96644f0dcabcbc6808670206",
+    "/css/app.css": "/css/app.css?id=26649877c1c981db3eaa8a2d24a41912"
 }
