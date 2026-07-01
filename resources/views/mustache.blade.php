@@ -217,64 +217,48 @@
 </script>
 
 <script id="js-template-location-nestable-wbs" type="x-tmpl-mustache">
-         <li class="dd-item dd-location" data-id="@{{ text }}">
-             <div class="dd-handle">
-                <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
-                <div class="float-start col-md-10">
-                    @{{ text }}
-                </div>
-                <div class="float-end dd-nodrag">
-                    <span class="js-add-new-nestable-wbs" data-is-element="false">
-                <div class="float-end">
-                    <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="false">
-                       <i data-feather="plus-circle"></i>
-                    </span>
-                    <span class="cursor-pointer text-danger js-delete-wbs-discipline dd-nodrag">
-                        <i data-feather="x"></i>
-                    </span>
-                </div>
-             </div>
-
-             <ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2">
-                <li class="dd-item" data-id="@{{id}}">
-                    <div class="dd-handle">
-                        <div class="float-start col-md-10 js-dd-handle-edit">
-                            <span class="js-dd-title dd-nodrag">@{{title}}</span>
-                        </div>
-                        <div class="float-end dd-nodrag">
-                            <span class="js-add-new-nestable-wbs" data-is-element="true">
-                                <i data-feather="plus-circle"></i>
-                            </span>
-                @{{#dataList}}
-                    <li class="dd-item" data-id="@{{id}}">
-                        <div class="dd-handle">
-                            <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
-                            <div class="float-start col-md-10 js-dd-handle-edit dd-nodrag">
-                                <span class="js-dd-title dd-nodrag">@{{title}}</span>
-                            </div>
-                            <div class="float-end">
-                                <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="true">
-                                    <i data-feather="plus-circle"></i>
-                                </span>
-
-                                <span class="cursor-pointer text-danger js-delete-wbs-discipline dd-nodrag">
-                                    <i data-feather="x"></i>
-                                </span>
-                            </div>
-                        </div>
-                        <span class="js-dd-select d-none">
-                            <select class="select2 js-select-update-discipline">
-                            @{{#dataList}}
-                              <option value="@{{ id }}">@{{ title }}</option>
-                            @{{ /dataList }}
-                            </select>
+    <li class="dd-item dd-location" data-id="@{{ text }}">
+        <div class="dd-handle">
+            <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
+            <div class="float-start col-md-10 dd-nodrag">
+                @{{ text }}
+            </div>
+            <div class="float-end dd-nodrag">
+                <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="false">
+                    <i data-feather="plus-circle"></i>
+                </span>
+                <span class="cursor-pointer text-danger js-delete-wbs-discipline dd-nodrag">
+                    <i data-feather="x"></i>
+                </span>
+            </div>
+        </div>
+        <ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2">
+            @{{#dataList}}
+            <li class="dd-item" data-id="@{{id}}">
+                <div class="dd-handle">
+                    <span class="wbs-drag-grip"><i class="fa fa-bars"></i></span>
+                    <div class="float-start col-md-10 js-dd-handle-edit dd-nodrag">
+                        <span class="js-dd-title dd-nodrag">@{{title}}</span>
+                    </div>
+                    <div class="float-end dd-nodrag">
+                        <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="true">
+                            <i data-feather="plus-circle"></i>
                         </span>
-                        <ol class="dd-list" data-idx="3"></ol>
-                    </li>
-                @{{/dataList}}
-             </ol>
-         </li>
-
+                        <span class="cursor-pointer text-danger js-delete-wbs-discipline dd-nodrag">
+                            <i data-feather="x"></i>
+                        </span>
+                    </div>
+                </div>
+                <span class="js-dd-select d-none">
+                    <select class="select2 js-select-update-discipline js-discipline-lazy-select" data-current-id="@{{id}}">
+                        <option value=""></option>
+                    </select>
+                </span>
+                <ol class="dd-list" data-idx="3"></ol>
+            </li>
+            @{{/dataList}}
+        </ol>
+    </li>
 </script>
 
 <script id="js-template-sub-nestable" type="x-tmpl-mustache">
@@ -305,6 +289,7 @@
              @{{ #isSelect }}
                 <span class="js-dd-select d-none">
                     <select class="select2 js-select-update-discipline">
+                        <option value=""></option>
                         @{{#dataList}}
                           <option value="@{{ id }}">@{{ title }}</option>
                         @{{ /dataList }}
