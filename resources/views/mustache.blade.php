@@ -227,6 +227,9 @@
                 <span class="js-add-new-nestable-wbs dd-nodrag" data-is-element="false">
                     <i data-feather="plus-circle"></i>
                 </span>
+                <span class="cursor-pointer text-primary js-duplicate-location dd-nodrag" title="Duplicate location">
+                    <i data-feather="copy"></i>
+                </span>
                 <span class="cursor-pointer text-danger js-delete-wbs-discipline dd-nodrag">
                     <i data-feather="x"></i>
                 </span>
