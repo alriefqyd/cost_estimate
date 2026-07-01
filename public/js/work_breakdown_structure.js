@@ -555,6 +555,17 @@ $(function(){
         bindBeforeUnloadEvent();
     });
 
+    $(document).on('click', '.js-duplicate-location', function() {
+        var $item = $(this).closest('.dd-item');
+        var $clone = $item.clone(false);
+        $clone.find('.select2-container').remove();
+        $clone.find('select').removeClass('select2-hidden-accessible').removeAttr('data-select2-id aria-hidden');
+        $clone.insertAfter($item);
+        initNestable();
+        feather.replace();
+        bindBeforeUnloadEvent();
+    });
+
     $(document).on('change','.js-select-update-wbs',function(){
         var _this = $(this);
     })
