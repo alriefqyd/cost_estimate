@@ -448,7 +448,7 @@ $(function(){
                     initNestable();
                     feather.replace()
                     $('.select2').select2()
-                    _location_form.val('')
+                    _location_form.val('').trigger('keyup')
                 } else {
                     notification('danger','cannot get data discipline','fa fa-exclamation','Error')
                 }
@@ -502,14 +502,14 @@ $(function(){
                             $childList = $('<ol class="dd-list" data-idx="3"></ol>');
                             _parent.append($childList);
                         }
-                        $childList.append(_temp);
+                        $childList.prepend(_temp);
                     } else {
                         var $childList = _parent.children('ol.js-mustache-wbs-element').first();
                         if($childList.length === 0){
                             $childList = $('<ol class="dd-list js-get-idx js-mustache-wbs-element" data-idx="2"></ol>');
                             _parent.append($childList);
                         }
-                        $childList.append(_temp);
+                        $childList.prepend(_temp);
                     }
                     initNestable();
                     bindBeforeUnloadEvent();
@@ -563,7 +563,41 @@ $(function(){
         var _this = $(this);
         var _parent = _this.closest('.dd-item');
         _parent.find('.dd-handle').first().addClass('d-none');
-        _parent.find('.js-dd-select').first().removeClass('d-none')
+        var _selectWrap = _parent.find('.js-dd-select').first();
+        _selectWrap.removeClass('d-none');
+
+        var _lazySelect = _selectWrap.find('.js-discipline-lazy-select');
+        if (_lazySelect.length > 0) {
+            if (_lazySelect.find('option[value!=""]').length === 0) {
+                var _currentId = _lazySelect.data('current-id');
+                $.ajax({
+                    url: '/getDisciplineList',
+                    type: 'GET',
+                    data: { isMustache: true },
+                    success: function(result) {
+                        if (result.status === 200) {
+                            result.data.forEach(function(disc) {
+                                var opt = $('<option>').val(disc.id).text(disc.title);
+                                if (String(disc.id) === String(_currentId)) opt.attr('selected', 'selected');
+                                _lazySelect.append(opt);
+                            });
+                            if (_lazySelect.data('select2')) _lazySelect.select2('destroy');
+                            _lazySelect.select2({ placeholder: 'Select Discipline', allowClear: true, width: '100%' });
+                            setTimeout(function() { _lazySelect.select2('open'); }, 0);
+                        }
+                    }
+                });
+            } else {
+                setTimeout(function() { _lazySelect.select2('open'); }, 0);
+            }
+        } else {
+            var _regularSelect = _selectWrap.find('.js-select-update-discipline');
+            if (_regularSelect.length > 0) {
+                if (_regularSelect.data('select2')) _regularSelect.select2('destroy');
+                _regularSelect.select2({ placeholder: 'Select Discipline', allowClear: true, width: '100%' });
+                setTimeout(function() { _regularSelect.select2('open'); }, 0);
+            }
+        }
     })
 
     $(document).on('focusout','.js-dd-title-text',function(){
@@ -622,6 +656,14 @@ $(function(){
             _child.remove();
         }
         initNestable();
+    });
+
+    $(document).on('select2:close','.js-select-update-discipline', function(){
+        var _parent = $(this).closest('.dd-item');
+        if (_parent.find('.dd-handle').first().hasClass('d-none')) {
+            _parent.find('.dd-handle').first().removeClass('d-none');
+            _parent.find('.js-dd-select').first().addClass('d-none');
+        }
     });
 
     function bindBeforeUnloadEvent(){
