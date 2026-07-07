@@ -297,21 +297,20 @@
 
 .wi-cell {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
     height: 100%;
     gap: 6px;
-    overflow: hidden;
     border-radius: 4px;
-    padding: 0 2px;
+    padding: 4px 2px;
     transition: background 0.1s;
 }
 
 .wi-cell > span:first-child {
     flex: 1;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.35;
     color: var(--vale-text-dark);
     font-size: 13px;
 }
@@ -330,6 +329,8 @@
     opacity: 0;
     font-size: 11px;
     flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 2px;
     color: var(--vale-primary);
     transition: opacity 0.15s;
 }
@@ -346,6 +347,132 @@
     border-radius: 10px;
     flex-shrink: 0;
     font-weight: 600;
+}
+
+/* ─── Rate cell (Man Power / Equipment / Material) + breakdown popover ──────── */
+
+.rate-cell {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    width: 100%;
+}
+
+.rate-cell-info-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 13px;
+    line-height: 1;
+    color: #a8b2c1;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: color 0.1s;
+}
+.rate-cell-info-btn:hover { color: var(--vale-primary); }
+
+.rate-breakdown-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: transparent;
+}
+
+.rate-breakdown-popover {
+    position: fixed;
+    width: 360px;
+    max-width: 90vw;
+    max-height: 320px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 16px 40px rgba(44,50,63,0.24), 0 0 0 1px rgba(0,0,0,0.05);
+    overflow: hidden;
+}
+
+.rate-breakdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--vale-text-dark);
+    border-bottom: 1px solid var(--vale-page-bg);
+}
+
+.rate-breakdown-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #a8b2c1;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px 4px;
+}
+.rate-breakdown-close:hover { color: var(--vale-text-dark); }
+
+.rate-breakdown-columns {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--vale-page-bg);
+    border-bottom: 1px solid var(--vale-border);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--vale-text);
+}
+
+.rate-breakdown-body {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.rate-breakdown-hint {
+    padding: 20px;
+    text-align: center;
+    color: #a8b2c1;
+    font-size: 12px;
+}
+
+.rate-breakdown-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--vale-page-bg);
+    font-size: 12px;
+}
+
+.rate-breakdown-name {
+    flex: 1;
+    color: var(--vale-text-dark);
+    white-space: normal;
+    word-break: break-word;
+}
+
+.rate-breakdown-qty {
+    flex-shrink: 0;
+    width: 70px;
+    text-align: right;
+    color: var(--vale-text);
+}
+
+.rate-breakdown-rate,
+.rate-breakdown-subtotal {
+    flex-shrink: 0;
+    width: 90px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--vale-text-dark);
 }
 
 /* ─── Number cell editor ───────────────────────────────────────────────────── */
@@ -752,6 +879,20 @@
 .wi-search-results::-webkit-scrollbar-track   { background: transparent; }
 .wi-search-results::-webkit-scrollbar-thumb   { background: var(--vale-border); border-radius: 3px; }
 
+.wi-search-category-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 8px 16px;
+    background: var(--vale-page-bg);
+    color: var(--vale-text);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--vale-border);
+}
+
 .wi-search-hint {
     padding: 24px;
     color: #a8b2c1;
@@ -761,7 +902,7 @@
 
 .wi-search-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     padding: 10px 16px;
     cursor: pointer;
     border-bottom: 1px solid var(--vale-page-bg);
@@ -776,12 +917,13 @@
     font-size: 13px;
     color: var(--vale-text-dark);
     transition: color 0.08s;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    word-break: break-word;
+    line-height: 1.35;
 }
 
 .wi-search-item-unit {
+    flex-shrink: 0;
     font-size: 11px;
     color: var(--vale-text);
     background: var(--vale-page-bg);
@@ -790,6 +932,29 @@
     flex-shrink: 0;
     font-weight: 600;
 }
+
+.wi-search-footer {
+    flex-shrink: 0;
+    padding: 10px 16px;
+    border-top: 1px solid var(--vale-page-bg);
+}
+
+.wi-search-create-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 9px 12px;
+    border-radius: 8px;
+    background: var(--vale-page-bg);
+    color: var(--vale-primary-dk);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.1s;
+}
+.wi-search-create-btn:hover { background: #eaf5f2; color: var(--vale-primary); }
 
 /* ─── Discipline badge chip (shown in Discipline column for data rows) ─────── */
 

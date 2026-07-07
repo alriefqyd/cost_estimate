@@ -472,21 +472,22 @@ class WorkItemController extends Controller
      */
     public function searchWorkItemsLean(Request $request): \Illuminate\Http\JsonResponse
     {
-        $q = trim($request->input('q', ''));
-        if (strlen($q) < 2) {
-            return response()->json([]);
-        }
+        $q      = trim($request->input('q', ''));
+        $offset = max(0, (int) $request->input('offset', 0));
+        $limit  = 10;
 
         $userId     = auth()->id();
         $isReviewer = auth()->user()->isWorkItemReviewer();
         $like       = '%' . $q . '%';
 
-        $rows = DB::table('work_items as wi')
+        $query = DB::table('work_items as wi')
+            ->join('work_item_types as wit', 'wit.id', '=', 'wi.work_item_type_id')
             ->select([
                 'wi.id',
                 'wi.description',
                 'wi.unit',
                 'wi.status',
+                'wit.title as category',
                 DB::raw('COALESCE((
                     SELECT SUM(mp.overall_rate_hourly * mpwi.labor_coefisient)
                     FROM man_powers_work_items mpwi
@@ -507,23 +508,80 @@ class WorkItemController extends Controller
                 ), 0) AS material_rate'),
             ])
             ->whereNull('wi.deleted_at')
-            ->where('wi.description', 'like', $like)
+            ->when($q !== '', fn($q2) => $q2->where(function ($q3) use ($like) {
+                $q3->where('wi.description', 'like', $like)
+                   ->orWhere('wit.title', 'like', $like);
+            }))
             ->when(!$isReviewer, fn($q2) => $q2->where(function ($q3) use ($userId) {
                 $q3->where('wi.status', WorkItem::REVIEWED)
                    ->orWhere('wi.created_by', $userId);
             }))
-            ->orderByRaw("LOCATE(?, wi.description)", [$q])
-            ->limit(30)
+            ->orderBy('wit.title')
+            ->orderBy('wi.description')
+            ->offset($offset)
+            ->limit($limit + 1);
+
+        $rows    = $query->get();
+        $hasMore = $rows->count() > $limit;
+        $rows    = $rows->take($limit);
+
+        return response()->json([
+            'items' => $rows->map(fn($r) => [
+                'id'                    => $r->id,
+                'text'                  => $r->description . ' - (' . $r->status . ')',
+                'unit'                  => $r->unit,
+                'category'              => $r->category,
+                'manPowersTotalRateInt' => (float) $r->labor_rate,
+                'equipmentToolsRateInt' => (float) $r->equipment_rate,
+                'materialsRateInt'      => (float) $r->material_rate,
+            ])->values(),
+            'hasMore' => $hasMore,
+        ]);
+    }
+
+    public function breakdown($id): \Illuminate\Http\JsonResponse
+    {
+        $labor = DB::table('man_powers_work_items as mpwi')
+            ->join('man_powers as mp', 'mp.id', '=', 'mpwi.man_power_id')
+            ->where('mpwi.work_item_id', $id)
+            ->select([
+                'mp.title as name',
+                'mp.overall_rate_hourly as rate',
+                'mpwi.labor_coefisient as quantity',
+                'mpwi.labor_unit as unit',
+                'mpwi.amount as subtotal',
+            ])
             ->get();
 
-        return response()->json($rows->map(fn($r) => [
-            'id'                    => $r->id,
-            'text'                  => $r->description . ' - (' . $r->status . ')',
-            'unit'                  => $r->unit,
-            'manPowersTotalRateInt' => (float) $r->labor_rate,
-            'equipmentToolsRateInt' => (float) $r->equipment_rate,
-            'materialsRateInt'      => (float) $r->material_rate,
-        ]));
+        $material = DB::table('work_items_materials as wim')
+            ->join('materials as m', 'm.id', '=', 'wim.materials_id')
+            ->where('wim.work_item_id', $id)
+            ->select([
+                DB::raw('COALESCE(m.tool_equipment_description, m.description, m.code) as name'),
+                'wim.unit',
+                'wim.quantity',
+                'wim.unit_price as rate',
+                'wim.amount as subtotal',
+            ])
+            ->get();
+
+        $equipment = DB::table('work_items_equipment_tools as wiet')
+            ->join('equipment_tools as et', 'et.id', '=', 'wiet.equipment_tools_id')
+            ->where('wiet.work_item_id', $id)
+            ->select([
+                'et.description as name',
+                'wiet.unit',
+                'wiet.quantity',
+                'wiet.unit_price as rate',
+                'wiet.amount as subtotal',
+            ])
+            ->get();
+
+        return response()->json([
+            'labor'     => $labor,
+            'material'  => $material,
+            'equipment' => $equipment,
+        ]);
     }
 
     public function setWorkItems(Request $request){
