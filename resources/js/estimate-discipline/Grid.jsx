@@ -3,6 +3,7 @@ import { AgGridReact } from 'ag-grid-react'
 import 'ag-grid-community/styles/ag-grid.css'
 import 'ag-grid-community/styles/ag-theme-alpine.css'
 import WorkItemSearch from './WorkItemSearch'
+import { getWorkItemBreakdown } from './api'
 
 // ─── Formatters ──────────────────────────────────────────────────────────────
 
@@ -12,10 +13,15 @@ function fmt(val) {
     return int.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + dec
 }
 
+// Factorials default to 1 when unset, but an explicit 0 must zero out the cost — Number(0) || 1 would wrongly reset it to 1.
+function factorialOr1(val) {
+    return (val === null || val === undefined || val === '') ? 1 : Number(val)
+}
+
 function computeTotal(row) {
-    const lf  = Number(row.labourFactorial)    || 1
-    const ef  = Number(row.equipmentFactorial) || 1
-    const mf  = Number(row.materialFactorial)  || 1
+    const lf  = factorialOr1(row.labourFactorial)
+    const ef  = factorialOr1(row.equipmentFactorial)
+    const mf  = factorialOr1(row.materialFactorial)
     const vol = Number(row.volume) || 1
     return ((Number(row.laborRate) || 0) * lf
           + (Number(row.toolRate)  || 0) * ef
@@ -145,6 +151,71 @@ function VolCellRenderer({ value, data }) {
     )
 }
 
+// ─── Rate cell renderer (Man Power / Equipment / Material — shows total + breakdown icon) ──
+
+const RATE_KIND_CONFIG = {
+    'col-mp':  { rateField: 'laborRate',    facField: 'labourFactorial',    kind: 'labor',     label: 'Man Power' },
+    'col-eq':  { rateField: 'toolRate',     facField: 'equipmentFactorial', kind: 'equipment', label: 'Equipment' },
+    'col-mat': { rateField: 'materialRate', facField: 'materialFactorial',  kind: 'material',   label: 'Material' },
+}
+
+function RateCellRenderer({ data, colDef, context }) {
+    if (!data || data._type !== 'data') return null
+    const cfg = RATE_KIND_CONFIG[colDef.colId]
+    const total = (Number(data[cfg.rateField]) || 0) * factorialOr1(data[cfg.facField])
+    return (
+        <div className="rate-cell">
+            <span>{fmt(total)}</span>
+            {data.workItemId != null && (
+                <button
+                    type="button"
+                    className="rate-cell-info-btn"
+                    title={`Show ${cfg.label.toLowerCase()} breakdown`}
+                    onClick={e => { e.stopPropagation(); context.openBreakdown(data.workItemId, cfg, e.currentTarget) }}
+                >
+                    <i className="fa fa-info-circle" />
+                </button>
+            )}
+        </div>
+    )
+}
+
+// ─── Breakdown popover (list of man power / equipment / material lines for a work item) ───
+
+function BreakdownPopover({ breakdown, onClose }) {
+    if (!breakdown) return null
+    const { label, kind, top, left, loading, data } = breakdown
+    const rows = data?.[kind] || []
+    return (
+        <div className="rate-breakdown-overlay" onClick={onClose}>
+            <div className="rate-breakdown-popover" style={{ top, left }} onClick={e => e.stopPropagation()}>
+                <div className="rate-breakdown-header">
+                    <span>{label} breakdown</span>
+                    <button className="rate-breakdown-close" onClick={onClose}>✕</button>
+                </div>
+                <div className="rate-breakdown-columns">
+                    <span className="rate-breakdown-name">Item</span>
+                    <span className="rate-breakdown-qty">Qty</span>
+                    <span className="rate-breakdown-rate">Rate</span>
+                    <span className="rate-breakdown-subtotal">Subtotal</span>
+                </div>
+                <div className="rate-breakdown-body">
+                    {loading && <div className="rate-breakdown-hint">Loading…</div>}
+                    {!loading && rows.length === 0 && <div className="rate-breakdown-hint">No items</div>}
+                    {!loading && rows.map((r, i) => (
+                        <div key={i} className="rate-breakdown-row">
+                            <span className="rate-breakdown-name">{r.name || '—'}</span>
+                            <span className="rate-breakdown-qty">{r.quantity ?? ''} {r.unit ?? ''}</span>
+                            <span className="rate-breakdown-rate">{fmt(r.rate)}</span>
+                            <span className="rate-breakdown-subtotal">{fmt(r.subtotal)}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    )
+}
+
 // ─── Number cell editor ───────────────────────────────────────────────────────
 
 const NumberCellEditor = React.forwardRef(({ value, stopEditing }, ref) => {
@@ -199,6 +270,46 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
     const gridRef = useRef(null)
     const [wiSearchUid, setWiSearchUid] = useState(null)
     const [collapsed, setCollapsed] = useState(new Set())
+    const [breakdown, setBreakdown] = useState(null)
+    const breakdownCacheRef = useRef(new Map())
+
+    const closeBreakdown = useCallback(() => setBreakdown(null), [])
+
+    const openBreakdown = useCallback((workItemId, cfg, anchorEl) => {
+        if (breakdown?.workItemId === workItemId && breakdown?.kind === cfg.kind) {
+            setBreakdown(null)
+            return
+        }
+
+        const rect   = anchorEl.getBoundingClientRect()
+        const cached = breakdownCacheRef.current.get(workItemId)
+
+        const POPOVER_WIDTH = 360
+        const POPOVER_MAX_HEIGHT = 320
+        const MARGIN = 8
+        let left = Math.min(rect.left, window.innerWidth - POPOVER_WIDTH - MARGIN)
+        left = Math.max(MARGIN, left)
+        let top = rect.bottom + 4
+        if (top + POPOVER_MAX_HEIGHT > window.innerHeight - MARGIN) {
+            const spaceAbove = rect.top - MARGIN
+            top = spaceAbove > POPOVER_MAX_HEIGHT
+                ? rect.top - POPOVER_MAX_HEIGHT - 4
+                : Math.max(MARGIN, window.innerHeight - POPOVER_MAX_HEIGHT - MARGIN)
+        }
+
+        setBreakdown({
+            workItemId, kind: cfg.kind, label: cfg.label,
+            top, left,
+            loading: !cached, data: cached || null,
+        })
+
+        if (!cached) {
+            getWorkItemBreakdown(workItemId).then(data => {
+                breakdownCacheRef.current.set(workItemId, data)
+                setBreakdown(b => (b && b.workItemId === workItemId) ? { ...b, loading: false, data } : b)
+            })
+        }
+    }, [breakdown])
 
     const toggleCollapsed = useCallback((rowId) => {
         setCollapsed(prev => {
@@ -374,6 +485,8 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
             flex:         2,
             minWidth:     220,
             editable:     false,
+            wrapText:     true,
+            autoHeight:   true,
             cellRenderer: WorkItemCellRenderer,
             suppressKeyboardEvent: () => true,
         },
@@ -391,34 +504,28 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
             colId:     'col-mp',
             headerName: 'Man Power',
             field:      'laborRate',
-            width:      120,
+            width:      130,
             editable:   false,
             cellClass:  ['cell-readonly', 'cell-num'],
-            valueFormatter: params => params.data?._type === 'data'
-                ? fmt((Number(params.data.laborRate) || 0) * (Number(params.data.labourFactorial) || 1))
-                : '',
+            cellRenderer: RateCellRenderer,
         },
         {
             colId:      'col-eq',
             headerName: 'Equipment',
             field:      'toolRate',
-            width:      120,
+            width:      130,
             editable:   false,
             cellClass:  ['cell-readonly', 'cell-num'],
-            valueFormatter: params => params.data?._type === 'data'
-                ? fmt((Number(params.data.toolRate) || 0) * (Number(params.data.equipmentFactorial) || 1))
-                : '',
+            cellRenderer: RateCellRenderer,
         },
         {
             colId:      'col-mat',
             headerName: 'Material',
             field:      'materialRate',
-            width:      120,
+            width:      130,
             editable:   false,
             cellClass:  ['cell-readonly', 'cell-num'],
-            valueFormatter: params => params.data?._type === 'data'
-                ? fmt((Number(params.data.materialRate) || 0) * (Number(params.data.materialFactorial) || 1))
-                : '',
+            cellRenderer: RateCellRenderer,
         },
         {
             colId:      'col-lf',
@@ -532,7 +639,8 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
         openAddRow: (wbs3Id, workElId, rowMeta) => {
             if (onAddRowInline) onAddRowInline(wbs3Id, workElId, rowMeta)
         },
-    }), [userDiscipline, isReadOnly, isAdmin, toggleCollapsed, onAddRowInline])
+        openBreakdown,
+    }), [userDiscipline, isReadOnly, isAdmin, toggleCollapsed, onAddRowInline, openBreakdown])
 
     const handleWorkItemSelected = useCallback(item => {
         if (!wiSearchUid) return
@@ -609,6 +717,8 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
                     onClose={() => setWiSearchUid(null)}
                 />
             )}
+
+            <BreakdownPopover breakdown={breakdown} onClose={closeBreakdown} />
         </>
     )
 }

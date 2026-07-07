@@ -271,7 +271,7 @@ class ProjectServices
     }
 
     public function getResultCount($value,$factorial){
-        if(!$factorial) $factorial = 1;
+        if($factorial === null || $factorial === '') $factorial = 1;
         $factorial = (float) $factorial;
         if(!$value) return '';
         $newValue = $value * $factorial;

@@ -553,9 +553,9 @@ class EstimateAllDisciplineController extends Controller
                 $estimateToSync->workItemManPowerCostRate   = $cv['labourUnitRate'];
                 $estimateToSync->workItemEquipmentCostRate  = $cv['equipmentUnitRate'] ?? null;
                 $estimateToSync->workItemMaterialCostRate   = $cv['materialUnitRate'] ?? null;
-                $estimateToSync->laborFactorial    = (float) $cv['labourFactorial'] > 0 ? (float) $cv['labourFactorial'] : 1;
-                $estimateToSync->equipmentFactorial = (float) $cv['equipmentFactorial'] > 0 ? (float) $cv['equipmentFactorial'] : 1;
-                $estimateToSync->materialFactorial  = (float) $cv['materialFactorial'] > 0 ? (float) $cv['materialFactorial'] : 1;
+                $estimateToSync->laborFactorial    = ($cv['labourFactorial'] !== null && $cv['labourFactorial'] !== '') ? (float) $cv['labourFactorial'] : 1;
+                $estimateToSync->equipmentFactorial = ($cv['equipmentFactorial'] !== null && $cv['equipmentFactorial'] !== '') ? (float) $cv['equipmentFactorial'] : 1;
+                $estimateToSync->materialFactorial  = ($cv['materialFactorial'] !== null && $cv['materialFactorial'] !== '') ? (float) $cv['materialFactorial'] : 1;
                 $estimateToSync->wbsLevel3Id        = $cv['wbs_level3'];
                 $estimateToSync->uniqueIdentifier   = $cv['idx'];
                 $estimateToSync->version            = $version;
@@ -586,9 +586,9 @@ class EstimateAllDisciplineController extends Controller
                 $est->workItemManPowerCostRate   = $totalManPowers;
                 $est->workItemEquipmentCostRate  = $totalEquipment;
                 $est->workItemMaterialCostRate   = $totalMaterial;
-                $est->laborFactorial    = (float) $item->labour_factorial > 0 ? (float) $item->labour_factorial : 1;
-                $est->equipmentFactorial = (float) $item->equipment_factorial > 0 ? (float) $item->equipment_factorial : 1;
-                $est->materialFactorial  = (float) $item->material_factorial > 0 ? (float) $item->material_factorial : 1;
+                $est->laborFactorial    = ($item->labour_factorial !== null && $item->labour_factorial !== '') ? (float) $item->labour_factorial : 1;
+                $est->equipmentFactorial = ($item->equipment_factorial !== null && $item->equipment_factorial !== '') ? (float) $item->equipment_factorial : 1;
+                $est->materialFactorial  = ($item->material_factorial !== null && $item->material_factorial !== '') ? (float) $item->material_factorial : 1;
                 $est->wbsLevel3Id        = $item->wbs_level3_id;
                 $est->version            = $item->version;
                 $est->uniqueIdentifier   = $item->unique_identifier;

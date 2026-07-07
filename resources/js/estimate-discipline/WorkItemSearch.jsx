@@ -1,54 +1,70 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { searchWorkItems } from './api'
 
+const PAGE_SIZE = 10
+
 // Module-level cache — survives re-mounts within the same session
-const queryCache = new Map()
+const pageCache = new Map()
 
 export default function WorkItemSearch({ onSelect, onClose }) {
     const [query, setQuery]     = useState('')
     const [results, setResults] = useState([])
+    const [hasMore, setHasMore] = useState(false)
     const [loading, setLoading] = useState(false)
     const inputRef  = useRef(null)
+    const listRef   = useRef(null)
     const timerRef  = useRef(null)
     const abortRef  = useRef(null)
+    const offsetRef = useRef(0)
 
     useEffect(() => { inputRef.current?.focus() }, [])
 
-    useEffect(() => {
-        clearTimeout(timerRef.current)
+    const loadPage = useCallback((q, offset) => {
         abortRef.current?.abort()
 
-        const q = query.trim()
-        if (q.length < 2) { setResults([]); setLoading(false); return }
-
-        // Return cached result immediately — no network, no delay
-        if (queryCache.has(q)) {
-            setResults(queryCache.get(q))
+        const cacheKey = `${q}::${offset}`
+        if (pageCache.has(cacheKey)) {
+            const page = pageCache.get(cacheKey)
+            setResults(prev => offset === 0 ? page.items : [...prev, ...page.items])
+            setHasMore(page.hasMore)
             setLoading(false)
             return
         }
 
         setLoading(true)
-        timerRef.current = setTimeout(async () => {
-            const controller = new AbortController()
-            abortRef.current = controller
-            try {
-                const data = await searchWorkItems(q, controller.signal)
-                const flat = Array.isArray(data) ? data : []
-                queryCache.set(q, flat)
-                setResults(flat)
-            } catch (e) {
-                if (e.name !== 'AbortError') setResults([])
-            } finally {
-                setLoading(false)
-            }
-        }, 200)
+        const controller = new AbortController()
+        abortRef.current = controller
+        searchWorkItems(q, offset, controller.signal)
+            .then(data => {
+                const page = { items: Array.isArray(data?.items) ? data.items : [], hasMore: !!data?.hasMore }
+                pageCache.set(cacheKey, page)
+                setResults(prev => offset === 0 ? page.items : [...prev, ...page.items])
+                setHasMore(page.hasMore)
+            })
+            .catch(e => { if (e.name !== 'AbortError') { if (offset === 0) setResults([]); setHasMore(false) } })
+            .finally(() => setLoading(false))
+    }, [])
 
-        return () => {
-            clearTimeout(timerRef.current)
-            abortRef.current?.abort()
-        }
-    }, [query])
+    // Reset pagination and load the first page whenever the query changes (debounced)
+    useEffect(() => {
+        clearTimeout(timerRef.current)
+        const q = query.trim()
+        offsetRef.current = 0
+        if (listRef.current) listRef.current.scrollTop = 0
+        timerRef.current = setTimeout(() => loadPage(q, 0), 200)
+        return () => clearTimeout(timerRef.current)
+    }, [query, loadPage])
+
+    const loadMore = useCallback(() => {
+        if (loading || !hasMore) return
+        offsetRef.current += PAGE_SIZE
+        loadPage(query.trim(), offsetRef.current)
+    }, [loading, hasMore, query, loadPage])
+
+    const handleScroll = e => {
+        const el = e.target
+        if (el.scrollHeight - el.scrollTop - el.clientHeight < 80) loadMore()
+    }
 
     const pick = (item) => {
         onSelect({
@@ -61,6 +77,9 @@ export default function WorkItemSearch({ onSelect, onClose }) {
         })
     }
 
+    // Group consecutive results by category for display
+    let lastCategory = null
+
     return (
         <div className="wi-search-overlay" onClick={onClose}>
             <div className="wi-search-panel" onClick={e => e.stopPropagation()}>
@@ -68,28 +87,46 @@ export default function WorkItemSearch({ onSelect, onClose }) {
                     <input
                         ref={inputRef}
                         className="wi-search-input"
-                        placeholder="Search work items… (min. 2 characters)"
+                        placeholder="Search work items or category…"
                         value={query}
                         onChange={e => setQuery(e.target.value)}
                     />
                     <button className="wi-search-close" onClick={onClose}>✕</button>
                 </div>
-                <div className="wi-search-results">
-                    {loading && <div className="wi-search-hint">Searching…</div>}
-                    {!loading && query.trim().length < 2 && (
-                        <div className="wi-search-hint">Type at least 2 characters…</div>
-                    )}
-                    {!loading && query.trim().length >= 2 && results.length === 0 && (
-                        <div className="wi-search-hint">No results for "{query}"</div>
-                    )}
-                    {results.map(item => (
-                        <div key={item.id} className="wi-search-item" onClick={() => pick(item)}>
-                            <span className="wi-search-item-name">
-                                {item.text.replace(/ - \(REVIEWED\)| - \(DRAFT\)/g, '')}
-                            </span>
-                            <span className="wi-search-item-unit">{item.unit}</span>
+                <div className="wi-search-results" ref={listRef} onScroll={handleScroll}>
+                    {!loading && results.length === 0 && (
+                        <div className="wi-search-hint">
+                            {query.trim() ? `No results for "${query}"` : 'No work items found'}
                         </div>
-                    ))}
+                    )}
+                    {results.map(item => {
+                        const showHeader = item.category !== lastCategory
+                        lastCategory = item.category
+                        return (
+                            <React.Fragment key={item.id}>
+                                {showHeader && (
+                                    <div className="wi-search-category-header">{item.category}</div>
+                                )}
+                                <div className="wi-search-item" onClick={() => pick(item)}>
+                                    <span className="wi-search-item-name">
+                                        {item.text.replace(/ - \(REVIEWED\)| - \(DRAFT\)/g, '')}
+                                    </span>
+                                    <span className="wi-search-item-unit">{item.unit}</span>
+                                </div>
+                            </React.Fragment>
+                        )
+                    })}
+                    {loading && <div className="wi-search-hint">Loading…</div>}
+                </div>
+                <div className="wi-search-footer">
+                    <a
+                        className="wi-search-create-btn"
+                        href="/work-item/create"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        <i className="fa fa-plus" /> Create new work item
+                    </a>
                 </div>
             </div>
         </div>
