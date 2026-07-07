@@ -1,5 +1,10 @@
 const csrf = () => document.querySelector('meta[name="csrf-token"]')?.content ?? ''
 
+// Factorials default to 1 when unset, but an explicit 0 must zero out the cost — parseFloat(0) || 1 would wrongly reset it to 1.
+function factorialOr1(val) {
+    return (val === null || val === undefined || val === '') ? 1 : parseFloat(val)
+}
+
 function formBody(obj) {
     const p = new URLSearchParams()
     Object.entries(obj).forEach(([k, v]) => p.set(k, v ?? ''))
@@ -21,9 +26,9 @@ export async function autosave(projectId, row) {
             labourUnitRate:      row.laborRate,
             equipmentUnitRate:   row.toolRate,
             materialUnitRate:    row.materialRate,
-            totalRateManPowers:  row.laborRate  * (parseFloat(row.labourFactorial)    || 1),
-            totalRateEquipments: row.toolRate   * (parseFloat(row.equipmentFactorial) || 1),
-            totalRateMaterials:  row.materialRate * (parseFloat(row.materialFactorial)  || 1),
+            totalRateManPowers:  row.laborRate  * factorialOr1(row.labourFactorial),
+            totalRateEquipments: row.toolRate   * factorialOr1(row.equipmentFactorial),
+            totalRateMaterials:  row.materialRate * factorialOr1(row.materialFactorial),
             wbs_level3:          row.wbs_level3_id,
             work_element:        row.work_element_id,
         }),
@@ -48,8 +53,13 @@ export async function saveContingency(projectId, value) {
     return res.json()
 }
 
-export async function searchWorkItems(q, signal) {
-    const res = await fetch(`/work-items/search?q=${encodeURIComponent(q)}`, { signal })
+export async function searchWorkItems(q, offset, signal) {
+    const res = await fetch(`/work-items/search?q=${encodeURIComponent(q)}&offset=${offset}`, { signal })
+    return res.json()
+}
+
+export async function getWorkItemBreakdown(workItemId) {
+    const res = await fetch(`/work-items/${workItemId}/breakdown`)
     return res.json()
 }
 

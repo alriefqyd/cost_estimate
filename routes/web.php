@@ -70,6 +70,7 @@ Route::get('/project/getProjectDisciplineStatus/{project:id}/',[\App\Http\Contro
 Route::post('/workElement/{project:id}',[\App\Http\Controllers\WorkElementController::class,'store'])->middleware('auth');
 Route::get('/getWorkItems',[\App\Http\Controllers\WorkItemController::class,'setWorkItems'])->name('getWorkItem')->middleware('auth');
 Route::get('/work-items/search',[\App\Http\Controllers\WorkItemController::class,'searchWorkItemsLean'])->middleware('auth');
+Route::get('/work-items/{id}/breakdown',[\App\Http\Controllers\WorkItemController::class,'breakdown'])->middleware('auth');
 Route::get('/getWorkElement',[\App\Http\Controllers\WorkElementController::class,'setWorkElements'])->name('getWorkElement');
 Route::get('/getItemAdditional/{type}',[\App\Http\Controllers\EstimateAllDisciplineController::class,'getItemAdditional'])->name('getItemAdditional');
 

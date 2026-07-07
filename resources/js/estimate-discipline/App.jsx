@@ -16,10 +16,15 @@ function fmt(val) {
     return int.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + dec
 }
 
+// Factorials default to 1 when unset, but an explicit 0 must zero out the cost — Number(0) || 1 would wrongly reset it to 1.
+function factorialOr1(val) {
+    return (val === null || val === undefined || val === '') ? 1 : Number(val)
+}
+
 function computeTotal(row) {
-    const lf  = Number(row.labourFactorial)    || 1
-    const ef  = Number(row.equipmentFactorial) || 1
-    const mf  = Number(row.materialFactorial)  || 1
+    const lf  = factorialOr1(row.labourFactorial)
+    const ef  = factorialOr1(row.equipmentFactorial)
+    const mf  = factorialOr1(row.materialFactorial)
     const vol = Number(row.volume) || 1
     return ((Number(row.laborRate) || 0) * lf
           + (Number(row.toolRate)  || 0) * ef
