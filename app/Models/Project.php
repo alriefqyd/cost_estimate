@@ -231,9 +231,9 @@ class Project extends Model
     public function getTotalCost(){
         try{
             $total = $this->estimateAllDisciplines->sum(function($ed) {
-                $lf  = (float) ($ed->labour_factorial    ?? 1) ?: 1;
-                $ef  = (float) ($ed->equipment_factorial ?? 1) ?: 1;
-                $mf  = (float) ($ed->material_factorial  ?? 1) ?: 1;
+                $lf  = (float) ($ed->labour_factorial    ?? 1);
+                $ef  = (float) ($ed->equipment_factorial ?? 1);
+                $mf  = (float) ($ed->material_factorial  ?? 1);
                 $vol = (float) ($ed->volume ?? 1);
                 return ((float) ($ed->labor_unit_rate    ?? 0) * $lf
                       + (float) ($ed->tool_unit_rate     ?? 0) * $ef
