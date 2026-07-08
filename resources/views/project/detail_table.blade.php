@@ -114,12 +114,6 @@
                     @foreach($disciplineGroup as $disciplineName => $workElementGroup)
                         @php
                             $dt = $disciplineTotals[$locationKey][$disciplineName] ?? null;
-                            $firstWE = reset($workElementGroup);
-                            $firstItem = is_array($firstWE) ? reset($firstWE) : null;
-                            $ws = $firstItem->workScope ?? null;
-                            $discApprovalStatus = $ws ? ($project->{$ws . '_approval_status'} ?? null) : null;
-                            $discIsPublished = $ws ? $project->getStatusEstimateDiscipline('design_engineer_' . $ws) : false;
-                            $showApprovalBadge = $discIsPublished || in_array($discApprovalStatus, [\App\Models\Project::APPROVE, \App\Models\Project::REJECTED]);
                         @endphp
                         <tr class="js-column-discipline table-row-discipline" style="background-color:#DEDEDED0;">
                             <td></td>
@@ -129,9 +123,6 @@
                                         <i class="fa fa-layer-group me-1" style="font-size:10px;opacity:0.6;"></i>
                                         {{ucwords(strtolower($disciplineName))}}
                                     </span>
-                                    @if($ws && $showApprovalBadge)
-                                        <span class="ms-2 flex-shrink-0">{!! $project->getStatusApprovalDiscipline($discApprovalStatus, null) !!}</span>
-                                    @endif
                                     <div class="collapse-toggle ms-2 flex-shrink-0">
                                         <i class="fa fa-chevron-up js-minimize cursor-pointer"></i>
                                         <i class="fa fa-chevron-down js-maximize cursor-pointer d-none"></i>
