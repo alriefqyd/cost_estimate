@@ -10,6 +10,7 @@ use App\Models\EstimateAllDiscipline;
 use App\Models\Material;
 use App\Models\Project;
 use App\Models\WbsLevel3;
+use App\Models\WorkItem;
 use App\Services\ProjectServices;
 use Carbon\Carbon;
 use Exception;
@@ -196,6 +197,7 @@ class EstimateAllDisciplineController extends Controller
                     'work_element_id'     => $ed->equipment_location_id,
                     'workItemId'          => $ed->work_item_id,
                     'workItemDescription' => $ed->workItems?->description ?? $ed->title ?? '',
+                    'workItemStatus'      => $ed->workItems?->status,
                     'volume'              => (float) ($ed->volume ?? 1),
                     'unit'                => $ed->workItems?->unit ?? '',
                     'laborRate'           => (float) ($ed->labor_unit_rate ?? 0),
@@ -370,6 +372,17 @@ class EstimateAllDisciplineController extends Controller
 
         $position = $this->getUserDiscipline();
         $projectServices = new ProjectServices();
+
+        $hasDraftWorkItems = EstimateAllDiscipline::where('project_id', $project->id)
+            ->where('work_scope', $position)
+            ->whereHas('workItems', function ($q) {
+                $q->where('status', WorkItem::DRAFT);
+            })
+            ->exists();
+
+        if ($hasDraftWorkItems) {
+            return response()->json(['status' => 422, 'message' => 'Cannot publish: one or more work items are still in draft status and have not been reviewed.']);
+        }
 
         DB::beginTransaction();
         try {
