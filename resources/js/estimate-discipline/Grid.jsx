@@ -127,13 +127,22 @@ function WeCellRenderer({ data, context }) {
 function WorkItemCellRenderer({ value, data, context }) {
     if (!data || data._type !== 'data') return null
     const canEdit = context.isAdmin || !data.scopeOwned || data.workScope === context.userDiscipline
+    const isDraft = data.workItemStatus === 'DRAFT'
+    const tooltip = isDraft
+        ? 'This work item is still in draft and has not been reviewed — it cannot be used until it is reviewed'
+        : (canEdit ? 'Click to select work item' : `Read-only (${data.workScope})`)
     return (
         <div
             className={`wi-cell ${canEdit ? 'wi-cell-editable' : 'wi-cell-readonly'}`}
             onClick={() => canEdit && context.openWorkItemSearch(data.uid)}
-            title={canEdit ? 'Click to select work item' : `Read-only (${data.workScope})`}
+            title={tooltip}
         >
-            <span>{value || <em className="text-muted">— click to select —</em>}</span>
+            <span className={isDraft ? 'wi-cell-text-draft' : ''}>{value || <em className="text-muted">— click to select —</em>}</span>
+            {isDraft && (
+                <span className="wi-draft-badge" title="Draft — not yet reviewed, cannot be used">
+                    <i className="fa fa-exclamation-triangle" /> Draft
+                </span>
+            )}
             {canEdit && <span className="wi-cell-edit-hint">✏</span>}
         </div>
     )
@@ -647,6 +656,7 @@ export default function EstimateGrid({ rows, wbsOptions, userDiscipline, isReadO
         const fields = {
             workItemId:          item.workItemId,
             workItemDescription: item.workItemDescription,
+            workItemStatus:      item.workItemStatus ?? null,
             unit:                item.unit,
             laborRate:           item.laborRate,
             toolRate:            item.toolRate,

@@ -15,11 +15,16 @@ class SettingController extends Controller
     public function updateCurrencyUsd(){
         try {
             $apiController = new ApiController();
-            $setting = Setting::where('setting_type','USD_RATE')->first();
-            $setting->setting_value = $apiController->getUsdRateApi();
-            $setting->updated_at = now();
-            $setting->save();
-            Log::info('Running cron job update currency usd');
+            $rate = $apiController->getUsdRateApi();
+            if ($rate) {
+                $setting = Setting::where('setting_type','USD_RATE')->first();
+                $setting->setting_value = $rate;
+                $setting->updated_at = now();
+                $setting->save();
+                Log::info('Running cron job update currency usd');
+            } else {
+                Log::warning('Skipped cron job update currency usd: API returned no rate');
+            }
         } catch (\Exception $e) {
             Log::error($e->getMessage());
         }

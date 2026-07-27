@@ -529,6 +529,7 @@ class WorkItemController extends Controller
             'items' => $rows->map(fn($r) => [
                 'id'                    => $r->id,
                 'text'                  => $r->description . ' - (' . $r->status . ')',
+                'status'                => $r->status,
                 'unit'                  => $r->unit,
                 'category'              => $r->category,
                 'manPowersTotalRateInt' => (float) $r->labor_rate,
