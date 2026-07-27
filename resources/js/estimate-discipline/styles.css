@@ -337,6 +337,30 @@
 
 .wi-cell-readonly { cursor: default; opacity: 0.75; }
 
+/* ─── Draft work item warning (unreviewed work items cannot be used) ───────── */
+
+.wi-cell-text-draft { color: #b91c1c !important; font-weight: 600; }
+
+.wi-draft-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 1px 8px;
+    margin-left: 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    flex-shrink: 0;
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fca5a5;
+    vertical-align: middle;
+}
+.wi-draft-badge .fa { font-size: 9px; }
+
 /* ─── Volume unit badge ────────────────────────────────────────────────────── */
 
 .vol-unit-badge {

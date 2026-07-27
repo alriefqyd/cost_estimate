@@ -28,7 +28,7 @@ class ApiController extends Controller
         $req_url = "https://api.frankfurter.app/latest?from=USD&to=IDR";
         $response = $this->getApi($req_url);
         if($response) {
-            return $response->rates->IDR;
+            return $response['rates']['IDR'] ?? null;
         }
         return null;
     }

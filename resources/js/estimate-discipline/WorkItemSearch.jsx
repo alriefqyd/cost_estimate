@@ -70,6 +70,7 @@ export default function WorkItemSearch({ onSelect, onClose }) {
         onSelect({
             workItemId:          item.id,
             workItemDescription: item.text.replace(/ - \(REVIEWED\)| - \(DRAFT\)/g, ''),
+            workItemStatus:      item.status ?? null,
             unit:                item.unit ?? '',
             laborRate:           item.manPowersTotalRateInt ?? 0,
             toolRate:            item.equipmentToolsRateInt ?? 0,
@@ -110,6 +111,11 @@ export default function WorkItemSearch({ onSelect, onClose }) {
                                 <div className="wi-search-item" onClick={() => pick(item)}>
                                     <span className="wi-search-item-name">
                                         {item.text.replace(/ - \(REVIEWED\)| - \(DRAFT\)/g, '')}
+                                        {item.status === 'DRAFT' && (
+                                            <span className="wi-draft-badge" title="This work item is still in draft and has not been reviewed">
+                                                <i className="fa fa-exclamation-triangle" /> Draft
+                                            </span>
+                                        )}
                                     </span>
                                     <span className="wi-search-item-unit">{item.unit}</span>
                                 </div>

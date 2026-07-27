@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
+import Swal from 'sweetalert2'
 import { useCollab } from './collab'
 import EstimateGrid from './Grid'
 import AddRowModal from './AddRowModal'
@@ -276,7 +277,7 @@ export default function App({
                 throw new Error(res.message || 'Publish failed')
             }
         } catch (e) {
-            alert(e.message)
+            Swal.fire({ icon: 'error', title: 'Cannot Publish', text: e.message })
         } finally {
             setPublishing(false)
         }

@@ -487,7 +487,7 @@ class ProjectController extends Controller
         $costProjects = $projectServices->getAllProjectCost($project, $request);
 
         $settingController = new SettingController();
-        $getUsdIdr =  $settingController->getUsdRateFromDB();
+        $getUsdIdr =  $settingController->getUsdRateFromDB() ?: 1;
         Log::info('Export Estimate All Discipline Project ' . $project->project_title . ' by: ' . auth()->user()->profiles->full_name);
         // Pass data to a view
         $view = 'project.excel_format.summary';
