@@ -319,8 +319,14 @@ $(function(){
             success: function (result){
                 if(result.status === 200){
                     var _rendered = Mustache.render(template, result.data);
-                    $(_rendered).appendTo('body');
-                    $('#workItemFullDetailModal').modal('show');
+                    // Wait for the loading modal to fully finish hiding before showing the
+                    // next one — Bootstrap doesn't cleanly support two modals stacked at
+                    // once (its backdrop/body-scroll-lock state gets left behind), which
+                    // made the loading modal appear stuck after closing the detail modal.
+                    $('#workItemDetailLoadingModal').one('hidden.bs.modal', function () {
+                        $(_rendered).appendTo('body');
+                        $('#workItemFullDetailModal').modal('show');
+                    });
                 } else {
                     notification('danger', result.message || 'Failed to load work item detail', 'fa fa-warning', 'Error');
                 }
