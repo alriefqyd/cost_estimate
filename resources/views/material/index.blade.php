@@ -112,6 +112,7 @@
                                     <tr>
                                         @if(auth()->user()->isMaterialReviewerRole())
                                             <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="material"></th>
+                                            <th class="text-center">Review List</th>
                                         @endif
                                         <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="code"></i></th>
                                         <th scope="col" class="text-left">Category <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="category"></i></th>
@@ -130,13 +131,21 @@
                                 </thead>
                                 <tbody>
                                 @foreach($material as $item)
-                                    <tr>
+                                    @php $isMaterialDraft = $item->status === App\Models\Material::DRAFT; @endphp
+                                    <tr class="{{ $isMaterialDraft ? 'text-danger' : '' }}">
                                         @if(auth()->user()->isMaterialReviewerRole())
                                             <td class="text-center">
                                                 <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox" data-url="material" value="{{$item->id}}">
                                             </td>
+                                            <td class="text-center">
+                                                @if($isMaterialDraft)
+                                                    <i class="fa fa-flag js-review-list-icon js-add-to-review-cart" title="Add to Review List"
+                                                       data-entity="material" data-id="{{$item->id}}"
+                                                       data-code="{{$item->code}}" data-label="{{$item->tool_equipment_description}}"></i>
+                                                @endif
+                                            </td>
                                         @endif
-                                        <td><a href="/material/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
+                                        <td><a href="/material/{{$item->id}}" class="font-weight-bold {{ $isMaterialDraft ? 'text-danger' : '' }}">{{$item->code}}</td>
                                         <td>{{$item?->materialsCategory?->description}}</td>
                                         <td class="min-w-200">{{$item->tool_equipment_description}}</td>
                                         <td class="min-w-50">{{$item->quantity}}</td>
@@ -145,7 +154,7 @@
                                         <td class="min-w-150">{{$item->ref_material_number}}</td>
                                         <td class="min-w-120">{{$item->stock_code}}</td>
                                         <td class="min-w-80">{{$item->createdBy?->profiles?->full_name}}</td>
-                                        <td class="min-w-80">{{$item->status}}</td>
+                                        <td class="min-w-80 fw-bold">{{$item->status}}</td>
                                         @can('delete',App\Models\Material::class)
                                         <td><a data-bs-toggle="modal" data-original-title="test" data-bs-target="#deleteConfirmationModal"
                                                 data-id="{{$item->id}}" class="text-danger js-delete-material">Delete</a></td>
@@ -242,4 +251,5 @@
             </div>
         </form>
     </div>
+    @include('layouts.review_cart')
 @endsection

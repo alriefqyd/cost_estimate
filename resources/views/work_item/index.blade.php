@@ -99,6 +99,7 @@
                                 <tr>
                                     @if(auth()->user()->isWorkItemReviewer())
                                         <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="workItem"></th>
+                                        <th class="text-center">Review List</th>
                                     @endif
                                     <th class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="work_items.code"></i>
                                     </th>
@@ -139,8 +140,14 @@
                                         @if(auth()->user()->isWorkItemReviewer())
                                             <td class="text-center">
                                                 <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox"
-                                                       data-url="workItem"
-                                                       value="{{$item->id}}">
+                                                       data-url="workItem" value="{{$item->id}}">
+                                            </td>
+                                            <td class="text-center">
+                                                @if($item->status === App\Models\WorkItem::DRAFT)
+                                                    <i class="fa fa-flag js-review-list-icon js-add-to-review-cart" title="Add to Review List"
+                                                       data-entity="workItem" data-id="{{$item->id}}"
+                                                       data-code="{{$item->code}}" data-label="{{$item->description}}"></i>
+                                                @endif
                                             </td>
                                         @endif
                                         <td class="min-w-100"><a href="/work-item/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
@@ -219,4 +226,5 @@
         </div>
     @endcan
 
+    @include('layouts.review_cart')
 @endsection

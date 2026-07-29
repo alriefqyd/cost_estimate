@@ -43,6 +43,57 @@
         </div>
     </div>
 
+    {{-- ── Pending Review ────────────────────────────────── --}}
+    @if(!empty($reviewQueues))
+    <div class="row g-3 mb-4" id="tour-home-review-queue">
+        <div class="col-12">
+            <div class="db-card">
+                <div class="db-card-header">
+                    <div>
+                        <h6>
+                            Pending Your Review
+                            @if(array_sum(array_column($reviewQueues, 'count')) > 0)
+                                <span class="rq-alert-dot" title="You have items waiting for your review"></span>
+                            @endif
+                        </h6>
+                        <p style="margin:2px 0 0; font-size:12px; color:#9ca3af;">Draft items waiting for your approval</p>
+                    </div>
+                </div>
+                <div class="db-card-body" style="padding:16px;">
+                    <div class="row g-3">
+                        @foreach($reviewQueues as $queue)
+                            <div class="col-md-6 col-xl-3">
+                                <div class="review-queue-block" style="--rq-color:{{ $queue['color'] }}; --rq-bg:{{ $queue['bg'] }};">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="rq-icon"><i class="fa {{ $queue['icon'] }}"></i></div>
+                                            <strong style="font-size:13px;">{{ $queue['label'] }}</strong>
+                                        </div>
+                                        <span class="kpi-pill pill-draft rq-pulse">{{ $queue['count'] }}</span>
+                                    </div>
+                                    <ul class="rq-list">
+                                        @foreach($queue['items'] as $draftItem)
+                                            <li>
+                                                <a href="{{ $draftItem['url'] }}">{{ $draftItem['code'] }}</a>
+                                                <span class="rq-desc" title="{{ $draftItem['label'] }}">{{ $draftItem['label'] }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                    @if($queue['count'] > 0)
+                                        <a href="{{ $queue['url'] }}" class="rq-view-all">
+                                            View all {{ $queue['count'] }} <i class="fa fa-arrow-right ms-1" style="font-size:10px;"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
     {{-- ── KPI Stats ─────────────────────────────────────── --}}
     <div class="row g-3 mb-4" id="tour-home-kpi">
 

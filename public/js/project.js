@@ -304,5 +304,37 @@ $(function(){
         getReviewerForm(_formEngineer, _formReviewer);
     });
 
+    $(document).on('click', '.js-open-work-item-detail', function(){
+        var _workItemId = $(this).data('work-item-id');
+        if(!_workItemId) return;
+
+        var template = $('#js-template-modal-work-item-detail').html();
+        Mustache.parse(template);
+
+        $('#workItemDetailLoadingModal').modal('show');
+
+        $.ajax({
+            url: '/work-items/' + _workItemId + '/detail-modal',
+            method: 'GET',
+            success: function (result){
+                if(result.status === 200){
+                    var _rendered = Mustache.render(template, result.data);
+                    $(_rendered).appendTo('body');
+                    $('#workItemFullDetailModal').modal('show');
+                } else {
+                    notification('danger', result.message || 'Failed to load work item detail', 'fa fa-warning', 'Error');
+                }
+            },
+            error: function(){
+                notification('danger', 'Failed to load work item detail', 'fa fa-warning', 'Error');
+            },
+            complete: function(){
+                $('#workItemDetailLoadingModal').modal('hide');
+            }
+        });
+    });
+
+    $(document).on('hidden.bs.modal', '#workItemFullDetailModal', function () { $(this).remove(); });
+
 
 });

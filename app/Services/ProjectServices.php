@@ -100,6 +100,9 @@ class ProjectServices
             $projectClass->workItemTotalCostStr = number_format($this->getTotalCostWorkItem($location),2);
             $projectClass->workItemTotalCost = $this->getTotalCostWorkItem($location);
             $projectClass->workScope = $location->work_scope;
+            $projectClass->workItemStatus = $location?->workItems?->status;
+            $projectClass->workItemHasDraftMaterial = $location?->workItems?->hasDraftMaterial() ?? false;
+            $projectClass->workItemHasDraftTool = $location?->workItems?->hasDraftTool() ?? false;
 
             return [
                 $location->wbss?->title => $projectClass,

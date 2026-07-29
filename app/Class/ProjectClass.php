@@ -34,6 +34,9 @@ class ProjectClass
     public $unique_identifier;
     public $version;
     public $workScope;
+    public $workItemStatus;
+    public $workItemHasDraftMaterial;
+    public $workItemHasDraftTool;
 
 
 }
