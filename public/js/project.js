@@ -311,7 +311,20 @@ $(function(){
         var template = $('#js-template-modal-work-item-detail').html();
         Mustache.parse(template);
 
-        $('#workItemDetailLoadingModal').modal('show');
+        // A single modal is reused for both the loading spinner and the detail
+        // content — its content is swapped in place instead of hiding one
+        // Bootstrap modal and showing another. Two stacked modal instances
+        // don't hide/show reliably back-to-back (Bootstrap's backdrop/body-lock
+        // bookkeeping gets left inconsistent, especially when the AJAX call
+        // resolves faster than the first modal's show transition), which caused
+        // the loading state to get stuck or the detail card to never appear.
+        var $modal = $('#workItemDetailModal');
+        var $dialog = $modal.find('.js-work-item-detail-dialog');
+        var $content = $modal.find('.js-work-item-detail-content');
+
+        $dialog.removeClass('modal-lg').addClass('modal-sm modal-dialog-centered');
+        $content.html('<div class="modal-body text-center"><div class="loading-spinner mb-2"></div><div>Loading work item detail...</div></div>');
+        $modal.modal('show');
 
         $.ajax({
             url: '/work-items/' + _workItemId + '/detail-modal',
@@ -319,28 +332,19 @@ $(function(){
             success: function (result){
                 if(result.status === 200){
                     var _rendered = Mustache.render(template, result.data);
-                    // Wait for the loading modal to fully finish hiding before showing the
-                    // next one — Bootstrap doesn't cleanly support two modals stacked at
-                    // once (its backdrop/body-scroll-lock state gets left behind), which
-                    // made the loading modal appear stuck after closing the detail modal.
-                    $('#workItemDetailLoadingModal').one('hidden.bs.modal', function () {
-                        $(_rendered).appendTo('body');
-                        $('#workItemFullDetailModal').modal('show');
-                    });
+                    $dialog.removeClass('modal-sm modal-dialog-centered').addClass('modal-lg');
+                    $content.html(_rendered);
                 } else {
                     notification('danger', result.message || 'Failed to load work item detail', 'fa fa-warning', 'Error');
+                    $modal.modal('hide');
                 }
             },
             error: function(){
                 notification('danger', 'Failed to load work item detail', 'fa fa-warning', 'Error');
-            },
-            complete: function(){
-                $('#workItemDetailLoadingModal').modal('hide');
+                $modal.modal('hide');
             }
         });
     });
-
-    $(document).on('hidden.bs.modal', '#workItemFullDetailModal', function () { $(this).remove(); });
 
 
 });

@@ -239,9 +239,9 @@
     </div>
 </div>
 
-<div class="modal fade" id="workItemDetailLoadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-        <div class="modal-content">
+<div class="modal fade" id="workItemDetailModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="workItemDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered js-work-item-detail-dialog">
+        <div class="modal-content js-work-item-detail-content">
             <div class="modal-body text-center">
                 <div class="loading-spinner mb-2"></div>
                 <div>Loading work item detail...</div>
