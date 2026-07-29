@@ -320,7 +320,7 @@ $(function(){
     // hide.bs.modal/hidden.bs.modal bracket that exact window, so track it
     // instead of guessing from timing.
     var isWorkItemDetailModalClosing = false;
-    $('#workItemDetailModal')
+    $('#workItemDetailCardModal')
         .on('hide.bs.modal', function () { isWorkItemDetailModalClosing = true; })
         .on('hidden.bs.modal', function () { isWorkItemDetailModalClosing = false; });
 
@@ -331,7 +331,7 @@ $(function(){
         var template = $('#js-template-modal-work-item-detail').html();
         Mustache.parse(template);
 
-        var $modal = $('#workItemDetailModal');
+        var $modal = $('#workItemDetailCardModal');
         var $dialog = $modal.find('.js-work-item-detail-dialog');
         var $content = $modal.find('.js-work-item-detail-content');
 

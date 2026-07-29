@@ -415,7 +415,7 @@
 
 <script id="js-template-modal-work-item-detail" type="x-templ-mustache">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="workItemDetailModalLabel">@{{ code }} &ndash; @{{ description }}</h5>
+                    <h5 class="modal-title" id="workItemDetailCardModalLabel">@{{ code }} &ndash; @{{ description }}</h5>
                     <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
