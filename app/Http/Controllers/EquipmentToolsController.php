@@ -262,6 +262,9 @@ class EquipmentToolsController extends Controller
     }
 
     public function updateList(Request $request){
+        if(!auth()->user()->isToolsEquipmentReviewerRole()){
+            abort(403);
+        }
         $ids = (string) $request->ids;
         DB::beginTransaction();
         $ids = explode(',',$ids);

@@ -34,17 +34,15 @@ class ApiController extends Controller
     }
 
     public function getPublicHolidayApi(){
-        $year    = date('Y');
-        $reqUrl  = "https://date.nager.at/api/v3/PublicHolidays/{$year}/ID";
-        $data    = $this->getApi($reqUrl);
+        $data = $this->getApi('https://api-harilibur.netlify.app/api');
 
         if (!$data) return collect([]);
 
         return collect($data)
-            ->filter(fn($item) => in_array('Public', (array)($item->types ?? [])))
+            ->filter(fn($item) => ($item['is_national_holiday'] ?? false) === true)
             ->map(fn($item) => [
-                'holiday_date'       => $item->date,
-                'holiday_name'       => $item->localName,
+                'holiday_date'       => \Carbon\Carbon::parse($item['holiday_date'])->format('Y-m-d'),
+                'holiday_name'       => $item['holiday_name'],
                 'is_national_holiday'=> true,
             ])
             ->values();

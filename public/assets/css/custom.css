@@ -784,36 +784,97 @@ custom-checkbox:checked:before {
     color: grey;
 }
 
-.fc-multimonth-month{
-    margin-top: 5px;
+/* ============================================================
+   Production Calendar — modern FullCalendar skin
+   ============================================================ */
+#calendar { padding: 20px; }
+
+.fc { font-family: inherit; }
+
+/* Toolbar */
+.fc .fc-toolbar-title { font-size: 16px; font-weight: 700; color: #1a2b47; }
+.fc .fc-button-primary {
+    background: #fff; border: 1px solid #e5e7eb; color: #374151;
+    border-radius: 8px; font-weight: 600; font-size: 12px;
+    padding: 6px 12px; box-shadow: none !important; text-transform: capitalize;
+}
+.fc .fc-button-primary:hover { background: #f8f9fc; color: #1a2b47; }
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active {
+    background: #24695c; border-color: #24695c; color: #fff;
+}
+.fc .fc-button-primary:focus,
+.fc .fc-button-primary:not(:disabled).fc-button-active:focus { box-shadow: 0 0 0 3px rgba(36,105,92,.18) !important; }
+.fc .fc-button:disabled { opacity: .4; }
+
+/* Multi-month grid — each month reads as its own card */
+.fc-multimonth-month {
+    margin-top: 12px !important;
     width: 260px !important;
-    padding: 10px;
+    padding: 14px !important;
+    background: #fff;
+    border-radius: 14px !important;
+    border: none !important;
+    box-shadow: 0 2px 14px rgba(0,0,0,.06);
 }
-#calendar {
-    padding: 30px;
+.fc-multimonth-title { font-size: 13px; font-weight: 700; color: #1a2b47; padding-bottom: 8px !important; }
+
+/* Column headers & grid lines */
+.fc-col-header-cell {
+    background: #f8f9fc; border-color: #f0f0f0 !important;
+}
+.fc-col-header-cell-cushion {
+    font-size: 10px; font-weight: 700; letter-spacing: .5px;
+    text-transform: uppercase; color: #9ca3af; padding: 6px 4px !important;
+}
+.fc-theme-standard td, .fc-theme-standard th { border-color: #f0f0f0; }
+.fc-daygrid-day-number { font-size: 12px; color: #374151; padding: 4px 6px !important; }
+
+/* Today — filled circle marker instead of a plain highlight */
+.fc-day-today { background: rgba(36,105,92,.06) !important; }
+.fc-day-today .fc-daygrid-day-number {
+    background: #24695c; color: #fff; border-radius: 50%;
+    width: 20px; height: 20px; display: flex; align-items: center;
+    justify-content: center; margin: 3px; padding: 0 !important; font-weight: 600;
 }
 
-#legend {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 20px;
-}
+/* Weekend — soft tint instead of solid red text */
+.cal-weekend .fc-daygrid-day-number { color: #ef4444; }
+.cal-weekend.fc-day-today .fc-daygrid-day-number { color: #fff; }
 
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-}
+/* Day markers — small colored dots instead of solid cell fills */
+.cal-day-markers { display: flex; gap: 3px; padding: 0 4px 3px; flex-wrap: wrap; }
+.cal-day-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.cal-dot-wos       { background: #f2b705; }
+.cal-dot-monthly   { background: #2e75b6; }
+.cal-dot-quarterly { background: #198754; }
 
-.legend-item-color {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
+/* Legend — pill badges matching the rest of the dashboard */
+.cal-legend-wrap { padding: 16px 4px 4px; }
+.cal-legend-pills { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-bottom: 14px; }
+.cal-legend-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 500; color: #6b7280;
 }
+.cal-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.cal-legend-dot-holiday   { background: #ff9f89; }
+.cal-legend-dot-weekend   { background: #ef4444; }
+.cal-legend-dot-wos       { background: #f2b705; }
+.cal-legend-dot-monthly   { background: #2e75b6; }
+.cal-legend-dot-quarterly { background: #198754; }
 
-.legend-item-label {
-    font-size: 14px;
+.cal-holiday-panel {
+    background: #f8f9fc; border-radius: 12px; padding: 14px 16px; max-width: 420px;
 }
+.cal-holiday-panel h6 { margin: 0 0 8px; font-weight: 700; font-size: 13px; color: #1a2b47; }
+.cal-holiday-list { max-height: 180px; overflow-y: auto; }
+.cal-holiday-row {
+    display: flex; align-items: baseline; gap: 10px;
+    font-size: 12px; padding: 5px 0; border-bottom: 1px dashed #e5e7eb;
+}
+.cal-holiday-row:last-child { border-bottom: none; }
+.cal-holiday-date { font-weight: 700; color: #ff9f89; flex-shrink: 0; width: 46px; }
+.cal-holiday-name { color: #6b7280; }
 
 .tourguide-tooltip {
     background-color: #2A3F54; /* Change to Viho theme color */
@@ -2211,6 +2272,54 @@ custom-checkbox:checked:before {
 .empty-state i { font-size: 36px; color: #d1d5db; margin-bottom: 10px; display: block; }
 .empty-state p { font-size: 13px; color: #9ca3af; margin: 0; }
 
+/* Pending review queue (dashboard) */
+.review-queue-block {
+    background: #f8f9fc; border-radius: 12px; padding: 14px 16px;
+    height: 100%; display: flex; flex-direction: column;
+}
+.rq-icon {
+    width: 30px; height: 30px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--rq-bg, #e8f0fb); color: var(--rq-color, #2e75b6);
+    font-size: 13px; flex-shrink: 0;
+}
+.rq-list { list-style: none; margin: 0 0 10px; padding: 0; flex: 1; }
+.rq-list li {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 0; font-size: 12px;
+    border-bottom: 1px dashed #e5e7eb;
+}
+.rq-list li:last-child { border-bottom: none; }
+.rq-list a { color: var(--rq-color, #2e75b6); font-weight: 600; text-decoration: none; flex-shrink: 0; }
+.rq-list a:hover { text-decoration: underline; }
+.rq-desc {
+    color: #6b7280; overflow: hidden; text-overflow: ellipsis;
+    white-space: nowrap; flex: 1;
+}
+.rq-view-all {
+    font-size: 12px; font-weight: 600; color: var(--rq-color, #2e75b6);
+    text-decoration: none; margin-top: auto;
+}
+.rq-view-all:hover { text-decoration: underline; }
+
+/* Attention pulse — draws the eye to items that need review, without moving the layout */
+@keyframes rq-pulse {
+    0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(230,92,0,.5); }
+    50%  { transform: scale(1.12); box-shadow: 0 0 0 6px rgba(230,92,0,0); }
+    100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(230,92,0,0); }
+}
+.rq-pulse { animation: rq-pulse 1.8s ease-in-out infinite; transform-origin: center; }
+
+.rq-alert-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #e65c00;
+    margin-left: 8px;
+    vertical-align: middle;
+    animation: rq-pulse 1.8s ease-in-out infinite;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .db-wrap { padding: 0 12px 32px; }
@@ -2699,6 +2808,25 @@ body.dark-only .proj-table thead tr { background: #202938; }
 body.dark-only .proj-table th  { color: rgba(255,255,255,.4); border-bottom-color: rgba(36,105,92,.2); }
 body.dark-only .proj-table td  { color: rgba(255,255,255,.7); border-bottom-color: rgba(36,105,92,.15); }
 body.dark-only .proj-table tbody tr:hover td { background: rgba(255,255,255,.03); }
+body.dark-only .review-queue-block { background: #202938; }
+body.dark-only .rq-list li { border-bottom-color: rgba(255,255,255,.08); }
+body.dark-only .rq-desc    { color: rgba(255,255,255,.4); }
+
+/* Production calendar */
+body.dark-only .fc-toolbar-title { color: #fff; }
+body.dark-only .fc .fc-button-primary { background: #111727; border-color: rgba(36,105,92,.3); color: rgba(255,255,255,.7); }
+body.dark-only .fc .fc-button-primary:hover { background: #202938; color: #fff; }
+body.dark-only .fc-multimonth-month { background: #111727; box-shadow: 1px 1px 2px 1px rgba(29,28,28,.08); border: 1px solid rgba(36,105,92,.2) !important; }
+body.dark-only .fc-multimonth-title { color: #fff; }
+body.dark-only .fc-col-header-cell { background: #202938; }
+body.dark-only .fc-col-header-cell-cushion { color: rgba(255,255,255,.4); }
+body.dark-only .fc-theme-standard td, body.dark-only .fc-theme-standard th { border-color: rgba(36,105,92,.15); }
+body.dark-only .fc-daygrid-day-number { color: rgba(255,255,255,.7); }
+body.dark-only .cal-legend-pill { color: rgba(255,255,255,.5); }
+body.dark-only .cal-holiday-panel { background: #202938; }
+body.dark-only .cal-holiday-panel h6 { color: #fff; }
+body.dark-only .cal-holiday-row { border-bottom-color: rgba(255,255,255,.08); }
+body.dark-only .cal-holiday-name { color: rgba(255,255,255,.5); }
 
 /* Project stepper */
 body.dark-only .project-stepper        { background: #111727; }
@@ -2797,4 +2925,64 @@ body.dark-only .page-main-header .dark-logo-wrapper img {
     background: rgba(255,255,255,0.92);
     border-radius: 6px;
     padding: 3px 8px;
+}
+
+/* Review list toggle — compact icon used in list tables to flag a draft item for review */
+.js-review-list-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: #24695c;
+    background: rgba(36,105,92,.08);
+    transition: background .15s ease-in-out, color .15s ease-in-out;
+}
+.js-review-list-icon:hover {
+    background: rgba(36,105,92,.18);
+}
+.js-review-list-icon.js-added-to-cart {
+    color: #fff;
+    background: #198754;
+}
+.js-review-list-icon.js-added-to-cart:hover {
+    background: #157347;
+}
+body.dark-only .js-review-list-icon {
+    color: #4fb3a0;
+    background: rgba(79,179,160,.12);
+}
+body.dark-only .js-review-list-icon:hover {
+    background: rgba(79,179,160,.22);
+}
+
+/* Review list button — used on detail pages instead of the default blue btn-outline-primary */
+.btn-review-list {
+    color: #24695c;
+    border-color: #24695c;
+    background: transparent;
+}
+.btn-review-list:hover,
+.btn-review-list:focus {
+    color: #fff;
+    background: #24695c;
+    border-color: #24695c;
+}
+.btn-review-list.js-added-to-cart,
+.btn-review-list.js-added-to-cart:hover,
+.btn-review-list.js-added-to-cart:focus {
+    color: #fff;
+    background: #198754;
+    border-color: #198754;
+}
+body.dark-only .btn-review-list {
+    color: #4fb3a0;
+    border-color: #4fb3a0;
+}
+body.dark-only .btn-review-list:hover,
+body.dark-only .btn-review-list:focus {
+    color: #111727;
+    background: #4fb3a0;
+    border-color: #4fb3a0;
 }

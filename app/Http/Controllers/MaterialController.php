@@ -119,7 +119,8 @@ class MaterialController extends Controller
         $materialCategory = MaterialCategory::select('id','description','code')->get();
         return view('material.detail',[
             'material' => $material,
-            'material_category' => $materialCategory
+            'material_category' => $materialCategory,
+            'changeLogs' => $material->changeLogs()->with('user.profiles')->latest()->limit(50)->get()
         ]);
     }
 
@@ -215,6 +216,9 @@ class MaterialController extends Controller
     }
 
     public function updateList(Request $request){
+        if(!auth()->user()->isMaterialReviewerRole()){
+            abort(403);
+        }
         $ids = (string) $request->ids;
         DB::beginTransaction();
         $ids = explode(',',$ids);

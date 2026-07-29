@@ -98,6 +98,7 @@
                                     <tr>
                                         @if(auth()->user()->isManPowerReviewer())
                                             <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="manPower"></th>
+                                            <th class="text-center">Review List</th>
                                         @endif
                                         <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="code"></i></th>
                                         <th scope="col" class="text-left">Skill Level <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="skill_level"></i></th>
@@ -117,7 +118,15 @@
                                     <tr>
                                         @if(auth()->user()->isManPowerReviewer())
                                             <td class="text-center">
-                                                <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox" data-url="manPower" value="{{$item->id}}">
+                                                <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox"
+                                                       data-url="manPower" value="{{$item->id}}">
+                                            </td>
+                                            <td class="text-center">
+                                                @if($item->status === App\Models\ManPower::DRAFT)
+                                                    <i class="fa fa-flag js-review-list-icon js-add-to-review-cart" title="Add to Review List"
+                                                       data-entity="manPower" data-id="{{$item->id}}"
+                                                       data-code="{{$item->code}}" data-label="{{$item->title}}"></i>
+                                                @endif
                                             </td>
                                         @endif
                                         <td><a href="/man-power/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
@@ -216,4 +225,5 @@
             </div>
         </form>
     </div>
+    @include('layouts.review_cart')
 @endsection

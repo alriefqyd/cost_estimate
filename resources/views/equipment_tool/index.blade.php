@@ -111,6 +111,7 @@
                                 <tr>
                                     @if(auth()->user()->isToolsEquipmentReviewerRole())
                                         <th><input type="checkbox" class="js-select-all-project-to-review js-check-review-all custom-checkbox" data-url="equipmentTools"></th>
+                                        <th class="text-center">Review List</th>
                                     @endif
                                     <th scope="col" class="text-left">Code <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.code"></i></th>
                                     <th scope="col" class="text-left">Description <i class="fa fa-sort cursor-pointer js-order-sort" data-sort="equipment_tools.description"></i></th>
@@ -132,8 +133,14 @@
                                         @if(auth()->user()->isToolsEquipmentReviewerRole())
                                             <td class="text-center">
                                                 <input type="checkbox" class="js-select-project-to-review js-check-review custom-checkbox"
-                                                       data-url="equipmentTools"
-                                                       value="{{$item->id}}">
+                                                       data-url="equipmentTools" value="{{$item->id}}">
+                                            </td>
+                                            <td class="text-center">
+                                                @if($item->status === App\Models\EquipmentTools::DRAFT)
+                                                    <i class="fa fa-flag js-review-list-icon js-add-to-review-cart" title="Add to Review List"
+                                                       data-entity="equipmentTools" data-id="{{$item->id}}"
+                                                       data-code="{{$item->code}}" data-label="{{$item->description}}"></i>
+                                                @endif
                                             </td>
                                         @endif
                                         <td class="min-w-150"><a href="/tool-equipment/{{$item->id}}" class="font-weight-bold">{{$item->code}}</td>
@@ -233,4 +240,5 @@
             </div>
         </form>
     </div>
+    @include('layouts.review_cart')
 @endsection

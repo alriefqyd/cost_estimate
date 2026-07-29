@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Exports\WorkItemExport;
+use App\Models\EquipmentTools;
+use App\Models\Material;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\WorkItem;
@@ -61,7 +63,8 @@ class WorkItemController extends Controller
 
         return view('work_item.show',[
             'work_item' => $workItem,
-            'isUserHaveAccess' => $isUserHaveAccess
+            'isUserHaveAccess' => $isUserHaveAccess,
+            'changeLogs' => $workItem->changeLogs()->with('user.profiles')->latest()->limit(50)->get()
         ]);
     }
 
@@ -289,6 +292,7 @@ class WorkItemController extends Controller
             DB::beginTransaction();
             $pivotData = $this->processStoreToolEquipment($workItem,$request);
             $workItem->equipmentTools()->attach($pivotData);
+            $this->logToolAttach($workItem, $pivotData);
             $this->setStatusDraft($workItem);
             DB::commit();
             return response()->json([
@@ -311,7 +315,9 @@ class WorkItemController extends Controller
         try{
             $pivotData = $this->processStoreToolEquipment($workItem,$request);
             $uniquePivotData = array_map("unserialize", array_unique(array_map("serialize", $pivotData)));
-            $workItem->equipmentTools()->sync($uniquePivotData);
+            $beforeQty = $workItem->equipmentTools->pluck('pivot.quantity', 'id')->all();
+            $syncResult = $workItem->equipmentTools()->sync($uniquePivotData);
+            $this->logToolSyncChanges($workItem, $syncResult, $uniquePivotData, $beforeQty);
             $this->setStatusDraft($workItem);
 
             $workItemService = new WorkItemServices();
@@ -380,6 +386,7 @@ class WorkItemController extends Controller
         try{
             $pivotData = $this->processStoreMaterial($workItem,$request);
             $workItem->materials()->attach($pivotData);
+            $this->logMaterialAttach($workItem, $pivotData);
             $this->setStatusDraft($workItem);
             return response()->json([
                 'status' => 200,
@@ -399,7 +406,9 @@ class WorkItemController extends Controller
         }
         try{
             $pivotData = $this->processStoreMaterial($workItem,$request);
-            $workItem->materials()->sync($pivotData);
+            $beforeQty = $workItem->materials->pluck('pivot.quantity', 'id')->all();
+            $syncResult = $workItem->materials()->sync($pivotData);
+            $this->logMaterialSyncChanges($workItem, $syncResult, $pivotData, $beforeQty);
             $this->setStatusDraft($workItem);
 
             $workItemService = new WorkItemServices();
@@ -435,6 +444,80 @@ class WorkItemController extends Controller
         }
 
         return $pivotData;
+    }
+
+    private function materialLabel($material): string {
+        return $material->code . ' - ' . ($material->tool_equipment_description ?? $material->description ?? '');
+    }
+
+    private function toolLabel($tool): string {
+        return $tool->code . ' - ' . ($tool->description ?? '');
+    }
+
+    public function logMaterialAttach(WorkItem $workItem, array $pivotData){
+        if (empty($pivotData)) return;
+        $materials = Material::whereIn('id', array_keys($pivotData))->get()->keyBy('id');
+        foreach ($pivotData as $materialId => $data) {
+            $label = $materials->get($materialId) ? $this->materialLabel($materials->get($materialId)) : "#{$materialId}";
+            $workItem->logCustom('material_added', "Added material: {$label}", null, $data['quantity'] ?? null);
+        }
+    }
+
+    public function logMaterialSyncChanges(WorkItem $workItem, array $syncResult, array $pivotData, array $beforeQty){
+        $touchedIds = array_merge($syncResult['attached'] ?? [], $syncResult['detached'] ?? [], $syncResult['updated'] ?? []);
+        if (empty($touchedIds)) return;
+        $materials = Material::whereIn('id', $touchedIds)->get()->keyBy('id');
+
+        foreach ($syncResult['attached'] ?? [] as $materialId) {
+            $label = $materials->get($materialId) ? $this->materialLabel($materials->get($materialId)) : "#{$materialId}";
+            $workItem->logCustom('material_added', "Added material: {$label}", null, $pivotData[$materialId]['quantity'] ?? null);
+        }
+
+        foreach ($syncResult['detached'] ?? [] as $materialId) {
+            $label = $materials->get($materialId) ? $this->materialLabel($materials->get($materialId)) : "#{$materialId}";
+            $workItem->logCustom('material_removed', "Removed material: {$label}", $beforeQty[$materialId] ?? null, null);
+        }
+
+        foreach ($syncResult['updated'] ?? [] as $materialId) {
+            $label = $materials->get($materialId) ? $this->materialLabel($materials->get($materialId)) : "#{$materialId}";
+            $oldQty = $beforeQty[$materialId] ?? null;
+            $newQty = $pivotData[$materialId]['quantity'] ?? null;
+            if ($oldQty == $newQty) continue;
+            $workItem->logCustom('material_changed', "Changed quantity for material {$label}: " . ($oldQty ?? '—') . ' → ' . ($newQty ?? '—'), $oldQty, $newQty);
+        }
+    }
+
+    public function logToolAttach(WorkItem $workItem, array $pivotData){
+        if (empty($pivotData)) return;
+        $tools = EquipmentTools::whereIn('id', array_keys($pivotData))->get()->keyBy('id');
+        foreach ($pivotData as $toolId => $data) {
+            $label = $tools->get($toolId) ? $this->toolLabel($tools->get($toolId)) : "#{$toolId}";
+            $workItem->logCustom('tool_added', "Added tool/equipment: {$label}", null, $data['quantity'] ?? null);
+        }
+    }
+
+    public function logToolSyncChanges(WorkItem $workItem, array $syncResult, array $pivotData, array $beforeQty){
+        $touchedIds = array_merge($syncResult['attached'] ?? [], $syncResult['detached'] ?? [], $syncResult['updated'] ?? []);
+        if (empty($touchedIds)) return;
+        $tools = EquipmentTools::whereIn('id', $touchedIds)->get()->keyBy('id');
+
+        foreach ($syncResult['attached'] ?? [] as $toolId) {
+            $label = $tools->get($toolId) ? $this->toolLabel($tools->get($toolId)) : "#{$toolId}";
+            $workItem->logCustom('tool_added', "Added tool/equipment: {$label}", null, $pivotData[$toolId]['quantity'] ?? null);
+        }
+
+        foreach ($syncResult['detached'] ?? [] as $toolId) {
+            $label = $tools->get($toolId) ? $this->toolLabel($tools->get($toolId)) : "#{$toolId}";
+            $workItem->logCustom('tool_removed', "Removed tool/equipment: {$label}", $beforeQty[$toolId] ?? null, null);
+        }
+
+        foreach ($syncResult['updated'] ?? [] as $toolId) {
+            $label = $tools->get($toolId) ? $this->toolLabel($tools->get($toolId)) : "#{$toolId}";
+            $oldQty = $beforeQty[$toolId] ?? null;
+            $newQty = $pivotData[$toolId]['quantity'] ?? null;
+            if ($oldQty == $newQty) continue;
+            $workItem->logCustom('tool_changed', "Changed quantity for tool/equipment {$label}: " . ($oldQty ?? '—') . ' → ' . ($newQty ?? '—'), $oldQty, $newQty);
+        }
     }
 
     public function getWorkItems(Request $request){
@@ -582,6 +665,78 @@ class WorkItemController extends Controller
             'labor'     => $labor,
             'material'  => $material,
             'equipment' => $equipment,
+        ]);
+    }
+
+    public function detailModal($id){
+        if(!auth()->user()->can('viewAny', WorkItem::class)){
+            return response()->json(['status' => 403, 'message' => "You're not authorized"], 403);
+        }
+
+        $workItem = WorkItem::with(['workItemTypes', 'manPowers', 'equipmentTools', 'materials', 'createdBy.profiles'])->find($id);
+        if(!$workItem){
+            return response()->json(['status' => 404, 'message' => 'Work item not found'], 404);
+        }
+
+        $groupedLogs = $workItem->changeLogs()->with('user.profiles')->latest()->limit(30)->get()
+            ->groupBy(fn($log) => $log->created_at->format('d F Y'))
+            ->map(fn($logs, $date) => [
+                'date'    => $date,
+                'entries' => $logs->map(fn($log) => [
+                    'time'        => $log->created_at->format('H:i'),
+                    'user'        => $log->user?->profiles?->full_name ?? $log->user?->name ?? 'System',
+                    'description' => $log->description,
+                ])->values(),
+            ])->values();
+
+        return response()->json([
+            'status' => 200,
+            'data'   => [
+                'code'              => $workItem->code,
+                'description'       => $workItem->description,
+                'category'          => $workItem->workItemTypes?->title,
+                'unit'              => $workItem->unit,
+                'volume'            => $workItem->volume,
+                'status'            => $workItem->status,
+                'isDraft'           => $workItem->status === WorkItem::DRAFT,
+                'hasDraftMaterial'  => $workItem->hasDraftMaterial(),
+                'hasDraftTool'      => $workItem->hasDraftTool(),
+                'createdBy'         => $workItem->createdBy?->profiles?->full_name ?? $workItem->createdBy?->name,
+                'totalCost'         => number_format($workItem->getTotalSum(), 2, ',', '.'),
+                'totalLabor'        => number_format($workItem->getTotalCostManPower(), 2, ',', '.'),
+                'totalTool'         => number_format($workItem->getTotalCostEquipment(), 2, ',', '.'),
+                'totalMaterial'     => number_format($workItem->getTotalCostMaterial(), 2, ',', '.'),
+                'hasManPower'       => $workItem->manPowers->count() > 0,
+                'manPowers'         => $workItem->manPowers->map(fn($mp) => [
+                    'title'  => $mp->title,
+                    'unit'   => $mp->pivot->labor_unit,
+                    'coef'   => number_format((float) $mp->pivot->labor_coefisient, 2),
+                    'rate'   => number_format($mp->overall_rate_hourly, 2, ',', '.'),
+                    'amount' => number_format($mp->getAmount(), 2, ',', '.'),
+                ])->values(),
+                'hasEquipmentTools' => $workItem->equipmentTools->count() > 0,
+                'equipmentTools'    => $workItem->equipmentTools->map(fn($t) => [
+                    'code'        => $t->code,
+                    'description' => $t->description,
+                    'unit'        => $t->pivot->unit,
+                    'quantity'    => number_format($t->pivot->quantity, 2),
+                    'rate'        => number_format($t->local_rate, 2, ',', '.'),
+                    'amount'      => number_format($t->getAmount(), 2, ',', '.'),
+                    'isDraft'     => $t->status === EquipmentTools::DRAFT,
+                ])->values(),
+                'hasMaterials'      => $workItem->materials->count() > 0,
+                'materials'         => $workItem->materials->map(fn($m) => [
+                    'code'        => $m->code,
+                    'description' => $m->tool_equipment_description,
+                    'unit'        => $m->pivot->unit,
+                    'quantity'    => number_format($m->pivot->quantity, 2),
+                    'rate'        => number_format($m->rate, 2, ',', '.'),
+                    'amount'      => number_format($m->getAmount(), 2, ',', '.'),
+                    'isDraft'     => $m->status === Material::DRAFT,
+                ])->values(),
+                'hasHistory'        => $groupedLogs->count() > 0,
+                'history'           => $groupedLogs,
+            ],
         ]);
     }
 
@@ -966,6 +1121,9 @@ class WorkItemController extends Controller
     }
 
     public function updateList(Request $request){
+        if(!auth()->user()->isWorkItemReviewer()){
+            abort(403);
+        }
         $ids = (string) $request->ids;
         DB::beginTransaction();
         $ids = explode(',',$ids);
