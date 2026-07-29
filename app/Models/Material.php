@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Material extends Model
 {
     use HasFactory;
+    use LogsChanges;
     protected $guarded = ['id'];
 
     public const DRAFT = 'DRAFT';

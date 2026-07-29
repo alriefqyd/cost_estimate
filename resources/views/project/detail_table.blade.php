@@ -172,19 +172,36 @@
                             </tr>
 
                             @foreach($workItems as $item)
-                                <tr class="table-row-work-item" data-estimate-id="{{$item->id}}">
+                                @php
+                                    $wiNeedsAttention = $item->workItemStatus === \App\Models\WorkItem::DRAFT
+                                        || $item->workItemHasDraftMaterial
+                                        || $item->workItemHasDraftTool;
+                                    $wiReasons = [];
+                                    if ($item->workItemStatus === \App\Models\WorkItem::DRAFT) $wiReasons[] = 'Work item is still draft / changed since last review';
+                                    if ($item->workItemHasDraftMaterial) $wiReasons[] = 'Contains a material that is still draft';
+                                    if ($item->workItemHasDraftTool) $wiReasons[] = 'Contains a tool/equipment that is still draft';
+                                @endphp
+                                <tr class="table-row-work-item {{ $item->workItemId ? 'js-open-work-item-detail cursor-pointer' : '' }}" data-estimate-id="{{$item->id}}" data-work-item-id="{{$item->workItemId}}" title="{{ $item->workItemId ? 'Click for work item detail' : '' }}">
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td class="f-w-500">{{$item->workItemDescription}}</td>
+                                    <td class="f-w-500">
+                                        @if($wiNeedsAttention)
+                                            <span class="text-danger fw-bold" title="{{ implode(' | ', $wiReasons) }}">
+                                                <i class="fa fa-exclamation-triangle me-1"></i>{{$item->workItemDescription}}
+                                            </span>
+                                        @else
+                                            {{$item->workItemDescription}}
+                                        @endif
+                                    </td>
                                     <td>{{$item->estimateVolume}}</td>
                                     <td>{{$item->workItemUnit}}</td>
                                     <td class="col-group-unit-rate">{{$item->workItemUnitRateLaborCost}}</td>
                                     <td class="text-end">{{number_format($item->workItemTotalLaborCost,2,',','.')}}</td>
-                                    <td class="col-group-unit-rate">{{$item->workItemUnitRateToolCost}}</td>
-                                    <td class="text-end">{{number_format($item->workItemTotalToolCost,2,',','.')}}</td>
-                                    <td class="col-group-unit-rate">{{$item->workItemUnitRateMaterialCost}}</td>
-                                    <td class="text-end">{{number_format($item->workItemTotalMaterialCost,2,',','.')}}</td>
+                                    <td class="col-group-unit-rate {{ $item->workItemHasDraftTool ? 'text-danger' : '' }}" @if($item->workItemHasDraftTool) title="Contains a tool/equipment that is still draft" @endif>{{$item->workItemUnitRateToolCost}}</td>
+                                    <td class="text-end {{ $item->workItemHasDraftTool ? 'text-danger' : '' }}">{{number_format($item->workItemTotalToolCost,2,',','.')}}</td>
+                                    <td class="col-group-unit-rate {{ $item->workItemHasDraftMaterial ? 'text-danger' : '' }}" @if($item->workItemHasDraftMaterial) title="Contains a material that is still draft" @endif>{{$item->workItemUnitRateMaterialCost}}</td>
+                                    <td class="text-end {{ $item->workItemHasDraftMaterial ? 'text-danger' : '' }}">{{number_format($item->workItemTotalMaterialCost,2,',','.')}}</td>
                                     <td class="f-w-500">{{$item->workItemTotalCostStr}}</td>
                                     <td class="text-center col-group-fac">{{$item->workItemLaborFactorial}}</td>
                                     <td class="text-center col-group-fac">{{$item->workItemEquipmentFactorial}}</td>
@@ -219,5 +236,16 @@
              data-project-id="{{$project->id}}"
              data-readonly="{{ $project->isAssignedReviewer() ? '0' : '1' }}"></div>
         @endif
+    </div>
+</div>
+
+<div class="modal fade" id="workItemDetailLoadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-sm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <div class="loading-spinner mb-2"></div>
+                <div>Loading work item detail...</div>
+            </div>
+        </div>
     </div>
 </div>

@@ -413,6 +413,141 @@
     </div>
 </script>
 
+<script id="js-template-modal-work-item-detail" type="x-templ-mustache">
+    <div class="modal fade js-modal-work-item-detail" id="workItemFullDetailModal"
+         tabindex="-1" role="dialog" aria-labelledby="workItemFullDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="workItemFullDetailModalLabel">@{{ code }} &ndash; @{{ description }}</h5>
+                    <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <table class="table table-striped mb-4">
+                        <tr>
+                            <td class="min-w-150">Category</td>
+                            <td>@{{ category }}</td>
+                        </tr>
+                        <tr>
+                            <td>Volume</td>
+                            <td>@{{ volume }} @{{ unit }}</td>
+                        </tr>
+                        <tr>
+                            <td>Status</td>
+                            <td>
+                                <span class="@{{ #isDraft }}text-danger fw-bold@{{ /isDraft }}">@{{ status }}</span>
+                                @{{ #hasDraftMaterial }}<span class="text-danger ms-2"><i class="fa fa-exclamation-triangle"></i> Contains a draft material</span>@{{ /hasDraftMaterial }}
+                                @{{ #hasDraftTool }}<span class="text-danger ms-2"><i class="fa fa-exclamation-triangle"></i> Contains a draft tool/equipment</span>@{{ /hasDraftTool }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Created By</td>
+                            <td>@{{ createdBy }}</td>
+                        </tr>
+                        <tr>
+                            <td>Total Cost</td>
+                            <td class="fw-bold">Rp @{{ totalCost }}</td>
+                        </tr>
+                    </table>
+
+                    @{{ #hasManPower }}
+                    <div class="mb-4">
+                        <label>Man Power</label>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr><th>Description</th><th>Unit</th><th>Coef</th><th>Rate (Rp)</th><th>Amount (Rp)</th></tr>
+                            </thead>
+                            <tbody>
+                            @{{ #manPowers }}
+                            <tr>
+                                <td>@{{ title }}</td>
+                                <td>@{{ unit }}</td>
+                                <td>@{{ coef }}</td>
+                                <td>@{{ rate }}</td>
+                                <td>@{{ amount }}</td>
+                            </tr>
+                            @{{ /manPowers }}
+                            </tbody>
+                            <tfoot><tr><td colspan="4" class="text-end fw-bold">Total</td><td class="fw-bold">Rp @{{ totalLabor }}</td></tr></tfoot>
+                        </table>
+                    </div>
+                    @{{ /hasManPower }}
+
+                    @{{ #hasEquipmentTools }}
+                    <div class="mb-4">
+                        <label>Tools &amp; Equipment</label>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr><th>Code</th><th>Description</th><th>Unit</th><th>Quantity</th><th>Rate (Rp)</th><th>Amount (Rp)</th></tr>
+                            </thead>
+                            <tbody>
+                            @{{ #equipmentTools }}
+                            <tr>
+                                <td class="@{{ #isDraft }}text-danger fw-bold@{{ /isDraft }}">@{{ code }}</td>
+                                <td class="@{{ #isDraft }}text-danger fw-bold@{{ /isDraft }}">@{{ description }} @{{ #isDraft }}<i class="fa fa-exclamation-triangle text-danger" title="Still draft"></i>@{{ /isDraft }}</td>
+                                <td>@{{ unit }}</td>
+                                <td>@{{ quantity }}</td>
+                                <td>@{{ rate }}</td>
+                                <td>@{{ amount }}</td>
+                            </tr>
+                            @{{ /equipmentTools }}
+                            </tbody>
+                            <tfoot><tr><td colspan="5" class="text-end fw-bold">Total</td><td class="fw-bold">Rp @{{ totalTool }}</td></tr></tfoot>
+                        </table>
+                    </div>
+                    @{{ /hasEquipmentTools }}
+
+                    @{{ #hasMaterials }}
+                    <div class="mb-4">
+                        <label>Material</label>
+                        <table class="table table-striped">
+                            <thead>
+                            <tr><th>Code</th><th>Description</th><th>Unit</th><th>Quantity</th><th>Rate (Rp)</th><th>Amount (Rp)</th></tr>
+                            </thead>
+                            <tbody>
+                            @{{ #materials }}
+                            <tr>
+                                <td class="@{{ #isDraft }}text-danger fw-bold@{{ /isDraft }}">@{{ code }}</td>
+                                <td class="@{{ #isDraft }}text-danger fw-bold@{{ /isDraft }}">@{{ description }} @{{ #isDraft }}<i class="fa fa-exclamation-triangle text-danger" title="Still draft"></i>@{{ /isDraft }}</td>
+                                <td>@{{ unit }}</td>
+                                <td>@{{ quantity }}</td>
+                                <td>@{{ rate }}</td>
+                                <td>@{{ amount }}</td>
+                            </tr>
+                            @{{ /materials }}
+                            </tbody>
+                            <tfoot><tr><td colspan="5" class="text-end fw-bold">Total</td><td class="fw-bold">Rp @{{ totalMaterial }}</td></tr></tfoot>
+                        </table>
+                    </div>
+                    @{{ /hasMaterials }}
+
+                    <div class="mb-2">
+                        <label>History</label>
+                        @{{ #hasHistory }}
+                        @{{ #history }}
+                        <div class="mb-3">
+                            <h6 class="mb-2">@{{ date }}</h6>
+                            <ul class="mb-0">
+                                @{{ #entries }}
+                                <li><span class="text-muted">@{{ time }}</span> &mdash; <strong>@{{ user }}</strong>: @{{ description }}</li>
+                                @{{ /entries }}
+                            </ul>
+                        </div>
+                        @{{ /history }}
+                        @{{ /hasHistory }}
+                        @{{ ^hasHistory }}
+                        <p class="text-center text-muted mb-0">No history yet</p>
+                        @{{ /hasHistory }}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="button" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script id="js-template-modal-update-status-project" type="x-templ-mustache">
     <div class="js-row-form-status adm-form-wrap">
         <input type="hidden" class="js-modal-discipline" value="@{{ discipline }}">

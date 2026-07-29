@@ -939,6 +939,60 @@
         }
         //set current tooltip text
         oldtooltipLayer.innerHTML = targetElement.intro;
+
+        //update prev/next/skip button state and labels for the new step
+        //(this reuse path skips the class/label reset that the initial
+        //tooltip-creation path does, so without this the "done" button
+        //never gets its label/class on steps after the first one)
+        if (self._currentStep == 0 && self._introItems.length > 1) {
+          if (typeof skipTooltipButton !== "undefined" && skipTooltipButton != null) {
+            skipTooltipButton.className = 'introjs-button introjs-skipbutton';
+            skipTooltipButton.innerHTML = self._options.skipLabel;
+          }
+          if (typeof nextTooltipButton !== "undefined" && nextTooltipButton != null) {
+            nextTooltipButton.className = 'introjs-button introjs-nextbutton';
+          }
+          if (self._options.hidePrev == true) {
+            if (typeof prevTooltipButton !== "undefined" && prevTooltipButton != null) {
+              prevTooltipButton.className = 'introjs-button introjs-prevbutton introjs-hidden';
+            }
+            if (typeof nextTooltipButton !== "undefined" && nextTooltipButton != null) {
+              nextTooltipButton.className += ' introjs-fullbutton';
+            }
+          } else if (typeof prevTooltipButton !== "undefined" && prevTooltipButton != null) {
+            prevTooltipButton.className = 'introjs-button introjs-prevbutton introjs-disabled';
+          }
+        } else if (self._introItems.length - 1 == self._currentStep || self._introItems.length == 1) {
+          if (typeof skipTooltipButton !== "undefined" && skipTooltipButton != null) {
+            skipTooltipButton.innerHTML = self._options.doneLabel;
+            skipTooltipButton.className = 'introjs-button introjs-skipbutton introjs-donebutton';
+          }
+          if (typeof prevTooltipButton !== "undefined" && prevTooltipButton != null) {
+            prevTooltipButton.className = 'introjs-button introjs-prevbutton';
+          }
+          if (self._options.hideNext == true) {
+            if (typeof nextTooltipButton !== "undefined" && nextTooltipButton != null) {
+              nextTooltipButton.className = 'introjs-button introjs-nextbutton introjs-hidden';
+            }
+            if (typeof prevTooltipButton !== "undefined" && prevTooltipButton != null) {
+              prevTooltipButton.className += ' introjs-fullbutton';
+            }
+          } else if (typeof nextTooltipButton !== "undefined" && nextTooltipButton != null) {
+            nextTooltipButton.className = 'introjs-button introjs-nextbutton introjs-disabled';
+          }
+        } else {
+          if (typeof skipTooltipButton !== "undefined" && skipTooltipButton != null) {
+            skipTooltipButton.className = 'introjs-button introjs-skipbutton';
+            skipTooltipButton.innerHTML = self._options.skipLabel;
+          }
+          if (typeof prevTooltipButton !== "undefined" && prevTooltipButton != null) {
+            prevTooltipButton.className = 'introjs-button introjs-prevbutton';
+          }
+          if (typeof nextTooltipButton !== "undefined" && nextTooltipButton != null) {
+            nextTooltipButton.className = 'introjs-button introjs-nextbutton';
+          }
+        }
+
         //set the tooltip position
         oldtooltipContainer.style.display = "block";
         _placeTooltip.call(self, targetElement.element, oldtooltipContainer, oldArrowLayer, oldHelperNumberLayer);

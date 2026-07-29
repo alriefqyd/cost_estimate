@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\LogsChanges;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -10,6 +11,7 @@ class WorkItem extends Model
 {
     use HasFactory;
     use SoftDeletes;
+    use LogsChanges;
     protected $guarded = ['id'];
 
     const DRAFT = 'DRAFT';
@@ -132,6 +134,14 @@ class WorkItem extends Model
 
     public function isHaveManPowers(){
         return count($this->manPowers) > 0;
+    }
+
+    public function hasDraftMaterial(): bool {
+        return $this->materials->contains(fn($m) => $m->status === Material::DRAFT);
+    }
+
+    public function hasDraftTool(): bool {
+        return $this->equipmentTools->contains(fn($t) => $t->status === EquipmentTools::DRAFT);
     }
 
     public function createdBy(){

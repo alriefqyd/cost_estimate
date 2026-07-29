@@ -110,6 +110,7 @@
 <script src="{{'/js/home.js'}}"></script>
 <script src="{{'/js/notification_bell.js'}}"></script>
 <script src="{{'/js/project.js'}}"></script>
+<script src="{{'/js/review_cart.js'}}"></script>
 <script src="{{ asset('/js/realtime.js') }}"></script>
 <script src="{{'/js/collab.js'}}"></script>
 <script src="{{'/js/estimate_discipline.js'}}"></script>

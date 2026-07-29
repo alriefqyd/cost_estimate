@@ -11,6 +11,19 @@
                         <li class="breadcrumb-item active">{{$man_power->title}}</li>
                     </ol>
                 </div>
+                @if(auth()->user()->isManPowerReviewer() && $man_power->status === App\Models\ManPower::DRAFT)
+                    <div class="col-md-6 col-sm-6 text-end d-flex justify-content-end align-items-center gap-2">
+                        <button type="button" class="btn btn-review-list js-add-to-review-cart" title="Add to Review List"
+                                data-entity="manPower" data-id="{{$man_power->id}}"
+                                data-code="{{$man_power->code}}" data-label="{{$man_power->title}}">
+                            <i class="fa fa-flag me-1"></i> <span class="js-review-list-label">Add to Review List</span>
+                        </button>
+                        <button type="button" class="btn btn-success js-direct-approve" title="Set to Review"
+                                data-entity="manPower" data-id="{{$man_power->id}}">
+                            <i class="fa fa-check me-1"></i> Set to Review
+                        </button>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

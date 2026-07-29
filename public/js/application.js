@@ -144,29 +144,28 @@ $(function(){
             selectable: true,
             title: "Calendar Production 2024",
             dayCellDidMount: function(info) {
-                var cell = info.el;
+                var cell = $(info.el);
                 var date = info.date;
 
-                // Check if the day is a weekend (Saturday or Sunday)
                 if (date.getDay() === 0 || date.getDay() === 6) {
-                    $(cell).find('a').css('color', 'red');
+                    cell.addClass('cal-weekend');
                 }
 
-                if (date.getDate() === 2) {
-                    $(cell).css('background-color', 'yellow');
-                }
-
-                if (date.getDate() === 3) {
-                    $(cell).css('background-color', '#00ffff');
-                }
-
+                var markerClasses = [];
+                if (date.getDate() === 2) markerClasses.push('cal-dot-wos');
+                if (date.getDate() === 3) markerClasses.push('cal-dot-monthly');
                 if (date.getMonth() % 3 === 0) {
-                    if (date.getMonth() === 9 && date.getDate() === 8) {
-                        $(cell).css('background-color', '#a3c7a3');
-                    }
-                    if (date.getMonth() !== 9 && date.getDate() === 9) {
-                        $(cell).css('background-color', '#a3c7a3');
-                    }
+                    if (date.getMonth() === 9 && date.getDate() === 8) markerClasses.push('cal-dot-quarterly');
+                    if (date.getMonth() !== 9 && date.getDate() === 9) markerClasses.push('cal-dot-quarterly');
+                }
+
+                if (markerClasses.length) {
+                    cell.addClass('cal-has-marker');
+                    var $markers = $('<div class="cal-day-markers"></div>');
+                    markerClasses.forEach(function (cls) {
+                        $markers.append('<span class="cal-day-dot ' + cls + '"></span>');
+                    });
+                    cell.find('.fc-daygrid-day-top').append($markers);
                 }
             },
             headerToolbar: {
@@ -189,10 +188,9 @@ $(function(){
         // Append public holiday legend
         publicHolidays.reverse().forEach(function(item) {
             $('.js-public-holiday').append(`
-                <div class="legend-item">
-                    <div class="legend-item-label">
-                        <span style="color: red">${formatDate(item.start)}</span> : ${item.holiday_name}
-                    </div>
+                <div class="cal-holiday-row">
+                    <span class="cal-holiday-date">${formatDate(item.start)}</span>
+                    <span class="cal-holiday-name">${item.holiday_name}</span>
                 </div>
             `);
         });
