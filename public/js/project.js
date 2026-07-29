@@ -304,6 +304,26 @@ $(function(){
         getReviewerForm(_formEngineer, _formReviewer);
     });
 
+    // A single modal is reused for both the loading spinner and the detail
+    // content — its content is swapped in place instead of hiding one
+    // Bootstrap modal and showing another. Two stacked modal instances
+    // don't hide/show reliably back-to-back (Bootstrap's backdrop/body-lock
+    // bookkeeping gets left inconsistent, especially when the AJAX call
+    // resolves faster than the first modal's show transition), which caused
+    // the loading state to get stuck or the detail card to never appear.
+    //
+    // Bootstrap's modal.show() is also a silent no-op while this same element
+    // is still mid-transition from closing a previous item (its internal
+    // _isTransitioning flag stays true for the whole fade-out, which is
+    // longer than the `show` class stays on the element) — clicking the next
+    // row right after closing the previous card would otherwise do nothing.
+    // hide.bs.modal/hidden.bs.modal bracket that exact window, so track it
+    // instead of guessing from timing.
+    var isWorkItemDetailModalClosing = false;
+    $('#workItemDetailModal')
+        .on('hide.bs.modal', function () { isWorkItemDetailModalClosing = true; })
+        .on('hidden.bs.modal', function () { isWorkItemDetailModalClosing = false; });
+
     $(document).on('click', '.js-open-work-item-detail', function(){
         var _workItemId = $(this).data('work-item-id');
         if(!_workItemId) return;
@@ -311,39 +331,40 @@ $(function(){
         var template = $('#js-template-modal-work-item-detail').html();
         Mustache.parse(template);
 
-        // A single modal is reused for both the loading spinner and the detail
-        // content — its content is swapped in place instead of hiding one
-        // Bootstrap modal and showing another. Two stacked modal instances
-        // don't hide/show reliably back-to-back (Bootstrap's backdrop/body-lock
-        // bookkeeping gets left inconsistent, especially when the AJAX call
-        // resolves faster than the first modal's show transition), which caused
-        // the loading state to get stuck or the detail card to never appear.
         var $modal = $('#workItemDetailModal');
         var $dialog = $modal.find('.js-work-item-detail-dialog');
         var $content = $modal.find('.js-work-item-detail-content');
 
-        $dialog.removeClass('modal-lg').addClass('modal-sm modal-dialog-centered');
-        $content.html('<div class="modal-body text-center"><div class="loading-spinner mb-2"></div><div>Loading work item detail...</div></div>');
-        $modal.modal('show');
+        function openWorkItemDetailModal() {
+            $dialog.removeClass('modal-lg').addClass('modal-sm modal-dialog-centered');
+            $content.html('<div class="modal-body text-center"><div class="loading-spinner mb-2"></div><div>Loading work item detail...</div></div>');
+            $modal.modal('show');
 
-        $.ajax({
-            url: '/work-items/' + _workItemId + '/detail-modal',
-            method: 'GET',
-            success: function (result){
-                if(result.status === 200){
-                    var _rendered = Mustache.render(template, result.data);
-                    $dialog.removeClass('modal-sm modal-dialog-centered').addClass('modal-lg');
-                    $content.html(_rendered);
-                } else {
-                    notification('danger', result.message || 'Failed to load work item detail', 'fa fa-warning', 'Error');
+            $.ajax({
+                url: '/work-items/' + _workItemId + '/detail-modal',
+                method: 'GET',
+                success: function (result){
+                    if(result.status === 200){
+                        var _rendered = Mustache.render(template, result.data);
+                        $dialog.removeClass('modal-sm modal-dialog-centered').addClass('modal-lg');
+                        $content.html(_rendered);
+                    } else {
+                        notification('danger', result.message || 'Failed to load work item detail', 'fa fa-warning', 'Error');
+                        $modal.modal('hide');
+                    }
+                },
+                error: function(){
+                    notification('danger', 'Failed to load work item detail', 'fa fa-warning', 'Error');
                     $modal.modal('hide');
                 }
-            },
-            error: function(){
-                notification('danger', 'Failed to load work item detail', 'fa fa-warning', 'Error');
-                $modal.modal('hide');
-            }
-        });
+            });
+        }
+
+        if (isWorkItemDetailModalClosing) {
+            $modal.one('hidden.bs.modal', openWorkItemDetailModal);
+        } else {
+            openWorkItemDetailModal();
+        }
     });
 
 
