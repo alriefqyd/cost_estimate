@@ -11,16 +11,18 @@ export default function WorkItemSearch({ onSelect, onClose }) {
     const [results, setResults] = useState([])
     const [hasMore, setHasMore] = useState(false)
     const [loading, setLoading] = useState(false)
-    const inputRef  = useRef(null)
-    const listRef   = useRef(null)
-    const timerRef  = useRef(null)
-    const abortRef  = useRef(null)
-    const offsetRef = useRef(0)
+    const inputRef   = useRef(null)
+    const listRef    = useRef(null)
+    const timerRef   = useRef(null)
+    const abortRef   = useRef(null)
+    const offsetRef  = useRef(0)
+    const loadingRef = useRef(false) // synchronous guard — `loading` state lags behind rapid-fire scroll events
 
     useEffect(() => { inputRef.current?.focus() }, [])
 
     const loadPage = useCallback((q, offset) => {
         abortRef.current?.abort()
+        loadingRef.current = true
 
         const cacheKey = `${q}::${offset}`
         if (pageCache.has(cacheKey)) {
@@ -28,6 +30,7 @@ export default function WorkItemSearch({ onSelect, onClose }) {
             setResults(prev => offset === 0 ? page.items : [...prev, ...page.items])
             setHasMore(page.hasMore)
             setLoading(false)
+            loadingRef.current = false
             return
         }
 
@@ -42,7 +45,7 @@ export default function WorkItemSearch({ onSelect, onClose }) {
                 setHasMore(page.hasMore)
             })
             .catch(e => { if (e.name !== 'AbortError') { if (offset === 0) setResults([]); setHasMore(false) } })
-            .finally(() => setLoading(false))
+            .finally(() => { setLoading(false); loadingRef.current = false })
     }, [])
 
     // Reset pagination and load the first page whenever the query changes (debounced)
@@ -56,10 +59,10 @@ export default function WorkItemSearch({ onSelect, onClose }) {
     }, [query, loadPage])
 
     const loadMore = useCallback(() => {
-        if (loading || !hasMore) return
+        if (loadingRef.current || !hasMore) return
         offsetRef.current += PAGE_SIZE
         loadPage(query.trim(), offsetRef.current)
-    }, [loading, hasMore, query, loadPage])
+    }, [hasMore, query, loadPage])
 
     const handleScroll = e => {
         const el = e.target
