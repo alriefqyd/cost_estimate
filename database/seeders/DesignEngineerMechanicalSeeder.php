@@ -6,6 +6,7 @@ use App\Models\Profile;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 /**
@@ -68,45 +69,78 @@ class DesignEngineerMechanicalSeeder extends Seeder
         $roleIds = $this->ensureRoles();
 
         foreach ($this->people as $person) {
-            $placeholderEmail = strtolower($person['user_name']) . '@placeholder.local';
+            try {
+                // One transaction per person: a mid-person failure never leaves an
+                // orphan `users` row behind (which is exactly what a previous run of
+                // the un-wrapped version did).
+                DB::transaction(function () use ($person, $roleIds) {
+                    $this->provision($person, $roleIds);
+                });
+                $this->command?->info("Provisioned {$person['full_name']} ({$person['user_name']})");
+            } catch (\Throwable $e) {
+                // Keep going with the rest of the list instead of aborting the whole run.
+                $this->command?->error("Skipped {$person['user_name']}: {$e->getMessage()}");
+            }
+        }
+    }
 
+    /**
+     * Idempotent provision of one engineer. Reconciles against whatever a prior
+     * (partial) run left behind:
+     *   - `users.user_name` is NOT unique (only `users.email` is), so we cannot
+     *     rely on firstOrCreate(['user_name' => ...]); match on the placeholder
+     *     email / an existing profile instead.
+     *   - An existing `profiles` row (unique on `email`) is re-linked to the user
+     *     rather than re-inserted.
+     */
+    private function provision(array $person, array $roleIds): void
+    {
+        // TODO: replace with the person's real corporate email if available —
+        // login uses user_name (see config/fortify.php), not email, but the
+        // `email` column is required and unique on both users and profiles.
+        $email = strtolower($person['user_name']) . '@placeholder.local';
+
+        $profile = Profile::where('email', $email)->first();
+
+        $user = $profile ? User::find($profile->user_id) : null;
+        $user = $user ?: User::where('user_name', $person['user_name'])
+            ->where('email', $email)
+            ->first();
+
+        if (!$user) {
             $user = User::firstOrCreate(
-                ['user_name' => $person['user_name']],
-                [
-                    // TODO: replace with the person's real corporate email if available —
-                    // login uses user_name (see config/fortify.php), not email, but the
-                    // `email` column is required and unique on profiles.
-                    'email'    => $placeholderEmail,
-                    'password' => Hash::make($person['password']),
-                ]
+                ['email' => $email],
+                ['user_name' => $person['user_name'], 'password' => Hash::make($person['password'])]
             );
+        }
 
-            if (!$user->profiles) {
-                $profile = new Profile();
-                $profile->user_id   = $user->id;
-                $profile->full_name = $person['full_name'];
-                $profile->position  = 'design_mechanical_engineer';
-                $profile->email     = $placeholderEmail;
-                $profile->save();
+        $profile = $profile ?: Profile::firstOrNew(['user_id' => $user->id]);
+        $profile->user_id   = $user->id;
+        $profile->full_name = $profile->full_name ?: $person['full_name'];
+        $profile->position  = 'design_mechanical_engineer';
+        $profile->email     = $profile->email ?: $email;
+        $profile->save();
+
+        // Keep the reverse pointer some parts of the app read (users.profile_id).
+        if ((int) $user->profile_id !== (int) $profile->id) {
+            $user->profile_id = $profile->id;
+            $user->save();
+        }
+
+        $existingRoleIds = $user->roles()->pluck('roles.id')->all();
+        $toAttach = array_diff($roleIds, $existingRoleIds);
+
+        if (!empty($toAttach)) {
+            $pivotData = [];
+            foreach ($toAttach as $roleId) {
+                $pivotData[$roleId] = [
+                    'created_by' => $this->adminUserId,
+                    'updated_by' => $this->adminUserId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
             }
-
-            $existingRoleIds = $user->roles()->pluck('roles.id')->all();
-            $toAttach = array_diff($roleIds, $existingRoleIds);
-
-            if (!empty($toAttach)) {
-                $pivotData = [];
-                foreach ($toAttach as $roleId) {
-                    $pivotData[$roleId] = [
-                        'created_by' => $this->adminUserId,
-                        'updated_by' => $this->adminUserId,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
-                }
-                $user->roles()->attach($pivotData);
-            }
-
-            $this->command?->info("Provisioned {$person['full_name']} ({$person['user_name']})");
+            $user->roles()->attach($pivotData);
         }
     }
 
