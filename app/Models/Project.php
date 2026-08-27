@@ -441,4 +441,25 @@ class Project extends Model
         return false;
     }
 
+    /**
+     * Combined pipeline-stage info for a discipline, used to render a single
+     * progress indicator (Draft -> In Review -> Approved/Rejected) instead of
+     * separate "estimate published?" and "approval status" badges.
+     *
+     * @return array{step:int,state:string,label:string}  step: 1=Draft, 2=In Review, 3=Approved/Rejected
+     */
+    public function getDisciplineStageInfo($discipline, $approvalStatus): array
+    {
+        if (!$this->getStatusEstimateDiscipline($discipline)) {
+            return ['step' => 1, 'state' => 'draft', 'label' => 'Draft'];
+        }
+        if ($approvalStatus == $this::REJECTED) {
+            return ['step' => 3, 'state' => 'rejected', 'label' => 'Rejected'];
+        }
+        if ($approvalStatus == $this::APPROVE) {
+            return ['step' => 3, 'state' => 'approved', 'label' => 'Approved'];
+        }
+        return ['step' => 2, 'state' => 'review', 'label' => 'Publish and In Review'];
+    }
+
 }
