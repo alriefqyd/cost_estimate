@@ -246,6 +246,22 @@ class EstimateAllDisciplineController extends Controller
         ]);
     }
 
+    private function fillEstimateRowFields(EstimateAllDiscipline $row, Request $request, WorkItemController $workItemController): void
+    {
+        $row->title                    = $request->workItemText ?? '';
+        $row->work_item_id             = $request->workItem;
+        $row->volume                   = $request->vol > 0 ? $request->vol : 1;
+        $row->labour_factorial         = $request->labourFactorial !== '' ? (float) $request->labourFactorial : null;
+        $row->equipment_factorial      = $request->equipmentFactorial !== '' ? (float) $request->equipmentFactorial : null;
+        $row->material_factorial       = $request->materialFactorial !== '' ? (float) $request->materialFactorial : null;
+        $row->labor_unit_rate          = $workItemController->strToFloat($request->labourUnitRate);
+        $row->labor_cost_total_rate    = $workItemController->strToFloat($request->totalRateManPowers) * $row->volume;
+        $row->tool_unit_rate           = $workItemController->strToFloat($request->equipmentUnitRate);
+        $row->tool_unit_rate_total     = $workItemController->strToFloat($request->totalRateEquipments) * $row->volume;
+        $row->material_unit_rate       = $workItemController->strToFloat($request->materialUnitRate);
+        $row->material_unit_rate_total = $workItemController->strToFloat($request->totalRateMaterials) * $row->volume;
+    }
+
     public function autosave(Project $project, Request $request): JsonResponse
     {
         if (!$project->isDesignEngineer() && !$this->isAdmin()) {
@@ -291,19 +307,30 @@ class EstimateAllDisciplineController extends Controller
             // Always stamp the uid (assigns one to migrated old rows)
             $row->unique_identifier = $uniqueIdentifier;
 
-            $row->title                   = $request->workItemText ?? '';
-            $row->work_item_id            = $request->workItem;
-            $row->volume                  = $request->vol > 0 ? $request->vol : 1;
-            $row->labour_factorial        = $request->labourFactorial !== '' ? (float) $request->labourFactorial : null;
-            $row->equipment_factorial     = $request->equipmentFactorial !== '' ? (float) $request->equipmentFactorial : null;
-            $row->material_factorial      = $request->materialFactorial !== '' ? (float) $request->materialFactorial : null;
-            $row->labor_unit_rate         = $workItemController->strToFloat($request->labourUnitRate);
-            $row->labor_cost_total_rate   = $workItemController->strToFloat($request->totalRateManPowers) * $row->volume;
-            $row->tool_unit_rate          = $workItemController->strToFloat($request->equipmentUnitRate);
-            $row->tool_unit_rate_total    = $workItemController->strToFloat($request->totalRateEquipments) * $row->volume;
-            $row->material_unit_rate      = $workItemController->strToFloat($request->materialUnitRate);
-            $row->material_unit_rate_total = $workItemController->strToFloat($request->totalRateMaterials) * $row->volume;
-            $row->save();
+            $this->fillEstimateRowFields($row, $request, $workItemController);
+
+            try {
+                $row->save();
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Lost a race: another concurrent autosave for the same uid inserted first
+                // (DB now enforces uniqueness on project_id+unique_identifier). Fall back to
+                // updating that row instead of failing, so we never end up with two rows.
+                if (!$isNew || $uniqueIdentifier === '' || (string) $e->getCode() !== '23000') {
+                    throw $e;
+                }
+
+                $row = EstimateAllDiscipline::where('project_id', $project->id)
+                    ->where('unique_identifier', $uniqueIdentifier)
+                    ->firstOrFail();
+
+                if ($row->scope_owner_id && !$this->isAdmin() && $row->work_scope !== $position) {
+                    DB::rollBack();
+                    return response()->json(['status' => 403, 'message' => 'Not authorized to edit this item']);
+                }
+
+                $this->fillEstimateRowFields($row, $request, $workItemController);
+                $row->save();
+            }
 
             $payload = $this->buildBroadcastPayload($row->load('workItems'));
             try {
