@@ -151,12 +151,30 @@
                                         <p class="font-weight-bold" style="color: black"> Design Engineer </p>
                                     </td>
                                 </tr>
+                                @php
+                                    $civilStage      = $project->getDisciplineStageInfo('design_engineer_civil', $project->civil_approval_status);
+                                    $mechanicalStage = $project->getDisciplineStageInfo('design_engineer_mechanical', $project->mechanical_approval_status);
+                                    $architectStage  = $project->getDisciplineStageInfo('design_engineer_architect', $project->architect_approval_status);
+                                    $electricalStage = $project->getDisciplineStageInfo('design_engineer_electrical', $project->electrical_approval_status);
+                                    $instrumentStage = $project->getDisciplineStageInfo('design_engineer_instrument', $project->instrument_approval_status);
+                                    $itStage         = $project->getDisciplineStageInfo('design_engineer_it', $project->it_approval_status);
+
+                                    // Assigned discipline reviewer (the only user who can approve/reject that discipline).
+                                    $reviewerName = fn ($approverId) => $approverId ? optional($project->getProfileUser($approverId))->full_name : null;
+                                    $civilReviewer      = $reviewerName($project->civil_approver);
+                                    $mechanicalReviewer = $reviewerName($project->mechanical_approver);
+                                    $architectReviewer  = $reviewerName($project->architect_approver);
+                                    $electricalReviewer = $reviewerName($project->electrical_approver);
+                                    $instrumentReviewer = $reviewerName($project->instrument_approver);
+                                    $itReviewer         = $reviewerName($project->it_approver);
+                                @endphp
+                                <tbody class="de-approval-rows">
                                 <tr>
                                     <td id="tour-reviewer-icon">
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil && $project->getStatusEstimateDiscipline('design_engineer_civil') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil && $project->getStatusEstimateDiscipline('design_engineer_civil') ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['civil']}}" {!! $isAuthorizeToReviewCivil && $civilStage['step'] >= 2 ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{!! $isAuthorizeToReviewCivil && $civilStage['step'] >= 2 ? 'js-modal-approval cursor-pointer' : 'color-grey'!!}  m-r-10" style="width: 17px"></i>
                                         Civil
                                         @if(isset($project->design_engineer_civil))
-                                            {!!$project->getStatusApprovalDiscipline($project->civil_approval_status, $project->getProfileUser($project->civil_approver)?->full_name) !!}
+                                            @include('project.partials.discipline_stage_progress', ['stage' => $civilStage, 'reviewer' => $civilReviewer])
                                         @endif
                                     </td>
                                     <td>:</td>
@@ -169,10 +187,10 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['mechanical']}}" {!! $isAuthorizeToReviewMechanical && $project->getStatusEstimateDiscipline('design_engineer_mechanical') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewMechanical && $project->getStatusEstimateDiscipline('design_engineer_mechanical')? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px" ></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['mechanical']}}" {!! $isAuthorizeToReviewMechanical && $mechanicalStage['step'] >= 2 ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewMechanical && $mechanicalStage['step'] >= 2 ? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px" ></i>
                                             Mechanical
                                         @if(isset($project->design_engineer_mechanical))
-                                            {!! $project->getStatusApprovalDiscipline($project->mechanical_approval_status, $project->getProfileUser($project->mechanical_approver)?->full_name) !!}
+                                            @include('project.partials.discipline_stage_progress', ['stage' => $mechanicalStage, 'reviewer' => $mechanicalReviewer])
                                         @endif
 
                                     </td>
@@ -186,10 +204,10 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['architect']}}" {!! $isAuthorizeToReviewArchitect && $project->getStatusEstimateDiscipline('design_engineer_architect') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewArchitect && $project->getStatusEstimateDiscipline('design_engineer_architect')? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px" ></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['architect']}}" {!! $isAuthorizeToReviewArchitect && $architectStage['step'] >= 2 ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewArchitect && $architectStage['step'] >= 2 ? 'js-modal-approval  cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px" ></i>
                                         Architecture
                                         @if(isset($project->design_engineer_architect))
-                                            {!! $project->getStatusApprovalDiscipline($project->architect_approval_status, $project->getProfileUser($project->architect_approver)?->full_name) !!}
+                                            @include('project.partials.discipline_stage_progress', ['stage' => $architectStage, 'reviewer' => $architectReviewer])
                                         @endif
 
                                     </td>
@@ -203,10 +221,10 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['electrical']}}" {!! $isAuthorizeToReviewElectrical && $project->getStatusEstimateDiscipline('design_engineer_electrical')? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!}  class="{!! $isAuthorizeToReviewElectrical && $project->getStatusEstimateDiscipline('design_engineer_electrical')? 'js-modal-approval cursor-pointer' : 'color-grey'!!} m-r-10" style="width: 17px"></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['electrical']}}" {!! $isAuthorizeToReviewElectrical && $electricalStage['step'] >= 2 ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!}  class="{!! $isAuthorizeToReviewElectrical && $electricalStage['step'] >= 2 ? 'js-modal-approval cursor-pointer' : 'color-grey'!!} m-r-10" style="width: 17px"></i>
                                         Electrical
                                         @if(isset($project->design_engineer_electrical))
-                                            {!!$project->getStatusApprovalDiscipline($project->electrical_approval_status,$project->getProfileUser($project->electrical_approver)?->full_name) !!}
+                                            @include('project.partials.discipline_stage_progress', ['stage' => $electricalStage, 'reviewer' => $electricalReviewer])
                                         @endif
                                     </td>
                                     <td>:</td>
@@ -219,10 +237,10 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewInstrument && $project->getStatusEstimateDiscipline('design_engineer_instrument') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewInstrument && $project->getStatusEstimateDiscipline('design_engineer_instrument')? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['instrument']}}" {!! $isAuthorizeToReviewInstrument && $instrumentStage['step'] >= 2 ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewInstrument && $instrumentStage['step'] >= 2 ? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
                                             Instrument
                                         @if(isset($project->design_engineer_instrument))
-                                            {!!$project->getStatusApprovalDiscipline($project->instrument_approval_status, $project->getProfileUser($project->instrument_approver)?->full_name) !!}
+                                            @include('project.partials.discipline_stage_progress', ['stage' => $instrumentStage, 'reviewer' => $instrumentReviewer])
                                         @endif
                                     </td>
                                     <td>:</td>
@@ -235,10 +253,10 @@
                                 </tr>
                                 <tr>
                                     <td>
-                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['it']}}" {!! $isAuthorizeToReviewIt && $project->getStatusEstimateDiscipline('design_engineer_it') ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewIt && $project->getStatusEstimateDiscipline('design_engineer_it')? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
+                                        <i data-feather="user-check" data-discipline="{{\App\Models\Setting::DESIGN_ENGINEER_LIST['it']}}" {!! $isAuthorizeToReviewIt && $itStage['step'] >= 2 ? 'data-bs-toggle="modal" data-bs-target=".js-modal-approve-discipline"' : ''!!} class="{{$isAuthorizeToReviewIt && $itStage['step'] >= 2 ? 'js-modal-approval cursor-pointer' : 'color-grey'}} m-r-10" style="width: 17px"></i>
                                         IT
                                         @if(isset($project->design_engineer_it))
-                                            {!!$project->getStatusApprovalDiscipline($project->it_approval_status, $project->getProfileUser($project->it_approver)?->full_name) !!}
+                                            @include('project.partials.discipline_stage_progress', ['stage' => $itStage, 'reviewer' => $itReviewer])
                                         @endif
                                     </td>
                                     <td>:</td>
@@ -249,6 +267,7 @@
                                         @endif
                                     </td>
                                 </tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>

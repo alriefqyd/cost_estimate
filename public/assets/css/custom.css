@@ -2165,6 +2165,33 @@ custom-checkbox:checked:before {
 .pill-draft    { background: #fff3e0; color: #e65c00; }
 .pill-reviewed { background: #e8f5e9; color: #2e7d32; }
 .pill-approved { background: #e3f2fd; color: #1565c0; }
+
+/* ── Per-discipline estimate pipeline stepper (project detail page) ─────── */
+/* Draft -> In Review -> Approved/Rejected, mirrors the .step-item look above but inline/compact */
+.disc-progress-row { display: block; margin-top: 4px; margin-left: 27px; }
+.disc-progress { display: inline-flex; align-items: center; vertical-align: middle; }
+.disc-progress-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: #dee2e6; flex-shrink: 0; transition: background .2s;
+}
+.disc-progress-dot.is-done    { background: #3b7ddd; }
+.disc-progress-dot.is-current { background: #3b7ddd; box-shadow: 0 0 0 3px rgba(59, 125, 221, .25); }
+.disc-progress-dot-final.is-done     { background: #28a745; }
+.disc-progress-dot-final.is-rejected { background: #dc3545; }
+.disc-progress-bar { width: 12px; height: 2px; background: #dee2e6; flex-shrink: 0; }
+.disc-progress-bar.is-done     { background: #3b7ddd; }
+.disc-progress-bar.is-rejected { background: #dc3545; }
+.disc-progress-label { font-size: 11px; font-weight: 600; margin-left: 6px; }
+.disc-progress-label-draft    { color: #e65c00; }
+.disc-progress-label-review   { color: #3b7ddd; }
+.disc-progress-label-approved { color: #28a745; }
+.disc-progress-label-rejected { color: #dc3545; }
+/* Tighten the Design Engineer approval rows so the two-line (discipline + stepper)
+   cell reads as intentional rather than loosely spaced. */
+.de-approval-rows > tr > td { padding-top: .3rem; padding-bottom: .3rem; }
+.de-approval-rows .disc-progress-row { margin-top: 2px; }
+/* Drop the ":" and engineer-name columns to the bottom so they line up with the
+   stepper row rather than floating next to the discipline label. */
+.de-approval-rows > tr > td + td { vertical-align: bottom; }
 .kpi-progress {
     height: 3px; background: #f0f0f0; border-radius: 4px;
     margin-top: 12px; overflow: hidden;

@@ -134,9 +134,14 @@ class ProjectServices
                 return $q->where('work_scope','=','electrical');
             })->when($request->discipline == 'instrument', function($q){
                 return $q->where('work_scope','=','instrument');
-            })->where('project_id',$project->id)->get();
+            })->where('project_id',$project->id)->orderBy('id')->get();
 
-        return $data;
+        // Guard against duplicate rows sharing a unique_identifier (e.g. from a
+        // realtime autosave race) so they don't appear twice in exports/totals.
+        // Rows without a uid are never collapsed into each other.
+        return $data->unique(function ($row) {
+            return $row->unique_identifier ?: 'row-' . $row->id;
+        })->values();
     }
 
     /**
