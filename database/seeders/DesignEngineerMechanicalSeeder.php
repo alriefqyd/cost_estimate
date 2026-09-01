@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Hash;
  * One-off provisioning seeder: creates 9 "Design Engineer Mechanical" accounts.
  *
  * Access granted:
- *  - View-only: Material, Man Power (read role, no create/update/delete)
+ *  - View-only: Material, Man Power, Work Item (read role, no create/update/delete)
+ *  - View Cost Estimate Assignee (see projects where they are the assigned engineer)
+ *  - Create Cost Estimate (cost_estimate/create)
  *  - Full access to develop their own cost estimate (read/create/update on
  *    the Estimate Discipline feature). Note: this grants access to the
  *    Estimate Discipline *feature* generally — per-project scoping to their
@@ -157,6 +159,15 @@ class DesignEngineerMechanicalSeeder extends Seeder
             ['action' => 'read',   'feature' => 'estimate_discipline', 'name' => 'View Estimate Discipline'],
             ['action' => 'create', 'feature' => 'estimate_discipline', 'name' => 'Create Estimate Discipline'],
             ['action' => 'update', 'feature' => 'estimate_discipline', 'name' => 'Update Estimate Discipline'],
+
+            // View cost estimates assigned to them (ProjectPolicy::viewAny/view and
+            // User::isAssigneeCostEstimateRole() both match on this exact name —
+            // Role::ACTION_COST_ESTIMATE['read_assignee'] — so do NOT change it).
+            ['action' => 'read_assignee', 'feature' => 'cost_estimate', 'name' => 'View Cost Estimate Assignee'],
+            // View the Work Item list/detail (WorkItemPolicy, feature+action match).
+            ['action' => 'read',          'feature' => 'work_item',     'name' => 'View Work Item'],
+            // Create cost estimates (ProjectPolicy::create, feature+action match).
+            ['action' => 'create',        'feature' => 'cost_estimate', 'name' => 'Create Cost Estimate'],
         ];
 
         $ids = [];
@@ -165,6 +176,15 @@ class DesignEngineerMechanicalSeeder extends Seeder
                 ['action' => $def['action'], 'feature' => $def['feature']],
                 ['name' => $def['name']]
             );
+
+            // Backfill the name if an earlier run / another seeder created this
+            // action+feature row without one (Role::$fillable excludes 'name',
+            // but seeders run unguarded so this write still applies).
+            if (blank($role->name) && !blank($def['name'])) {
+                $role->name = $def['name'];
+                $role->save();
+            }
+
             $ids[] = $role->id;
         }
 
