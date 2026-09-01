@@ -436,6 +436,8 @@ class EstimateAllDisciplineController extends Controller
             $projectServices->setRejectedDisciplineToWaiting($project);
             $project->save();
 
+            $projectServices->notifyOtherEngineersOfDisciplinePublish($project, $position);
+
             DB::commit();
             return response()->json(['status' => 200, 'message' => 'Published successfully']);
         } catch (Exception $e) {

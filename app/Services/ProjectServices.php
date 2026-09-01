@@ -6,6 +6,7 @@ use App\Class\ProjectClass;
 use App\Class\ProjectTotalCostClass;
 use App\Exports\SummaryExport;
 use App\Mail\DisciplineApprovedMail;
+use App\Mail\DisciplinePublishedMail;
 use App\Mail\ReviewerDailyReminderMail;
 use App\Mail\ReviewerReassignedMail;
 use App\Mail\SendMail;
@@ -16,6 +17,7 @@ use App\Models\Profile;
 use App\Models\Project;
 use App\Models\Setting;
 use App\Models\User;
+use App\Notifications\DisciplinePublishedNotification;
 use App\Notifications\ProjectApprovedNotification;
 use App\Notifications\ProjectSubmittedForReviewNotification;
 use Illuminate\Http\Request;
@@ -344,6 +346,103 @@ class ProjectServices
             }
         } catch (\Exception $e) {
             Log::error('DB notification failed (sendEmailToReviewer): ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Build a per-discipline status list for the "discipline published" email so every
+     * engineer can see what is still outstanding before the cost estimate can be
+     * downloaded to PDF (which needs every discipline published AND reviewer-approved).
+     *
+     * @return array<int, array{label:string, designLabel:string, isPublished:bool, reviewLabel:string, outstanding:bool}>
+     */
+    public function buildDisciplineStatusSummary(Project $project): array
+    {
+        $statuses = collect(json_decode($project->estimate_discipline_status ?? '[]'));
+
+        $rows = [];
+        foreach ($statuses as $entry) {
+            $position = $entry->position ?? '';
+            $key      = str_replace('design_engineer_', '', $position);
+            $label    = Setting::DESIGN_ENGINEER_LIST[$key] ?? ucfirst($key ?: 'Unknown');
+
+            $isPublished = strtoupper($entry->status ?? 'DRAFT') === 'PUBLISH';
+
+            $approvalCol = $key . '_approval_status';
+            $approvalRaw = $project->$approvalCol ?? '';
+
+            if (!$isPublished) {
+                $reviewLabel = 'Not published yet';
+                $outstanding = true;
+            } elseif ($approvalRaw === Project::APPROVE) {
+                $reviewLabel = 'Approved by reviewer';
+                $outstanding = false;
+            } elseif ($approvalRaw === Project::REJECTED) {
+                $reviewLabel = 'Rejected — needs rework';
+                $outstanding = true;
+            } else {
+                $reviewLabel = 'Waiting for reviewer approval';
+                $outstanding = true;
+            }
+
+            $rows[] = [
+                'label'       => $label,
+                'designLabel' => $isPublished ? 'Published' : 'Draft',
+                'isPublished' => $isPublished,
+                'reviewLabel' => $reviewLabel,
+                'outstanding' => $outstanding,
+            ];
+        }
+
+        return $rows;
+    }
+
+    public function notifyOtherEngineersOfDisciplinePublish(Project $project, string $publishedDiscipline): void
+    {
+        $publisher     = auth()->user();
+        $publisherName = $publisher?->profiles?->full_name ?? $publisher?->user_name ?? 'An engineer';
+
+        $disciplineStatuses = $this->buildDisciplineStatusSummary($project);
+
+        $notifiedUserIds = [];
+
+        foreach (Setting::DESIGN_ENGINEER_LIST_DB_COLUMN as $key => $column) {
+            if ($key === strtolower($publishedDiscipline)) continue;
+
+            $engineerUserId = $project->$column;
+            if (empty($engineerUserId)) continue;
+            if ($engineerUserId === $publisher?->id) continue;
+            if (in_array($engineerUserId, $notifiedUserIds)) continue;
+            $notifiedUserIds[] = $engineerUserId;
+
+            $profile = Profile::where('user_id', $engineerUserId)->first();
+            if ($profile && $profile->email) {
+                try {
+                    Mail::to($profile->email)->send(new DisciplinePublishedMail(
+                        $project,
+                        $profile->full_name,
+                        ucfirst($publishedDiscipline),
+                        $publisherName,
+                        $disciplineStatuses
+                    ));
+                    Log::info("Discipline published ({$publishedDiscipline}) email sent to: {$profile->email}");
+                } catch (\Exception $e) {
+                    Log::error("Failed to send discipline published email for {$publishedDiscipline}: " . $e->getMessage());
+                }
+            }
+
+            try {
+                $engineerUser = User::find($engineerUserId);
+                $engineerUser?->notify(new DisciplinePublishedNotification(
+                    $project->id,
+                    $project->project_no ?? '',
+                    $project->project_title,
+                    $publishedDiscipline,
+                    $publisherName
+                ));
+            } catch (\Exception $e) {
+                Log::error('DB notification failed (notifyOtherEngineersOfDisciplinePublish): ' . $e->getMessage());
+            }
         }
     }
 

@@ -95,7 +95,7 @@
                                 </p>
 
                                 <p style="text-align: center; margin: 25px 0;">
-                                    <a href="http://10.34.168.90:8080/project/{{ $project->id }}"
+                                    <a href="{{ url('project/' . $project->id) }}"
                                        style="padding: 12px 20px; background-color: #24695c; color: #fff; display: inline-block; border-radius: 4px; font-weight: 600; text-decoration: none;">
                                         View Cost Estimate Project
                                     </a>
